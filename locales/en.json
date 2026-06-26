@@ -1,0 +1,627 @@
+{
+  "common": {
+    "appName": "FlowRate",
+    "flow": "Flow",
+    "rate": "Rate",
+    "or": "or",
+    "back": "Back",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "save": "Save",
+    "add": "Add",
+    "create": "Create",
+    "manage": "Manage",
+    "loading": "Loading...",
+    "viewAll": "View all",
+    "getStarted": "Get started",
+    "getStartedFree": "Get started free",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "settings": "Settings",
+    "account": "Account",
+    "freePlan": "Free Plan",
+    "pro": "Pro",
+    "copyright": "© {year} FlowRate. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "language": "Language",
+    "english": "English",
+    "french": "French"
+  },
+  "nav": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "overview": "Overview",
+    "transactions": "Transactions",
+    "accounts": "Accounts",
+    "subscriptions": "Subscriptions",
+    "budgets": "Budgets",
+    "spaces": "Spaces",
+    "family": "Family",
+    "company": "Company",
+    "myMoney": "My Money"
+  },
+  "spaceTypes": {
+    "INDEPENDENT": "Independent",
+    "HOUSEHOLD": "Household",
+    "FAMILY": "Family",
+    "COMPANY": "Company"
+  },
+  "auth": {
+    "social": {
+      "google": "Continue with Google",
+      "github": "Continue with GitHub"
+    },
+    "login": {
+      "title": "Sign in to FlowRate",
+      "noAccount": "Don't have an account?",
+      "createFree": "Create one free",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "you@example.com",
+      "passwordPlaceholder": "••••••••",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "errorInvalid": "Invalid email or password.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "errorOAuth": "Google or GitHub sign-in failed. Please try again."
+    },
+    "register": {
+      "title": "Create your FlowRate account",
+      "hasAccount": "Already have an account?",
+      "name": "Full name",
+      "namePlaceholder": "Alex Johnson",
+      "confirmPassword": "Confirm password",
+      "passwordPlaceholder": "Min. 8 characters",
+      "proBadge": "Starting with Pro plan",
+      "termsPrefix": "By creating an account, you agree to our",
+      "termsOfService": "Terms of Service",
+      "termsAnd": "and",
+      "privacyPolicy": "Privacy Policy",
+      "submit": "Create account",
+      "errorGeneric": "Failed to create account. Please try again.",
+      "inviteTitle": "Join {spaceName}",
+      "inviteDescription": "You've been invited as {role}."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "remember": "Remember your password?",
+      "checkEmailTitle": "Check your email",
+      "checkEmailDescription": "If an account exists for that address, we sent a link to reset your password.",
+      "submit": "Send reset link",
+      "errorGeneric": "Failed to send reset email. Please try again."
+    }
+  },
+  "landing": {
+    "heroTagline": "Your Financial Operating System",
+    "heroTitle": "Finance for everyone who runs things",
+    "heroSubtitle": "Finance designed for thoughtful people.",
+    "heroDescription": "Manage Independent, Household, Family, and Company identities in one calm, intelligent platform — where geometry replaces clutter and clarity replaces noise.",
+    "seeHow": "See how it works",
+    "heroCards": {
+      "balance": "Balance",
+      "shared": "Shared",
+      "allowance": "Allowance",
+      "runway": "Runway",
+      "independent": { "metric": "$12,480" },
+      "household": { "metric": "$28,340" },
+      "family": { "metric": "$420 / mo" },
+      "company": { "metric": "14 mo" }
+    },
+    "testimonials": {
+      "title": "Quiet confidence",
+      "description": "Thoughtful people, calmer finances.",
+      "one": {
+        "quote": "Finally, software that treats money with the same care I do. FlowRate feels like opening a well-edited book — not a spreadsheet.",
+        "author": "Elena Laurent",
+        "role": "Independent consultant"
+      },
+      "two": {
+        "quote": "We stopped arguing about accounts. Household and personal live in separate spaces, but we still see what matters together.",
+        "author": "Marcus & Riya",
+        "role": "Household space"
+      },
+      "three": {
+        "quote": "Burn rate, runway, subscriptions — all in one view that doesn't shout at me. It's the operating system my company deserved.",
+        "author": "Sofia Chen",
+        "role": "Solo founder"
+      }
+    },
+    "howItWorks": {
+      "title": "How FlowRate works",
+      "description": "Three steps from scattered accounts to a clear financial picture.",
+      "steps": {
+        "connect": {
+          "title": "Connect your banks",
+          "description": "Link personal, joint, or business accounts securely via Stripe. Your credentials never touch our servers."
+        },
+        "organize": {
+          "title": "Organize into Spaces",
+          "description": "Independent, Household, Family, or Company — each space keeps its own accounts, budgets, and permissions."
+        },
+        "act": {
+          "title": "Act with confidence",
+          "description": "Track burn rate, catch duplicate SaaS, split expenses, and teach teens to save — all from one intelligent dashboard."
+        }
+      }
+    },
+    "spacesTitle": "Built for how you actually live and work",
+    "spacesDescription": "Most finance apps assume one life. FlowRate knows you wear multiple hats — and gives each hat its own space without losing the big picture.",
+    "featuresTitle": "Built different from passive trackers",
+    "featuresDescription": "FlowRate doesn't just record what happened. It protects, predicts, and adapts to how you actually manage money.",
+    "pricingTitle": "Plans for every stage",
+    "pricingDescription": "Each tier is designed for a specific kind of money manager. Start free, upgrade when your life or business grows.",
+    "ctaTitle": "Your money. Your spaces. One flow.",
+    "ctaDescription": "Whether you're a founder tracking burn rate, a couple splitting groceries, or a parent teaching a teen to save — FlowRate adapts to you.",
+    "ctaButton": "Create free account",
+    "audiences": {
+      "independent": {
+        "title": "Independent",
+        "description": "Just you — personal accounts, side income, subscriptions, and savings goals in one clean view."
+      },
+      "household": {
+        "title": "Household",
+        "description": "Couples and roommates — mix joint and separate accounts, set shared budgets, and split recurring bills fairly."
+      },
+      "family": {
+        "title": "Family",
+        "description": "Parents and guardians — manage the household, set allowances, create savings jars, and give teens supervised access."
+      },
+      "company": {
+        "title": "Company",
+        "description": "Solo founders and freelancers — monitor burn rate, runway, SaaS waste, and cloud spend alongside personal money."
+      }
+    },
+    "features": {
+      "spaces": {
+        "title": "Financial Spaces",
+        "description": "Switch between Independent, Household, Family, and Company contexts. One login, every hat you wear."
+      },
+      "accounts": {
+        "title": "Any Account Setup",
+        "description": "Connect banks as personal or shared. Mix joint and separate accounts — FlowRate aggregates what you choose to share."
+      },
+      "saasShield": {
+        "title": "SaaS Shield",
+        "description": "Detect duplicate subscriptions, price hikes, and wasted seats across personal and business spend."
+      },
+      "burnRate": {
+        "title": "Burn Rate & Runway",
+        "description": "Company spaces show monthly burn, cash runway, and cloud/dev-tool spend — built for founders."
+      },
+      "teen": {
+        "title": "Teen & Child Accounts",
+        "description": "Allowances, savings jars, spending limits, and teen logins with guardian oversight."
+      },
+      "ai": {
+        "title": "AI Categorization",
+        "description": "Every transaction categorized automatically. Forecast cash flow before month-end surprises."
+      }
+    },
+    "pricing": {
+      "bestForLabel": "Best for",
+      "free": {
+        "name": "Free",
+        "price": "$0",
+        "target": "Individuals getting started",
+        "targetDetail": "Track personal finances without paying a cent — ideal for your first budget.",
+        "bestFor": {
+          "personal": "Personal budgeting",
+          "starter": "First-time money trackers",
+          "student": "Students & early career"
+        },
+        "description": "Independent space, get started free.",
+        "cta": "Get started free",
+        "features": {
+          "space": "1 Independent space",
+          "bank": "1 bank connection",
+          "dashboard": "Basic dashboard",
+          "export": "CSV export"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$12",
+        "period": "/month",
+        "target": "Freelancers, founders & couples",
+        "targetDetail": "When personal and professional money overlap — or when you share finances with a partner.",
+        "bestFor": {
+          "freelancer": "Freelancers & consultants",
+          "founder": "Solo founders & side projects",
+          "couple": "Couples with shared budgets"
+        },
+        "description": "For freelancers and founders who mean business.",
+        "badge": "Most popular",
+        "cta": "Start Pro trial",
+        "features": {
+          "spaces": "Unlimited spaces (Household, Family, Company)",
+          "banks": "Unlimited bank connections",
+          "shield": "SaaS Shield & burn rate",
+          "ai": "AI categorization",
+          "teen": "Teen accounts",
+          "cloud": "Cloud spend tracking"
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "$49",
+        "period": "/month",
+        "target": "Teams & growing companies",
+        "targetDetail": "Multiple people managing company money with roles, audit trails, and priority support.",
+        "bestFor": {
+          "team": "Small finance teams",
+          "agency": "Agencies & studios",
+          "growing": "Growing LLCs with staff"
+        },
+        "description": "Teams and growing companies.",
+        "cta": "Contact us",
+        "features": {
+          "pro": "Everything in Pro",
+          "members": "Up to 10 company members",
+          "roles": "Role-based access",
+          "audit": "Audit-ready exports",
+          "support": "Priority support"
+        }
+      }
+    }
+  },
+  "dashboard": {
+    "overview": {
+      "title": "Overview",
+      "subtitle": "{name} financial snapshot for this month",
+      "members": "{count} members",
+      "combined": "Combined",
+      "sharedAccounts": "Shared accounts",
+      "yourPersonal": "Your personal",
+      "recentTransactions": "Recent Transactions",
+      "accounts": "Accounts",
+      "noAccounts": "No accounts connected",
+      "connectBank": "Connect a bank",
+      "saasAlerts": "SaaS Shield Alerts",
+      "reviewSubscriptions": "Review all subscriptions",
+      "stats": {
+        "totalBalance": "Total Balance",
+        "monthlySpending": "Monthly Spending",
+        "monthlyIncome": "Monthly Income",
+        "netSavings": "Net Savings"
+      }
+    },
+    "accounts": {
+      "title": "Accounts",
+      "count": "{count} accounts · Total {total}",
+      "connectBank": "Connect bank",
+      "connectPersonal": "Connect as personal",
+      "connectShared": "Connect as shared",
+      "filterAll": "All visible",
+      "filterShared": "Shared only",
+      "filterPersonal": "Personal only",
+      "filterMine": "Mine",
+      "emptyTitle": "No accounts connected",
+      "emptyDescription": "Connect personal or shared bank accounts. In Household and Family spaces, you choose what guardians can see.",
+      "connectFirst": "Connect your first bank",
+      "shared": "Shared",
+      "personal": "Personal",
+      "connectedBy": "Connected by {name}",
+      "mixedAccountsTitle": "Mixed & separate accounts",
+      "mixedAccountsDescription": "Each member connects their own banks. Tag accounts as Personal (only you) or Shared (visible to guardians). Company spaces work the same way for founders and team members.",
+      "synced": "Synced {time}",
+      "syncedJustNow": "just now",
+      "syncedMinutes": "{count}m ago",
+      "syncedHours": "{count}h ago",
+      "syncedDays": "{count}d ago",
+      "notSynced": "Not yet synced",
+      "stripeNote": "Powered by Stripe Financial Connections",
+      "stripeDescription": "Your bank credentials are never stored. FlowRate uses Stripe's secure, read-only bank link to sync balances and transactions.",
+      "connectError": "Failed to connect bank. Please try again.",
+      "stripeNotConfigured": "Stripe is not configured. Add STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY to your environment.",
+      "stripeTestModeTitle": "Stripe test mode",
+      "stripeTestModeDescription": "Only sandbox test banks appear with test API keys. To link real US bank accounts, switch to live keys on a deployed HTTPS site after Stripe approves your Financial Connections application."
+    },
+    "spaces": {
+      "title": "Financial Spaces",
+      "subtitle": "Independent, Household, Family, or Company — manage each context separately.",
+      "newSpace": "New space",
+      "createTitle": "Create a financial space",
+      "nameLabel": "Space name",
+      "namePlaceholder": "e.g. Johnson Family, Acme LLC",
+      "typeLabel": "Type",
+      "members": "{count} members",
+      "accountCount": "{count} accounts",
+      "created": "Space created",
+      "createdDescription": "{name} is ready.",
+      "createFailed": "Failed to create space",
+      "tryAgain": "Try again",
+      "manageSpaces": "Manage spaces",
+      "types": {
+        "household": {
+          "label": "Household",
+          "description": "Couple finances — 1–2 guardians, shared budgets"
+        },
+        "family": {
+          "label": "Family",
+          "description": "Household + children & teens with supervision"
+        },
+        "company": {
+          "label": "Company",
+          "description": "Founders & freelancers — burn rate, SaaS Shield"
+        }
+      }
+    },
+    "onboarding": {
+      "welcome": "Welcome",
+      "title": "Who are you managing money for?",
+      "subtitle": "You can add more spaces anytime. Each keeps its own accounts and budgets.",
+      "spaceNameLabel": "Space name",
+      "getStarted": "Get started",
+      "types": {
+        "independent": {
+          "title": "Independent",
+          "description": "Just me — personal finances, side projects, freelance income."
+        },
+        "household": {
+          "title": "Household",
+          "description": "Me and my partner — shared budgets, separate or joint accounts."
+        },
+        "family": {
+          "title": "Family",
+          "description": "Household plus kids — allowances, teen accounts, supervision."
+        },
+        "company": {
+          "title": "Company",
+          "description": "My business — burn rate, SaaS Shield, cloud spend."
+        }
+      },
+      "defaultNames": {
+        "independent": "My Finances",
+        "household": "Our Household",
+        "family": "Our Family",
+        "company": "My Company"
+      }
+    },
+    "family": {
+      "title": "Family & Household",
+      "subtitle": "Manage guardians, children, and shared finances.",
+      "tabs": {
+        "members": "Members",
+        "children": "Children & Teens",
+        "splits": "Split Rules"
+      },
+      "inviteGuardian": "Invite co-guardian",
+      "sendInvite": "Send invite",
+      "membersTitle": "Members",
+      "addChildTitle": "Add child or teen",
+      "addChildDescription": "Teens get their own login. Younger children are guardian-managed.",
+      "childName": "Child's name",
+      "teenEmail": "Email (required for teen login)",
+      "roleChild": "Child (guardian-managed)",
+      "roleTeen": "Teen (own account)",
+      "allowance": "Allowance: {amount}",
+      "allowanceNotSet": "Not set",
+      "savingsJars": "{count} savings jars",
+      "splitsHint": "Configure how shared expenses are split between guardians in Settings → Split Rules.",
+      "displayNamePlaceholder": "Display name",
+      "emailPlaceholder": "partner@email.com",
+      "teenAccount": "Teen account",
+      "guardianManaged": "Guardian-managed",
+      "childFallback": "Child",
+      "accountSuffix": "{role} account",
+      "child": {
+        "title": "Allowance & supervision",
+        "allowanceAmount": "Allowance amount",
+        "frequency": "Frequency",
+        "learnMode": "Learn mode (simplified spending view)",
+        "jarsTitle": "Savings jars",
+        "jarPlaceholder": "New jar name",
+        "goal": "Goal: {amount}"
+      }
+    },
+    "company": {
+      "title": "Company Dashboard",
+      "subtitle": "Burn rate, runway, and SaaS waste — built for solo founders and freelancers.",
+      "switchHint": "Switch to a Company space or create one to view burn rate.",
+      "monthlyBreakdown": "Monthly breakdown",
+      "income": "Income",
+      "expenses": "Expenses",
+      "subscriptions": "Subscriptions",
+      "cloudDev": "Cloud & dev tools",
+      "saasShield": "SaaS Shield",
+      "activeSubs": "{count} active subscriptions detected.",
+      "duplicateWaste": "~{amount}/mo in duplicate seats.",
+      "reviewSubs": "Review subscriptions",
+      "stats": {
+        "cash": "Cash on hand",
+        "burn": "Monthly burn",
+        "runway": "Runway",
+        "waste": "SaaS waste",
+        "months": "{count} mo",
+        "infinite": "∞"
+      }
+    },
+    "teen": {
+      "greeting": "Hey, {name} 👋",
+      "greetingDefault": "Hey, there 👋",
+      "subtitle": "Your savings and goals",
+      "totalSaved": "Total saved",
+      "allowance": "Allowance: {amount} / {frequency}",
+      "jarsTitle": "Savings jars",
+      "noJars": "No savings jars yet. Ask your guardian to set one up!",
+      "learnModeTitle": "Learn mode",
+      "learnModeDescription": "Your spending is grouped into Needs, Wants, and Saved — ask your guardian for details."
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Manage your account and preferences",
+      "profile": "Profile",
+      "profileSaved": "Profile saved successfully.",
+      "fullName": "Full name",
+      "namePlaceholder": "Your name",
+      "email": "Email address",
+      "emailHelp": "Email is managed through Neon Auth. Change it in your account settings.",
+      "saveChanges": "Save changes",
+      "planBilling": "Plan & Billing",
+      "upgradeDescription": "Upgrade to Pro to unlock unlimited bank connections, SaaS Shield alerts, predictive cash flow, and export features.",
+      "upgradeCta": "Upgrade to Pro — $12/mo",
+      "manageDescription": "Manage your subscription, update payment method, or download invoices.",
+      "billingPortal": "Open billing portal",
+      "connectedServices": "Connected Services",
+      "github": "GitHub",
+      "githubDescription": "Track billing and usage spend",
+      "cloud": "AWS / Google Cloud",
+      "cloudDescription": "Cloud infrastructure spend tracking",
+      "connect": "Connect",
+      "dangerZone": "Danger Zone",
+      "deleteWarning": "Permanently delete your account and all associated data. This action cannot be undone.",
+      "deleteAccount": "Delete account",
+      "plans": {
+        "FREE": "Free",
+        "PRO": "Pro",
+        "ENTERPRISE": "Enterprise"
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "total": "{count} total transactions",
+      "exportCsv": "Export CSV",
+      "searchPlaceholder": "Search transactions...",
+      "all": "All",
+      "empty": "No transactions yet",
+      "pending": "Pending",
+      "columns": {
+        "date": "Date",
+        "description": "Description",
+        "category": "Category",
+        "account": "Account",
+        "amount": "Amount"
+      }
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Auto-detected SaaS subscriptions · Monthly total:",
+      "priceChangeTitle": "{count} price change detected",
+      "priceChangeTitlePlural": "{count} price changes detected",
+      "priceChangeDescription": "{names} {verb} changed pricing. Review now to avoid surprise charges.",
+      "priceChangeVerbSingular": "has",
+      "priceChangeVerbPlural": "have",
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "priceChanged": "Price changed",
+        "cancelled": "Cancelled"
+      },
+      "emptyTitle": "No subscriptions detected",
+      "emptyDescription": "Connect your bank accounts and FlowRate will automatically detect recurring subscriptions.",
+      "shieldTitle": "SaaS Shield is active",
+      "shieldDescription": "FlowRate monitors your subscriptions for price changes and unused services. You'll be notified immediately when something changes.",
+      "priceUp": "Price ↑",
+      "nextCharge": "Next: {date}",
+      "status": {
+        "ACTIVE": "Active",
+        "PAUSED": "Paused",
+        "CANCELLED": "Cancelled",
+        "PRICE_CHANGED": "Price changed"
+      },
+      "frequency": {
+        "WEEKLY": "/week",
+        "MONTHLY": "/month",
+        "YEARLY": "/year"
+      }
+    },
+    "budgets": {
+      "title": "Budgets",
+      "activeCount": "{count} active budgets",
+      "nearLimit": "· {count} near limit",
+      "newBudget": "New budget",
+      "emptyTitle": "No budgets set",
+      "emptyDescription": "Create spending limits by category to take control of your finances.",
+      "createFirst": "Create first budget",
+      "modalTitle": "New Budget",
+      "nameLabel": "Budget name",
+      "namePlaceholder": "e.g. Monthly groceries",
+      "categoryLabel": "Category",
+      "limitLabel": "Monthly limit ($)",
+      "periodLabel": "Period",
+      "createBudget": "Create budget",
+      "percentUsed": "{percent}% used",
+      "overBudget": "— over budget!"
+    }
+  },
+  "categories": {
+    "ALL": "All",
+    "FOOD": "Food",
+    "TRANSPORT": "Transport",
+    "SUBSCRIPTIONS": "Subscriptions",
+    "HOUSING": "Housing",
+    "UTILITIES": "Utilities",
+    "HEALTHCARE": "Healthcare",
+    "ENTERTAINMENT": "Entertainment",
+    "SHOPPING": "Shopping",
+    "SAVINGS": "Savings",
+    "INCOME": "Income",
+    "CLOUD_INFRA": "Cloud infra",
+    "DEVELOPER_TOOLS": "Developer tools",
+    "OTHER": "Other"
+  },
+  "frequencies": {
+    "WEEKLY": "Weekly",
+    "MONTHLY": "Monthly",
+    "YEARLY": "Yearly"
+  },
+  "roles": {
+    "GUARDIAN": "Guardian",
+    "CO_GUARDIAN": "Co-guardian",
+    "CHILD": "Child",
+    "TEEN": "Teen",
+    "OWNER": "Owner",
+    "MEMBER": "Member"
+  },
+  "memberStatus": {
+    "ACTIVE": "Active",
+    "PENDING": "Pending",
+    "INVITED": "Invited"
+  },
+  "accountTypes": {
+    "CHECKING": "Checking",
+    "SAVINGS": "Savings",
+    "CREDIT": "Credit",
+    "INVESTMENT": "Investment",
+    "CRYPTO": "Crypto",
+    "CLOUD": "Cloud"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "seoTitle": "Privacy Policy — FlowRate",
+      "lastUpdated": "Last updated: June 26, 2025",
+      "p1": "FlowRate collects information you provide when creating an account (such as your name and email) and financial data you choose to connect through our bank sync partners.",
+      "p2": "We use this data solely to provide and improve the service. We do not sell your personal information to third parties.",
+      "p3": "Bank credentials are never stored on our servers. Account connections are handled securely through Stripe Financial Connections.",
+      "p4": "You may request deletion of your account and associated data at any time by contacting"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "seoTitle": "Terms of Service — FlowRate",
+      "lastUpdated": "Last updated: June 26, 2025",
+      "p1": "By using FlowRate, you agree to these terms. FlowRate provides personal finance tracking tools including bank account sync, budgeting, and subscription monitoring.",
+      "p2": "You are responsible for maintaining the security of your account and for all activity under it. Do not use FlowRate for any unlawful purpose.",
+      "p3": "We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the updated terms.",
+      "p4": "Questions? Contact us at"
+    }
+  },
+  "validation": {
+    "passwordMismatch": "Passwords do not match"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Check your connection and try again.",
+    "badRequest": "Invalid request. Please check your input.",
+    "unauthorized": "You need to sign in to continue.",
+    "forbidden": "You don't have permission to do that.",
+    "notFound": "The requested resource was not found.",
+    "conflict": "This action conflicts with existing data.",
+    "validation": "Please check your input and try again.",
+    "rateLimit": "Too many requests. Please wait a moment.",
+    "server": "Server error. Please try again later.",
+    "unavailable": "Service temporarily unavailable.",
+    "codes": {}
+  }
+}

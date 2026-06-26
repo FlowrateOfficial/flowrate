@@ -1,0 +1,51 @@
+{
+  "name": "FlowRate",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "dev:all": "nuxt dev & pnpm stripe:listen",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
+    "build": "nuxt build",
+    "start": "node .output/server/index.mjs",
+    "preview": "nuxt preview",
+    "postinstall": "prisma generate && nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "db:push": "prisma db push",
+    "db:seed-spaces": "tsx prisma/seed-spaces.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@iconify-json/lucide": "^1.2.114",
+    "@iconify-json/simple-icons": "^1.2.86",
+    "@neondatabase/auth": "0.4.2-beta",
+    "@neondatabase/serverless": "^1.1.0",
+    "@nuxt/ui": "^4.9.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@prisma/adapter-neon": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "better-auth": "^1.6.20",
+    "jose": "^6.2.3",
+    "nuxt": "^4.4.8",
+    "nuxt-i18n-micro": "3.21.0",
+    "pinia": "^3.0.4",
+    "stripe": "^22.3.0",
+    "tailwindcss": "^4.3.1",
+    "vue-router": "^5.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.16.0",
+    "@stripe/cli": "^1.43.2",
+    "@types/node": "^26.0.1",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.5.0",
+    "prisma": "^7.8.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.5"
+  },
+  "packageManager": "pnpm@11.8.0"
+}
