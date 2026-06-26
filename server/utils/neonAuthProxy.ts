@@ -5,7 +5,7 @@
  * proxy, third-party cookies on the neonauth domain are blocked and OAuth appears
  * to succeed (user created) but the app never sees a session.
  */
-import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '../../shared/auth'
+import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 import { parseCookies, parseSetCookieHeader } from 'better-auth/cookies'
 import { SignJWT, jwtVerify } from 'jose'
 import type { H3Event } from 'h3'

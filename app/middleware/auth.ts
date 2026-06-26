@@ -1,4 +1,4 @@
-import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '../../shared/auth'
+import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 
 // Protects /dashboard/* — session from cookies; OAuth verifier exchanged by server middleware.
 export default defineNuxtRouteMiddleware(async (to) => {

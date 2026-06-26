@@ -13,7 +13,7 @@ import {
   tryOAuthSessionExchange
 } from '../utils/neonAuthProxy'
 
-export { NEON_AUTH_SESSION_VERIFIER_PARAM } from '../../shared/auth'
+export { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 export { getSocialOAuthRedirectUrl, tryOAuthSessionExchange }
 
 export interface AuthUser {

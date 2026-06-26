@@ -1,4 +1,4 @@
-import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '../../shared/auth'
+import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 
 /** Completes Google/GitHub OAuth when landing with neon_auth_session_verifier in the URL. */
 export default defineNuxtPlugin(async () => {
