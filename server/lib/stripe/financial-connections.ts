@@ -8,6 +8,7 @@ import {
   FINANCIAL_CONNECTIONS_PREFETCH
 } from '#shared/stripe-financial-connections'
 import { linkStripeCustomerToUser, resolveUserIdFromStripeCustomer } from './customer'
+import { resolveHttpsBaseUrl } from './client'
 import type { StripeLinkContext } from './types'
 
 export {
@@ -39,11 +40,8 @@ export async function createBankLinkSession(
   customerId: string,
   context: StripeLinkContext
 ) {
-  void event
-  void appUrl
-  void context
+  const returnBase = resolveHttpsBaseUrl(event, appUrl)
 
-  // NOTE - Web uses collectFinancialConnectionsAccounts modal; return_url is mobile webview only
   return stripe.financialConnections.sessions.create({
     account_holder: {
       type: 'customer',
@@ -51,7 +49,13 @@ export async function createBankLinkSession(
     },
     permissions: [...FINANCIAL_CONNECTIONS_PERMISSIONS],
     prefetch: [...FINANCIAL_CONNECTIONS_PREFETCH],
-    filters: { countries: [...FINANCIAL_CONNECTIONS_BANK_COUNTRIES] }
+    filters: { countries: [...FINANCIAL_CONNECTIONS_BANK_COUNTRIES] },
+    ...(returnBase ? { return_url: `${returnBase}/dashboard/accounts` } : {}),
+    metadata: {
+      userId: context.userId,
+      spaceId: context.spaceId,
+      visibility: context.visibility
+    }
   })
 }
 

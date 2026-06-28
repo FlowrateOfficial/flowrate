@@ -1270,7 +1270,8 @@
       "STRIPE_LIVEMODE_MISMATCH": "Un client Stripe en mode test est lié à ce compte. Déconnectez les anciennes banques ou contactez le support après le passage en live.",
       "STRIPE_FC_NOT_ENABLED": "Financial Connections n'est pas approuvé en mode live. Complétez la demande dans le Dashboard Stripe.",
       "STRIPE_FC_PERMISSION_DENIED": "Votre demande Financial Connections n'inclut pas les permissions soldes et transactions.",
-      "STRIPE_CONNECT_FAILED": "Impossible de démarrer la connexion bancaire. Vérifiez les clés live et les paramètres Financial Connections."
+      "STRIPE_CONNECT_FAILED": "Impossible de démarrer la connexion bancaire. Vérifiez les clés live et les paramètres Financial Connections.",
+      "NO_ACTIVE_SPACE": "Aucun espace financier actif. Ouvrez Espaces, sélectionnez un espace, puis réessayez."
     }
   }
 }

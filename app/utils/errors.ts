@@ -2,10 +2,30 @@
 type TranslateFn = (key: string, params?: Record<string, string | number>) => string
 
 interface FetchErrorLike {
-  data?: { message?: string; statusMessage?: string; code?: string }
+  data?: {
+    message?: string
+    statusMessage?: string
+    code?: string
+    data?: { message?: string, code?: string }
+  }
   statusCode?: number
   statusMessage?: string
   message?: string
+}
+
+function extractApiErrorPayload(error: FetchErrorLike): { code?: string, message?: string } {
+  const root = error.data
+  if (!root) return {}
+
+  if (root.data && typeof root.data === 'object') {
+    return root.data
+  }
+
+  if (root.code || root.message) {
+    return { code: root.code, message: root.message }
+  }
+
+  return {}
 }
 
 const STATUS_KEYS: Record<number, string> = {
@@ -28,10 +48,15 @@ export function resolveErrorMessage(
   if (!error) return t(fallbackKey)
 
   const err = error as FetchErrorLike & { code?: string }
-  const code = err.data?.code ?? err.code
+  const payload = extractApiErrorPayload(err)
+  const code = payload.code ?? err.data?.code ?? err.code ?? err.statusMessage
 
   if (code && t(`errors.codes.${code}`) !== `errors.codes.${code}`) {
     return t(`errors.codes.${code}`)
+  }
+
+  if (payload.message) {
+    return payload.message
   }
 
   const status = err.statusCode ?? (error as { status?: number }).status

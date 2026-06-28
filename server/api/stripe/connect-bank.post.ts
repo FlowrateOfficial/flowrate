@@ -23,8 +23,21 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
   }
 
-  const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
-  const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
+  let visibility: 'PERSONAL' | 'SHARED' = 'PERSONAL'
+  try {
+    const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
+    visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'VALIDATION_ERROR',
+        message: 'Invalid request body',
+        data: { code: 'VALIDATION_ERROR', message: 'Invalid request body' }
+      })
+    }
+    throw error
+  }
 
   try {
     const { config, stripe } = requireStripe(event)
@@ -58,6 +71,7 @@ export default defineEventHandler(async (event) => {
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
+    console.error('[stripe/connect-bank]', error)
     throwStripeApiError(error)
   }
 })

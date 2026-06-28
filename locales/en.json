@@ -1277,7 +1277,8 @@
       "STRIPE_LIVEMODE_MISMATCH": "A test-mode Stripe customer is linked to this account. Disconnect old banks or contact support after switching to live keys.",
       "STRIPE_FC_NOT_ENABLED": "Financial Connections is not approved for live mode. Complete Stripe's Financial Connections application in your Dashboard.",
       "STRIPE_FC_PERMISSION_DENIED": "Your Stripe Financial Connections application does not include balances and transactions permissions.",
-      "STRIPE_CONNECT_FAILED": "Could not start bank connection. Check Stripe live keys and Financial Connections settings."
+      "STRIPE_CONNECT_FAILED": "Could not start bank connection. Check Stripe live keys and Financial Connections settings.",
+      "NO_ACTIVE_SPACE": "No active financial space. Open Spaces and select a space, then try again."
     }
   }
 }

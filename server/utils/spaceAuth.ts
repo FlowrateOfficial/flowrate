@@ -171,7 +171,15 @@ export async function requireSpaceAccess(
   const spaceId = options?.spaceId ?? querySpaceId ?? headerSpaceId ?? await resolveActiveSpaceId(event, user.id)
 
   if (!spaceId) {
-    throw createError({ statusCode: 400, message: 'No active financial space' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'NO_ACTIVE_SPACE',
+      message: 'No active financial space',
+      data: {
+        code: 'NO_ACTIVE_SPACE',
+        message: 'No active financial space'
+      }
+    })
   }
 
   const membership = await getUserMembership(user.id, spaceId, {
