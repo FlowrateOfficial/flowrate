@@ -1,9 +1,9 @@
 import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 
-/** Routes a guardian-managed child (no own bank) may access. */
+// NOTE - Guardian-managed child routes (no own bank)
 const CHILD_ALLOWED_PREFIXES = ['/dashboard/teen', '/dashboard/settings']
 
-/** Routes a teen (own login + optional bank) may access. */
+// NOTE - Teen routes (own login, optional bank)
 const TEEN_ALLOWED_PREFIXES = [
   '/dashboard/teen',
   '/dashboard/accounts',
@@ -16,7 +16,7 @@ function isAllowedPath(path: string, prefixes: string[]) {
   return prefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`))
 }
 
-// Protects /dashboard/* — session from cookies; OAuth verifier exchanged by server middleware.
+// NOTE - Protects /dashboard/* — OAuth verifier exchanged by server middleware
 export default defineNuxtRouteMiddleware(async (to) => {
   const verifier = to.query[NEON_AUTH_SESSION_VERIFIER_PARAM]
 
@@ -55,7 +55,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     try {
       await userStore.fetchUser()
     } catch {
-      // Session exists but profile failed — layout can retry
+      // NOTE - Session exists but profile failed — layout can retry
     }
   }
 

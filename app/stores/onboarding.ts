@@ -1,4 +1,5 @@
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useOnboardingStore = defineStore('onboarding', () => {
   const { t } = useAppI18n()

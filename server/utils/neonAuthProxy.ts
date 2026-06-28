@@ -1,10 +1,4 @@
-/**
- * Same-origin Neon Auth proxy for Nuxt/Nitro.
- *
- * Neon Auth OAuth sets a session challenge on the auth origin. Without a local
- * proxy, third-party cookies on the neonauth domain are blocked and OAuth appears
- * to succeed (user created) but the app never sees a session.
- */
+// ANCHOR: Same-origin Neon Auth proxy — first-party session cookies for OAuth
 import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 import { parseCookies, parseSetCookieHeader } from 'better-auth/cookies'
 import { SignJWT, jwtVerify } from 'jose'
@@ -254,7 +248,7 @@ function appendSetCookies(event: H3Event, response: Response, cookieConfig: Cook
     for (const parsedCookie of parseSetCookies(cookieHeader)) {
       parsedCookie.sameSite = effectiveSameSite
       if (cookieConfig.domain) parsedCookie.domain = cookieConfig.domain
-      // __Secure- cookies need Secure on HTTPS; on local HTTP keep Secure for Chromium localhost.
+      // NOTE - __Secure- cookies stay Secure on HTTPS; relax on local HTTP except __Secure- prefix
       if (!isHttps && !parsedCookie.name.startsWith('__Secure-')) {
         parsedCookie.secure = false
       }
@@ -370,10 +364,7 @@ export async function proxyNeonAuthRequest(event: H3Event, path: string) {
   return handleAuthResponse(event, upstream, baseUrl, cookieConfig)
 }
 
-/**
- * Start OAuth and return the provider redirect URL (Google/GitHub).
- * Sets the session challenge cookie on the app origin before redirect.
- */
+// NOTE - Start OAuth — set challenge cookie on app origin, return provider redirect URL
 export async function getSocialOAuthRedirectUrl(
   event: H3Event,
   provider: 'google' | 'github',
@@ -478,7 +469,7 @@ export async function getSessionFromEvent(event: H3Event): Promise<SessionData |
       const sessionData = parseSessionData(payload)
       if (sessionData.session) return sessionData
     } catch {
-      // fall through to upstream
+      // NOTE - fall through to upstream session fetch
     }
   }
 

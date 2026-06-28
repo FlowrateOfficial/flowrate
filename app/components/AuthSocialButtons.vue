@@ -5,7 +5,7 @@ const route = useRoute()
 
 const isOAuthConfigured = computed(() => Boolean(config.public.neonAuthConfigured))
 
-/** Where to land after OAuth — supports ?redirect= on login/register pages */
+// NOTE - ?redirect= on login/register sets post-OAuth landing path
 const postAuthRedirect = computed(() => {
   const fromQuery = route.query.redirect
   if (typeof fromQuery === 'string' && fromQuery.startsWith('/')) {
@@ -20,7 +20,7 @@ const postAuthRedirect = computed(() => {
 
 <template>
   <div v-if="isOAuthConfigured" class="space-y-2">
-    <!-- Native form GET = guaranteed full-page navigation to server OAuth route -->
+    <!-- NOTE - Native form GET for full-page navigation to server OAuth route -->
     <form action="/auth/google" method="get" class="w-full">
       <input type="hidden" name="redirect" :value="postAuthRedirect">
       <button

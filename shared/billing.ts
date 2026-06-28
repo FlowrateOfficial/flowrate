@@ -1,8 +1,7 @@
-/** Application plan tiers (mirrors Prisma `Plan` enum). */
+// ANCHOR: App plan tiers and Stripe billing status mapping
 export const APP_PLANS = ['FREE', 'PRO', 'ENTERPRISE'] as const
 export type AppPlan = (typeof APP_PLANS)[number]
 
-/** Stripe subscription statuses that grant paid app access. */
 export const PAID_BILLING_STATUSES = new Set([
   'TRIALING',
   'ACTIVE',

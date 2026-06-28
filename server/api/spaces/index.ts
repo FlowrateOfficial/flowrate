@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { secureAppCookieOptions } from '../../lib/security/cookies'
 
 const createSpaceSchema = z.object({
   name: z.string().min(2).max(80),
@@ -21,20 +22,33 @@ export default defineEventHandler(async (event) => {
       orderBy: { joinedAt: 'asc' }
     })
 
+    const userRow = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { activeSpaceId: true }
+    })
+
     const minorMembership = memberships.find(m => m.role === 'TEEN' || m.role === 'CHILD')
     const visible = minorMembership
       ? memberships.filter(m => m.spaceId === minorMembership.spaceId)
       : memberships
 
-    return visible.map(m => ({
-      id: m.space.id,
-      name: m.space.name,
-      type: m.space.type,
-      role: m.role,
-      memberCount: m.space._count.members,
-      accountCount: m.space._count.accounts,
-      isOwner: m.space.ownerId === user.id
-    }))
+    const activeSpaceId = minorMembership?.spaceId
+      ?? (userRow?.activeSpaceId && visible.some(m => m.space.id === userRow.activeSpaceId)
+        ? userRow.activeSpaceId
+        : visible[0]?.space.id ?? null)
+
+    return {
+      activeSpaceId,
+      spaces: visible.map(m => ({
+        id: m.space.id,
+        name: m.space.name,
+        type: m.space.type,
+        role: m.role,
+        memberCount: m.space._count.members,
+        accountCount: m.space._count.accounts,
+        isOwner: m.space.ownerId === user.id
+      }))
+    }
   }
 
   if (event.method === 'POST') {
@@ -94,9 +108,7 @@ export default defineEventHandler(async (event) => {
     })
 
     setCookie(event, ACTIVE_SPACE_COOKIE, space.id, {
-      httpOnly: false,
-      sameSite: 'lax',
-      path: '/',
+      ...secureAppCookieOptions(event),
       maxAge: 60 * 60 * 24 * 365
     })
 

@@ -1,5 +1,6 @@
 import type { BusinessOverview } from '~/types/dashboard'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useBusinessStore = defineStore('business', () => {
   const { t } = useAppI18n()

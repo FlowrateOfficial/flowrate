@@ -1,3 +1,4 @@
+// ANCHOR: Stripe SDK client and HTTPS base URL helpers
 import type { H3Event } from 'h3'
 import Stripe from 'stripe'
 
@@ -38,7 +39,7 @@ export function requireStripe(event: H3Event) {
   }
 }
 
-/** Financial Connections `return_url` must be HTTPS — omit on local HTTP dev. */
+// NOTE - Financial Connections return_url requires HTTPS — omit on local HTTP dev
 export function resolveHttpsBaseUrl(event: H3Event, appUrl: string): string | null {
   const candidates = [
     appUrl.replace(/\/$/, ''),

@@ -1,4 +1,5 @@
-import type { SpaceRole, SpaceType, MemberStatus } from '~/generated/prisma'
+// ANCHOR: Space membership, roles, and active-space resolution
+import type { SpaceRole, SpaceType, MemberStatus } from '~~/generated/prisma'
 
 export const ACTIVE_SPACE_COOKIE = 'flowrate-active-space'
 
@@ -39,7 +40,7 @@ export function canViewFinancials(role: SpaceRole): boolean {
   return !isChildRole(role) || role === 'TEEN'
 }
 
-/** Company guests and similar roles can view but not change financial data. */
+// NOTE - Company guests view financials but cannot edit
 export function isReadOnlyFinancialRole(role: SpaceRole, spaceType: SpaceType): boolean {
   if (spaceType !== 'COMPANY') return false
   return role === 'GUEST'
@@ -211,7 +212,7 @@ export function accountVisibilityFilter(userId: string, role: SpaceRole) {
   }
 }
 
-export function getRolesForSpaceType(type: SpaceType): SpaceRole[] {
+export function getRolesForSpaceType(type: SpaceType) {
   switch (type) {
     case 'INDEPENDENT':
       return ['OWNER']

@@ -1,4 +1,4 @@
-import type { BudgetPeriod } from '@prisma/client'
+import type { BudgetPeriod } from '~~/generated/prisma'
 
 export function periodStart(period: BudgetPeriod, now = new Date()): Date {
   const d = new Date(now)

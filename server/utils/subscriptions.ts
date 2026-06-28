@@ -1,4 +1,4 @@
-import type { BudgetPeriod, TransactionCategory } from '@prisma/client'
+import type { BudgetPeriod, TransactionCategory } from '~~/generated/prisma'
 
 interface TxLike {
   merchant: string | null

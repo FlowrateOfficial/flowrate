@@ -1,2 +1,2 @@
-/** Re-export barrel — Nitro resolves `lib/billing` to this file before the directory. */
+// ANCHOR: Nitro barrel — resolves lib/billing before lib/billing/ directory
 export * from './billing/index'

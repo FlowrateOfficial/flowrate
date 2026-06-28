@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
       const { stripe } = requireStripe(event)
       await stripe.financialConnections.accounts.disconnect(account.stripeFcAccountId)
     } catch {
-      // Stripe may already be disconnected
+      // NOTE - Stripe may already be disconnected
     }
   }
 

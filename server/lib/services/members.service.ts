@@ -166,13 +166,13 @@ export async function inviteCompanyMember(
   try {
     await sendPhoneVerification(phone)
   } catch {
-    // Verification can be retried on the invite page
+    // NOTE - Verification retried on invite page
   }
 
   try {
     await sendSms(phone, `You've been invited to ${spaceName} on FlowRate. Join: ${inviteUrl}`)
   } catch {
-    // SMS delivery failure should not block invite creation
+    // NOTE - SMS failure must not block invite creation
   }
 
   return { member, invited: true, inviteUrl, token: invitation.token }

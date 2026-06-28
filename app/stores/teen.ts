@@ -1,5 +1,6 @@
 import type { TeenDashboard } from '~/types/dashboard'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useTeenStore = defineStore('teen', () => {
   const { api } = useApi()

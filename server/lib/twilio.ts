@@ -1,3 +1,4 @@
+// ANCHOR: Twilio SMS and Verify
 import { normalizePhone } from '../utils/phone'
 
 export interface TwilioConfig {
@@ -76,7 +77,6 @@ async function twilioVerifyRequest(
   return data
 }
 
-/** Send a one-time verification code via SMS (Twilio Verify). */
 export async function sendPhoneVerification(to: string): Promise<void> {
   const normalized = normalizePhone(to)
   if (!normalized) {
@@ -93,7 +93,6 @@ export async function sendPhoneVerification(to: string): Promise<void> {
   }
 }
 
-/** Check an SMS verification code. Returns true when approved. */
 export async function checkPhoneVerification(to: string, code: string): Promise<boolean> {
   const normalized = normalizePhone(to)
   if (!normalized) {

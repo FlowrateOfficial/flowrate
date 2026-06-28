@@ -1,6 +1,4 @@
-/**
- * Credit allowance jars when due based on allowance frequency.
- */
+// ANCHOR: Child allowance jar payouts
 export async function processAllowancePayouts(spaceId: string) {
   const profiles = await prisma.childProfile.findMany({
     where: {

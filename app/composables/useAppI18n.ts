@@ -1,6 +1,4 @@
-/**
- * Typed wrapper around nuxt-i18n-micro for cleaner component code.
- */
+// ANCHOR: Typed nuxt-i18n-micro wrapper
 type TranslateParams = Record<string, string | number>
 
 export function useAppI18n() {

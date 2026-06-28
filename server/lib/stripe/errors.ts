@@ -1,3 +1,4 @@
+// ANCHOR: Stripe SDK errors → stable H3 error codes
 import type Stripe from 'stripe'
 
 type StripeErrorCode =
@@ -66,7 +67,6 @@ function mapStripeError(error: Stripe.errors.StripeError): {
   }
 }
 
-/** Re-throw Stripe SDK errors as H3 errors with stable client codes. */
 export function throwStripeApiError(error: unknown, fallback = 'Bank connection failed'): never {
   if (isStripeError(error)) {
     const mapped = mapStripeError(error)

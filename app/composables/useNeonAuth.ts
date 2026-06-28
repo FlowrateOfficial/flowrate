@@ -1,11 +1,7 @@
-/**
- * Client-side Neon Auth composable.
- *
- * Email/password and session use the SDK against /api/auth (proxied to Neon Auth).
- * Google/GitHub use server redirect routes (/auth/google, /auth/github).
- */
+// NOTE - ANCHOR: Client Neon Auth — SDK on /api/auth; Google/GitHub via /auth/*
 import { getAuthClient, resetAuthClient } from '~/lib/auth-client'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export function useNeonAuth() {
   const config = useRuntimeConfig()

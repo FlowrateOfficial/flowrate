@@ -1,6 +1,8 @@
+// NOTE - ANCHOR: User profile store — bootstrap, nav, settings, account menu
 import type { UserProfile } from '~/types/user'
 import type { AppPlan } from '#shared/billing'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useUserStore = defineStore('user', () => {
   const { t } = useAppI18n()
@@ -57,7 +59,7 @@ export const useUserStore = defineStore('user', () => {
     }
 
     if (!spacesStore.isCompany) {
-      // overview already at top for non-business spaces
+      // NOTE - Overview link already first for non-business spaces
     } else if (!items.some(i => i.to === '/dashboard')) {
       items.splice(1, 0, { label: t('nav.overview'), icon: 'i-lucide-layout-dashboard', to: '/dashboard' })
     }

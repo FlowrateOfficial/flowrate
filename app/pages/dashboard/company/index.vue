@@ -192,7 +192,7 @@ const setupSteps = computed(() => [
         </div>
 
         <template v-else-if="overview">
-          <!-- Guided setup when empty -->
+      <!-- NOTE - Guided setup when empty -->
           <UCard v-if="!overview.setup.complete" :ui="{ body: 'p-6 sm:p-8' }">
             <h2 class="font-display text-xl mb-2">{{ t('dashboard.company.setup.title') }}</h2>
             <p class="text-sm text-muted mb-8 max-w-2xl">{{ t('dashboard.company.setup.subtitle') }}</p>
@@ -225,7 +225,7 @@ const setupSteps = computed(() => [
             </ol>
           </UCard>
 
-          <!-- Alerts -->
+          <!-- NOTE - Alerts -->
           <div v-if="overview.alerts.length" class="space-y-3">
             <h2 class="font-display text-lg">{{ t('dashboard.company.alertsTitle') }}</h2>
             <UAlert
@@ -238,7 +238,7 @@ const setupSteps = computed(() => [
             />
           </div>
 
-          <!-- Metrics -->
+          <!-- NOTE - Metrics -->
           <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <DashboardStatsCard
               :title="t('dashboard.company.stats.cash')"

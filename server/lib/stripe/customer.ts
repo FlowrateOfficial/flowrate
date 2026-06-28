@@ -1,3 +1,4 @@
+// ANCHOR: Stripe customer ↔ app user linking
 import type Stripe from 'stripe'
 import {
   findUserIdByStripeCustomerId,
@@ -8,7 +9,6 @@ import {
 import { isLivemodeMismatch } from './errors'
 import type { StripeUserRef } from './types'
 
-/** Persist Stripe customer ↔ app user link (DB + Stripe metadata). */
 export async function linkStripeCustomerToUser(
   stripe: Stripe,
   userId: string,
@@ -34,10 +34,6 @@ export async function linkStripeCustomerToUser(
   await setStripeCustomerId(userId, customerId)
 }
 
-/**
- * Find an existing Stripe customer for this user (DB id, then Stripe email search)
- * and link it. Returns null if none exists.
- */
 export async function findAndLinkStripeCustomer(
   stripe: Stripe,
   user: StripeUserRef,
@@ -54,7 +50,7 @@ export async function findAndLinkStripeCustomer(
       if (isLivemodeMismatch(error)) {
         await clearStripeCustomerId(user.id)
       }
-      // Stored customer invalid (e.g. test vs live) — search below.
+      // NOTE - Stored customer invalid (test vs live) — search by email below
     }
   }
 
@@ -92,7 +88,6 @@ export async function ensureStripeCustomer(
   return customer.id
 }
 
-/** Resolve app user ID from a Stripe customer (metadata → DB → email). */
 export async function resolveUserIdFromStripeCustomer(
   stripe: Stripe,
   customerId: string

@@ -1,4 +1,4 @@
-import type { TransactionCategory } from '@prisma/client'
+import type { TransactionCategory } from '~~/generated/prisma'
 import type Stripe from 'stripe'
 
 const MERCHANT_RULES: Array<{ pattern: RegExp, category: TransactionCategory }> = [

@@ -1,6 +1,7 @@
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
 import { formatCurrencyForLocale } from '~/utils/format'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export interface BudgetItem {
   id: string

@@ -1,4 +1,4 @@
-/** Central API route map — single source of truth for client paths. */
+// ANCHOR: API route map — single source of truth for client paths
 export const apiRoutes = {
   auth: {
     session: '/api/auth/get-session'

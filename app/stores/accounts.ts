@@ -1,3 +1,4 @@
+// NOTE - ANCHOR: Accounts store — bank connect, sync, list
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { AccountSummary } from '~/types/financial'
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
@@ -6,7 +7,8 @@ import { resolveErrorMessage } from '~/utils/errors'
 import { loadStripe } from '~/lib/load-stripe'
 import { isStripeConnectCancelled } from '~/lib/stripe-errors'
 import { extractFcAccountIds } from '~/utils/stripe-fc'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useAccountsStore = defineStore('accounts', () => {
   const { t, getLocale } = useAppI18n()
@@ -191,7 +193,7 @@ export const useAccountsStore = defineStore('accounts', () => {
       }
 
       if (result.synced?.length && !accounts.value.length) {
-        // Accounts saved under wrong space before fix — re-run sync to attach to active space.
+        // NOTE - Legacy accounts on wrong space — re-sync to attach to active space
         const retry = await api<{ synced: Array<{ id: string }> }>(apiRoutes.stripe.syncAccounts, {
           method: 'POST',
           body: { syncAll: true, visibility }

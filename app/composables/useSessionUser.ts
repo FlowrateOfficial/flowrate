@@ -1,4 +1,4 @@
-/** Shared session check for layouts (logo target, guest UI). */
+// NOTE - ANCHOR: Layout session check — logo target, guest UI
 export function useSessionUser() {
   const { getSession } = useNeonAuth()
 

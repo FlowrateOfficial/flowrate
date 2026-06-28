@@ -1,4 +1,4 @@
-// FlowRate user type for server-side Neon Auth (Better Auth) sessions.
+// ANCHOR: Neon Auth session types (server)
 export interface NeonAuthUser {
   id: string
   email: string

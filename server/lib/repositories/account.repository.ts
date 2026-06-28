@@ -1,4 +1,4 @@
-import type { AccountVisibility, Prisma } from '~/generated/prisma'
+import type { Prisma } from '~~/generated/prisma'
 import type { SpaceContext } from '../domain/context'
 
 export type AccountListFilter = 'all' | 'shared' | 'personal' | 'mine'

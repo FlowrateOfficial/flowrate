@@ -1,3 +1,4 @@
+// ANCHOR: Server-side Neon Auth user provisioning
 export interface CreatedAuthUser {
   id: string
   email: string
@@ -12,7 +13,6 @@ function resolveAppOrigin(event?: H3Event): string {
   return (config.public.appUrl as string || 'http://localhost:3000').replace(/\/$/, '')
 }
 
-/** Create a Neon Auth user via the sign-up endpoint (server-side provisioning). */
 export async function createNeonAuthEmailUser(
   params: {
     email: string

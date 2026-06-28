@@ -1,10 +1,6 @@
+// NOTE - ANCHOR: OAuth session exchange middleware — completes Google/GitHub redirect
 import { tryOAuthSessionExchange } from '../utils/neonAuthProxy'
 
-/**
- * Completes OAuth after Google/GitHub redirect.
- * Exchanges the session verifier for first-party cookies, then redirects
- * to the clean URL (without the verifier query param).
- */
 export default defineEventHandler(async (event) => {
   const path = event.path
 

@@ -1,10 +1,7 @@
-/** E.164 phone number: + followed by country code and subscriber number (max 15 digits). */
+// ANCHOR: E.164 phone normalization
 const E164_REGEX = /^\+[1-9]\d{1,14}$/
 
-/**
- * Strip national trunk prefix (leading 0) mistakenly included after country code.
- * e.g. +330987765432 → +33987765432 (France), +4407911123456 → +447911123456 (UK)
- */
+// NOTE - Strip trunk zero after country code (+330… → +33…, +440… → +44…, etc.)
 function stripTrunkZeroAfterCountryCode(candidate: string): string {
   const fr = candidate.match(/^\+33(0)(\d{9})$/)
   if (fr) return `+33${fr[2]}`
@@ -36,12 +33,12 @@ export function normalizePhone(input: string): string | null {
   if (trimmed.startsWith('+')) {
     candidate = `+${digits}`
   } else if (digits.length === 10) {
-    // Default US: 10-digit local → +1XXXXXXXXXX
+    // NOTE - US 10-digit local → +1XXXXXXXXXX
     candidate = `+1${digits}`
   } else if (digits.length === 11 && digits.startsWith('1')) {
     candidate = `+${digits}`
   } else if (digits.length === 10 && digits.startsWith('0')) {
-    // French local without country code: 0987765432 → +33987765432
+    // NOTE - French local 0987765432 → +33987765432
     candidate = `+33${digits.slice(1)}`
   } else if (digits.length === 11 && digits.startsWith('33')) {
     candidate = `+${digits}`

@@ -1,6 +1,7 @@
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
-/** After Stripe Checkout success, sync plan from Stripe (webhooks may lag in local dev). */
+// NOTE - ANCHOR: Post-checkout billing sync — webhooks may lag in local dev
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.query.upgraded !== '1') return
 

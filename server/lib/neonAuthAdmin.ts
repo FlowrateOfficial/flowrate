@@ -1,3 +1,4 @@
+// ANCHOR: Neon Auth admin API — delete users (guardian/self-serve)
 import type { H3Event } from 'h3'
 import { extractNeonAuthCookies } from '../utils/neonAuthProxy'
 
@@ -41,7 +42,6 @@ async function resolveNeonBranchId(event?: H3Event): Promise<string> {
   return branch.id
 }
 
-/** Delete a Neon Auth user via the Neon Management API (guardian/admin flows). */
 export async function deleteNeonAuthUserByAdmin(userId: string, event?: H3Event): Promise<void> {
   const config = useRuntimeConfig(event)
   const projectId = config.stackProjectId as string | undefined
@@ -72,7 +72,6 @@ export async function deleteNeonAuthUserByAdmin(userId: string, event?: H3Event)
   }
 }
 
-/** Delete the signed-in user's Neon Auth account (requires password for credential users). */
 export async function deleteNeonAuthUserSelf(
   event: H3Event,
   password?: string

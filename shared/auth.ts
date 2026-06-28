@@ -1,4 +1,4 @@
-/** Query param Neon Auth appends after OAuth redirect. */
+// ANCHOR: OAuth session verifier query param (Neon Auth redirect)
 export const NEON_AUTH_SESSION_VERIFIER_PARAM = 'neon_auth_session_verifier'
 
 export const OAUTH_PROVIDERS = ['google', 'github'] as const

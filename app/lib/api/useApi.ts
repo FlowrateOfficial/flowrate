@@ -1,4 +1,6 @@
+// ANCHOR: App HTTP client — CSRF, active space header, SSR cookies, GET dedupe
 import type { FetchOptions } from 'ofetch'
+import { CSRF_COOKIE, CSRF_HEADER } from '#shared/security'
 import { buildRequestKey, dedupeRequest } from './dedupe'
 
 export type ApiMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
@@ -6,19 +8,19 @@ export type ApiMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 export interface ApiRequestOptions extends Omit<FetchOptions, 'method' | 'body'> {
   method?: ApiMethod
   body?: unknown
-  /** Do not attach active-space header (global/user routes). */
   noSpace?: boolean
-  /** Skip in-flight deduplication for this request. */
   noDedupe?: boolean
 }
 
-/**
- * Single HTTP entry point for the app.
- * Forwards cookies on SSR and attaches the active financial space header.
- */
 export function useApi() {
   const http = useApiFetch()
   const spacesStore = useSpacesStore()
+  const csrfCookie = import.meta.client ? useCookie<string | null>(CSRF_COOKIE) : ref(null)
+
+  function mutationHeaders(): Record<string, string> {
+    const token = csrfCookie.value
+    return token ? { [CSRF_HEADER]: token } : {}
+  }
 
   async function api<T>(url: string, options: ApiRequestOptions = {}): Promise<T> {
     const { noSpace, noDedupe, method, body, query, headers, ...rest } = options
@@ -32,6 +34,7 @@ export function useApi() {
       ...rest,
       headers: {
         ...(noSpace ? {} : spacesStore.spaceHeaders()),
+        ...(verb !== 'GET' ? mutationHeaders() : {}),
         ...(headers as Record<string, string> | undefined)
       }
     })

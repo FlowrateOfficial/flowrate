@@ -1,3 +1,4 @@
+// ANCHOR: Lazy Stripe.js loader
 let stripeLoader: Promise<StripeInstance | null> | null = null
 
 function injectStripeScript(): Promise<void> {
@@ -28,7 +29,6 @@ function injectStripeScript(): Promise<void> {
   })
 }
 
-/** Load Stripe.js and return a configured client, or null when not configured. */
 export async function loadStripe(): Promise<StripeInstance | null> {
   const key = useRuntimeConfig().public.stripePublishableKey
   if (!key) return null

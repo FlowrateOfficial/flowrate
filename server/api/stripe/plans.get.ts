@@ -1,7 +1,7 @@
 import { formatPlanPrice, listStripePlans } from '../../lib/billing'
 import { requireStripe } from '../../lib/stripe'
 
-/** Public catalog — active Stripe Products + default Prices (cached 5 min). */
+// ANCHOR: Public Stripe plan catalog (cached 5 min)
 export default defineEventHandler(async (event) => {
   const { stripe } = requireStripe(event)
   const plans = await listStripePlans(stripe)

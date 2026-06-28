@@ -11,7 +11,6 @@ import { syncSpaceTransactions } from '../../lib/transactionSync'
 const bodySchema = z.object({
   accountIds: z.array(z.string().min(1)).optional(),
   visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL'),
-  /** When true (or accountIds empty), sync all FC accounts on the Stripe customer. */
   syncAll: z.boolean().optional()
 })
 

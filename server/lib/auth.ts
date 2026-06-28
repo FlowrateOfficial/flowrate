@@ -1,11 +1,4 @@
-/**
- * Server-side Neon Auth for Nuxt/Nitro.
- *
- * Mirrors the Next.js `createNeonAuth()` pattern: proxy auth API on the app origin,
- * read sessions from request cookies, provision app users after sign-in.
- *
- * @see https://neon.com/docs/auth/authentication-flow
- */
+// ANCHOR: Server Neon Auth — session, provisioning, OAuth helpers
 import type { H3Event } from 'h3'
 import {
   getSessionFromEvent,
@@ -72,7 +65,7 @@ export async function requireAuthUser(event: H3Event): Promise<AuthUser> {
   return user
 }
 
-/** Session + existing DB user only — no provisioning (use after /api/user/bootstrap). */
+// NOTE - No DB provisioning — call after /api/user/bootstrap
 export async function requireSessionUser(event: H3Event): Promise<AuthUser> {
   if (event.context.flowrateAuth) {
     return event.context.flowrateAuth

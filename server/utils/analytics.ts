@@ -1,4 +1,4 @@
-import type { TransactionCategory } from '@prisma/client'
+import type { TransactionCategory } from '~~/generated/prisma'
 
 export type AnalyticsRange = '7d' | '30d' | '90d' | '12m'
 

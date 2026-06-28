@@ -1,3 +1,4 @@
+// ANCHOR: API/auth error → i18n keys (never surface raw server messages in UI)
 type TranslateFn = (key: string, params?: Record<string, string | number>) => string
 
 interface FetchErrorLike {
@@ -19,7 +20,6 @@ const STATUS_KEYS: Record<number, string> = {
   503: 'errors.unavailable'
 }
 
-/** Map API / auth errors to i18n keys — never surface raw English server messages in the UI. */
 export function resolveErrorMessage(
   error: unknown,
   t: TranslateFn,

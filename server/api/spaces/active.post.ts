@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { secureAppCookieOptions } from '../../lib/security/cookies'
 
 const activeSpaceSchema = z.object({
   spaceId: z.string().min(1)
@@ -26,9 +27,7 @@ export default defineEventHandler(async (event) => {
   })
 
   setCookie(event, ACTIVE_SPACE_COOKIE, spaceId, {
-    httpOnly: false,
-    sameSite: 'lax',
-    path: '/',
+    ...secureAppCookieOptions(event),
     maxAge: 60 * 60 * 24 * 365
   })
 

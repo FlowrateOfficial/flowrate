@@ -1,4 +1,4 @@
-// FlowRate user type — reflects the session data returned by Neon Auth (Better Auth).
+// ANCHOR: Neon Auth session types (client)
 export interface NeonAuthUser {
   id: string
   email: string

@@ -1,6 +1,7 @@
 import type { AnalyticsOverview, AnalyticsRange } from '~/types/financial'
 import { formatCurrencyForLocale } from '~/utils/format'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useAnalyticsStore = defineStore('analytics', () => {
   const { t, getLocale, categoryLabel } = useAppI18n()

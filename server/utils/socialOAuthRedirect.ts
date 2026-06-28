@@ -1,10 +1,7 @@
+// NOTE - ANCHOR: OAuth redirect handler — GET /auth/google|github?redirect=
 import type { H3Event } from 'h3'
 import { getSocialOAuthRedirectUrl } from '../utils/neonAuthProxy'
 
-/**
- * Start OAuth: GET /auth/google?redirect=/dashboard
- * Sets challenge cookie on app origin, then 302 to Google/GitHub.
- */
 export async function handleSocialOAuthRedirect(
   event: H3Event,
   provider: 'google' | 'github'

@@ -1,9 +1,9 @@
+// NOTE - ANCHOR: Dashboard breadcrumbs — path segments to i18n labels
 export interface BreadcrumbItem {
   label: string
   to?: string
 }
 
-/** Dashboard path segment → i18n key */
 const DASHBOARD_SEGMENT_KEYS: Record<string, string> = {
   transactions: 'nav.transactions',
   accounts: 'nav.accounts',

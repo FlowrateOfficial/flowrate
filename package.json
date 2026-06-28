@@ -6,7 +6,7 @@
     "dev": "nuxt dev",
     "dev:all": "nuxt dev & pnpm stripe:listen",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
-    "build": "nuxt build",
+    "build": "prisma generate && nuxt build",
     "start": "node .output/server/index.mjs",
     "preview": "nuxt preview",
     "postinstall": "prisma generate && nuxt prepare",

@@ -1,4 +1,4 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// ANCHOR: Nuxt config
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
@@ -13,7 +13,7 @@ export default defineNuxtConfig({
       localeCookie: 'user-locale',
       translationDir: 'locales',
       strategy: 'no_prefix',
-      // All copy lives in locales/en.json + fr.json; per-page files caused broken merges.
+      // NOTE - All copy in locales/en.json + fr.json — per-page files broke merges
       disablePageLocales: true
     }]
   ],
@@ -65,6 +65,12 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-01-15',
+
+  nitro: {
+    externals: {
+      inline: ['@prisma/client', '@prisma/adapter-neon', '~~/generated/prisma']
+    }
+  },
 
   vite: {
     optimizeDeps: {

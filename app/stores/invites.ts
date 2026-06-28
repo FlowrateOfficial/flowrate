@@ -1,4 +1,5 @@
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export interface InviteDetail {
   spaceName: string

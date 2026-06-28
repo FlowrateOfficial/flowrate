@@ -1,6 +1,7 @@
+// ANCHOR: Financial Connections — bank link sessions, account sync, subscriptions
 import type { H3Event } from 'h3'
 import type Stripe from 'stripe'
-import type { AccountType } from '~/generated/prisma'
+import type { AccountType } from '~~/generated/prisma'
 import {
   FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
   FINANCIAL_CONNECTIONS_PERMISSIONS,
@@ -42,8 +43,7 @@ export async function createBankLinkSession(
   void appUrl
   void context
 
-  // Web flow uses stripe.collectFinancialConnectionsAccounts (on-page modal).
-  // return_url is for mobile webview only and can cause live-mode session errors.
+  // NOTE - Web uses collectFinancialConnectionsAccounts modal; return_url is mobile webview only
   return stripe.financialConnections.sessions.create({
     account_holder: {
       type: 'customer',
@@ -128,7 +128,6 @@ export function assertFinancialConnectionOwnership(
   }
 }
 
-/** Subscribe to daily transaction refreshes per Stripe data-product guidance. */
 export async function ensureFinancialConnectionSubscriptions(
   stripe: Stripe,
   fcAccountId: string
@@ -138,7 +137,7 @@ export async function ensureFinancialConnectionSubscriptions(
       features: ['transactions']
     })
   } catch {
-    // Already subscribed or unavailable in the current Stripe mode.
+    // NOTE - Already subscribed or unavailable in current Stripe mode
   }
 }
 

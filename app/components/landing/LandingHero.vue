@@ -63,7 +63,7 @@ const featureStrip = computed(() => [
         </div>
       </div>
 
-      <!-- Feature strip — museum caption row -->
+      <!-- NOTE - Feature strip -->
       <div class="mt-20 sm:mt-28 pt-12 border-t border-flow-border/50 dark:border-flow-border-dark/50">
         <div class="flex flex-wrap justify-center lg:justify-between gap-x-10 gap-y-6">
           <div

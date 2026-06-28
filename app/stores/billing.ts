@@ -1,5 +1,6 @@
 import { resolveErrorMessage } from '~/utils/errors'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export interface StripePlanSummary {
   key: string

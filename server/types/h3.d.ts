@@ -1,5 +1,5 @@
 import type { AuthUser } from '../lib/auth'
-import type { FinancialSpace, SpaceMember } from '~/generated/prisma'
+import type { FinancialSpace, SpaceMember } from '~~/generated/prisma'
 
 export interface FlowRateSpaceAccess {
   user: AuthUser

@@ -1,4 +1,4 @@
-/** Stripe.js user-cancelled Financial Connections flows — not an application error. */
+// ANCHOR: Stripe FC user-cancel detection — not an application error
 export function isStripeConnectCancelled(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false
 

@@ -2,18 +2,12 @@ import type { ActiveSpace, FinancialSpaceSummary } from '~/types/space'
 import { isTeenOrChild } from '~/types/space'
 import { createSpaceSchema } from '~/utils/schemas'
 import { resolveErrorMessage } from '~/utils/errors'
-import { apiRoutes, useApi } from '~/lib/api'
-
-const ACTIVE_SPACE_KEY = 'flowrate-active-space'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useSpacesStore = defineStore('spaces', () => {
   const { t, spaceType } = useAppI18n()
   const toast = useToast()
-  const activeSpaceIdCookie = useCookie<string | null>(ACTIVE_SPACE_KEY, {
-    default: () => null,
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: 'lax'
-  })
 
   const activeSpace = ref<ActiveSpace | null>(null)
   const spaces = ref<FinancialSpaceSummary[]>([])
@@ -52,28 +46,29 @@ export const useSpacesStore = defineStore('spaces', () => {
   function clearSession() {
     activeSpace.value = null
     spaces.value = []
-    activeSpaceIdCookie.value = null
   }
 
   async function fetchSpaces() {
     loading.value = true
     try {
-      const list = await api<FinancialSpaceSummary[]>(apiRoutes.spaces.list, { noSpace: true })
+      const result = await api<{ activeSpaceId: string | null, spaces: FinancialSpaceSummary[] }>(
+        apiRoutes.spaces.list,
+        { noSpace: true }
+      )
+      const list = result.spaces
       spaces.value = list
 
       const minor = list.find(s => isTeenOrChild(s.role))
-      const storedId = activeSpaceIdCookie.value
       const current = minor
-        ?? list.find(s => s.id === storedId)
+        ?? list.find(s => s.id === result.activeSpaceId)
         ?? list.find(s => s.type === 'INDEPENDENT')
         ?? list[0]
 
       if (current) {
         activeSpace.value = current
-        activeSpaceIdCookie.value = current.id
       }
 
-      if (minor && minor.id !== storedId) {
+      if (minor && minor.id !== result.activeSpaceId) {
         await api<ActiveSpace>(apiRoutes.spaces.active, {
           method: 'POST',
           body: { spaceId: minor.id },
@@ -102,7 +97,6 @@ export const useSpacesStore = defineStore('spaces', () => {
     activeSpace.value = result
     const idx = spaces.value.findIndex(s => s.id === spaceId)
     if (idx >= 0) spaces.value[idx] = { ...spaces.value[idx], ...result }
-    activeSpaceIdCookie.value = spaceId
     await refreshNuxtData()
   }
 

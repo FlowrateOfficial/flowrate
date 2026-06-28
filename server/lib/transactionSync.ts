@@ -1,3 +1,4 @@
+// ANCHOR: Stripe FC transaction import and subscription detection
 import type Stripe from 'stripe'
 import { ensureFinancialConnectionSubscriptions } from './stripe'
 import { detectSubscriptionsFromTransactions } from '../utils/subscriptions'
@@ -19,7 +20,7 @@ export async function syncAccountTransactions(
       features: ['balance', 'transactions']
     })
   } catch {
-    // Refresh may fail in test mode — still attempt listing
+    // NOTE - Refresh may fail in test mode — still attempt listing
   }
 
   await ensureFinancialConnectionSubscriptions(stripe, account.stripeFcAccountId)

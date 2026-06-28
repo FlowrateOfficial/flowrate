@@ -1,7 +1,8 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { TransactionRow } from '~/types/financial'
 import { formatCurrencyForLocale } from '~/utils/format'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export interface MemberFinancial {
   member: {

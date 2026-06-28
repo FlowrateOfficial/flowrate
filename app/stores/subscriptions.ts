@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { SubscriptionItem } from '~/types/financial'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useSubscriptionsStore = defineStore('subscriptions', () => {
   const spacesStore = useSpacesStore()

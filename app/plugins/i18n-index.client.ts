@@ -1,4 +1,4 @@
-/** Ensure full root locale is loaded — avoids raw i18n keys when page chunks are empty. */
+// NOTE - ANCHOR: Load root locale on boot — avoids raw i18n keys when page chunks are empty
 export default defineNuxtPlugin({
   name: 'flowrate-i18n-index',
   enforce: 'post',

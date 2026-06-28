@@ -1,7 +1,8 @@
 import type { AccountSummary, AnalyticsOverview, SubscriptionItem, TransactionsResponse } from '~/types/financial'
 import type { DashboardStats } from '~/types/dashboard'
 import { formatCurrencyForLocale } from '~/utils/format'
-import { apiRoutes, useApi } from '~/lib/api'
+import { apiRoutes } from '~/lib/api/endpoints'
+import { useApi } from '~/lib/api/useApi'
 
 export const useDashboardStore = defineStore('dashboard', () => {
   const { t, getLocale, categoryLabel } = useAppI18n()

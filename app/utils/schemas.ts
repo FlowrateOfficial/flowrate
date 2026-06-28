@@ -1,6 +1,6 @@
+// ANCHOR: Zod form schemas — auth, spaces
 import { z } from 'zod'
 
-/** Auth login form — messages come from Zod locale (zod/locales). */
 export function createLoginSchema() {
   return z.object({
     email: z.email(),
@@ -8,7 +8,6 @@ export function createLoginSchema() {
   })
 }
 
-/** Auth register form */
 export function createRegisterSchema(t: (key: string) => string) {
   return z.object({
     name: z.string().min(2),
@@ -29,14 +28,12 @@ export function createRegisterSchema(t: (key: string) => string) {
   })
 }
 
-/** Forgot password form */
 export function createForgotPasswordSchema() {
   return z.object({
     email: z.email()
   })
 }
 
-/** Create space form */
 export function createSpaceSchema() {
   return z.object({
     name: z.string().min(2).max(80),

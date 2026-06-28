@@ -1,3 +1,4 @@
+// ANCHOR: Account deletion — Stripe, DB, Neon Auth purge
 import type { H3Event } from 'h3'
 import type Stripe from 'stripe'
 import { getStripeClient } from '../stripe/client'
@@ -30,7 +31,7 @@ async function disconnectUserBankAccounts(
       await stripe.financialConnections.accounts.disconnect(account.stripeFcAccountId)
       disconnected++
     } catch {
-      // Already disconnected at Stripe
+      // NOTE - Already disconnected at Stripe
     }
   }
   return disconnected
@@ -49,14 +50,14 @@ async function cancelStripeBilling(stripe: Stripe | null, userId: string) {
     try {
       await stripe.subscriptions.cancel(billing.subscription.stripeSubscriptionId)
     } catch {
-      // May already be canceled
+      // NOTE - Subscription may already be canceled
     }
   }
 
   try {
     await stripe.customers.del(billing.stripeCustomerId)
   } catch {
-    // Customer may already be deleted
+    // NOTE - Stripe customer may already be deleted
   }
 
   await clearStripeCustomerId(userId)
@@ -115,10 +116,7 @@ async function resolveOwnedSpaces(userId: string) {
   return { deletedSpaces, transferredSpaces, deletedSpaceIds }
 }
 
-/**
- * Permanently remove a user's application data: bank links, billing, memberships,
- * and the user record. Does not remove the Neon Auth login (call separately).
- */
+// NOTE - Removes app data only — Neon Auth login deleted separately
 export async function purgeUserApplicationData(
   userId: string,
   event?: H3Event
