@@ -2,6 +2,9 @@ import { resolveErrorMessage } from '~/utils/errors'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
+export type BillingInterval = 'month' | 'year'
+export type PricingCadence = 'monthly' | 'yearly'
+
 export interface StripePlanSummary {
   key: string
   productId: string
@@ -10,7 +13,7 @@ export interface StripePlanSummary {
   description: string | null
   amount: number
   currency: string
-  interval: 'day' | 'week' | 'month' | 'year' | null
+  interval: BillingInterval | null
   intervalCount: number
   formattedPrice: string
   formattedPeriod?: string
@@ -22,9 +25,21 @@ export const useBillingStore = defineStore('billing', () => {
   const loading = ref(false)
   const plans = ref<StripePlanSummary[]>([])
   const plansLoading = ref(false)
+  const pricingCadence = ref<PricingCadence>('monthly')
   const { api } = useApi()
 
-  const proPlan = computed(() => plans.value.find(p => p.key === 'pro'))
+  const billingInterval = computed<BillingInterval>(() =>
+    pricingCadence.value === 'yearly' ? 'year' : 'month'
+  )
+
+  function planForKey(key: string, interval = billingInterval.value) {
+    return plans.value.find(p => p.key === key && p.interval === interval)
+      ?? plans.value.find(p => p.key === key && p.interval === 'month')
+      ?? plans.value.find(p => p.key === key)
+  }
+
+  const proPlan = computed(() => planForKey('pro'))
+  const enterprisePlan = computed(() => planForKey('enterprise'))
 
   async function fetchPlans() {
     plansLoading.value = true
@@ -38,15 +53,16 @@ export const useBillingStore = defineStore('billing', () => {
     }
   }
 
-  async function startCheckout(planKey = 'pro') {
+  async function startCheckout(planKey = 'pro', interval: BillingInterval = billingInterval.value) {
     loading.value = true
     try {
-      const pro = plans.value.find(p => p.key === planKey)
+      const selected = planForKey(planKey, interval)
       const { url } = await api<{ url: string }>(apiRoutes.stripe.checkout, {
         method: 'POST',
         body: {
           planKey,
-          priceId: pro?.priceId
+          priceId: selected?.priceId,
+          interval
         },
         noSpace: true
       })
@@ -85,7 +101,11 @@ export const useBillingStore = defineStore('billing', () => {
     loading,
     plans,
     plansLoading,
+    pricingCadence,
+    billingInterval,
     proPlan,
+    enterprisePlan,
+    planForKey,
     fetchPlans,
     startCheckout,
     openPortal

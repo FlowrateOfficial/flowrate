@@ -155,6 +155,8 @@ export const useAccountsStore = defineStore('accounts', () => {
   }
 
   async function connectBank() {
+    if (isConnecting.value) return false
+
     isConnecting.value = true
     connectError.value = ''
     if (isTeenView.value) {

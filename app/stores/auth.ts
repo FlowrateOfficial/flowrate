@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', () => {
   const forgotSent = ref(false)
 
   const inviteInfo = ref<{ spaceName: string; role: string; email: string } | null>(null)
+  const selectedPlan = ref<'free' | 'pro' | 'enterprise'>('free')
 
   const loginSchema = createLoginSchema()
   const forgotSchema = createForgotPasswordSchema()
@@ -61,9 +62,15 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
 
-      if (route.query.plan === 'pro') {
-        const billing = useBillingStore()
-        await billing.startCheckout('pro')
+      const billingStore = useBillingStore()
+      const plan = (route.query.plan as string) || selectedPlan.value
+      const billing = billingStore.pricingCadence === 'yearly' ? 'year' : 'month'
+
+      if (plan === 'pro' || plan === 'enterprise') {
+        if (!billingStore.plans.length) {
+          await billingStore.fetchPlans()
+        }
+        await billingStore.startCheckout(plan, billing)
         return
       }
 
@@ -100,6 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     forgotSent,
     inviteInfo,
+    selectedPlan,
     loginSchema,
     forgotSchema,
     registerSchema,

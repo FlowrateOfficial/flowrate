@@ -9,6 +9,7 @@ export interface LandingPlan {
   name: string
   price: string
   period?: string
+  yearlyNote?: string
   target: string
   targetDetail: string
   bestFor: string[]
@@ -69,8 +70,39 @@ export const useLandingStore = defineStore('landing', () => {
   ])
 
   const billingStore = useBillingStore()
+  const { pricingCadence } = storeToRefs(billingStore)
+
+  function stripePlanPrice(key: 'pro' | 'enterprise', fallbackPrice: string, fallbackPeriod: string) {
+    const stripe = billingStore.planForKey(key)
+    if (stripe) {
+      return {
+        price: stripe.formattedPrice,
+        period: stripe.formattedPeriod ?? fallbackPeriod,
+        yearlyNote: pricingCadence.value === 'yearly' && stripe.interval === 'year'
+          ? t('landing.pricing.billedAnnually')
+          : undefined
+      }
+    }
+
+    if (pricingCadence.value === 'yearly') {
+      const yearlyFallback = key === 'pro'
+        ? { price: t('landing.pricing.pro.yearlyPrice'), period: t('landing.pricing.pro.yearlyPeriod') }
+        : { price: t('landing.pricing.enterprise.yearlyPrice'), period: t('landing.pricing.enterprise.yearlyPeriod') }
+      return { ...yearlyFallback, yearlyNote: t('landing.pricing.billedAnnually') }
+    }
+
+    return { price: fallbackPrice, period: fallbackPeriod, yearlyNote: undefined }
+  }
 
   const pricingPlans = computed<LandingPlan[]>(() => {
+    const proPricing = stripePlanPrice('pro', t('landing.pricing.pro.price'), t('landing.pricing.pro.period'))
+    const enterprisePricing = stripePlanPrice(
+      'enterprise',
+      t('landing.pricing.enterprise.price'),
+      t('landing.pricing.enterprise.period')
+    )
+
+    const cadence = pricingCadence.value === 'yearly' ? 'yearly' : 'monthly'
     const plans: LandingPlan[] = [
     {
       key: 'free',
@@ -96,8 +128,9 @@ export const useLandingStore = defineStore('landing', () => {
     {
       key: 'pro',
       name: t('landing.pricing.pro.name'),
-      price: t('landing.pricing.pro.price'),
-      period: t('landing.pricing.pro.period'),
+      price: proPricing.price,
+      period: proPricing.period,
+      yearlyNote: proPricing.yearlyNote,
       target: t('landing.pricing.pro.target'),
       targetDetail: t('landing.pricing.pro.targetDetail'),
       bestFor: [
@@ -114,14 +147,15 @@ export const useLandingStore = defineStore('landing', () => {
         t('landing.pricing.pro.features.cloud')
       ],
       cta: t('landing.pricing.pro.cta'),
-      to: '/auth/register?plan=pro',
+      to: `/auth/register?plan=pro&billing=${cadence}`,
       highlight: true
     },
     {
       key: 'enterprise',
       name: t('landing.pricing.enterprise.name'),
-      price: t('landing.pricing.enterprise.price'),
-      period: t('landing.pricing.enterprise.period'),
+      price: enterprisePricing.price,
+      period: enterprisePricing.period,
+      yearlyNote: enterprisePricing.yearlyNote,
       target: t('landing.pricing.enterprise.target'),
       targetDetail: t('landing.pricing.enterprise.targetDetail'),
       bestFor: [
@@ -137,22 +171,10 @@ export const useLandingStore = defineStore('landing', () => {
         t('landing.pricing.enterprise.features.support')
       ],
       cta: t('landing.pricing.enterprise.cta'),
-      to: 'mailto:mathieu.lievre.pro@outlook.com',
+      to: `/auth/register?plan=enterprise&billing=${cadence}`,
       highlight: false
     }
     ]
-
-    for (const stripe of billingStore.plans) {
-      const idx = plans.findIndex(p => p.key === stripe.key)
-      if (idx >= 0) {
-        plans[idx] = {
-          ...plans[idx],
-          name: stripe.name || plans[idx].name,
-          price: stripe.formattedPrice,
-          period: stripe.formattedPeriod ?? plans[idx].period
-        }
-      }
-    }
 
     return plans
   })

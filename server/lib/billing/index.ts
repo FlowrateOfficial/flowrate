@@ -1,5 +1,6 @@
 export {
   clearBillingSubscription,
+  formatPlanPeriod,
   formatPlanPrice,
   getStripeCustomerId,
   getUserBillingSnapshot,

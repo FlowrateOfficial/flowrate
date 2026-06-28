@@ -3,9 +3,17 @@ import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Welcome', middleware: 'auth' })
 
+const route = useRoute()
 const { t } = useAppI18n()
 const onboarding = useOnboardingStore()
 const { step, selected, spaceName, loading, options } = storeToRefs(onboarding)
+
+onMounted(() => {
+  if (route.query.plan === 'enterprise') {
+    onboarding.selectType('COMPANY')
+    onboarding.continueFromStep1()
+  }
+})
 
 useSeoMeta({ title: () => `${t('dashboard.onboarding.welcome')} — ${t('common.appName')}` })
 </script>

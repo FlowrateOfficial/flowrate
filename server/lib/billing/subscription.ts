@@ -209,6 +209,7 @@ export async function processCheckoutSessionCompleted(
 }
 
 export {
+  formatPlanPeriod,
   formatPlanPrice,
   listStripePlans,
   resolveStripePriceId,

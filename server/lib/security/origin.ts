@@ -1,26 +1,9 @@
 // ANCHOR: Same-origin checks for state-changing API requests
 import type { H3Event } from 'h3'
+import { collectAppOrigins } from './csp'
 
 function allowedOrigins(event: H3Event): Set<string> {
-  const config = useRuntimeConfig(event)
-  const origins = new Set<string>()
-  origins.add(getRequestURL(event).origin)
-
-  const appUrl = config.public.appUrl as string
-  if (appUrl) {
-    try {
-      origins.add(new URL(appUrl).origin)
-    } catch {
-      // NOTE - ignore invalid APP_URL
-    }
-  }
-
-  const vercelUrl = process.env.VERCEL_URL
-  if (vercelUrl) {
-    origins.add(`https://${vercelUrl}`)
-  }
-
-  return origins
+  return new Set(collectAppOrigins(event))
 }
 
 export function assertSameOriginMutation(event: H3Event) {

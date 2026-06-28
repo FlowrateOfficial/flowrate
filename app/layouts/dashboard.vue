@@ -14,8 +14,8 @@ const { isMinor, activeSpace } = storeToRefs(spacesStore)
   <div class="flex h-screen overflow-hidden surface-page">
     <aside class="hidden lg:flex flex-col w-[17rem] shrink-0 border-r border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-warm/60 dark:bg-flow-warm-dark/40">
       <div class="px-8 py-10 border-b border-flow-border/30 dark:border-flow-border-dark/30">
-        <NuxtLink to="/dashboard" class="font-display text-2xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
-          FlowRate
+        <NuxtLink to="/dashboard" class="inline-flex">
+          <BrandFlowRateLogo :mark-size="30" />
         </NuxtLink>
       </div>
 
@@ -75,8 +75,8 @@ const { isMinor, activeSpace } = storeToRefs(spacesStore)
 
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
       <header class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-flow-border/60 dark:border-flow-border-dark/60">
-        <NuxtLink to="/dashboard" class="font-display text-lg text-flow-ink dark:text-flow-ink-dark">
-          FlowRate
+        <NuxtLink to="/dashboard" class="inline-flex">
+          <BrandFlowRateLogo :mark-size="26" class="[&_span]:text-lg" />
         </NuxtLink>
         <div class="flex items-center gap-1">
           <LanguageSwitcher />

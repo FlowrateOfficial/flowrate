@@ -20,11 +20,16 @@ export default defineEventHandler((event) => {
     rateLimit(event, 'api', { max: 240, windowMs: 60_000 })
   }
 
+  const method = event.method.toUpperCase()
+
   if (path.startsWith('/api/auth/')) {
     rateLimit(event, 'auth', { max: 60, windowMs: 60_000 })
     const action = path.split('/').pop() ?? ''
     if (['sign-in', 'sign-up', 'forget-password', 'forgot-password', 'reset-password'].includes(action)) {
       rateLimit(event, `auth:${action}`, { max: 10, windowMs: 15 * 60_000 })
+    }
+    if (method === 'GET' || method === 'HEAD') {
+      ensureCsrfCookie(event)
     }
     return
   }
@@ -51,10 +56,12 @@ export default defineEventHandler((event) => {
   }
 
   if (isSecurityExemptPath(path)) {
+    if (method === 'GET' || method === 'HEAD') {
+      ensureCsrfCookie(event)
+    }
     return
   }
 
-  const method = event.method.toUpperCase()
   if (method === 'GET' || method === 'HEAD') {
     ensureCsrfCookie(event)
     return

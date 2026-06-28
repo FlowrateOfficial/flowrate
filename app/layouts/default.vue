@@ -13,8 +13,8 @@ const navLinks = computed(() => [
   <div class="min-h-screen flex flex-col surface-page">
     <header class="sticky top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-bg/85 dark:bg-flow-bg-dark/85 backdrop-blur-md">
       <UContainer class="flex items-center justify-between h-16 sm:h-[4.5rem]">
-        <NuxtLink :to="homePath" class="font-display text-xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
-          FlowRate
+        <NuxtLink :to="homePath" class="inline-flex">
+          <BrandFlowRateLogo :mark-size="28" />
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-10">
@@ -64,9 +64,7 @@ const navLinks = computed(() => [
       <UContainer class="py-20 sm:py-28">
         <div class="grid lg:grid-cols-12 gap-12">
           <div class="lg:col-span-6 space-y-6">
-            <p class="text-display-footer text-flow-ink dark:text-flow-ink-dark">
-              FlowRate
-            </p>
+            <BrandFlowRateLogo :mark-size="28" class="text-display-footer" />
             <p class="text-flow-muted dark:text-flow-muted-dark max-w-sm leading-relaxed">
               {{ t('landing.heroSubtitle') }}
             </p>
@@ -78,6 +76,9 @@ const navLinks = computed(() => [
             </NuxtLink>
             <NuxtLink to="/terms" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
               {{ t('common.terms') }}
+            </NuxtLink>
+            <NuxtLink to="/glba" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+              {{ t('common.glba') }}
             </NuxtLink>
             <a href="mailto:mathieu.lievre.pro@outlook.com" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
               mathieu.lievre.pro@outlook.com

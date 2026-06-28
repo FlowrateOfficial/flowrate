@@ -1,6 +1,7 @@
 // ANCHOR: App HTTP client — CSRF, active space header, SSR cookies, GET dedupe
 import type { FetchOptions } from 'ofetch'
 import { CSRF_COOKIE, CSRF_HEADER } from '#shared/security'
+import { readCsrfTokenFromDocument } from '~/utils/csrf'
 import { buildRequestKey, dedupeRequest } from './dedupe'
 
 export type ApiMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
@@ -18,7 +19,7 @@ export function useApi() {
   const csrfCookie = import.meta.client ? useCookie<string | null>(CSRF_COOKIE) : ref(null)
 
   function mutationHeaders(): Record<string, string> {
-    const token = csrfCookie.value
+    const token = csrfCookie.value ?? readCsrfTokenFromDocument()
     return token ? { [CSRF_HEADER]: token } : {}
   }
 

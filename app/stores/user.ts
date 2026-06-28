@@ -95,10 +95,16 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function logout() {
-    await signOut()
     resetSession()
     spacesStore.clearSession()
-    await refreshNuxtData('neon-auth-session')
+    await clearNuxtData('neon-auth-session')
+    await signOut()
+
+    if (import.meta.client) {
+      window.location.assign('/')
+      return
+    }
+
     await navigateTo('/', { replace: true })
   }
 
@@ -110,6 +116,7 @@ export const useUserStore = defineStore('user', () => {
     items.push(
       { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' },
       { label: t('common.privacy'), icon: 'i-lucide-shield', to: '/privacy' },
+      { label: t('common.glba'), icon: 'i-lucide-landmark', to: '/glba' },
       { label: t('common.terms'), icon: 'i-lucide-file-text', to: '/terms' }
     )
     return items

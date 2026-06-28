@@ -21,12 +21,8 @@ function planKeyFromProduct(product: Stripe.Product): string {
   return product.name.trim().toLowerCase().replace(/\s+/g, '-')
 }
 
-function mapProduct(product: Stripe.Product): StripePlan | null {
-  const raw = product.default_price
-  if (!raw || typeof raw === 'string') return null
-
-  const price = raw as Stripe.Price
-  if (!price.active) return null
+function mapPrice(product: Stripe.Product, price: Stripe.Price): StripePlan | null {
+  if (!price.active || !price.recurring) return null
 
   return {
     key: planKeyFromProduct(product),
@@ -36,8 +32,8 @@ function mapProduct(product: Stripe.Product): StripePlan | null {
     description: product.description,
     amount: price.unit_amount != null ? price.unit_amount / 100 : 0,
     currency: price.currency.toUpperCase(),
-    interval: price.recurring?.interval ?? null,
-    intervalCount: price.recurring?.interval_count ?? 1
+    interval: price.recurring.interval,
+    intervalCount: price.recurring.interval_count ?? 1
   }
 }
 
@@ -48,14 +44,25 @@ export async function listStripePlans(stripe: Stripe, force = false): Promise<St
 
   const products = await stripe.products.list({
     active: true,
-    expand: ['data.default_price'],
     limit: 25
   })
 
-  const plans = products.data
-    .map(mapProduct)
-    .filter((p): p is StripePlan => p != null)
-    .sort((a, b) => a.amount - b.amount)
+  const plans: StripePlan[] = []
+
+  for (const product of products.data) {
+    const prices = await stripe.prices.list({
+      product: product.id,
+      active: true,
+      limit: 20
+    })
+
+    for (const price of prices.data) {
+      const mapped = mapPrice(product, price)
+      if (mapped) plans.push(mapped)
+    }
+  }
+
+  plans.sort((a, b) => a.amount - b.amount)
 
   cache = { fetchedAt: Date.now(), plans }
   return plans
@@ -63,12 +70,21 @@ export async function listStripePlans(stripe: Stripe, force = false): Promise<St
 
 export async function resolveStripePriceId(
   stripe: Stripe,
-  options: { planKey?: string, priceId?: string, fallbackPriceId?: string }
+  options: {
+    planKey?: string
+    priceId?: string
+    fallbackPriceId?: string
+    interval?: 'month' | 'year'
+  }
 ): Promise<string> {
   if (options.priceId) return options.priceId
 
   const key = (options.planKey ?? 'pro').toLowerCase()
+  const interval = options.interval ?? 'month'
   const plans = await listStripePlans(stripe)
+
+  const byKeyInterval = plans.find(p => p.key === key && p.interval === interval)
+  if (byKeyInterval) return byKeyInterval.priceId
 
   const byKey = plans.find(p => p.key === key)
   if (byKey) return byKey.priceId
@@ -80,7 +96,7 @@ export async function resolveStripePriceId(
 
   throw createError({
     statusCode: 404,
-    message: `No Stripe price found for plan "${key}". Create a Product in Stripe with metadata planKey=${key}, or set STRIPE_PRICE_PRO.`
+    message: `No Stripe price found for plan "${key}" (${interval}). Add a Product with metadata planKey=${key}.`
   })
 }
 
@@ -92,4 +108,11 @@ export function formatPlanPrice(plan: StripePlan, locale = 'en-US'): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
   }).format(plan.amount)
+}
+
+export function formatPlanPeriod(plan: StripePlan): string | undefined {
+  if (!plan.interval) return undefined
+  if (plan.interval === 'month') return '/mo'
+  if (plan.interval === 'year') return '/yr'
+  return `/${plan.interval}`
 }

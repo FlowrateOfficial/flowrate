@@ -25,6 +25,7 @@
     "copyright": "© {year} FlowRate. Tous droits réservés.",
     "privacy": "Confidentialité",
     "terms": "Conditions",
+    "glba": "Confidentialité financière (GLBA)",
     "language": "Langue",
     "english": "Anglais",
     "french": "Français",
@@ -214,8 +215,8 @@
         "description": "Argent de poche, tirelires, limites de dépenses et connexions ado avec supervision parentale."
       },
       "ai": {
-        "title": "Catégorisation IA",
-        "description": "Chaque transaction catégorisée automatiquement. Anticipez votre trésorerie avant les surprises de fin de mois."
+        "title": "Analyses IA optionnelles",
+        "description": "Les abonnés Pro et Entreprise pourront activer des analyses de dépenses par IA. Aujourd'hui, la catégorisation repose sur des règles — aucune IA ne traite vos données tant que vous ne l'activez pas."
       }
     },
     "pricing": {
@@ -257,7 +258,7 @@
           "spaces": "Espaces illimités (Foyer, Famille, Entreprise)",
           "banks": "Connexions bancaires illimitées",
           "shield": "SaaS Shield et taux de consommation",
-          "ai": "Catégorisation IA",
+          "ai": "Analyses IA optionnelles (opt-in)",
           "teen": "Comptes adolescents",
           "cloud": "Suivi des dépenses cloud"
         }
@@ -292,7 +293,7 @@
       "saasShield": "SaaS Shield",
       "burnRate": "Burn rate & runway",
       "teen": "Comptes ado & enfant",
-      "ai": "Catégorisation IA"
+      "ai": "Analyses IA optionnelles (opt-in)"
     }
   },
   "dashboard": {
@@ -885,8 +886,9 @@
     "privacy": {
       "title": "Politique de confidentialité",
       "seoTitle": "Politique de confidentialité — FlowRate",
-      "lastUpdated": "Dernière mise à jour : 26 juin 2026",
+      "lastUpdated": "Dernière mise à jour : 28 juin 2026",
       "seeAlsoTerms": "Voir aussi : Conditions d'utilisation",
+      "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "FlowRate (« nous ») est une application de gestion des finances personnelles et familiales. Cette politique explique quelles informations nous collectons, comment nous les utilisons, avec qui nous les partageons, où elles sont stockées et quels choix vous avez. Nous visons une transparence maximale pour que vous puissiez utiliser FlowRate en toute connaissance de cause.",
       "contact": "Des questions sur cette politique ou vos données ? Contactez-nous à",
       "table": {
@@ -907,7 +909,7 @@
             "Informations de compte : nom, adresse e-mail, numéro de téléphone optionnel, paramètres de profil et données d'authentification gérées via Neon Auth.",
             "Données d'espace financier : noms d'espaces, rôles des membres, invitations et préférences de visibilité (comptes personnels ou partagés).",
             "Données bancaires connectées (si vous choisissez de lier un compte) : nom de l'établissement, nom affiché du compte, type de compte, quatre derniers chiffres, soldes et historique des transactions reçus via Stripe Financial Connections.",
-            "Données dérivées : catégories de transactions (y compris catégorisation automatique), budgets, abonnements détectés, synthèses analytiques et règles de répartition que vous configurez.",
+            "Données dérivées : catégories de transactions (y compris catégorisation automatique par règles — pas d'IA aujourd'hui), budgets, abonnements détectés, synthèses analytiques et règles de répartition que vous configurez.",
             "Données de facturation : formule d'abonnement et identifiants client Stripe Billing si vous passez à une offre payante.",
             "Données techniques : journaux serveur, adresses IP et métadonnées de requêtes générées lors de l'utilisation de l'application (notamment via notre hébergeur)."
           ]
@@ -928,7 +930,7 @@
           "p1": "Nous utilisons les informations ci-dessus pour exploiter et améliorer FlowRate, notamment pour :",
           "items": [
             "Afficher les soldes et listes de transactions dans votre tableau de bord.",
-            "Catégoriser automatiquement les transactions et vous permettre de les ajuster.",
+            "Catégoriser les transactions par correspondance de règles sur les libellés (pas d'intelligence artificielle aujourd'hui) et vous permettre de les ajuster.",
             "Alimenter les budgets, analyses de dépenses, détection d'abonnements et vues par espace (par ex. synthèses famille ou burn rate entreprise).",
             "Appliquer les règles de visibilité que vous définissez (comptes personnels ou partagés).",
             "Vous authentifier, sécuriser les sessions, prévenir les abus et répondre au support.",
@@ -939,14 +941,26 @@
         "analytics": {
           "title": "5. Analyses et suivi",
           "p1": "Les fonctionnalités « Analyses » de FlowRate désignent des insights calculés à partir de vos propres données financières dans l'application — pas du suivi publicitaire tiers ou intersites.",
-          "p2": "Nous n'utilisons pas Google Analytics, de pixels publicitaires ni ne vendons de profils comportementaux. Nos hébergeurs peuvent enregistrer des journaux serveur standard (horodatages, URL, codes d'erreur) pour la fiabilité et la sécurité.",
-          "p3": "Si nous introduisons des analyses produit optionnelles à l'avenir, nous mettrons à jour cette politique et décrirons ce qui est collecté et comment vous désinscrire lorsque la loi l'exige."
+          "p2": "Nous n'utilisons pas Google Analytics, de pixels publicitaires ni ne vendons de profils comportementaux. Nos hébergeurs peuvent enregistrer des journaux serveur standard (horodatages, URL, codes d'erreur) pour la fiabilité et la sécurité."
+        },
+        "ai": {
+          "title": "6. Analyses IA optionnelles (Pro et Entreprise)",
+          "p1": "FlowRate n'utilise pas l'intelligence artificielle pour traiter vos données financières aujourd'hui. Les fonctionnalités standard — catégorisation, détection d'abonnements et analyses du tableau de bord — reposent sur des règles et calculs sur les données stockées dans FlowRate.",
+          "p2": "Nous prévoyons d'offrir des analyses de dépenses par IA, sur opt-in explicite dans Paramètres, aux abonnés Pro et Entreprise. Cette fonctionnalité n'est pas encore disponible ; nous mettrons à jour cette politique avant son lancement.",
+          "p3": "Si vous optez pour l'activation lorsque la fonctionnalité sera disponible, certaines informations financières (libellés, montants, dates, catégories et synthèses agrégées de vos comptes connectés) pourront être transmises à des prestataires d'IA tiers uniquement pour générer des insights affichés dans FlowRate.",
+          "p4": "L'opt-in est volontaire. Les utilisateurs du forfait gratuit et les abonnés payants qui ne s'inscrivent pas n'auront pas leurs données financières envoyées pour analyse IA. Vous pouvez retirer votre consentement à tout moment dans Paramètres ; nous arrêterons rapidement les nouveaux traitements IA et demanderons la suppression des copies chez le prestataire lorsque nos accords le permettent.",
+          "items": [
+            "Les insights IA sont informatifs uniquement — pas un conseil financier, d'investissement, fiscal ou juridique. Vérifiez les décisions importantes avec des professionnels qualifiés.",
+            "Nous ne vendons pas vos données financières. Les prestataires d'IA ne les traitent que pour nous fournir la fonctionnalité, sous restrictions contractuelles.",
+            "Nous n'utiliserons pas vos données financières opt-in pour entraîner des modèles d'IA publics destinés à des produits tiers non liés sans mettre à jour cette politique et, si requis, obtenir votre consentement.",
+            "L'opt-in aux analyses IA est distinct de la connexion bancaire ou de l'abonnement payant — vous devez l'activer explicitement."
+          ]
         },
         "sharing": {
-          "title": "6. Partage des informations",
+          "title": "7. Partage des informations",
           "p1": "Nous partageons des informations uniquement dans les cas suivants :",
           "items": [
-            "Prestataires (sous-traitants) : entreprises qui hébergent, authentifient, connectent les banques ou vérifient les numéros de téléphone pour notre compte, uniquement pour vous fournir FlowRate. Ils ne peuvent pas utiliser les données Financial Connections pour leurs propres finalités.",
+            "Prestataires (sous-traitants) : entreprises qui hébergent, authentifient, connectent les banques, vérifient les numéros de téléphone ou — uniquement si vous optez pour les analyses IA — génèrent des insights IA pour notre compte, uniquement pour vous fournir FlowRate. Ils ne peuvent pas utiliser les données Financial Connections pour leurs propres finalités.",
             "Au sein de vos espaces : lorsque vous marquez un compte ou des données comme partagés, les membres autorisés de cet espace (par ex. tuteurs dans un espace Famille) peuvent les voir selon leur rôle.",
             "Obligations légales : si la loi, une décision de justice ou la protection de droits, de la sécurité ou de la sûreté l'exige.",
             "Transferts d'activité : en cas de fusion ou acquisition impliquant FlowRate, les données peuvent être transférées sous réserve de cette politique."
@@ -954,7 +968,7 @@
           "p2": "Nous ne partageons pas les données Financial Connections avec des affiliés pour leur usage indépendant, des courtiers en données ou des tiers non liés qui utiliseraient les données pour améliorer leurs propres produits."
         },
         "subprocessors": {
-          "title": "7. Prestataires (sous-traitants)",
+          "title": "8. Prestataires (sous-traitants)",
           "p1": "Nous nous appuyons sur les catégories de prestataires suivantes. Chacun traite les données uniquement pour fournir des services à FlowRate :",
           "table": [
             {
@@ -976,26 +990,32 @@
               "name": "Twilio",
               "purpose": "Vérification optionnelle du numéro de téléphone (si vous en ajoutez un)",
               "location": "États-Unis"
+            },
+            {
+              "name": "Prestataires d'IA (opt-in uniquement)",
+              "purpose": "Analyses de dépenses IA optionnelles pour les utilisateurs Pro et Entreprise qui activent explicitement la fonctionnalité — non utilisés aujourd'hui",
+              "location": "États-Unis et/ou autres régions où le prestataire opère"
             }
           ]
         },
         "storage": {
-          "title": "8. Où nous stockons les données",
+          "title": "9. Où nous stockons les données",
           "p1": "Nous stockons les données d'application uniquement aux États-Unis et/ou dans des pays de l'Union européenne, via des prestataires d'infrastructure qui maintiennent la résidence des données dans ces régions.",
           "p2": "Nous ne stockons pas intentionnellement les données Financial Connections ou personnelles en dehors des États-Unis ou de l'UE. Si vous exigez un stockage exclusivement dans l'UE, contactez-nous pour les options de configuration prises en charge."
         },
         "retention": {
-          "title": "9. Durée de conservation",
+          "title": "10. Durée de conservation",
           "p1": "Nous conservons vos données tant que votre compte est actif et selon les besoins du service.",
           "items": [
             "Profil et espaces : jusqu'à la suppression de votre compte ou sur demande.",
             "Données bancaires connectées : jusqu'à la déconnexion du compte dans FlowRate ou la suppression du compte.",
             "Transactions et analyses dérivées : liées au compte ou à l'espace ; supprimées lors de la déconnexion ou suppression.",
-            "Journaux serveur : généralement conservés pour une durée limitée à des fins de sécurité et de dépannage, puis supprimés ou agrégés."
+            "Journaux serveur : généralement conservés pour une durée limitée à des fins de sécurité et de dépannage, puis supprimés ou agrégés.",
+            "Requêtes d'analyse IA (si opt-in) : conservées uniquement le temps nécessaire pour fournir les insights et respecter la loi ; supprimées ou anonymisées lorsque vous vous désinscrivez ou supprimez votre compte, sous réserve des limites du prestataire."
           ]
         },
         "yourRights": {
-          "title": "10. Vos choix et droits",
+          "title": "11. Vos choix et droits",
           "p1": "Selon votre lieu de résidence, vous pouvez disposer de droits d'accès, de rectification, de suppression, d'exportation ou de limitation du traitement. FlowRate prend en charge ce qui suit directement dans le produit ou sur demande :",
           "items": [
             "Accès et mise à jour : modifiez votre nom et téléphone dans Paramètres ; consultez transactions, comptes et budgets dans le tableau de bord.",
@@ -1004,37 +1024,38 @@
             "Suppression de compte : Paramètres → Supprimer mon compte pour votre propre profil.",
             "Tuteurs : supprimez un compte enfant ou ado depuis Famille → fiche enfant ou détails du membre (effacement définitif des données FlowRate et de la connexion).",
             "Export : écrivez à mathieu.lievre.pro@outlook.com pour demander une copie de vos données dans un format portable.",
-            "Marketing : nous n'envoyons pas de publicité tierce basée sur les données Financial Connections."
+            "Marketing : nous n'envoyons pas de publicité tierce basée sur les données Financial Connections.",
+            "Analyses IA : lorsque disponible, activez ou désactivez les insights IA optionnels dans Paramètres. La désactivation arrête les nouveaux traitements IA de vos données financières."
           ],
           "p2": "Les utilisateurs UE/RU peuvent également saisir leur autorité de protection des données locale. Nous répondrons aux demandes vérifiées dans les délais légaux applicables."
         },
         "security": {
-          "title": "11. Sécurité",
+          "title": "12. Sécurité",
           "p1": "Nous utilisons des mesures standard : chiffrement HTTPS, accès API authentifié et permissions par rôle dans les espaces financiers. Les identifiants bancaires sont gérés par Stripe et votre établissement — pas stockés sur les serveurs FlowRate.",
           "p2": "Aucune méthode de transmission ou de stockage n'est totalement sûre. Utilisez un mot de passe fort et unique et signalez-nous tout accès non autorisé suspecté."
         },
         "spaces": {
-          "title": "12. Espaces Foyer, Famille et Entreprise",
+          "title": "13. Espaces Foyer, Famille et Entreprise",
           "p1": "Lorsque vous rejoignez ou créez un espace partagé, certaines informations sont visibles par les autres membres selon leur rôle (propriétaire, tuteur, ado, admin finance, etc.). Les ados et enfants peuvent avoir des vues supervisées à permissions limitées.",
           "p2": "Vous êtes responsable des personnes que vous invitez et du choix Personnel ou Partagé lors de la connexion des comptes."
         },
         "children": {
-          "title": "13. Enfants et adolescents",
+          "title": "14. Enfants et adolescents",
           "p1": "Les espaces Famille peuvent inclure des profils ado ou enfant gérés par un parent ou tuteur. Nous ne collectons que ce qui est nécessaire à la gestion supervisée de l'argent. Les tuteurs contrôlent les invitations et la visibilité.",
           "p2": "FlowRate ne s'adresse pas aux enfants de moins de 13 ans pour créer un compte autonome sans implication parentale. Si vous pensez que nous avons collecté des données d'un enfant de manière inappropriée, contactez mathieu.lievre.pro@outlook.com."
         },
         "cookies": {
-          "title": "14. Cookies et technologies similaires",
+          "title": "15. Cookies et technologies similaires",
           "p1": "Nous utilisons des cookies essentiels et stockages similaires pour les sessions d'authentification, les préférences de langue et la sécurité. Ils sont nécessaires au fonctionnement de l'application.",
           "p2": "Nous n'utilisons pas de cookies publicitaires ni de suivi intersites. Vous pouvez effacer les cookies via votre navigateur, mais vous devrez peut-être vous reconnecter."
         },
         "international": {
-          "title": "15. Utilisateurs internationaux",
+          "title": "16. Utilisateurs internationaux",
           "p1": "FlowRate peut être utilisé depuis plusieurs pays. Si vous accédez au service hors États-Unis ou UE, vous comprenez que vos données peuvent être traitées aux États-Unis et/ou dans l'UE comme décrit ci-dessus.",
           "p2": "Lorsque la loi locale accorde des droits supplémentaires, nous les respectons dans la mesure applicable."
         },
         "changes": {
-          "title": "16. Modifications de cette politique",
+          "title": "17. Modifications de cette politique",
           "p1": "Nous pouvons mettre à jour cette politique. La version révisée sera publiée sur cette page avec la date de « Dernière mise à jour ». Les changements importants pourront aussi être communiqués dans l'application ou par e-mail.",
           "p2": "L'utilisation continue de FlowRate après l'entrée en vigueur des modifications vaut acceptation de la politique mise à jour."
         }
@@ -1045,6 +1066,7 @@
       "seoTitle": "Conditions d'utilisation — FlowRate",
       "lastUpdated": "Dernière mise à jour : 26 juin 2026",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
+      "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "Les présentes Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation de FlowRate. En créant un compte ou en utilisant le service, vous acceptez ces Conditions et notre Politique de confidentialité.",
       "contact": "Des questions sur ces Conditions ? Contactez-nous à",
       "sections": {
@@ -1054,8 +1076,9 @@
         },
         "service": {
           "title": "2. Le service",
-          "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses, définir des budgets, détecter les abonnements et collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise).",
-          "p2": "Les fonctionnalités peuvent évoluer. Nous pouvons ajouter, modifier ou retirer des fonctionnalités avec un préavis raisonnable lorsque c'est possible."
+          "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses (par règles aujourd'hui — pas d'intelligence artificielle), définir des budgets, détecter les abonnements et collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise).",
+          "p2": "Nous prévoyons d'offrir des analyses de dépenses par IA optionnelles aux abonnés Pro et Entreprise qui s'inscrivent explicitement. Cette fonctionnalité n'est pas encore disponible ; lorsqu'elle sera lancée, elle sera régie par notre Politique de confidentialité et votre choix d'opt-in dans Paramètres.",
+          "p3": "Les fonctionnalités peuvent évoluer. Nous pouvons ajouter, modifier ou retirer des fonctionnalités avec un préavis raisonnable lorsque c'est possible."
         },
         "eligibility": {
           "title": "3. Éligibilité",
@@ -1081,7 +1104,8 @@
         "billing": {
           "title": "7. Offres payantes et facturation",
           "p1": "Certaines fonctionnalités peuvent nécessiter un abonnement payant traité par Stripe Billing. Les tarifs sont affichés au moment du paiement. Les abonnements se renouvellent automatiquement jusqu'à annulation via le portail de facturation ou en contactant le support.",
-          "p2": "Les remboursements sont traités selon la politique affichée à l'achat et la loi applicable."
+          "p2": "Les remboursements sont traités selon la politique affichée à l'achat et la loi applicable.",
+          "p3": "Les analyses IA optionnelles, lorsqu'elles seront disponibles, nécessitent un abonnement Pro ou Entreprise et un opt-in distinct dans Paramètres. Payer un forfait n'active pas automatiquement le traitement IA de vos données financières."
         },
         "acceptableUse": {
           "title": "8. Usage acceptable",
@@ -1096,7 +1120,8 @@
         },
         "disclaimers": {
           "title": "9. Pas de conseil financier",
-          "p1": "FlowRate est fourni à titre informatif et organisationnel uniquement. Nous ne fournissons pas de conseil financier, d'investissement, fiscal ou juridique. Les catégorisations, détections d'abonnements et analyses sont des estimations automatisées — vérifiez les décisions importantes avec des professionnels qualifiés et vos relevés bancaires officiels."
+          "p1": "FlowRate est fourni à titre informatif et organisationnel uniquement. Nous ne fournissons pas de conseil financier, d'investissement, fiscal ou juridique. Les catégorisations, détections d'abonnements, analyses et tout futur insight généré par IA sont des estimations automatisées — vérifiez les décisions importantes avec des professionnels qualifiés et vos relevés bancaires officiels.",
+          "p2": "Les analyses IA, lorsqu'elles seront proposées, peuvent être inexactes ou incomplètes. Elles ne remplacent pas le jugement professionnel ni les relevés officiels."
         },
         "liability": {
           "title": "10. Exclusions et limitation de responsabilité",
@@ -1112,6 +1137,113 @@
           "title": "12. Modifications des Conditions",
           "p1": "Nous pouvons mettre à jour ces Conditions. La version mise à jour sera publiée sur cette page avec la date de « Dernière mise à jour ». L'utilisation continue après l'entrée en vigueur vaut acceptation.",
           "p2": "Si vous n'acceptez pas les Conditions mises à jour, vous devez cesser d'utiliser FlowRate et pouvez demander la suppression de votre compte."
+        }
+      }
+    },
+    "glba": {
+      "title": "Avis de confidentialité financière (GLBA)",
+      "seoTitle": "Avis de confidentialité financière (GLBA) — FlowRate",
+      "lastUpdated": "Dernière mise à jour : 28 juin 2026",
+      "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
+      "seeAlsoTerms": "Conditions d'utilisation",
+      "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation.",
+      "contact": "Des questions sur cet avis ou vos IPNP ? Contactez-nous à",
+      "sections": {
+        "purpose": {
+          "title": "1. Objet de cet avis",
+          "p1": "FlowRate est une application de finances personnelles et familiales. Nous ne sommes pas une banque, un coopérative de crédit ou un autre établissement de dépôt. Lorsque vous choisissez de lier un compte financier américain, nous recevons certaines informations financières vous concernant avec votre consentement afin d'afficher soldes, transactions, budgets et fonctionnalités associées.",
+          "p2": "Cet avis explique quelles IPNP nous traitons, comment nous les utilisons, avec qui nous pouvons les partager et les choix dont vous disposez. Nous le fournissons au moment ou avant la connexion d'un compte financier et le rendons disponible en permanence sur notre site."
+        },
+        "scope": {
+          "title": "2. Personnes concernées",
+          "p1": "Cet avis s'applique aux personnes qui utilisent FlowRate en tant que consommateurs—titulaires de compte, membres du foyer, participants à un espace Famille et utilisateurs autorisés d'un espace Entreprise—lorsque nous collectons des IPNP les concernant dans le cadre du service.",
+          "p2": "Si vous utilisez FlowRate uniquement au nom d'une entité commerciale et non en tant que consommateur, d'autres accords peuvent s'appliquer. Contactez-nous pour toute clarification concernant votre organisation."
+        },
+        "npiDefinition": {
+          "title": "3. Qu'est-ce qu'une information personnelle non publique (IPNP) ?",
+          "p1": "Aux fins du présent avis, une IPNP désigne une information financière personnellement identifiable qui n'est pas accessible au public. Exemples : soldes de compte, historique des transactions, identifiants de compte (nom de l'établissement, quatre derniers chiffres) et informations que nous en dérivons (catégories de dépenses, détection d'abonnements).",
+          "p2": "Les informations accessibles au public—telles que les registres gouvernementaux ou les médias largement diffusés—ne sont pas des IPNP lorsque nous avons pris des mesures raisonnables pour confirmer leur caractère public."
+        },
+        "whatWeCollect": {
+          "title": "4. IPNP que nous collectons",
+          "p1": "Les IPNP collectées dépendent de votre utilisation de FlowRate. Catégories :",
+          "items": [
+            "Identité et contact : nom, adresse e-mail, numéro de téléphone optionnel et identifiants d'authentification gérés par notre fournisseur d'identité.",
+            "Comptes connectés : nom de l'établissement, libellé du compte, type, numéros masqués, soldes et transactions reçus via Stripe Financial Connections lorsque vous autorisez l'accès.",
+            "Informations financières dérivées : catégories de transactions, budgets, estimations d'abonnements, synthèses analytiques et règles de répartition que vous configurez dans FlowRate.",
+            "Espaces et partage : rôles, invitations et paramètres de visibilité (personnel vs partagé) déterminant qui dans un foyer, une famille ou une entreprise peut voir les informations financières liées.",
+            "Facturation : statut d'abonnement et identifiants client Stripe Billing si vous souscrivez un forfait payant (nous ne stockons pas les numéros complets de carte bancaire)."
+          ]
+        },
+        "howWeCollect": {
+          "title": "5. Comment nous collectons les IPNP",
+          "p1": "Nous collectons les IPNP directement auprès de vous lors de l'inscription, de la mise à jour du profil, de la création ou de l'adhésion à des espaces et de la configuration des budgets ou catégories.",
+          "p2": "Lorsque vous connectez un compte bancaire, vous passez par le flux Stripe Financial Connections. Vous vous authentifiez auprès de votre établissement (ou via l'interface sécurisée de Stripe). FlowRate ne reçoit ni ne stocke vos identifiants de connexion bancaire en ligne.",
+          "p3": "Nous pouvons également recevoir des données techniques limitées (adresse IP, journaux de requêtes) générées lors de l'utilisation de l'application, comme décrit dans notre Politique de confidentialité."
+        },
+        "howWeUse": {
+          "title": "6. Comment nous utilisons les IPNP",
+          "p1": "Nous utilisons les IPNP uniquement pour des finalités légitimes liées à FlowRate, notamment :",
+          "items": [
+            "Afficher soldes et transactions dans votre tableau de bord.",
+            "Catégoriser les transactions, alimenter budgets, détection d'abonnements et analyses de dépenses (par règles aujourd'hui — pas d'IA sauf opt-in ultérieur aux analyses IA).",
+            "Générer des insights de dépenses IA optionnels pour les utilisateurs Pro et Entreprise qui s'inscrivent explicitement, lorsque cette fonctionnalité sera disponible.",
+            "Appliquer la visibilité et les permissions par rôle dans les espaces que vous créez ou rejoignez.",
+            "Vous authentifier, sécuriser le service, prévenir la fraude et les abus, et fournir le support client.",
+            "Traiter les abonnements payants optionnels via Stripe Billing.",
+            "Respecter la loi, répondre aux demandes légales et protéger nos droits et la sécurité des utilisateurs."
+          ],
+          "p2": "Nous n'utilisons pas les IPNP pour des décisions d'éligibilité au crédit, la vente de prospects à des prêteurs ou la création de profils publicitaires pour des tiers non liés. Nous n'envoyons pas les IPNP à des prestataires d'IA sauf si vous êtes sur un forfait payant éligible, que la fonctionnalité IA est disponible et que vous avez opté pour l'activation."
+        },
+        "sharing": {
+          "title": "7. Comment nous partageons les IPNP",
+          "p1": "Nous ne vendons pas vos IPNP. Nous les partageons uniquement dans les cas limités suivants :",
+          "items": [
+            "Prestataires de services : entreprises de confiance qui traitent des données pour notre compte afin d'exploiter FlowRate—par exemple Stripe (Financial Connections et facturation), Neon (authentification et base de données), Vercel (hébergement) et Twilio (vérification téléphonique optionnelle). Ces prestataires ne peuvent utiliser les IPNP que pour nous fournir leurs services et doivent les protéger de manière appropriée.",
+            "Prestataires d'IA (opt-in uniquement) : si vous êtes abonné Pro ou Entreprise et activez explicitement les analyses IA lorsque la fonctionnalité sera disponible, nous pourrons partager certaines IPNP avec des prestataires d'IA tiers uniquement pour générer des insights dans FlowRate. Ce partage n'a pas lieu aujourd'hui et ne se produit jamais sans votre opt-in.",
+            "Au sein de vos espaces : lorsque vous marquez un compte ou des données comme partagés, les membres autorisés de cet espace (tuteurs dans un espace Famille, administrateurs financiers dans un espace Entreprise, etc.) peuvent les consulter selon leur rôle.",
+            "Affiliés : FlowRate ne partage actuellement pas les IPNP avec des affiliés pour leurs propres finalités.",
+            "Obligations légales et sécurité : lorsque la loi, la réglementation, une procédure judiciaire l'exige, ou pour protéger les droits, les biens ou la sécurité de FlowRate, de nos utilisateurs ou d'autrui.",
+            "Transferts d'activité : en cas de fusion, acquisition ou cession d'actifs, les IPNP peuvent être transférées sous réserve du présent avis et de la loi applicable."
+          ],
+          "p2": "Nous ne partageons pas les IPNP avec des tiers non affiliés pour qu'ils vous commercialisent leurs propres produits ou services."
+        },
+        "optOut": {
+          "title": "8. Vos droits de refus (opt-out)",
+          "p1": "En vertu du GLBA, les consommateurs ont généralement le droit de refuser certains partages d'IPNP avec des tiers non affiliés à des fins de marketing pour le compte de ces tiers.",
+          "p2": "FlowRate ne partage pas les IPNP avec des tiers non affiliés pour leur marketing indépendant. Nous n'effectuons donc pas ce type de partage et il n'existe pas de liste de refus marketing à rejoindre pour le moment.",
+          "p3": "Vous gardez néanmoins le contrôle de vos données : déconnectez les comptes liés depuis la page Comptes, ajustez la visibilité Personnel vs Partagé lors de la connexion bancaire, quittez ou supprimez des espaces, et supprimez votre compte depuis Paramètres. Lorsque les analyses IA seront disponibles, vous pourrez vous inscrire ou vous désinscrire indépendamment dans Paramètres — la désinscription arrête les nouveaux traitements IA. Pour exercer vos droits ou demander l'accès ou la suppression de données, écrivez à mathieu.lievre.pro@outlook.com."
+        },
+        "safeguards": {
+          "title": "9. Protection des IPNP",
+          "p1": "Nous maintenons des mesures administratives, techniques et physiques destinées à protéger les IPNP, notamment le chiffrement en transit (HTTPS), l'accès authentifié aux API, les permissions par rôle dans les espaces et la limitation de l'accès des employés aux données de production selon le besoin d'en connaître.",
+          "p2": "Les identifiants bancaires sont traités par Stripe et votre établissement—ils ne sont pas stockés sur les serveurs FlowRate. Aucun programme de sécurité n'est parfait ; utilisez un mot de passe fort et unique et signalez-nous tout accès non autorisé suspecté."
+        },
+        "retention": {
+          "title": "10. Durée de conservation des IPNP",
+          "p1": "Nous conservons les IPNP tant que votre compte est actif et selon les besoins pour fournir le service, respecter les obligations légales, résoudre les litiges et faire respecter nos accords.",
+          "items": [
+            "IPNP des comptes connectés : jusqu'à la déconnexion du compte dans FlowRate ou la suppression de votre compte.",
+            "Analyses et catégories dérivées : supprimées lorsque les données du compte sous-jacent sont supprimées ou déconnectées.",
+            "Profil et espaces : jusqu'à la suppression de votre compte ou sur demande.",
+            "Journaux serveur : conservés pour une durée limitée à des fins de sécurité et de dépannage, puis supprimés ou agrégés.",
+            "Requêtes d'analyse IA (si opt-in) : conservées uniquement le temps nécessaire pour fournir les insights ; arrêtées et supprimées ou anonymisées lorsque vous vous désinscrivez ou supprimez votre compte, sous réserve des limites du prestataire."
+          ]
+        },
+        "formerCustomers": {
+          "title": "11. Après avoir cessé d'utiliser FlowRate",
+          "p1": "Si vous supprimez votre compte ou déconnectez tous les comptes financiers, nous supprimons ou anonymisons les IPNP associées de notre base applicative dans un délai raisonnable, sous réserve d'une conservation limitée des sauvegardes et des obligations légales décrites dans notre Politique de confidentialité.",
+          "p2": "Le présent avis continue de décrire comment nous avons traité les IPNP pendant votre utilisation. Un avis mis à jour s'appliquera si vous revenez et connectez à nouveau des comptes."
+        },
+        "otherNotices": {
+          "title": "12. Lien avec les autres politiques",
+          "p1": "Notre Politique de confidentialité détaille davantage nos pratiques, les utilisateurs internationaux, les cookies, les enfants et adolescents, et les sous-traitants. Nos Conditions d'utilisation régissent votre utilisation de FlowRate.",
+          "p2": "En cas de conflit entre le présent avis et la Politique de confidentialité concernant les IPNP collectées via des connexions de comptes financiers, le présent avis prévaut pour ces IPNP."
+        },
+        "changes": {
+          "title": "13. Modifications de cet avis",
+          "p1": "Nous pouvons mettre à jour cet avis de temps à autre. La version révisée sera publiée sur cette page avec la date de « Dernière mise à jour ». Les changements importants pourront aussi être communiqués dans l'application ou par e-mail le cas échéant.",
+          "p2": "L'utilisation continue de FlowRate après l'entrée en vigueur des modifications vaut acceptation de l'avis mis à jour, dans la mesure permise par la loi."
         }
       }
     }

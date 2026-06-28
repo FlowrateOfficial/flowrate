@@ -1,4 +1,4 @@
-import { formatPlanPrice, listStripePlans } from '../../lib/billing'
+import { formatPlanPeriod, formatPlanPrice, listStripePlans } from '../../lib/billing'
 import { requireStripe } from '../../lib/stripe'
 
 // ANCHOR: Public Stripe plan catalog (cached 5 min)
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     plans: plans.map(plan => ({
       ...plan,
       formattedPrice: formatPlanPrice(plan, locale),
-      formattedPeriod: plan.interval === 'month' ? '/mo' : plan.interval ? `/${plan.interval}` : undefined
+      formattedPeriod: formatPlanPeriod(plan)
     }))
   }
 })

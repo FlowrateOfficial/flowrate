@@ -4,7 +4,8 @@ import { ensureStripeCustomer, requireStripe, resolveHttpsBaseUrl } from '../../
 
 const bodySchema = z.object({
   planKey: z.string().optional().default('pro'),
-  priceId: z.string().optional()
+  priceId: z.string().optional(),
+  interval: z.enum(['month', 'year']).optional().default('month')
 })
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +16,8 @@ export default defineEventHandler(async (event) => {
   const priceId = await resolveStripePriceId(stripe, {
     planKey: body.planKey ?? 'pro',
     priceId: body.priceId,
-    fallbackPriceId: config.stripePricePro || undefined
+    fallbackPriceId: config.stripePricePro || undefined,
+    interval: body.interval
   })
 
   const dbUser = await prisma.user.findUnique({

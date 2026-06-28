@@ -23,8 +23,9 @@ useSeoMeta({ title: () => t('legal.terms.seoTitle') })
 
 <template>
   <UContainer class="py-16 max-w-3xl">
-    <p class="text-sm text-primary font-medium mb-3">
+    <p class="text-sm text-primary font-medium mb-3 flex flex-wrap gap-x-4 gap-y-1">
       <NuxtLink to="/privacy" class="hover:underline">{{ t('legal.terms.seeAlsoPrivacy') }}</NuxtLink>
+      <NuxtLink to="/glba" class="hover:underline">{{ t('legal.terms.seeAlsoGlba') }}</NuxtLink>
     </p>
 
     <h1 class="text-3xl font-bold mb-2">{{ t('legal.terms.title') }}</h1>

@@ -6,7 +6,8 @@ defineProps<{
 }>()
 
 const { t } = useAppI18n()
-const billingPeriod = ref<'monthly' | 'yearly'>('monthly')
+const billingStore = useBillingStore()
+const { pricingCadence } = storeToRefs(billingStore)
 </script>
 
 <template>
@@ -27,16 +28,16 @@ const billingPeriod = ref<'monthly' | 'yearly'>('monthly')
             <button
               type="button"
               class="px-5 py-2 text-sm rounded-[0.5rem] transition-all duration-300"
-              :class="billingPeriod === 'monthly' ? 'bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal' : 'text-flow-muted'"
-              @click="billingPeriod = 'monthly'"
+              :class="pricingCadence === 'monthly' ? 'bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal' : 'text-flow-muted'"
+              @click="pricingCadence = 'monthly'"
             >
               {{ t('landing.pricing.monthly') }}
             </button>
             <button
               type="button"
               class="px-5 py-2 text-sm rounded-[0.5rem] transition-all duration-300"
-              :class="billingPeriod === 'yearly' ? 'bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal' : 'text-flow-muted'"
-              @click="billingPeriod = 'yearly'"
+              :class="pricingCadence === 'yearly' ? 'bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal' : 'text-flow-muted'"
+              @click="pricingCadence = 'yearly'"
             >
               {{ t('landing.pricing.yearly') }}
             </button>
@@ -75,10 +76,13 @@ const billingPeriod = ref<'monthly' | 'yearly'>('monthly')
               <span class="text-4xl sm:text-5xl font-light tabular-nums text-flow-ink dark:text-flow-ink-dark tracking-tight">
                 {{ plan.price }}
               </span>
-              <span v-if="plan.period && billingPeriod === 'monthly'" class="text-flow-muted dark:text-flow-muted-dark text-sm">
+              <span v-if="plan.period" class="text-flow-muted dark:text-flow-muted-dark text-sm">
                 {{ plan.period }}
               </span>
             </div>
+            <p v-if="plan.yearlyNote" class="text-xs text-sage">
+              {{ plan.yearlyNote }}
+            </p>
           </header>
 
           <div class="flex-1 space-y-8">

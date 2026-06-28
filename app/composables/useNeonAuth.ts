@@ -16,11 +16,13 @@ export function useNeonAuth() {
   async function signUp(email: string, password: string, name?: string) {
     const auth = getAuthClient()
     if (!auth) throw new Error('Auth is only available in the browser')
-    return auth.signUp.email({ email, password, name: name ?? email.split('@')[0] })
+    return auth.signUp.email({ email, password, name: `${name ?? email.split('@')[0]}` })
   }
 
   async function signOut() {
     if (!import.meta.client) return
+
+    resetAuthClient()
 
     try {
       await $fetch('/api/auth/sign-out', {
@@ -28,8 +30,8 @@ export function useNeonAuth() {
         body: {},
         credentials: 'include'
       })
-    } finally {
-      resetAuthClient()
+    } catch {
+      // NOTE - Session may already be cleared
     }
   }
 

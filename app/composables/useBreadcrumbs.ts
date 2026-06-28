@@ -36,13 +36,18 @@ export function useBreadcrumbs() {
   const items = computed((): BreadcrumbItem[] => {
     const path = route.path
 
-    if (path === '/privacy' || path === '/terms') {
+    if (path === '/privacy' || path === '/terms' || path === '/glba') {
       const root: BreadcrumbItem = isLoggedIn.value
         ? { label: t('nav.overview'), to: '/dashboard' }
         : { label: t('common.appName'), to: '/' }
+      const titleKey = path === '/privacy'
+        ? 'legal.privacy.title'
+        : path === '/terms'
+          ? 'legal.terms.title'
+          : 'legal.glba.title'
       return [
         root,
-        { label: t(path === '/privacy' ? 'legal.privacy.title' : 'legal.terms.title') }
+        { label: t(titleKey) }
       ]
     }
 

@@ -25,6 +25,7 @@
     "copyright": "© {year} FlowRate. All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms",
+    "glba": "Financial Privacy (GLBA)",
     "language": "Language",
     "english": "English",
     "french": "French",
@@ -85,6 +86,16 @@
       "confirmPassword": "Confirm password",
       "passwordPlaceholder": "Min. 8 characters",
       "proBadge": "Starting with Pro plan",
+      "enterpriseBadge": "Starting with Enterprise plan",
+      "choosePlan": "Choose your plan",
+      "planFree": "Personal",
+      "planFreeDescription": "Free — independent space, 1 bank connection",
+      "planPro": "Pro",
+      "planProDescription": "Unlimited spaces, SaaS Shield, teen accounts",
+      "planEnterprise": "Enterprise",
+      "planEnterpriseDescription": "Business spaces, team roles, priority support",
+      "billingMonthly": "Monthly billing",
+      "billingYearly": "Yearly billing (save ~17%)",
       "termsPrefix": "By creating an account, you agree to our",
       "termsCheckboxPrefix": "I agree to the",
       "termsOfService": "Terms of Service",
@@ -115,7 +126,7 @@
       "saasShield": "SaaS Shield",
       "burnRate": "Burn Rate & Runway",
       "teen": "Teen & Child Accounts",
-      "ai": "AI Categorization"
+      "ai": "Optional AI insights (opt-in)"
     },
     "heroCards": {
       "balance": "Balance",
@@ -213,13 +224,14 @@
         "description": "Allowances, savings jars, spending limits, and teen logins with guardian oversight."
       },
       "ai": {
-        "title": "AI Categorization",
-        "description": "Every transaction categorized automatically. Forecast cash flow before month-end surprises."
+        "title": "Optional AI Insights",
+        "description": "Pro and Enterprise subscribers will be able to opt in to AI-powered spending analysis. Today, categorization uses rule-based matching—no AI processes your data unless you choose to enable it later."
       }
     },
     "pricing": {
       "monthly": "Monthly",
       "yearly": "Yearly",
+      "billedAnnually": "Billed annually",
       "mostPopular": "Most popular",
       "bestForLabel": "Best for",
       "free": {
@@ -255,11 +267,13 @@
         "description": "For freelancers and founders who mean business.",
         "badge": "Most popular",
         "cta": "Start Pro trial",
+        "yearlyPrice": "$120",
+        "yearlyPeriod": "/yr",
         "features": {
           "spaces": "Unlimited spaces (Household, Family, Company)",
           "banks": "Unlimited bank connections",
           "shield": "SaaS Shield & burn rate",
-          "ai": "AI categorization",
+          "ai": "Optional AI insights (opt-in)",
           "teen": "Teen accounts",
           "cloud": "Cloud spend tracking"
         }
@@ -276,7 +290,9 @@
           "growing": "Growing LLCs with staff"
         },
         "description": "Teams and growing companies.",
-        "cta": "Contact us",
+        "cta": "Start Enterprise",
+        "yearlyPrice": "$490",
+        "yearlyPeriod": "/yr",
         "features": {
           "pro": "Everything in Pro",
           "members": "Up to 10 company members",
@@ -877,8 +893,9 @@
     "privacy": {
       "title": "Privacy Policy",
       "seoTitle": "Privacy Policy — FlowRate",
-      "lastUpdated": "Last updated: June 26, 2026",
+      "lastUpdated": "Last updated: June 28, 2026",
       "seeAlsoTerms": "See also: Terms of Service",
+      "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
       "intro": "FlowRate (“we”, “us”, “our”) is a personal and household finance application. This Privacy Policy explains what information we collect, how we use it, who we share it with, where it is stored, and the choices you have. We aim to be transparent so you can make informed decisions about using FlowRate.",
       "contact": "Questions about this policy or your data? Contact us at",
       "table": {
@@ -899,7 +916,7 @@
             "Account information: name, email address, optional phone number, profile settings, and authentication data managed through Neon Auth.",
             "Financial space data: space names, membership roles, invitations, and visibility preferences (personal vs shared accounts).",
             "Connected bank data (when you choose to link): institution name, account display name, account type, last four digits, balances, and transaction history received through Stripe Financial Connections.",
-            "Derived data: transaction categories (including rule-based auto-categorization), budget entries, detected subscriptions, analytics summaries, and split rules you configure.",
+            "Derived data: transaction categories (including rule-based auto-categorization—no AI today), budget entries, detected subscriptions, analytics summaries, and split rules you configure.",
             "Billing data: subscription plan and Stripe Billing customer identifiers if you upgrade to a paid plan.",
             "Technical data: server logs, IP addresses, and request metadata generated when you use the app (for example through our hosting provider)."
           ]
@@ -920,7 +937,7 @@
           "p1": "We use the information above to operate and improve FlowRate, including:",
           "items": [
             "Displaying account balances and transaction lists in your dashboard.",
-            "Categorizing transactions automatically and letting you review or adjust categories.",
+            "Categorizing transactions using rule-based matching on transaction descriptions (not artificial intelligence today), and letting you review or adjust categories.",
             "Powering budgets, spending analytics, subscription detection, and space-specific views (for example family or company burn-rate summaries).",
             "Enforcing visibility rules you set (personal vs shared accounts within a space).",
             "Authenticating you, securing sessions, preventing abuse, and responding to support requests.",
@@ -931,14 +948,26 @@
         "analytics": {
           "title": "5. Analytics and tracking",
           "p1": "FlowRate’s “Analytics” features refer to spending insights calculated from your own financial data inside the app—not third-party advertising or cross-site tracking.",
-          "p2": "We do not use Google Analytics, advertising pixels, or sell behavioral profiles. Our hosting and infrastructure providers may record standard server logs (timestamps, URLs, error codes) for reliability and security.",
-          "p3": "If we introduce optional product analytics in the future, we will update this policy and describe what is collected and how to opt out where required by law."
+          "p2": "We do not use Google Analytics, advertising pixels, or sell behavioral profiles. Our hosting and infrastructure providers may record standard server logs (timestamps, URLs, error codes) for reliability and security."
+        },
+        "ai": {
+          "title": "6. Optional AI analysis (Pro and Enterprise)",
+          "p1": "FlowRate does not use artificial intelligence to process your financial data today. Standard features—including transaction categorization, subscription detection, and dashboard analytics—use rule-based logic and calculations on data stored in FlowRate.",
+          "p2": "We plan to offer optional AI-powered spending analysis and insights for Pro and Enterprise subscribers who explicitly opt in through Settings. This feature is not available yet; we will update this policy before it launches.",
+          "p3": "If you opt in when the feature becomes available, selected financial information (such as transaction descriptions, amounts, dates, categories, and aggregated spending summaries from your connected accounts) may be sent to third-party AI service providers solely to generate insights displayed to you inside FlowRate.",
+          "p4": "Opt-in is voluntary. Free plan users and paid users who do not opt in will not have their financial data sent for AI analysis. You may withdraw consent at any time in Settings; we will stop new AI processing promptly and request deletion of provider-side copies where our agreements allow.",
+          "items": [
+            "AI insights are informational only—not financial, investment, tax, or legal advice. You should verify important decisions with qualified professionals.",
+            "We do not sell your financial data. AI providers process data only to deliver the feature on our behalf under contractual restrictions.",
+            "We will not use your opted-in financial data to train public AI models for unrelated third-party products without updating this policy and, where required, obtaining your consent.",
+            "Opting in to AI analysis is separate from connecting a bank account or subscribing to a paid plan—you must enable it explicitly."
+          ]
         },
         "sharing": {
-          "title": "6. How we share information",
+          "title": "7. How we share information",
           "p1": "We share information only in these situations:",
           "items": [
-            "Service providers (subprocessors): companies that host, authenticate, connect banks, or verify phone numbers on our behalf, solely to provide FlowRate to you. They may not use Financial Connections data for their own independent purposes.",
+            "Service providers (subprocessors): companies that host, authenticate, connect banks, verify phone numbers, or—only if you opt in to AI analysis—generate AI insights on our behalf, solely to provide FlowRate to you. They may not use Financial Connections data for their own independent purposes.",
             "Within your spaces: when you mark an account or data as shared, authorized members of that space (for example guardians in a Family space) can see it according to their role.",
             "Legal requirements: if required by law, court order, or to protect rights, safety, and security.",
             "Business transfers: if FlowRate is involved in a merger or acquisition, data may transfer subject to this policy."
@@ -946,7 +975,7 @@
           "p2": "We do not share Financial Connections data with affiliates for their independent use, data brokers, or unrelated third parties that would use the data to improve their own products."
         },
         "subprocessors": {
-          "title": "7. Service providers (subprocessors)",
+          "title": "8. Service providers (subprocessors)",
           "p1": "We rely on the following categories of providers. Each processes data only to deliver services to FlowRate:",
           "table": [
             {
@@ -968,26 +997,32 @@
               "name": "Twilio",
               "purpose": "Optional phone number verification (if you add a phone number)",
               "location": "United States"
+            },
+            {
+              "name": "AI service providers (opt-in only)",
+              "purpose": "Optional AI spending analysis for Pro and Enterprise users who explicitly enable the feature—not used today",
+              "location": "United States and/or other regions where the provider operates"
             }
           ]
         },
         "storage": {
-          "title": "8. Where we store data",
+          "title": "9. Where we store data",
           "p1": "We store application data only in the United States and/or countries within the European Union, using infrastructure providers that maintain data residency in those regions.",
           "p2": "We do not intentionally store Financial Connections or personal data in countries outside the US or EU. If you require EU-only storage, contact us and we will work with you on supported configuration options for your account."
         },
         "retention": {
-          "title": "9. How long we keep data",
+          "title": "10. How long we keep data",
           "p1": "We retain your data while your account is active and as needed to provide the service.",
           "items": [
             "Profile and space data: until you delete your account or ask us to remove it.",
             "Connected bank data: until you disconnect the account in FlowRate or delete your account.",
             "Transactions and derived analytics: tied to the connected account or space; removed when you disconnect or delete.",
-            "Server logs: typically retained for a limited period for security and troubleshooting, then deleted or aggregated."
+            "Server logs: typically retained for a limited period for security and troubleshooting, then deleted or aggregated.",
+            "AI analysis requests (if opted in): retained only as long as needed to deliver insights and comply with law; deleted or anonymized when you opt out or delete your account, subject to provider retention limits."
           ]
         },
         "yourRights": {
-          "title": "10. Your choices and rights",
+          "title": "11. Your choices and rights",
           "p1": "Depending on where you live, you may have rights to access, correct, delete, export, or restrict processing of your personal data. FlowRate supports the following directly in the product or on request:",
           "items": [
             "Access and update: edit your name and phone number in Settings; view your transactions, accounts, and budgets in the dashboard.",
@@ -996,37 +1031,38 @@
             "Delete account: use Settings → Delete my account for your own profile.",
             "Guardians: delete a child or teen account from Family → child card or member details (permanent erasure of their FlowRate data and login).",
             "Export: email mathieu.lievre.pro@outlook.com to request a copy of your data in a portable format.",
-            "Marketing: we do not send third-party advertising based on Financial Connections data."
+            "Marketing: we do not send third-party advertising based on Financial Connections data.",
+            "AI analysis: when available, enable or disable optional AI insights in Settings. Disabling opt-in stops new AI processing of your financial data."
           ],
           "p2": "EU/UK users may also lodge a complaint with their local data protection authority. We will respond to verified requests within applicable legal timeframes."
         },
         "security": {
-          "title": "11. Security",
+          "title": "12. Security",
           "p1": "We use industry-standard measures including HTTPS encryption in transit, authenticated API access, and role-based permissions within financial spaces. Bank credentials are handled by Stripe and your financial institution—not stored on FlowRate servers.",
           "p2": "No method of transmission or storage is 100% secure. Please use a strong, unique password and notify us promptly if you suspect unauthorized access."
         },
         "spaces": {
-          "title": "12. Household, Family, and Company spaces",
+          "title": "13. Household, Family, and Company spaces",
           "p1": "When you join or create a shared space, certain information is visible to other members according to their role (owner, guardian, teen, finance admin, etc.). Teens and children may have supervised views with limited permissions.",
           "p2": "You are responsible for inviting only people you trust and for choosing Personal vs Shared visibility when connecting accounts."
         },
         "children": {
-          "title": "13. Children and teens",
+          "title": "14. Children and teens",
           "p1": "Family spaces may include teen or child profiles managed by a parent or guardian. We collect only what is needed for supervised money management within those spaces. Guardians control invitations and visibility.",
           "p2": "FlowRate is not directed at children under 13 to create standalone accounts without parental involvement. If you believe we have collected data from a child improperly, contact mathieu.lievre.pro@outlook.com."
         },
         "cookies": {
-          "title": "14. Cookies and similar technologies",
+          "title": "15. Cookies and similar technologies",
           "p1": "We use essential cookies and similar storage for authentication sessions, locale preferences, and security. These are required for the app to function.",
           "p2": "We do not use advertising cookies or cross-site tracking cookies. You can clear cookies through your browser, but you may need to sign in again."
         },
         "international": {
-          "title": "15. International users",
+          "title": "16. International users",
           "p1": "FlowRate may be used by people in multiple countries. If you access the service from outside the US or EU, you understand that your data may be processed in the US and/or EU as described above.",
           "p2": "Where local law grants additional rights, we honor those rights to the extent applicable."
         },
         "changes": {
-          "title": "16. Changes to this policy",
+          "title": "17. Changes to this policy",
           "p1": "We may update this Privacy Policy from time to time. We will post the revised version on this page and update the “Last updated” date. Material changes may also be communicated in the app or by email where appropriate.",
           "p2": "Continued use of FlowRate after changes take effect means you accept the updated policy."
         }
@@ -1037,6 +1073,7 @@
       "seoTitle": "Terms of Service — FlowRate",
       "lastUpdated": "Last updated: June 26, 2026",
       "seeAlsoPrivacy": "See also: Privacy Policy",
+      "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
       "intro": "These Terms of Service (“Terms”) govern your access to and use of FlowRate. By creating an account or using the service, you agree to these Terms and our Privacy Policy.",
       "contact": "Questions about these Terms? Contact us at",
       "sections": {
@@ -1046,8 +1083,9 @@
         },
         "service": {
           "title": "2. The service",
-          "p1": "FlowRate provides tools to view connected account balances and transactions, categorize spending, set budgets, detect subscriptions, and collaborate in optional financial spaces (Independent, Household, Family, or Company).",
-          "p2": "Features may change over time. We may add, modify, or discontinue features with reasonable notice where practical."
+          "p1": "FlowRate provides tools to view connected account balances and transactions, categorize spending (using rule-based logic today—not artificial intelligence), set budgets, detect subscriptions, and collaborate in optional financial spaces (Independent, Household, Family, or Company).",
+          "p2": "We plan to offer optional AI-powered spending analysis for Pro and Enterprise subscribers who explicitly opt in. That feature is not available yet; when it launches, it will be governed by our Privacy Policy and your opt-in choice in Settings.",
+          "p3": "Features may change over time. We may add, modify, or discontinue features with reasonable notice where practical."
         },
         "eligibility": {
           "title": "3. Eligibility",
@@ -1073,7 +1111,8 @@
         "billing": {
           "title": "7. Paid plans and billing",
           "p1": "Some features may require a paid subscription processed by Stripe Billing. Prices and plan details are shown at checkout. Subscriptions renew automatically until canceled through the billing portal or by contacting support.",
-          "p2": "Refunds are handled according to the policy displayed at purchase and applicable law."
+          "p2": "Refunds are handled according to the policy displayed at purchase and applicable law.",
+          "p3": "Optional AI analysis, when available, requires a Pro or Enterprise subscription and a separate opt-in in Settings. Paying for a plan does not automatically enable AI processing of your financial data."
         },
         "acceptableUse": {
           "title": "8. Acceptable use",
@@ -1088,7 +1127,8 @@
         },
         "disclaimers": {
           "title": "9. Not financial advice",
-          "p1": "FlowRate is for informational and organizational purposes only. We do not provide financial, investment, tax, or legal advice. Categorizations, subscription detection, and analytics are automated estimates—you should verify important decisions with qualified professionals and your official bank records."
+          "p1": "FlowRate is for informational and organizational purposes only. We do not provide financial, investment, tax, or legal advice. Categorizations, subscription detection, analytics, and any future AI-generated insights are automated estimates—you should verify important decisions with qualified professionals and your official bank records.",
+          "p2": "AI analysis, when offered, may be inaccurate or incomplete. It does not replace professional judgment or official account records."
         },
         "liability": {
           "title": "10. Disclaimers and limitation of liability",
@@ -1104,6 +1144,113 @@
           "title": "12. Changes to these Terms",
           "p1": "We may update these Terms from time to time. We will post the updated version on this page and update the “Last updated” date. Continued use after changes take effect constitutes acceptance.",
           "p2": "If you do not agree to updated Terms, you must stop using FlowRate and may request account deletion."
+        }
+      }
+    },
+    "glba": {
+      "title": "Financial Privacy Notice (GLBA)",
+      "seoTitle": "Financial Privacy Notice (GLBA) — FlowRate",
+      "lastUpdated": "Last updated: June 28, 2026",
+      "seeAlsoPrivacy": "See also: Privacy Policy",
+      "seeAlsoTerms": "Terms of Service",
+      "intro": "This Financial Privacy Notice describes how FlowRate collects, uses, and shares nonpublic personal information (“NPI”) about consumers in connection with our personal finance application. It is provided to meet transparency expectations under the Gramm-Leach-Bliley Act (“GLBA”) and related U.S. financial privacy rules, including when you connect financial accounts through Stripe Financial Connections. This notice supplements our Privacy Policy and Terms of Service.",
+      "contact": "Questions about this Financial Privacy Notice or your NPI? Contact us at",
+      "sections": {
+        "purpose": {
+          "title": "1. Purpose of this notice",
+          "p1": "FlowRate is a personal and household finance application. We are not a bank, credit union, or other depository institution. When you choose to link a U.S. financial account, we receive certain financial information about you with your consent so we can display balances, transactions, budgets, and related features.",
+          "p2": "This notice explains what NPI we handle, how we use it, who we may share it with, and the choices available to you. We provide this notice at or before the time you connect a financial account and make it available on our website at all times."
+        },
+        "scope": {
+          "title": "2. Who this notice covers",
+          "p1": "This notice applies to individuals who use FlowRate as consumers—including account holders, household members, family space participants, and authorized company space users—when we collect NPI about them in connection with the service.",
+          "p2": "If you use FlowRate solely on behalf of a business entity and not as a consumer, additional agreements may apply. Contact us if you need clarification for your organization."
+        },
+        "npiDefinition": {
+          "title": "3. What is nonpublic personal information (NPI)?",
+          "p1": "For purposes of this notice, NPI means personally identifiable financial information that is not publicly available. Examples include account balances, transaction history, account identifiers (such as institution name and last four digits), and information we derive from that data (such as spending categories or subscription detection).",
+          "p2": "Publicly available information—such as information lawfully made available from government records or widely distributed media—is not NPI when we have taken reasonable steps to confirm it is public."
+        },
+        "whatWeCollect": {
+          "title": "4. NPI we collect",
+          "p1": "The NPI we collect depends on how you use FlowRate. Categories include:",
+          "items": [
+            "Identity and contact information: name, email address, optional phone number, and authentication identifiers managed through our identity provider.",
+            "Connected account information: financial institution name, account display name, account type, masked account numbers, balances, and transaction details received through Stripe Financial Connections when you authorize access.",
+            "Derived financial information: transaction categories, budgets, subscription estimates, analytics summaries, and split rules you configure inside FlowRate.",
+            "Space and sharing data: membership roles, invitations, and visibility settings (personal vs shared) that determine who within a household, family, or company space may see linked financial information.",
+            "Billing information: subscription plan status and Stripe Billing customer identifiers if you purchase a paid plan (we do not store full payment card numbers)."
+          ]
+        },
+        "howWeCollect": {
+          "title": "5. How we collect NPI",
+          "p1": "We collect NPI directly from you when you register, update your profile, create or join spaces, and configure budgets or categories.",
+          "p2": "When you connect a bank account, you are directed through Stripe’s Financial Connections flow. You authenticate with your financial institution (or through Stripe’s secure interface). FlowRate does not receive or store your online banking username or password.",
+          "p3": "We may also receive limited technical data (such as IP address and request logs) generated when you use the application, as described in our Privacy Policy."
+        },
+        "howWeUse": {
+          "title": "6. How we use NPI",
+          "p1": "We use NPI only for legitimate business purposes related to providing FlowRate, including:",
+          "items": [
+            "Displaying account balances and transactions in your dashboard.",
+            "Categorizing transactions, powering budgets, subscription detection, and spending analytics (using rule-based logic today—not artificial intelligence unless you later opt in to AI analysis).",
+            "Generating optional AI spending insights for Pro and Enterprise users who explicitly opt in, when that feature becomes available.",
+            "Enforcing visibility and role permissions within financial spaces you create or join.",
+            "Authenticating you, securing the service, preventing fraud and abuse, and providing customer support.",
+            "Processing optional paid subscriptions through Stripe Billing.",
+            "Complying with law, responding to lawful requests, and protecting our rights and users’ safety."
+          ],
+          "p2": "We do not use NPI to make credit eligibility decisions, sell leads to lenders, or build advertising profiles for unrelated third parties. We do not send NPI to AI providers unless you are on a qualifying paid plan, the AI feature is available, and you have opted in."
+        },
+        "sharing": {
+          "title": "7. How we share NPI",
+          "p1": "We do not sell your NPI. We share NPI only in the limited circumstances below:",
+          "items": [
+            "Service providers: trusted companies that process data on our behalf solely to operate FlowRate—for example Stripe (Financial Connections and billing), Neon (authentication and database hosting), Vercel (application hosting), and Twilio (optional phone verification). These providers may use NPI only to perform services for us and must protect it appropriately.",
+            "AI service providers (opt-in only): if you are a Pro or Enterprise subscriber and explicitly enable AI analysis when that feature is available, we may share selected NPI with third-party AI providers solely to generate insights for you inside FlowRate. This sharing does not occur today and never occurs without your opt-in.",
+            "Within your spaces: when you mark an account or data as shared, authorized members of that space (such as guardians in a Family space or finance admins in a Company space) can view it according to their role.",
+            "Affiliates: FlowRate does not currently share NPI with corporate affiliates for their own purposes.",
+            "Legal and safety: when required by law, regulation, legal process, or to protect the rights, property, or safety of FlowRate, our users, or others.",
+            "Business transfers: if FlowRate is involved in a merger, acquisition, or sale of assets, NPI may transfer subject to this notice and applicable law."
+          ],
+          "p2": "We do not share NPI with nonaffiliated third parties for them to market their own products or services to you."
+        },
+        "optOut": {
+          "title": "8. Your opt-out rights",
+          "p1": "Under GLBA, consumers generally have the right to opt out of certain sharing of NPI with nonaffiliated third parties for those parties’ own marketing purposes.",
+          "p2": "FlowRate does not share NPI with nonaffiliated third parties for their independent marketing. Because we do not engage in that type of sharing, there is no marketing opt-out list to join at this time.",
+          "p3": "You still control your data in other important ways: disconnect linked accounts from the Accounts page, adjust Personal vs Shared visibility when connecting banks, leave or delete spaces, and delete your account from Settings. When AI analysis is available, you may opt in or out independently in Settings—opting out stops new AI processing. To exercise privacy rights or request data access or deletion, email mathieu.lievre.pro@outlook.com."
+        },
+        "safeguards": {
+          "title": "9. How we protect NPI",
+          "p1": "We maintain administrative, technical, and physical safeguards designed to protect NPI, including encryption in transit (HTTPS), authenticated access to APIs, role-based permissions within spaces, and limiting employee access to production data on a need-to-know basis.",
+          "p2": "Bank login credentials are handled by Stripe and your financial institution—not stored on FlowRate servers. No security program is perfect; please use a strong, unique password and notify us promptly if you suspect unauthorized access."
+        },
+        "retention": {
+          "title": "10. How long we keep NPI",
+          "p1": "We retain NPI while your account is active and as needed to provide the service, comply with legal obligations, resolve disputes, and enforce our agreements.",
+          "items": [
+            "Connected account NPI: until you disconnect the account in FlowRate or delete your account.",
+            "Derived analytics and categories: removed when the underlying account data is deleted or disconnected.",
+            "Profile and space data: until you delete your account or request removal.",
+            "Server logs: retained for a limited period for security and troubleshooting, then deleted or aggregated.",
+            "AI analysis requests (if opted in): retained only as long as needed to deliver insights; stopped and deleted or anonymized when you opt out or delete your account, subject to provider limits."
+          ]
+        },
+        "formerCustomers": {
+          "title": "11. After you stop using FlowRate",
+          "p1": "If you delete your account or disconnect all financial accounts, we delete or de-identify associated NPI from our application database within a reasonable period, subject to limited backup retention and legal retention requirements described in our Privacy Policy.",
+          "p2": "This Financial Privacy Notice continues to describe how we treated NPI while you were a user. An updated notice will apply if you return and connect accounts again."
+        },
+        "otherNotices": {
+          "title": "12. Relationship to other policies",
+          "p1": "Our Privacy Policy provides additional detail about data practices, international users, cookies, children and teens, and subprocessors. Our Terms of Service govern your use of FlowRate.",
+          "p2": "If there is a conflict between this Financial Privacy Notice and the Privacy Policy regarding NPI collected through financial account connections, this notice controls for that NPI."
+        },
+        "changes": {
+          "title": "13. Changes to this notice",
+          "p1": "We may update this Financial Privacy Notice from time to time. We will post the revised version on this page and update the “Last updated” date. Material changes may also be communicated in the app or by email where appropriate.",
+          "p2": "Continued use of FlowRate after changes take effect means you accept the updated notice, to the extent permitted by law."
         }
       }
     }
