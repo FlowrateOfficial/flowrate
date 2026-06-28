@@ -1,10 +1,21 @@
 import { z } from 'zod'
+import {
+  inviteCompanyMember,
+  inviteFamilyMember
+} from '../../../../lib/services/members.service'
 
-const inviteSchema = z.object({
+const familyInviteSchema = z.object({
   email: z.string().email(),
   role: z.enum(['CO_GUARDIAN', 'TEEN', 'CHILD', 'FINANCE_ADMIN', 'MANAGER', 'MEMBER', 'GUEST']),
   displayName: z.string().min(1).optional(),
   dateOfBirth: z.string().datetime().optional()
+})
+
+const companyInviteSchema = z.object({
+  phone: z.string().min(8).max(20),
+  email: z.string().email().optional(),
+  role: z.enum(['FINANCE_ADMIN', 'GUEST']),
+  displayName: z.string().min(1).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -25,77 +36,32 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.method === 'POST') {
-    const body = await readValidatedBody(event, inviteSchema.parse)
-    const email = body.email.toLowerCase()
+    const config = useRuntimeConfig(event)
+    const appUrl = config.public.appUrl as string
 
-    const existingUser = await prisma.user.findUnique({ where: { email } })
-
-    if (existingUser) {
-      const member = await prisma.spaceMember.upsert({
-        where: { spaceId_userId: { spaceId, userId: existingUser.id } },
-        create: {
-          spaceId,
-          userId: existingUser.id,
-          email,
-          role: body.role,
-          status: 'ACTIVE',
-          displayName: body.displayName ?? existingUser.name,
-          dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
-          invitedBy: user.id,
-          joinedAt: new Date()
-        },
-        update: {
-          role: body.role,
-          status: 'ACTIVE',
-          displayName: body.displayName ?? existingUser.name
-        }
-      })
-
-      if (body.role === 'CHILD' || body.role === 'TEEN') {
-        await prisma.childProfile.upsert({
-          where: { memberId: member.id },
-          create: { spaceId, memberId: member.id },
-          update: {}
-        })
-      }
-
-      return { member, invited: false }
+    if (space.type === 'COMPANY') {
+      const body = await readValidatedBody(event, companyInviteSchema.parse)
+      return inviteCompanyMember(user.id, spaceId, space.name, space.type, body, appUrl)
     }
 
-    const invitation = await prisma.spaceInvitation.create({
-      data: {
-        spaceId,
-        email,
-        role: body.role,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      }
-    })
-
-    const member = await prisma.spaceMember.create({
-      data: {
-        spaceId,
-        email,
-        role: body.role,
-        status: 'PENDING',
-        displayName: body.displayName,
-        dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
-        invitedBy: user.id
-      }
-    })
+    const body = await readValidatedBody(event, familyInviteSchema.parse)
 
     if (body.role === 'CHILD' || body.role === 'TEEN') {
-      await prisma.childProfile.create({
-        data: { spaceId, memberId: member.id }
+      throw createError({
+        statusCode: 400,
+        message: 'Use the create-child endpoint to provision child or teen login accounts'
       })
     }
 
-    const config = useRuntimeConfig(event)
-    return {
-      member,
-      invited: true,
-      inviteUrl: `${config.public.appUrl}/auth/register?invite=${invitation.token}`,
-      token: invitation.token
+    if (body.role !== 'CO_GUARDIAN') {
+      throw createError({ statusCode: 400, message: 'Invalid role for this space' })
     }
+
+    return inviteFamilyMember(user.id, spaceId, space.type, {
+      email: body.email,
+      role: 'CO_GUARDIAN',
+      displayName: body.displayName
+    }, appUrl)
   }
 
   throw createError({ statusCode: 405, message: 'Method not allowed' })

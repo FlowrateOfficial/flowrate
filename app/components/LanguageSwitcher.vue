@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { getLocale, getLocales, switchLocale, t } = useI18n()
+const { getLocale, getLocales, switchLocale, t } = useAppI18n()
 
 const current = computed(() => getLocale())
 const locales = computed(() => getLocales())
@@ -8,7 +8,7 @@ const items = computed(() =>
   locales.value.map(locale => ({
     label: locale.code === 'fr' ? t('common.french') : t('common.english'),
     icon: locale.code === 'fr' ? 'i-emojione-flag-for-france' : 'i-emojione-flag-for-united-kingdom',
-    click: () => switchLocale(locale.code)
+    onSelect: () => switchLocale(locale.code)
   }))
 )
 

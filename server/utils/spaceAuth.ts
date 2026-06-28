@@ -32,11 +32,27 @@ export function canManageMembers(role: SpaceRole, spaceType: SpaceType): boolean
 }
 
 export function canConnectBanks(role: SpaceRole): boolean {
-  return ['OWNER', 'CO_GUARDIAN', 'FINANCE_ADMIN', 'MEMBER'].includes(role)
+  return ['OWNER', 'CO_GUARDIAN', 'FINANCE_ADMIN', 'MEMBER', 'TEEN'].includes(role)
 }
 
 export function canViewFinancials(role: SpaceRole): boolean {
   return !isChildRole(role) || role === 'TEEN'
+}
+
+/** Company guests and similar roles can view but not change financial data. */
+export function isReadOnlyFinancialRole(role: SpaceRole, spaceType: SpaceType): boolean {
+  if (spaceType !== 'COMPANY') return false
+  return role === 'GUEST'
+}
+
+export function canEditFinancials(role: SpaceRole, spaceType: SpaceType): boolean {
+  if (role === 'CHILD') return false
+  if (isReadOnlyFinancialRole(role, spaceType)) return false
+  return true
+}
+
+export function canManageBusinessTeam(role: SpaceRole, spaceType: SpaceType): boolean {
+  return spaceType === 'COMPANY' && isCompanyAdminRole(role)
 }
 
 export async function ensureDefaultIndependentSpace(userId: string, userName: string | null) {
@@ -90,6 +106,14 @@ export async function getUserMembership(userId: string, spaceId: string) {
 }
 
 export async function resolveActiveSpaceId(event: Parameters<typeof getRequestHeaders>[0], userId: string) {
+  const minorMembership = await prisma.spaceMember.findFirst({
+    where: { userId, status: 'ACTIVE', role: { in: ['TEEN', 'CHILD'] } },
+    orderBy: { joinedAt: 'asc' }
+  })
+  if (minorMembership) {
+    return minorMembership.spaceId
+  }
+
   const cookieSpaceId = getCookie(event, ACTIVE_SPACE_COOKIE)
   if (cookieSpaceId) {
     const membership = await getUserMembership(userId, cookieSpaceId)
@@ -140,8 +164,16 @@ export async function requireSpaceAccess(
 }
 
 export function accountVisibilityFilter(userId: string, role: SpaceRole) {
-  if (isChildRole(role)) {
+  if (role === 'CHILD') {
     return { visibility: 'SHARED' as const }
+  }
+  if (role === 'TEEN') {
+    return {
+      OR: [
+        { visibility: 'SHARED' as const },
+        { userId, visibility: 'PERSONAL' as const }
+      ]
+    }
   }
   return {
     OR: [

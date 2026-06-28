@@ -5,6 +5,7 @@
  * Google/GitHub use server redirect routes (/auth/google, /auth/github).
  */
 import { getAuthClient, resetAuthClient } from '~/lib/auth-client'
+import { apiRoutes, useApi } from '~/lib/api'
 
 export function useNeonAuth() {
   const config = useRuntimeConfig()
@@ -37,11 +38,12 @@ export function useNeonAuth() {
   }
 
   async function getSession() {
-    const api = useApiFetch()
     try {
       if (import.meta.server) {
+        const { api } = useApi()
         return await api<{ user?: { id: string; email?: string; name?: string | null } | null; session?: unknown }>(
-          '/api/auth/get-session'
+          apiRoutes.auth.session,
+          { noSpace: true }
         )
       }
 

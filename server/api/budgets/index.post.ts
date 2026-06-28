@@ -9,7 +9,12 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const { user, space } = await requireSpaceAccess(event)
+  const { user, space, membership } = await requireSpaceAccess(event)
+
+  if (!canEditFinancials(membership.role, space.type)) {
+    throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
+  }
+
   const body = await readValidatedBody(event, bodySchema.parse)
 
   const now = new Date()

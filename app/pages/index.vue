@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia'
 
 const landing = useLandingStore()
+const billingStore = useBillingStore()
 const {
   howItWorks,
   audiences,
@@ -10,6 +11,8 @@ const {
   testimonials
 } = storeToRefs(landing)
 const { t } = useAppI18n()
+
+onMounted(() => billingStore.fetchPlans())
 
 useSeoMeta({
   title: () => `${t('common.appName')} — ${t('landing.heroTitle')}`,

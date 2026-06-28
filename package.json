@@ -15,7 +15,8 @@
     "db:push": "prisma db push",
     "db:seed-spaces": "tsx prisma/seed-spaces.ts",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "locales:sync": "node scripts/sync-locales.mjs"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.114",
@@ -27,12 +28,14 @@
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "better-auth": "^1.6.20",
+    "chart.js": "^4.5.1",
     "jose": "^6.2.3",
     "nuxt": "^4.4.8",
     "nuxt-i18n-micro": "3.21.0",
     "pinia": "^3.0.4",
     "stripe": "^22.3.0",
     "tailwindcss": "^4.3.1",
+    "vue-chartjs": "^5.3.3",
     "vue-router": "^5.1.0",
     "zod": "^4.4.3"
   },

@@ -5,20 +5,38 @@ defineProps<{
 </script>
 
 <template>
-  <div class="relative w-full aspect-square max-w-lg mx-auto" :class="class" aria-hidden="true">
-    <!-- Large overlapping Bauhaus composition -->
-    <div class="absolute inset-[8%] rounded-full border border-flow-border/80 dark:border-flow-border-dark/80 bg-sage/5 dark:bg-sage/10 transition-transform duration-500 ease-[var(--ease-flow)]" />
-    <div class="absolute inset-[18%] left-[22%] border border-terracotta/40 bg-terracotta/8 dark:bg-terracotta/12 rotate-6" />
-    <div class="absolute bottom-[12%] right-[10%] w-[42%] h-[42%] rounded-full border border-sand/60 bg-sand/15 dark:bg-sand/10" />
-    <div class="absolute top-[20%] left-[8%] w-[28%] h-[28%] border border-charcoal/20 dark:border-flow-ink-dark/30 bg-flow-secondary/60 dark:bg-flow-secondary-dark/40 -rotate-12" />
-    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 400" fill="none">
+  <div class="relative w-full aspect-[4/5] max-w-xl mx-auto select-none" :class="class" aria-hidden="true">
+    <!-- Paper-cut Bauhaus composition -->
+    <div class="absolute inset-[5%] rounded-full border border-flow-border/70 dark:border-flow-border-dark/70 bg-sage/[0.04] dark:bg-sage/10" />
+    <div class="absolute top-[12%] right-[8%] w-[38%] aspect-square rounded-full border border-sand/50 bg-sand/20 dark:bg-sand/10" />
+    <div class="absolute bottom-[8%] left-[6%] w-[44%] h-[36%] border border-charcoal/15 dark:border-flow-ink-dark/20 bg-flow-secondary/70 dark:bg-flow-secondary-dark/50 rotate-[-4deg]" />
+    <div class="absolute top-[28%] left-[14%] w-[32%] h-[28%] border border-terracotta/30 bg-terracotta/[0.06] dark:bg-terracotta/10 rotate-[6deg]" />
+
+    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 480 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Arch -->
       <path
-        d="M200 80 A120 120 0 0 1 320 200 L200 200 Z"
-        class="fill-sand/25 dark:fill-sand/10 stroke-sand/40"
-        stroke-width="0.75"
+        d="M240 100 A140 140 0 0 1 380 240 L240 240 Z"
+        class="fill-sand/20 dark:fill-sand/8 stroke-sand/45 dark:stroke-sand/25"
+        stroke-width="0.8"
       />
-      <circle cx="280" cy="120" r="48" class="stroke-sage/50 fill-none" stroke-width="0.75" />
-      <rect x="60" y="260" width="100" height="100" class="stroke-charcoal/25 dark:stroke-flow-ink-dark/20 fill-none" stroke-width="0.75" transform="rotate(-8 110 310)" />
+      <!-- Circle outline -->
+      <circle cx="360" cy="140" r="56" class="stroke-sage/45 fill-none" stroke-width="0.8" />
+      <!-- Rectangle -->
+      <rect
+        x="72"
+        y="360"
+        width="120"
+        height="120"
+        class="stroke-charcoal/20 dark:stroke-flow-ink-dark/25 fill-none"
+        stroke-width="0.8"
+        transform="rotate(-6 132 420)"
+      />
+      <!-- Half circle -->
+      <path
+        d="M120 480 A60 60 0 0 1 240 480 L240 420 A0 0 0 0 0 120 420 Z"
+        class="fill-terracotta/10 stroke-terracotta/25"
+        stroke-width="0.8"
+      />
     </svg>
   </div>
 </template>

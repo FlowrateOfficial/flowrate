@@ -102,10 +102,36 @@ body::before {
   @apply bg-flow-card dark:bg-flow-card-dark border border-flow-border dark:border-flow-border-dark rounded-flow-lg p-6 sm:p-8
     shadow-[0_1px_2px_rgba(25,25,25,0.03)]
     dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]
-    transition-all duration-300 ease-[var(--ease-flow)]
-    hover:-translate-y-0.5
-    hover:shadow-[0_6px_20px_rgba(25,25,25,0.05)]
-    dark:hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)];
+    transition-all duration-[350ms] ease-[var(--ease-flow)]
+    hover:-translate-y-1
+    hover:shadow-[0_4px_16px_rgba(25,25,25,0.04)]
+    dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.25)];
+}
+
+.editorial-card-flat {
+  @apply bg-flow-card dark:bg-flow-card-dark border border-flow-border dark:border-flow-border-dark rounded-flow-lg p-6 sm:p-8
+    shadow-[0_1px_2px_rgba(25,25,25,0.02)];
+}
+
+.flow-section-label {
+  @apply text-sm tracking-[0.12em] uppercase text-flow-muted dark:text-flow-muted-dark font-medium;
+  letter-spacing: 0.14em;
+}
+
+.flow-chart-wrap {
+  @apply relative w-full min-h-[240px] sm:min-h-[280px];
+}
+
+.flow-chart-wrap-lg {
+  @apply relative w-full min-h-[300px] sm:min-h-[360px];
+}
+
+.editorial-list li {
+  @apply py-4 border-b border-flow-border/50 dark:border-flow-border-dark/50 last:border-0;
+}
+
+.editorial-table-row {
+  @apply py-4 px-2 border-b border-flow-border/40 dark:border-flow-border-dark/40 last:border-0;
 }
 
 /* Luxury buttons */

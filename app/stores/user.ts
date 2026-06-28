@@ -1,44 +1,83 @@
+import type { UserProfile } from '~/types/user'
+import type { AppPlan } from '#shared/billing'
+import { apiRoutes, useApi } from '~/lib/api'
+
 export const useUserStore = defineStore('user', () => {
   const { t } = useAppI18n()
   const { getSession, signOut } = useNeonAuth()
   const spacesStore = useSpacesStore()
-  const route = useRoute()
+  const { api } = useApi()
 
-  const user = ref<{ id: string; name: string | null; email: string } | null>(null)
+  const user = ref<{ id: string; name: string | null; email: string; phone?: string | null } | null>(null)
+  const phoneVerified = ref(false)
   const plan = ref<'FREE' | 'PRO' | 'ENTERPRISE'>('FREE')
   const loading = ref(false)
 
   const navItems = computed(() => {
-    if (spacesStore.isTeenView) {
+    if (spacesStore.isChildManaged) {
       return [{ label: t('nav.myMoney'), icon: 'i-lucide-piggy-bank', to: '/dashboard/teen' }]
     }
 
-    const items = [
-      { label: t('nav.overview'), icon: 'i-lucide-layout-dashboard', to: '/dashboard' },
+    if (spacesStore.isTeenView) {
+      return [
+        { label: t('nav.myMoney'), icon: 'i-lucide-piggy-bank', to: '/dashboard/teen' },
+        { label: t('nav.accounts'), icon: 'i-lucide-landmark', to: '/dashboard/accounts' },
+        { label: t('nav.transactions'), icon: 'i-lucide-arrow-left-right', to: '/dashboard/transactions' },
+        { label: t('nav.analytics'), icon: 'i-lucide-bar-chart-3', to: '/dashboard/analytics' }
+      ]
+    }
+
+    const items = []
+
+    if (spacesStore.isCompany) {
+      items.push({ label: t('nav.business'), icon: 'i-lucide-rocket', to: '/dashboard/company' })
+    } else {
+      items.push({ label: t('nav.overview'), icon: 'i-lucide-layout-dashboard', to: '/dashboard' })
+    }
+
+    items.push(
+      { label: t('nav.analytics'), icon: 'i-lucide-bar-chart-3', to: '/dashboard/analytics' },
       { label: t('nav.transactions'), icon: 'i-lucide-arrow-left-right', to: '/dashboard/transactions' },
       { label: t('nav.accounts'), icon: 'i-lucide-landmark', to: '/dashboard/accounts' },
-      { label: t('nav.subscriptions'), icon: 'i-lucide-shield-check', to: '/dashboard/subscriptions' },
+      {
+        label: spacesStore.isCompany ? t('nav.saasVendors') : t('nav.subscriptions'),
+        icon: 'i-lucide-shield-check',
+        to: '/dashboard/subscriptions'
+      },
       { label: t('nav.budgets'), icon: 'i-lucide-pie-chart', to: '/dashboard/budgets' }
-    ]
+    )
 
     if (spacesStore.isSharedSpace && (spacesStore.activeSpace?.type === 'HOUSEHOLD' || spacesStore.activeSpace?.type === 'FAMILY')) {
       items.push({ label: t('nav.family'), icon: 'i-lucide-users', to: '/dashboard/family' })
     }
-    if (spacesStore.isCompany) {
-      items.push({ label: t('nav.company'), icon: 'i-lucide-building-2', to: '/dashboard/company' })
+
+    if (spacesStore.isCompany && spacesStore.canManageBusiness) {
+      items.push({ label: t('nav.businessTeam'), icon: 'i-lucide-users-round', to: '/dashboard/company?tab=team' })
+    }
+
+    if (!spacesStore.isCompany) {
+      // overview already at top for non-business spaces
+    } else if (!items.some(i => i.to === '/dashboard')) {
+      items.splice(1, 0, { label: t('nav.overview'), icon: 'i-lucide-layout-dashboard', to: '/dashboard' })
     }
 
     return items
   })
 
-  const bottomItems = computed(() => [
-    { label: t('nav.spaces'), icon: 'i-lucide-layers', to: '/dashboard/spaces' },
-    { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' }
-  ])
+  const bottomItems = computed(() => {
+    const items = [
+      { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' }
+    ]
+    if (!spacesStore.isMinor) {
+      items.unshift({ label: t('nav.spaces'), icon: 'i-lucide-layers', to: '/dashboard/spaces' })
+    }
+    return items
+  })
 
   function isActive(to: string) {
-    if (to === '/dashboard') return route.path === '/dashboard'
-    return route.path.startsWith(to)
+    const path = useRouter().currentRoute.value.path
+    if (to === '/dashboard') return path === '/dashboard'
+    return path.startsWith(to)
   }
 
   async function logout() {
@@ -46,39 +85,118 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
     plan.value = 'FREE'
     spacesStore.clearSession()
-    if (import.meta.client) {
-      localStorage.removeItem('flowrate-active-space')
-    }
     await navigateTo('/', { replace: true })
   }
 
   const userMenuItems = computed(() => [[
     { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' },
-    { label: t('common.signOut'), icon: 'i-lucide-log-out', click: logout }
+    { label: t('common.signOut'), icon: 'i-lucide-log-out', onSelect: () => logout() }
   ]])
+
+  function applyProfile(profile: UserProfile) {
+    user.value = {
+      id: profile.id,
+      name: profile.name,
+      email: profile.email,
+      phone: profile.phone
+    }
+    phoneVerified.value = profile.phoneVerified
+    plan.value = profile.plan
+  }
+
+  async function bootstrap() {
+    await api(apiRoutes.user.bootstrap, { noSpace: true })
+  }
+
+  async function fetchProfile(syncBilling = false): Promise<UserProfile | null> {
+    let data = await api<UserProfile>(apiRoutes.user.profile, { noSpace: true }).catch(() => null)
+    if (!data) return null
+
+    if (syncBilling && data.plan === 'FREE') {
+      const synced = await api<UserProfile>(apiRoutes.stripe.syncSubscription, {
+        method: 'POST',
+        noSpace: true
+      }).catch(() => null)
+      if (synced?.plan && synced.plan !== 'FREE') {
+        data = { ...data, plan: synced.plan }
+      }
+    }
+
+    applyProfile(data)
+    return data
+  }
 
   async function fetchUser() {
     loading.value = true
     try {
       const session = await getSession()
-      user.value = session?.user ?? null
-      const api = useApiFetch()
-      const profile = await api<{ plan: 'FREE' | 'PRO' | 'ENTERPRISE' }>('/api/user/profile').catch(() => null)
-      if (profile?.plan) plan.value = profile.plan
+      const profile = await fetchProfile()
+
+      if (!profile && session?.user?.id) {
+        user.value = {
+          id: session.user.id,
+          name: session.user.name ?? null,
+          email: session.user.email ?? ''
+        }
+      } else if (!profile) {
+        user.value = null
+      }
     } finally {
       loading.value = false
     }
   }
 
+  async function updateProfile(body: { name: string, phone: string | null }) {
+    const data = await api<UserProfile>(apiRoutes.user.profile, {
+      method: 'PATCH',
+      body,
+      noSpace: true
+    })
+    applyProfile(data)
+    return data
+  }
+
+  async function verifyPhoneCode(code: string) {
+    await api(apiRoutes.user.phoneVerify, {
+      method: 'POST',
+      body: { code },
+      noSpace: true
+    })
+    phoneVerified.value = true
+  }
+
+  async function resendPhoneCode() {
+    await api(apiRoutes.user.phoneResend, { method: 'POST', noSpace: true })
+  }
+
+  async function syncSubscriptionPlan(): Promise<AppPlan | null> {
+    const result = await api<{ plan: AppPlan }>(apiRoutes.stripe.syncSubscription, {
+      method: 'POST',
+      noSpace: true
+    }).catch(() => null)
+    if (result?.plan) {
+      plan.value = result.plan
+      return result.plan
+    }
+    return null
+  }
+
   return {
     user,
+    phoneVerified,
     plan,
     loading,
     navItems,
     bottomItems,
     userMenuItems,
     isActive,
+    bootstrap,
+    fetchProfile,
     fetchUser,
+    updateProfile,
+    verifyPhoneCode,
+    resendPhoneCode,
+    syncSubscriptionPlan,
     logout
   }
 })

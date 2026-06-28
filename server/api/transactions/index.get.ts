@@ -6,14 +6,16 @@ const querySchema = z.object({
   category: z.string().optional(),
   search: z.string().optional(),
   accountId: z.string().optional(),
-  visibility: z.enum(['all', 'shared', 'personal', 'mine']).optional()
+  visibility: z.enum(['all', 'shared', 'personal', 'mine']).optional(),
+  dateFrom: z.string().datetime().optional(),
+  dateTo: z.string().datetime().optional()
 })
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
   const query = await getValidatedQuery(event, querySchema.parse)
 
-  const { page, limit, category, search, accountId, visibility } = query
+  const { page, limit, category, search, accountId, visibility, dateFrom, dateTo } = query
   const skip = (page - 1) * limit
 
   const accountFilter = accountVisibilityFilter(user.id, membership.role)
@@ -29,6 +31,14 @@ export default defineEventHandler(async (event) => {
     ...(category ? { category: category as never } : {}),
     ...(accountId ? { accountId } : {}),
     ...(visibility === 'mine' ? { userId: user.id } : {}),
+    ...(dateFrom || dateTo
+      ? {
+          date: {
+            ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
+            ...(dateTo ? { lte: new Date(dateTo) } : {})
+          }
+        }
+      : {}),
     ...(search
       ? {
           OR: [

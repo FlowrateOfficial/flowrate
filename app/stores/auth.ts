@@ -3,6 +3,7 @@ import { resolveErrorMessage } from '~/utils/errors'
 
 export const useAuthStore = defineStore('auth', () => {
   const { t } = useAppI18n()
+  const route = useRoute()
   const { signIn, signUp, requestPasswordReset } = useNeonAuth()
 
   const loginForm = reactive({ email: '', password: '' })
@@ -61,6 +62,13 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = resolveErrorMessage(result.error, t, 'auth.register.errorGeneric')
         return false
       }
+
+      if (route.query.plan === 'pro') {
+        const billing = useBillingStore()
+        await billing.startCheckout('pro')
+        return true
+      }
+
       await navigateTo('/dashboard/onboarding')
       return true
     } catch (e) {

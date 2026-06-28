@@ -21,7 +21,12 @@ export default defineEventHandler(async (event) => {
       orderBy: { joinedAt: 'asc' }
     })
 
-    return memberships.map(m => ({
+    const minorMembership = memberships.find(m => m.role === 'TEEN' || m.role === 'CHILD')
+    const visible = minorMembership
+      ? memberships.filter(m => m.spaceId === minorMembership.spaceId)
+      : memberships
+
+    return visible.map(m => ({
       id: m.space.id,
       name: m.space.name,
       type: m.space.type,
@@ -34,6 +39,36 @@ export default defineEventHandler(async (event) => {
 
   if (event.method === 'POST') {
     const body = await readValidatedBody(event, createSpaceSchema.parse)
+
+    const isMinor = await prisma.spaceMember.findFirst({
+      where: { userId: user.id, status: 'ACTIVE', role: { in: ['TEEN', 'CHILD'] } }
+    })
+    if (isMinor) {
+      throw createError({ statusCode: 403, message: 'Child and teen accounts cannot create spaces' })
+    }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { plan: true }
+    })
+
+    const existingSpaces = await prisma.spaceMember.count({
+      where: { userId: user.id, status: 'ACTIVE' }
+    })
+
+    if (dbUser?.plan === 'FREE' && existingSpaces >= 2) {
+      throw createError({
+        statusCode: 402,
+        message: 'Upgrade to Pro to create additional financial spaces'
+      })
+    }
+
+    if (dbUser?.plan === 'FREE' && body.type !== 'HOUSEHOLD' && existingSpaces >= 1) {
+      throw createError({
+        statusCode: 402,
+        message: 'Family and Company spaces require a Pro plan'
+      })
+    }
 
     const space = await prisma.financialSpace.create({
       data: {

@@ -64,7 +64,7 @@ const statusColor = computed(() => {
       </div>
     </div>
     <UProgress
-      :value="percentage"
+      :model-value="percentage"
       :color="statusColor"
       size="sm"
     />

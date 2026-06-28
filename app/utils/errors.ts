@@ -27,8 +27,8 @@ export function resolveErrorMessage(
 ): string {
   if (!error) return t(fallbackKey)
 
-  const err = error as FetchErrorLike
-  const code = err.data?.code
+  const err = error as FetchErrorLike & { code?: string }
+  const code = err.data?.code ?? err.code
 
   if (code && t(`errors.codes.${code}`) !== `errors.codes.${code}`) {
     return t(`errors.codes.${code}`)

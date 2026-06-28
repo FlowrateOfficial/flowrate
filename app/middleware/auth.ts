@@ -1,10 +1,25 @@
 import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 
+/** Routes a guardian-managed child (no own bank) may access. */
+const CHILD_ALLOWED_PREFIXES = ['/dashboard/teen', '/dashboard/settings']
+
+/** Routes a teen (own login + optional bank) may access. */
+const TEEN_ALLOWED_PREFIXES = [
+  '/dashboard/teen',
+  '/dashboard/accounts',
+  '/dashboard/transactions',
+  '/dashboard/analytics',
+  '/dashboard/settings'
+]
+
+function isAllowedPath(path: string, prefixes: string[]) {
+  return prefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`))
+}
+
 // Protects /dashboard/* — session from cookies; OAuth verifier exchanged by server middleware.
 export default defineNuxtRouteMiddleware(async (to) => {
   const verifier = to.query[NEON_AUTH_SESSION_VERIFIER_PARAM]
 
-  // Server: neon-auth.ts middleware exchanges verifier → redirect. If still present, defer to client.
   if (verifier && import.meta.server) {
     return
   }
@@ -16,33 +31,38 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/auth/login')
   }
 
-  const api = useApiFetch()
+  const userStore = useUserStore()
 
-  // Provision Prisma user + default space on first dashboard visit
   try {
-    await api('/api/user/bootstrap')
+    await userStore.bootstrap()
   } catch {
     return navigateTo('/auth/login')
   }
 
-  const { fetchSpaces, activeSpace, isTeenView, spaces } = useActiveSpace()
+  const spacesStore = useSpacesStore()
 
-  try {
-    await fetchSpaces()
-  } catch {
-    return navigateTo('/auth/login')
+  if (import.meta.server || !spacesStore.spaces.length) {
+    try {
+      await spacesStore.fetchSpaces()
+    } catch {
+      return navigateTo('/auth/login')
+    }
   }
 
-  if (isTeenView.value && !to.path.startsWith('/dashboard/teen')) {
+  if (spacesStore.isChildManaged && !isAllowedPath(to.path, CHILD_ALLOWED_PREFIXES)) {
     return navigateTo('/dashboard/teen')
   }
 
-  if (!isTeenView.value && to.path.startsWith('/dashboard/teen')) {
+  if (spacesStore.isTeenView && !isAllowedPath(to.path, TEEN_ALLOWED_PREFIXES)) {
+    return navigateTo('/dashboard/teen')
+  }
+
+  if (!spacesStore.isMinor && to.path.startsWith('/dashboard/teen')) {
     return navigateTo('/dashboard')
   }
 
-  if (to.path === '/dashboard/onboarding' && activeSpace.value) {
-    const hasMultiple = spaces.value.length > 1
+  if (to.path === '/dashboard/onboarding' && spacesStore.activeSpace) {
+    const hasMultiple = spacesStore.spaces.length > 1
     if (hasMultiple) return navigateTo('/dashboard')
   }
 })

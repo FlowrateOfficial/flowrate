@@ -7,35 +7,47 @@ const { t } = useAppI18n()
 const spacesStore = useSpacesStore()
 const userStore = useUserStore()
 const { user, plan, navItems, bottomItems, userMenuItems } = storeToRefs(userStore)
+const { isMinor, activeSpace } = storeToRefs(spacesStore)
 
 onMounted(async () => {
-  await spacesStore.fetchSpaces()
-  await userStore.fetchUser()
+  // Runs after hydration — refreshes spaces with cookie-backed active space and loads user profile.
+  await Promise.all([
+    spacesStore.fetchSpaces(),
+    userStore.fetchUser()
+  ])
 })
 </script>
 
 <template>
   <div class="flex h-screen overflow-hidden surface-page">
-    <aside class="hidden lg:flex flex-col w-64 shrink-0 border-r border-flow-border/60 dark:border-flow-border-dark/60 bg-flow-warm/50 dark:bg-flow-warm-dark/50">
-      <div class="px-8 py-8 border-b border-flow-border/40 dark:border-flow-border-dark/40">
-        <NuxtLink to="/" class="font-display text-xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
+    <aside class="hidden lg:flex flex-col w-[17rem] shrink-0 border-r border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-warm/60 dark:bg-flow-warm-dark/40">
+      <div class="px-8 py-10 border-b border-flow-border/30 dark:border-flow-border-dark/30">
+        <NuxtLink to="/" class="font-display text-2xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
           FlowRate
         </NuxtLink>
       </div>
 
-      <div class="px-5 py-5 border-b border-flow-border/40 dark:border-flow-border-dark/40">
+      <div v-if="!isMinor" class="px-5 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30">
         <DashboardSpaceSwitcher />
       </div>
+      <div v-else-if="activeSpace" class="px-5 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30">
+        <div class="px-4 py-3 rounded-flow bg-flow-secondary/60 dark:bg-flow-secondary-dark/60">
+          <p class="truncate font-medium text-flow-ink dark:text-flow-ink-dark text-sm">{{ activeSpace.name }}</p>
+          <p class="text-xs text-flow-muted dark:text-flow-muted-dark truncate mt-0.5">
+            {{ spacesStore.spaceType(activeSpace.type) }}
+          </p>
+        </div>
+      </div>
 
-      <nav class="flex-1 px-4 py-6 space-y-0.5 overflow-y-auto">
+      <nav class="flex-1 px-3 py-8 space-y-1 overflow-y-auto">
         <NuxtLink
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="flex items-center gap-3 px-4 py-3 rounded-flow text-sm transition-all duration-300"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-flow text-[15px] transition-all duration-300"
           :class="userStore.isActive(item.to)
-            ? 'bg-flow-secondary dark:bg-flow-secondary-dark text-flow-ink dark:text-flow-ink-dark'
-            : 'text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark hover:bg-flow-secondary/50 dark:hover:bg-flow-secondary-dark/50'"
+            ? 'bg-flow-secondary/80 dark:bg-flow-secondary-dark text-flow-ink dark:text-flow-ink-dark'
+            : 'text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark hover:bg-flow-secondary/40 dark:hover:bg-flow-secondary-dark/40'"
         >
           <UIcon :name="item.icon" class="w-4 h-4 shrink-0 stroke-[1.25]" />
           {{ item.label }}
@@ -80,15 +92,15 @@ onMounted(async () => {
         </div>
       </header>
 
-      <header class="hidden lg:flex items-center justify-between px-10 py-5 border-b border-flow-border/40 dark:border-flow-border-dark/40">
-        <p class="text-sm text-flow-muted dark:text-flow-muted-dark font-display">
+      <header class="hidden lg:flex items-center justify-between px-10 lg:px-14 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30">
+        <p class="text-sm text-flow-muted dark:text-flow-muted-dark font-display tracking-wide">
           {{ route.meta.title ?? t('nav.overview') }}
         </p>
         <div class="flex items-center gap-3">
           <LanguageSwitcher />
           <UColorModeButton size="sm" color="neutral" variant="ghost" />
           <UBadge
-            v-if="plan === 'FREE'"
+            v-if="!isMinor && plan === 'FREE'"
             :label="t('common.freePlan')"
             color="neutral"
             variant="subtle"
@@ -96,7 +108,7 @@ onMounted(async () => {
             class="font-normal"
           />
           <UBadge
-            v-else-if="plan === 'PRO'"
+            v-else-if="!isMinor && plan === 'PRO'"
             :label="t('common.pro')"
             color="neutral"
             variant="outline"
@@ -106,9 +118,11 @@ onMounted(async () => {
         </div>
       </header>
 
-      <main class="flex-1 overflow-y-auto bg-flow-bg dark:bg-flow-bg-dark">
+      <main class="flex-1 overflow-y-auto bg-flow-bg dark:bg-flow-bg-dark pb-20 lg:pb-0">
         <slot />
       </main>
     </div>
+
+    <DashboardMobileNav />
   </div>
 </template>

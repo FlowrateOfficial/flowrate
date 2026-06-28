@@ -1,8 +1,8 @@
+import { periodStart } from '../../utils/budgetPeriod'
+
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
-
   const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
   const accountFilter = accountVisibilityFilter(user.id, membership.role)
   const visibleAccounts = await prisma.account.findMany({
@@ -19,30 +19,31 @@ export default defineEventHandler(async (event) => {
     orderBy: { createdAt: 'asc' }
   })
 
-  const spending = await prisma.transaction.groupBy({
-    by: ['category'],
-    where: {
-      spaceId: space.id,
-      accountId: { in: visibleAccountIds },
-      date: { gte: startOfMonth },
-      amount: { lt: 0 }
-    },
-    _sum: { amount: true }
-  })
+  const results = await Promise.all(budgets.map(async (b) => {
+    const from = periodStart(b.period, now)
+    const agg = await prisma.transaction.aggregate({
+      where: {
+        spaceId: space.id,
+        accountId: { in: visibleAccountIds },
+        category: b.category,
+        date: { gte: from },
+        amount: { lt: 0 }
+      },
+      _sum: { amount: true }
+    })
 
-  const spendingMap = Object.fromEntries(
-    spending.map(s => [s.category, Math.abs(Number(s._sum.amount ?? 0))])
-  )
-
-  return budgets.map(b => ({
-    id: b.id,
-    name: b.name,
-    category: b.category,
-    amount: Number(b.amount),
-    currency: 'USD',
-    spent: spendingMap[b.category] ?? 0,
-    period: b.period,
-    isShared: b.isShared,
-    isMine: b.userId === user.id
+    return {
+      id: b.id,
+      name: b.name,
+      category: b.category,
+      amount: Number(b.amount),
+      currency: 'USD',
+      spent: Math.abs(Number(agg._sum.amount ?? 0)),
+      period: b.period,
+      isShared: b.isShared,
+      isMine: b.userId === user.id
+    }
   }))
+
+  return results
 })

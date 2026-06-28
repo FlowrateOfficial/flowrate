@@ -68,7 +68,10 @@ export const useLandingStore = defineStore('landing', () => {
     { icon: 'i-lucide-sparkles', title: t('landing.features.ai.title'), description: t('landing.features.ai.description') }
   ])
 
-  const pricingPlans = computed<LandingPlan[]>(() => [
+  const billingStore = useBillingStore()
+
+  const pricingPlans = computed<LandingPlan[]>(() => {
+    const plans: LandingPlan[] = [
     {
       key: 'free',
       name: t('landing.pricing.free.name'),
@@ -137,7 +140,22 @@ export const useLandingStore = defineStore('landing', () => {
       to: 'mailto:hello@flowrate.app',
       highlight: false
     }
-  ])
+    ]
+
+    for (const stripe of billingStore.plans) {
+      const idx = plans.findIndex(p => p.key === stripe.key)
+      if (idx >= 0) {
+        plans[idx] = {
+          ...plans[idx],
+          name: stripe.name || plans[idx].name,
+          price: stripe.formattedPrice,
+          period: stripe.formattedPeriod ?? plans[idx].period
+        }
+      }
+    }
+
+    return plans
+  })
 
   const heroSpaceCards = computed<HeroSpaceCard[]>(() => [
     {

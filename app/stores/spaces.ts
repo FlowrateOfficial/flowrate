@@ -1,12 +1,19 @@
 import type { ActiveSpace, FinancialSpaceSummary } from '~/types/space'
+import { isTeenOrChild } from '~/types/space'
 import { createSpaceSchema } from '~/utils/schemas'
 import { resolveErrorMessage } from '~/utils/errors'
+import { apiRoutes, useApi } from '~/lib/api'
 
 const ACTIVE_SPACE_KEY = 'flowrate-active-space'
 
 export const useSpacesStore = defineStore('spaces', () => {
   const { t, spaceType } = useAppI18n()
   const toast = useToast()
+  const activeSpaceIdCookie = useCookie<string | null>(ACTIVE_SPACE_KEY, {
+    default: () => null,
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: 'lax'
+  })
 
   const activeSpace = ref<ActiveSpace | null>(null)
   const spaces = ref<FinancialSpaceSummary[]>([])
@@ -16,10 +23,20 @@ export const useSpacesStore = defineStore('spaces', () => {
   const createForm = reactive({ name: '', type: 'HOUSEHOLD' as 'HOUSEHOLD' | 'FAMILY' | 'COMPANY' })
 
   const createSchema = createSpaceSchema()
+  const { api } = useApi()
 
-  const isTeenView = computed(() => activeSpace.value?.role === 'TEEN')
-  const isChildManaged = computed(() => activeSpace.value?.role === 'CHILD')
+  const isMinor = computed(() => spaces.value.some(s => isTeenOrChild(s.role)))
+  const minorSpace = computed(() => spaces.value.find(s => isTeenOrChild(s.role)) ?? null)
+  const isTeenView = computed(() => minorSpace.value?.role === 'TEEN')
+  const isChildManaged = computed(() => minorSpace.value?.role === 'CHILD')
   const isCompany = computed(() => activeSpace.value?.type === 'COMPANY')
+  const isBusinessReadOnly = computed(() =>
+    activeSpace.value?.type === 'COMPANY' && activeSpace.value?.role === 'GUEST'
+  )
+  const canManageBusiness = computed(() =>
+    activeSpace.value?.type === 'COMPANY'
+    && ['OWNER', 'FINANCE_ADMIN'].includes(activeSpace.value?.role ?? '')
+  )
   const isSharedSpace = computed(() =>
     activeSpace.value?.type === 'HOUSEHOLD'
     || activeSpace.value?.type === 'FAMILY'
@@ -35,33 +52,57 @@ export const useSpacesStore = defineStore('spaces', () => {
   function clearSession() {
     activeSpace.value = null
     spaces.value = []
+    activeSpaceIdCookie.value = null
   }
 
   async function fetchSpaces() {
     loading.value = true
     try {
-      const api = useApiFetch()
-      const list = await api<FinancialSpaceSummary[]>('/api/spaces')
+      const list = await api<FinancialSpaceSummary[]>(apiRoutes.spaces.list, { noSpace: true })
       spaces.value = list
 
-      const storedId = import.meta.client ? localStorage.getItem(ACTIVE_SPACE_KEY) : null
-      const current = list.find(s => s.id === storedId) ?? list.find(s => s.type === 'INDEPENDENT') ?? list[0]
-      if (current) activeSpace.value = current
+      const minor = list.find(s => isTeenOrChild(s.role))
+      const storedId = activeSpaceIdCookie.value
+      const current = minor
+        ?? list.find(s => s.id === storedId)
+        ?? list.find(s => s.type === 'INDEPENDENT')
+        ?? list[0]
+
+      if (current) {
+        activeSpace.value = current
+        activeSpaceIdCookie.value = current.id
+      }
+
+      if (minor && minor.id !== storedId) {
+        await api<ActiveSpace>(apiRoutes.spaces.active, {
+          method: 'POST',
+          body: { spaceId: minor.id },
+          noSpace: true
+        }).catch(() => {})
+      }
     } finally {
       loading.value = false
     }
   }
 
   async function switchSpace(spaceId: string) {
-    const api = useApiFetch()
-    const result = await api<ActiveSpace>('/api/spaces/active', {
+    if (isMinor.value && spaceId !== minorSpace.value?.id) {
+      toast.add({
+        title: t('dashboard.spaces.minorCannotSwitch'),
+        color: 'warning'
+      })
+      return
+    }
+
+    const result = await api<ActiveSpace>(apiRoutes.spaces.active, {
       method: 'POST',
-      body: { spaceId }
+      body: { spaceId },
+      noSpace: true
     })
     activeSpace.value = result
     const idx = spaces.value.findIndex(s => s.id === spaceId)
     if (idx >= 0) spaces.value[idx] = { ...spaces.value[idx], ...result }
-    if (import.meta.client) localStorage.setItem(ACTIVE_SPACE_KEY, spaceId)
+    activeSpaceIdCookie.value = spaceId
     await refreshNuxtData()
   }
 
@@ -69,8 +110,11 @@ export const useSpacesStore = defineStore('spaces', () => {
     creating.value = true
     try {
       const parsed = createSchema.parse(createForm)
-      const api = useApiFetch()
-      const space = await api<{ id: string; name: string }>('/api/spaces', { method: 'POST', body: parsed })
+      const space = await api<{ id: string; name: string }>(apiRoutes.spaces.list, {
+        method: 'POST',
+        body: parsed,
+        noSpace: true
+      })
       await fetchSpaces()
       await switchSpace(space.id)
       showCreate.value = false
@@ -115,9 +159,13 @@ export const useSpacesStore = defineStore('spaces', () => {
     showCreate,
     createForm,
     createSchema,
+    isMinor,
+    minorSpace,
     isTeenView,
     isChildManaged,
     isCompany,
+    isBusinessReadOnly,
+    canManageBusiness,
     isSharedSpace,
     spaceTypes,
     fetchSpaces,

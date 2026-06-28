@@ -7,10 +7,6 @@ const spacesStore = useSpacesStore()
 const { activeSpace, spaces, loading } = storeToRefs(spacesStore)
 const switching = ref(false)
 
-onMounted(() => {
-  if (!spaces.value.length) spacesStore.fetchSpaces()
-})
-
 async function onSwitch(spaceId: string) {
   if (spaceId === activeSpace.value?.id) return
   switching.value = true
@@ -26,7 +22,7 @@ const items = computed(() =>
     label: s.name,
     description: spacesStore.spaceType(s.type),
     icon: SPACE_TYPE_ICONS[s.type],
-    click: () => onSwitch(s.id)
+    onSelect: () => onSwitch(s.id)
   }))
 )
 </script>

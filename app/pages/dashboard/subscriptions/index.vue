@@ -1,121 +1,57 @@
 <script setup lang="ts">
-import { formatCurrencyForLocale } from '~/utils/format'
+import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Subscriptions', middleware: 'auth' })
 
-const { t, getLocale } = useAppI18n()
-useSeoMeta({ title: () => `${t('dashboard.subscriptions.title')} — ${t('common.appName')}` })
+const { t } = useAppI18n()
+const subscriptionsStore = useSubscriptionsStore()
+const spacesStore = useSpacesStore()
+const { subscriptions, loading, monthlyTotal, activeCount } = storeToRefs(subscriptionsStore)
 
-const filter = ref<'all' | 'active' | 'price_changed' | 'cancelled'>('all')
+const spaceId = computed(() => spacesStore.activeSpace?.id ?? '')
 
-const { data: subs, pending } = await useFetch('/api/subscriptions', {
-  query: computed(() => ({
-    status: filter.value === 'all' ? undefined : filter.value.toUpperCase()
-  }))
-})
+watch(spaceId, (id) => {
+  if (id) subscriptionsStore.fetchSubscriptions(id)
+}, { immediate: true })
 
-const priceAlerts = computed(() =>
-  (subs.value ?? []).filter(s => s.priceAlert || s.status === 'PRICE_CHANGED')
-)
-
-const totalMonthly = computed(() => {
-  return (subs.value ?? [])
-    .filter(s => s.status === 'ACTIVE' && s.frequency === 'MONTHLY')
-    .reduce((sum, s) => sum + s.amount, 0)
-})
-
-const filterItems = computed(() => [
-  { key: 'all' as const, label: t('dashboard.subscriptions.filters.all') },
-  { key: 'active' as const, label: t('dashboard.subscriptions.filters.active') },
-  { key: 'price_changed' as const, label: t('dashboard.subscriptions.filters.priceChanged') },
-  { key: 'cancelled' as const, label: t('dashboard.subscriptions.filters.cancelled') }
-])
-
-const priceAlertTitle = computed(() => {
-  const count = priceAlerts.value.length
-  return count === 1
-    ? t('dashboard.subscriptions.priceChangeTitle', { count })
-    : t('dashboard.subscriptions.priceChangeTitlePlural', { count })
-})
-
-const priceAlertDescription = computed(() => {
-  const count = priceAlerts.value.length
-  const names = priceAlerts.value.map(s => s.name).join(', ')
-  const verb = count === 1
-    ? t('dashboard.subscriptions.priceChangeVerbSingular')
-    : t('dashboard.subscriptions.priceChangeVerbPlural')
-  return t('dashboard.subscriptions.priceChangeDescription', { names, verb })
-})
-
-function fmt(amount: number, currency = 'USD') {
-  return formatCurrencyForLocale(amount, getLocale(), currency)
+function formatMoney(amount: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
 }
 </script>
 
 <template>
-  <div class="p-6 space-y-6 max-w-5xl mx-auto">
-    <div>
-      <h1 class="text-2xl font-bold tracking-tight">{{ t('dashboard.subscriptions.title') }}</h1>
-      <p class="text-sm text-muted mt-1">
-        {{ t('dashboard.subscriptions.subtitle') }}
-        <span class="font-semibold text-foreground">{{ fmt(totalMonthly) }}</span>
-      </p>
-    </div>
-
-    <UAlert
-      v-if="priceAlerts.length"
-      :title="priceAlertTitle"
-      :description="priceAlertDescription"
-      color="error"
-      variant="subtle"
-      icon="i-lucide-shield-alert"
+  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-7xl mx-auto">
+    <DashboardPageHeader
+      :title="t('dashboard.subscriptions.title')"
+      :description="t('dashboard.subscriptions.subtitle', { count: activeCount })"
     />
 
-    <div class="flex gap-2 flex-wrap">
-      <UButton
-        v-for="f in filterItems"
-        :key="f.key"
-        :label="f.label"
-        size="xs"
-        :color="filter === f.key ? 'primary' : 'neutral'"
-        :variant="filter === f.key ? 'solid' : 'subtle'"
-        @click="filter = f.key"
-      />
+    <div class="grid sm:grid-cols-3 gap-4">
+      <UCard :ui="{ body: 'p-5' }">
+        <p class="text-xs uppercase tracking-widest text-muted">{{ t('dashboard.subscriptions.active') }}</p>
+        <p class="font-display text-2xl mt-1">{{ activeCount }}</p>
+      </UCard>
+      <UCard :ui="{ body: 'p-5' }">
+        <p class="text-xs uppercase tracking-widest text-muted">{{ t('dashboard.subscriptions.monthlyTotal') }}</p>
+        <p class="font-display text-2xl mt-1">{{ formatMoney(monthlyTotal) }}</p>
+      </UCard>
     </div>
 
-    <UCard v-if="pending">
-      <div v-for="i in 6" :key="i" class="flex items-center gap-3 py-3 border-b border-default last:border-0 animate-pulse">
-        <div class="w-9 h-9 rounded-lg bg-muted/50 shrink-0" />
-        <div class="flex-1 space-y-1.5">
-          <div class="h-3.5 w-32 bg-muted/50 rounded" />
-          <div class="h-3 w-20 bg-muted/30 rounded" />
+    <div v-if="loading" class="text-center py-16 text-muted text-sm">{{ t('common.loading') }}</div>
+    <div v-else-if="!subscriptions.length" class="text-center py-16">
+      <p class="font-display text-lg">{{ t('dashboard.subscriptions.emptyTitle') }}</p>
+      <p class="text-sm text-muted mt-2 max-w-md mx-auto">{{ t('dashboard.subscriptions.emptyDescription') }}</p>
+    </div>
+    <div v-else class="space-y-3">
+      <UCard v-for="sub in subscriptions" :key="sub.id" :ui="{ body: 'p-4 sm:p-5' }">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="font-medium">{{ sub.name }}</p>
+            <p class="text-xs text-muted mt-1">{{ sub.frequency ?? 'monthly' }}</p>
+          </div>
+          <p class="font-display">{{ formatMoney(sub.amount ?? 0) }}</p>
         </div>
-        <div class="h-4 w-16 bg-muted/50 rounded" />
-      </div>
-    </UCard>
-
-    <UCard v-else-if="!subs?.length" class="text-center py-12">
-      <UIcon name="i-lucide-refresh-cw" class="w-10 h-10 mx-auto mb-3 text-muted opacity-40" />
-      <h3 class="font-semibold mb-1">{{ t('dashboard.subscriptions.emptyTitle') }}</h3>
-      <p class="text-sm text-muted">
-        {{ t('dashboard.subscriptions.emptyDescription') }}
-      </p>
-    </UCard>
-
-    <UCard v-else>
-      <ul class="divide-y divide-default">
-        <li v-for="sub in subs" :key="sub.id">
-          <DashboardSubscriptionCard :subscription="sub" />
-        </li>
-      </ul>
-    </UCard>
-
-    <UAlert
-      icon="i-lucide-shield-check"
-      :title="t('dashboard.subscriptions.shieldTitle')"
-      :description="t('dashboard.subscriptions.shieldDescription')"
-      color="primary"
-      variant="subtle"
-    />
+      </UCard>
+    </div>
   </div>
 </template>

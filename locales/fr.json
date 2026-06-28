@@ -26,7 +26,8 @@
     "terms": "Conditions",
     "language": "Langue",
     "english": "Anglais",
-    "french": "Français"
+    "french": "Français",
+    "delete": "Supprimer"
   },
   "nav": {
     "features": "Fonctionnalités",
@@ -36,9 +37,14 @@
     "accounts": "Comptes",
     "subscriptions": "Abonnements",
     "budgets": "Budgets",
+    "analytics": "Analyses",
+    "cashflow": "Flux de trésorerie",
     "spaces": "Espaces",
     "family": "Famille",
-    "company": "Entreprise",
+    "company": "Activité",
+    "business": "Activité",
+    "businessTeam": "Équipe",
+    "saasVendors": "SaaS & fournisseurs",
     "myMoney": "Mon argent"
   },
   "spaceTypes": {
@@ -103,10 +109,18 @@
       "shared": "Partagé",
       "allowance": "Argent de poche",
       "runway": "Runway",
-      "independent": { "metric": "12 480 €" },
-      "household": { "metric": "28 340 €" },
-      "family": { "metric": "420 € / mois" },
-      "company": { "metric": "14 mois" }
+      "independent": {
+        "metric": "12 480 €"
+      },
+      "household": {
+        "metric": "28 340 €"
+      },
+      "family": {
+        "metric": "420 € / mois"
+      },
+      "company": {
+        "metric": "14 mois"
+      }
     },
     "testimonials": {
       "title": "Confiance tranquille",
@@ -262,7 +276,17 @@
           "audit": "Exports prêts pour audit",
           "support": "Support prioritaire"
         }
-      }
+      },
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "mostPopular": "Le plus populaire"
+    },
+    "featureStrip": {
+      "spaces": "Espaces financiers",
+      "saasShield": "SaaS Shield",
+      "burnRate": "Burn rate & runway",
+      "teen": "Comptes ado & enfant",
+      "ai": "Catégorisation IA"
     }
   },
   "dashboard": {
@@ -283,12 +307,63 @@
         "totalBalance": "Solde total",
         "monthlySpending": "Dépenses mensuelles",
         "monthlyIncome": "Revenus mensuels",
-        "netSavings": "Épargne nette"
+        "netSavings": "Épargne nette",
+        "burnRate": "Burn rate",
+        "runway": "Runway"
+      },
+      "cashFlowChart": "Flux de trésorerie",
+      "spendingChart": "Dépenses par catégorie",
+      "viewAnalytics": "Analyses complètes",
+      "saasShield": "SaaS Shield",
+      "saasShieldHint": "Santé des abonnements en un coup d'œil",
+      "saasIssues": "problèmes détectés"
+    },
+    "analytics": {
+      "title": "Analyses",
+      "subtitle": "Flux de trésorerie, catégories, patrimoine net et habitudes de dépenses pour votre espace actif.",
+      "netWorth": "Patrimoine net",
+      "income": "Revenus",
+      "spending": "Dépenses",
+      "savingsRate": "Taux d'épargne",
+      "cashFlow": "Flux de trésorerie",
+      "cashFlowHint": "Revenus vs dépenses dans le temps",
+      "byCategory": "Dépenses par catégorie",
+      "byCategoryHint": "Où va votre argent",
+      "netWorthTrend": "Évolution du patrimoine",
+      "netWorthHint": "Solde estimé dans le temps",
+      "topMerchants": "Principaux marchands",
+      "topMerchantsHint": "Plus grosses dépenses récurrentes",
+      "insightsTitle": "Aperçu par catégorie",
+      "ofSpending": "des dépenses",
+      "syncData": "Synchroniser les banques",
+      "periodLabel": "Période",
+      "emptyTitle": "Aucune donnée de transaction",
+      "emptyDescription": "Connectez un compte bancaire et synchronisez les transactions pour débloquer les graphiques.",
+      "emptyTitleConnected": "Aucune transaction pour l'instant",
+      "emptyDescriptionConnected": "Votre banque est connectée, mais aucune transaction sur cette période. Synchronisez depuis les banques — les comptes test n'ont souvent pas d'historique.",
+      "ranges": {
+        "7d": "7 jours",
+        "30d": "30 jours",
+        "90d": "90 jours",
+        "12m": "12 mois"
       }
     },
     "accounts": {
       "title": "Comptes",
+      "subtitle": "Connectez vos banques, choisissez la visibilité personnelle ou partagée, et gardez les soldes à jour.",
+      "subtitleConnected": "Vos banques sont connectées. Synchronisez à tout moment pour récupérer les derniers soldes et transactions.",
+      "teenSubtitle": "Connecte ta banque pour suivre tes dépenses et voir où va ton argent.",
+      "teenSubtitleConnected": "Ta banque est connectée. Synchronise quand tu dépenses — les comptes test peuvent n'avoir aucune transaction tant qu'il n'y a pas d'activité.",
+      "teenEmptyDescription": "Lie ton compte bancaire pour synchroniser les transactions et débloquer les analyses. Seuls toi et tes tuteurs peuvent voir ce compte.",
       "count": "{count} comptes · Total {total}",
+      "totalBalance": "Solde total",
+      "accountCount": "Comptes",
+      "connected": "connectés",
+      "personalBalance": "Solde personnel",
+      "sharedBalance": "Solde partagé",
+      "filterLabel": "Afficher les comptes",
+      "connectOptions": "Type de connexion par défaut",
+      "viewTransactions": "Transactions",
       "connectBank": "Connecter une banque",
       "connectPersonal": "Connecter en personnel",
       "connectShared": "Connecter en partagé",
@@ -313,9 +388,15 @@
       "stripeNote": "Propulsé par Stripe Financial Connections",
       "stripeDescription": "Vos identifiants bancaires ne sont jamais stockés. FlowRate utilise la liaison bancaire sécurisée en lecture seule de Stripe.",
       "connectError": "Échec de la connexion bancaire. Veuillez réessayer.",
+      "syncNoAccounts": "Stripe a lié le compte mais rien n'a été enregistré. Réessayez — si le problème persiste, ajoutez STRIPE_WEBHOOK_SECRET depuis `pnpm stripe:listen` dans .env et redémarrez `pnpm dev`.",
+      "resyncFromStripe": "Actualiser depuis Stripe",
       "stripeNotConfigured": "Stripe n'est pas configuré. Ajoutez STRIPE_PUBLISHABLE_KEY et STRIPE_SECRET_KEY à votre environnement.",
       "stripeTestModeTitle": "Mode test Stripe",
-      "stripeTestModeDescription": "Seules des banques de test s'affichent avec des clés API de test. Pour connecter de vrais comptes bancaires américains, passez aux clés live sur un site HTTPS déployé après l'approbation de votre demande Financial Connections par Stripe."
+      "stripeTestModeDescription": "Seules des banques de test s'affichent avec des clés API de test. Pour connecter de vrais comptes bancaires américains, passez aux clés live sur un site HTTPS déployé après l'approbation de votre demande Financial Connections par Stripe.",
+      "disconnect": "Déconnecter",
+      "disconnectConfirm": "Retirer ce compte bancaire et ses transactions de FlowRate ?",
+      "sharedSpaceHintTitle": "Vous voulez des comptes partagés ou familiaux ?",
+      "sharedSpaceHintDescription": "Passez à un espace Foyer ou Famille via le sélecteur de la barre latérale, puis connectez vos banques en Personnel ou Partagé."
     },
     "spaces": {
       "title": "Espaces financiers",
@@ -332,6 +413,7 @@
       "createFailed": "Échec de la création",
       "tryAgain": "Réessayer",
       "manageSpaces": "Gérer les espaces",
+      "minorCannotSwitch": "Votre compte est lié uniquement à l'espace familial.",
       "types": {
         "household": {
           "label": "Foyer",
@@ -342,8 +424,8 @@
           "description": "Foyer + enfants et ados avec supervision"
         },
         "company": {
-          "label": "Entreprise",
-          "description": "Fondateurs & freelances — burn rate, SaaS Shield"
+          "label": "Activité",
+          "description": "Fondateurs & freelances — runway, SaaS Shield, cloud"
         }
       }
     },
@@ -367,15 +449,15 @@
           "description": "Foyer plus enfants — argent de poche, comptes ado, supervision."
         },
         "company": {
-          "title": "Entreprise",
-          "description": "Mon activité — burn rate, SaaS Shield, dépenses cloud."
+          "title": "Activité",
+          "description": "Séparer l'argent pro — runway, stack SaaS, dépenses cloud."
         }
       },
       "defaultNames": {
         "independent": "Mes finances",
         "household": "Notre foyer",
         "family": "Notre famille",
-        "company": "Mon entreprise"
+        "company": "Mon activité"
       }
     },
     "family": {
@@ -390,7 +472,17 @@
       "sendInvite": "Envoyer l'invitation",
       "membersTitle": "Membres",
       "addChildTitle": "Ajouter un enfant ou un ado",
-      "addChildDescription": "Les ados ont leur propre connexion. Les jeunes enfants sont gérés par les tuteurs.",
+      "addChildDescription": "Créez une connexion pour votre enfant ou ado. Ils se connectent avec e-mail et mot de passe.",
+      "username": "Nom d'utilisateur",
+      "usernamePlaceholder": "ex. alex",
+      "childEmail": "E-mail",
+      "childEmailPlaceholder": "alex@email.com",
+      "childEmailHelp": "Utilisé pour se connecter à son compte.",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "createAccount": "Créer le compte",
+      "accountCreated": "Compte créé",
+      "accountCreatedDescription": "{name} peut se connecter avec son e-mail et mot de passe.",
       "childName": "Prénom de l'enfant",
       "teenEmail": "E-mail (requis pour la connexion ado)",
       "roleChild": "Enfant (géré par tuteur)",
@@ -413,24 +505,118 @@
         "jarsTitle": "Tirelires",
         "jarPlaceholder": "Nom de la tirelire",
         "goal": "Objectif : {amount}"
+      },
+      "splits": {
+        "addTitle": "Ajouter une règle de partage",
+        "namePlaceholder": "Nom de la règle (ex. Courses)",
+        "empty": "Aucune règle de partage. Créez-en une pour répartir les dépenses communes.",
+        "allCategories": "Toutes les catégories"
+      },
+      "removeMember": "Retirer le membre",
+      "statusHeader": "Statut",
+      "dateOfBirth": "Date de naissance",
+      "roleLabel": "Rôle",
+      "childBalance": "Solde",
+      "spending30d": "Dépenses (30 j)",
+      "income30d": "Revenus (30 j)",
+      "transactionCount": "Transactions (30 j)",
+      "linkedAccounts": "{count} comptes liés",
+      "viewDetails": "Voir les détails",
+      "noChildrenTitle": "Aucun enfant pour l'instant",
+      "noChildrenDescription": "Ajoutez un enfant ou un ado pour suivre l'argent de poche et les dépenses supervisées.",
+      "childErrors": {
+        "missingFields": "Nom d'utilisateur, e-mail et mot de passe sont requis.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+        "emailTaken": "Un compte avec cet e-mail existe déjà.",
+        "createFailed": "Impossible de créer le compte. Réessayez."
+      },
+      "noLinkedAccounts": "Aucun compte bancaire lié pour ce membre.",
+      "noTransactions": "Aucune transaction synchronisée. Connectez une banque et lancez la sync depuis Comptes.",
+      "recentActivity": "Activité récente",
+      "splitsComingTitle": "Règles de partage bientôt disponibles",
+      "hints": {
+        "independent": "Créez un espace Foyer ou Famille pour inviter votre partenaire et gérer les enfants.",
+        "household": "Finances de couple — connectez des comptes partagés et invitez un co-tuteur.",
+        "family": "Finances familiales — gérez les enfants, l'argent de poche et les comptes supervisés."
+      },
+      "memberTabs": {
+        "overview": "Aperçu",
+        "accounts": "Comptes",
+        "transactions": "Transactions",
+        "allowance": "Argent de poche & tirelires"
       }
     },
     "company": {
-      "title": "Tableau de bord Entreprise",
-      "subtitle": "Burn rate, runway et gaspillage SaaS — pour fondateurs solo et freelances.",
-      "switchHint": "Passez à un espace Entreprise ou créez-en un pour voir le burn rate.",
-      "monthlyBreakdown": "Répartition mensuelle",
+      "title": "Activité",
+      "subtitle": "Runway, dépenses SaaS et cloud — pour fondateurs et freelances.",
+      "switchHint": "Créez un espace Activité pour séparer l'argent pro du perso et suivre le burn rate.",
+      "noBusinessTitle": "Pas encore d'espace activité",
+      "createBusinessCta": "Créer un espace activité",
+      "readOnlyTitle": "Accès lecture seule",
+      "readOnlyDesc": "Vous voyez le runway et les dépenses, mais seul le fondateur ou l'admin finance peut modifier les données.",
+      "monthlyBreakdown": "Ce mois-ci",
       "income": "Revenus",
-      "expenses": "Dépenses",
-      "subscriptions": "Abonnements",
+      "expenses": "Sorties",
+      "subscriptions": "SaaS & outils",
       "cloudDev": "Cloud & outils dev",
       "saasShield": "SaaS Shield",
-      "activeSubs": "{count} abonnements actifs détectés.",
-      "duplicateWaste": "~{amount}/mois en sièges en double.",
-      "reviewSubs": "Voir les abonnements",
+      "activeSubs": "{count} outils récurrents détectés",
+      "duplicateWaste": "~{amount}/mois en sièges en double — à couper.",
+      "reviewSubs": "Voir la stack SaaS",
+      "topVendors": "Top fournisseurs ce mois",
+      "noVendors": "Connectez votre compte pro pour voir où part l'argent.",
+      "alertsTitle": "Alertes",
+      "footnote": "Runway = trésorerie ÷ burn net mensuel. Gardez les comptes pro dans cet espace.",
+      "tabs": {
+        "overview": "Aperçu",
+        "team": "Équipe"
+      },
+      "setup": {
+        "title": "Configurez votre cockpit business",
+        "subtitle": "Trois étapes pour voir runway, gaspillage SaaS et dépenses cloud.",
+        "step1Title": "Connecter la banque pro",
+        "step1Desc": "Liez le compte courant utilisé pour les revenus et charges.",
+        "step1Cta": "Connecter un compte",
+        "step2Title": "Synchroniser les transactions",
+        "step2Desc": "On calcule le burn rate et catégorise les charges SaaS.",
+        "step2Cta": "Voir les transactions",
+        "step3Title": "Passer en revue SaaS & fournisseurs",
+        "step3Desc": "Repérez les doublons et le cloud avant qu'ils mangent votre runway.",
+        "step3Cta": "Ouvrir SaaS Shield",
+        "syncCta": "Synchroniser"
+      },
+      "alerts": {
+        "CONNECT_BANK": "Connectez un compte pro pour calculer runway et burn rate.",
+        "SYNC_TRANSACTIONS": "Synchronisation en cours — actualisez ou ouvrez Comptes.",
+        "LOW_RUNWAY": "Runway inférieur à {months} mois au burn actuel — réduisez le SaaS ou augmentez les revenus.",
+        "SAAS_WASTE": "Vous payez peut-être ~{amount} $/mois en sièges SaaS en double.",
+        "HIGH_CLOUD_SPEND": "Cloud & dev = {percent} % des dépenses du mois — à vérifier.",
+        "MANY_SUBSCRIPTIONS": "{count} abonnements actifs — auditez les outils inutilisés."
+      },
+      "team": {
+        "inviteTitle": "Inviter l'équipe",
+        "inviteDesc": "Nous envoyons un lien et un code de vérification par SMS. L'e-mail est optionnel.",
+        "phone": "Numéro de téléphone",
+        "phoneHelp": "Requis — nous envoyons une invitation et un code par SMS.",
+        "email": "E-mail (optionnel)",
+        "emailOptional": "Optionnel — pour se connecter par e-mail plutôt que par téléphone.",
+        "name": "Nom (optionnel)",
+        "role": "Niveau d'accès",
+        "sendInvite": "Envoyer l'invitation",
+        "inviteSent": "Invitation envoyée",
+        "inviteFailed": "Échec de l'envoi",
+        "membersTitle": "Personnes avec accès",
+        "roles": {
+          "financeAdmin": "Admin finance",
+          "financeAdminDesc": "Peut connecter les banques, modifier les budgets et inviter.",
+          "guest": "Lecture seule",
+          "guestDesc": "Voit runway, burn et SaaS — ne peut rien modifier."
+        }
+      },
       "stats": {
         "cash": "Trésorerie",
-        "burn": "Burn mensuel",
+        "burn": "Burn net (mois)",
         "runway": "Runway",
         "waste": "Gaspillage SaaS",
         "months": "{count} mois",
@@ -446,7 +632,8 @@
       "jarsTitle": "Tirelires",
       "noJars": "Pas encore de tirelires. Demande à ton tuteur d'en créer une !",
       "learnModeTitle": "Mode apprentissage",
-      "learnModeDescription": "Tes dépenses sont classées en Besoins, Envies et Épargne — demande les détails à ton tuteur."
+      "learnModeDescription": "Tes dépenses sont classées en Besoins, Envies et Épargne — demande les détails à ton tuteur.",
+      "connectBank": "Connecter ma banque"
     },
     "settings": {
       "title": "Paramètres",
@@ -476,15 +663,42 @@
         "FREE": "Gratuit",
         "PRO": "Pro",
         "ENTERPRISE": "Entreprise"
-      }
+      },
+      "phone": "Numéro de téléphone",
+      "phonePlaceholder": "+33 6 12 34 56 78",
+      "phoneHelp": "Vérification SMS via Twilio. Format international (E.164) : indicatif pays, puis le numéro sans le 0 initial. Ex. : 09 87 76 54 32 → +33987765432.",
+      "phoneFormatHint": "Retirez le 0 après l'indicatif (ex. +33987765432, pas +330987765432).",
+      "phoneVerified": "Vérifié",
+      "phoneUnverified": "Non vérifié — saisissez le code reçu par SMS",
+      "phoneCodeSent": "Code de vérification envoyé sur votre téléphone",
+      "phoneCodeResent": "Nouveau code de vérification envoyé",
+      "phoneCodeInvalid": "Code invalide ou expiré — réessayez",
+      "phoneVerifyCode": "Code de vérification",
+      "phoneVerifyCodePlaceholder": "Code à 6 chiffres",
+      "phoneVerify": "Vérifier le numéro",
+      "phoneResendCode": "Renvoyer le code",
+      "phoneVerifyRequired": "Enregistrez d'abord votre numéro, puis saisissez le code SMS",
+      "phoneInvalid": "Entrez un numéro valide (ex. +33987765432 ou +33612345678)",
+      "phoneVerificationFailed": "Impossible d'envoyer le SMS — vérifiez le format du numéro et la config Twilio",
+      "phoneTaken": "Ce numéro est déjà associé à un autre compte",
+      "upgradeCtaDynamic": "Passer à Pro — {price}/mois",
+      "upgradeSuccess": "Bienvenue sur Pro ! Votre offre est active.",
+      "upgradeCanceled": "Paiement annulé — vous pouvez passer à Pro à tout moment depuis Paramètres.",
+      "checkoutFailed": "Impossible de démarrer le paiement",
+      "portalFailed": "Impossible d'ouvrir le portail de facturation",
+      "tryAgain": "Veuillez réessayer."
     },
     "transactions": {
       "title": "Transactions",
+      "subtitle": "{count} transactions dans votre espace actif — recherchez, filtrez et exportez.",
       "total": "{count} transactions au total",
       "exportCsv": "Exporter CSV",
-      "searchPlaceholder": "Rechercher des transactions...",
-      "all": "Tout",
-      "empty": "Aucune transaction pour l'instant",
+      "searchPlaceholder": "Rechercher par marchand ou description",
+      "filterCategory": "Catégorie",
+      "clearFilters": "Effacer les filtres",
+      "emptyTitle": "Aucune transaction",
+      "emptyDescription": "Connectez une banque et synchronisez pour voir votre activité ici.",
+      "emptyDescriptionConnected": "Votre banque est connectée mais aucune transaction pour l'instant. Synchronisez depuis les banques ou élargissez la période — les comptes test peuvent rester vides.",
       "pending": "En attente",
       "columns": {
         "date": "Date",
@@ -492,7 +706,12 @@
         "category": "Catégorie",
         "account": "Compte",
         "amount": "Montant"
-      }
+      },
+      "dateFrom": "Du",
+      "dateTo": "Au",
+      "detailTitle": "Détails de la transaction",
+      "all": "Tout",
+      "empty": "Aucune transaction"
     },
     "subscriptions": {
       "title": "Abonnements",
@@ -524,7 +743,9 @@
         "WEEKLY": "/semaine",
         "MONTHLY": "/mois",
         "YEARLY": "/an"
-      }
+      },
+      "active": "Abonnements actifs",
+      "monthlyTotal": "Total mensuel"
     },
     "budgets": {
       "title": "Budgets",
@@ -542,7 +763,52 @@
       "periodLabel": "Période",
       "createBudget": "Créer le budget",
       "percentUsed": "{percent} % utilisé",
-      "overBudget": "— budget dépassé !"
+      "overBudget": "— budget dépassé !",
+      "subtitleOne": "1 budget actif dans cet espace",
+      "subtitleMany": "{count} budgets actifs dans cet espace",
+      "nearLimitAlert": "{count} budget(s) à 90 % ou plus de leur limite",
+      "sharedLabel": "Partagé avec les membres de l'espace",
+      "summary": {
+        "active": "Budgets actifs",
+        "budgeted": "Total budgété",
+        "spent": "Dépensé cette période",
+        "atRisk": "Proche de la limite"
+      }
+    },
+    "sync": {
+      "complete": "Synchronisation terminée",
+      "imported": "{count} transactions importées depuis {accounts} comptes liés.",
+      "failed": "Échec de la synchronisation",
+      "tryAgain": "Veuillez réessayer."
+    },
+    "invite": {
+      "title": "Rejoindre {space}",
+      "description": "Vous avez été invité en tant que {role}. Acceptez pour accéder à cet espace financier.",
+      "accept": "Accepter l'invitation",
+      "acceptedTitle": "Vous êtes inscrit !",
+      "loginHint": "Connectez-vous avec {email} et le mot de passe que vous venez de créer.",
+      "expiredTitle": "Invitation expirée",
+      "expiredDescription": "Ce lien n'est plus valide. Demandez au propriétaire de l'espace d'en envoyer un nouveau.",
+      "phoneTitle": "Rejoindre {space}",
+      "phoneDescription": "Entrez le code de vérification envoyé au {phone}.",
+      "verificationCode": "Code de vérification",
+      "verifyPhone": "Vérifier le téléphone",
+      "resendCode": "Renvoyer le code",
+      "codeInvalid": "Code invalide ou expiré.",
+      "resendFailed": "Impossible de renvoyer le code. Réessayez plus tard.",
+      "setupTitle": "Configurer votre accès à {space}",
+      "setupDescription": "Choisissez un mot de passe pour terminer. L'e-mail est optionnel.",
+      "yourName": "Votre nom",
+      "emailOptional": "E-mail (optionnel)",
+      "emailOptionalHelp": "Laissez vide pour vous connecter avec un e-mail lié au téléphone.",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "createAndJoin": "Créer le compte et rejoindre",
+      "completeFailed": "Impossible de terminer l'inscription.",
+      "acceptFailed": "Impossible d'accepter. Connectez-vous d'abord avec l'e-mail invité.",
+      "signInToAccept": "Se connecter pour accepter"
     }
   },
   "categories": {
@@ -572,7 +838,10 @@
     "CHILD": "Enfant",
     "TEEN": "Ado",
     "OWNER": "Propriétaire",
-    "MEMBER": "Membre"
+    "MEMBER": "Membre",
+    "FINANCE_ADMIN": "Admin finance",
+    "MANAGER": "Manager",
+    "GUEST": "Lecture seule"
   },
   "memberStatus": {
     "ACTIVE": "Actif",
@@ -622,6 +891,8 @@
     "rateLimit": "Trop de requêtes. Veuillez patienter.",
     "server": "Erreur serveur. Veuillez réessayer plus tard.",
     "unavailable": "Service temporairement indisponible.",
-    "codes": {}
+    "codes": {
+      "INVALID_ORIGIN": "L'URL de ce site n'est pas autorisée pour l'inscription. Ajoutez l'URL de déploiement (ex. https://votre-app.vercel.app) dans Console Neon → Auth → Configuration → Domaines."
+    }
   }
 }

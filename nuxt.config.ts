@@ -34,6 +34,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    stripePricePro: process.env.STRIPE_PRICE_PRO ?? '',
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? '',
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? '',
+    twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER ?? '',
+    twilioVerifyServiceSid: process.env.TWILIO_VERIFY_SERVICE_SID ?? '',
     neonApiKey: process.env.NEON_API_KEY,
     stackProjectId: process.env.STACK_PROJECT_ID,
     neonAuthCookieSecret: process.env.NUXT_SESSION_PASSWORD ?? process.env.NEON_AUTH_COOKIE_SECRET ?? '',
@@ -46,7 +51,13 @@ export default defineNuxtConfig({
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
       stripeConfigured: Boolean(process.env.STRIPE_PUBLISHABLE_KEY && process.env.STRIPE_SECRET_KEY),
       stripeLiveMode: (process.env.STRIPE_PUBLISHABLE_KEY ?? '').startsWith('pk_live_'),
-      appUrl: process.env.APP_URL ?? 'http://localhost:3000'
+      appUrl: process.env.APP_URL
+        ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
+      twilioConfigured: Boolean(
+        process.env.TWILIO_ACCOUNT_SID
+        && process.env.TWILIO_AUTH_TOKEN
+        && process.env.TWILIO_VERIFY_SERVICE_SID
+      )
     }
   },
 

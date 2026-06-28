@@ -1,5 +1,9 @@
 interface StripeFinancialConnectionsSession {
-  accounts?: Array<{ id: string }>
+  accounts?: Array<{ id: string }> | {
+    object?: string
+    data?: Array<{ id: string }>
+    has_more?: boolean
+  }
 }
 
 interface StripeInstance {

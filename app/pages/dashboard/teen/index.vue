@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { formatCurrencyForLocale } from '~/utils/format'
 
 definePageMeta({ layout: 'dashboard', title: 'My Money', middleware: 'auth' })
 
 const { t, getLocale } = useAppI18n()
+const teenStore = useTeenStore()
+const { dashboard: teen, pending } = storeToRefs(teenStore)
+
 useSeoMeta({ title: () => `${t('nav.myMoney')} — ${t('common.appName')}` })
 
-const { data: teen } = await useFetch('/api/teen/dashboard')
+await useAsyncData('teen-dashboard', () => teenStore.fetchDashboard())
 
 function fmt(n: number) {
   return formatCurrencyForLocale(n, getLocale(), 'USD')
@@ -28,9 +32,27 @@ function frequencyLabel(freq?: string | null) {
 
 <template>
   <div class="p-6 max-w-2xl mx-auto space-y-6">
-    <div class="text-center">
-      <h1 class="text-2xl font-bold">{{ greeting }}</h1>
-      <p class="text-sm text-muted mt-1">{{ t('dashboard.teen.subtitle') }}</p>
+    <div class="text-center space-y-4">
+      <div>
+        <h1 class="text-2xl font-bold">{{ greeting }}</h1>
+        <p class="text-sm text-muted mt-1">{{ t('dashboard.teen.subtitle') }}</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2">
+        <UButton
+          :label="t('dashboard.teen.connectBank')"
+          icon="i-lucide-landmark"
+          size="sm"
+          to="/dashboard/accounts"
+        />
+        <UButton
+          :label="t('nav.analytics')"
+          icon="i-lucide-bar-chart-3"
+          size="sm"
+          color="neutral"
+          variant="outline"
+          to="/dashboard/analytics"
+        />
+      </div>
     </div>
 
     <UCard class="text-center py-8">
@@ -51,12 +73,12 @@ function frequencyLabel(freq?: string | null) {
           <p class="font-medium">{{ jar.name }}</p>
           <p class="font-semibold">{{ fmt(jar.balance) }}</p>
         </div>
-        <UProgress v-if="jar.targetAmount" :value="jar.progress ?? 0" />
+        <UProgress v-if="jar.targetAmount" :model-value="jar.progress ?? 0" />
         <p v-if="jar.targetAmount" class="text-xs text-muted mt-1">
           {{ t('dashboard.family.child.goal', { amount: fmt(jar.targetAmount) }) }}
         </p>
       </UCard>
-      <p v-if="!teen?.jars?.length" class="text-sm text-muted text-center py-4">
+      <p v-if="!teen?.jars?.length && !pending" class="text-sm text-muted text-center py-4">
         {{ t('dashboard.teen.noJars') }}
       </p>
     </div>

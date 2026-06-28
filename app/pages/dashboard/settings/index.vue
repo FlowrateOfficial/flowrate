@@ -1,60 +1,130 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: 'auth' })
+import { storeToRefs } from 'pinia'
 
+definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: ['auth', 'billing-sync'] })
+
+const route = useRoute()
 const { t } = useAppI18n()
+const billingStore = useBillingStore()
+const userStore = useUserStore()
+const spacesStore = useSpacesStore()
+const { loading: billingLoading, proPlan } = storeToRefs(billingStore)
+const { plan: userPlan } = storeToRefs(userStore)
+const { isMinor } = storeToRefs(spacesStore)
+
 useSeoMeta({ title: () => `${t('dashboard.settings.title')} — ${t('common.appName')}` })
 
-const { getSession } = useNeonAuth()
-
-const authUser = ref<{ id: string; name: string | null; email: string } | null>(null)
-const userPlan = ref<'FREE' | 'PRO' | 'ENTERPRISE'>('FREE')
-
-onMounted(async () => {
-  const session = await getSession()
-  authUser.value = session?.user ?? null
-  if (authUser.value) {
-    profile.name = authUser.value.name ?? ''
-    profile.email = authUser.value.email
-  }
-  const data = await $fetch<{ plan: 'FREE' | 'PRO' | 'ENTERPRISE' }>('/api/user/profile')
-    .catch(() => null)
-  if (data?.plan) userPlan.value = data.plan
-})
+const toast = useToast()
 
 const profile = reactive({
   name: '',
-  email: ''
+  email: '',
+  phone: ''
 })
-
+const phoneVerified = ref(false)
+const verificationCode = ref('')
+const isVerifyingPhone = ref(false)
+const isResendingCode = ref(false)
+const showVerificationInput = ref(false)
 const isSavingProfile = ref(false)
 const profileSaved = ref(false)
+const profileError = ref('')
+
+onMounted(async () => {
+  await billingStore.fetchPlans()
+
+  if (route.query.upgraded === '1') {
+    toast.add({ title: t('dashboard.settings.upgradeSuccess'), color: 'success' })
+    await navigateTo({ path: '/dashboard/settings' }, { replace: true })
+  }
+  if (route.query.canceled === '1') {
+    toast.add({ title: t('dashboard.settings.upgradeCanceled'), color: 'neutral' })
+    await navigateTo({ path: '/dashboard/settings' }, { replace: true })
+  }
+
+  await loadProfile()
+})
+
+async function loadProfile() {
+  const data = await userStore.fetchProfile(true)
+  if (!data) return
+
+  profile.name = data.name ?? ''
+  profile.email = data.email
+  profile.phone = data.phone ?? ''
+  phoneVerified.value = data.phoneVerified
+  showVerificationInput.value = Boolean(data.phone && !data.phoneVerified)
+}
 
 async function saveProfile() {
   isSavingProfile.value = true
   profileSaved.value = false
+  profileError.value = ''
   try {
-    await $fetch('/api/user/profile', {
-      method: 'PATCH',
-      body: { name: profile.name }
+    const data = await userStore.updateProfile({
+      name: profile.name,
+      phone: profile.phone.trim() || null
     })
+    profile.name = data.name ?? ''
+    profile.email = data.email
+    profile.phone = data.phone ?? ''
+    phoneVerified.value = data.phoneVerified
+    showVerificationInput.value = Boolean(data.phone && !data.phoneVerified)
+    if (data.verificationSent) {
+      toast.add({ title: t('dashboard.settings.phoneCodeSent'), color: 'success' })
+    }
+    if (data.verificationError) {
+      profileError.value = t('dashboard.settings.phoneVerificationFailed')
+      toast.add({ title: data.verificationError, color: 'warning' })
+    }
     profileSaved.value = true
     setTimeout(() => { profileSaved.value = false }, 3000)
+  } catch (err: unknown) {
+    const message = err && typeof err === 'object' && 'data' in err
+      && typeof (err as { data?: { message?: string } }).data?.message === 'string'
+      ? (err as { data: { message: string } }).data.message
+      : t('dashboard.settings.tryAgain')
+    profileError.value = message.includes('already')
+      ? t('dashboard.settings.phoneTaken')
+      : message.includes('E.164') || message.includes('valid')
+        ? t('dashboard.settings.phoneInvalid')
+        : message
   } finally {
     isSavingProfile.value = false
   }
 }
 
-const isLoadingPortal = ref(false)
-
-async function openBillingPortal() {
-  isLoadingPortal.value = true
+async function verifyPhone() {
+  if (!verificationCode.value.trim()) return
+  isVerifyingPhone.value = true
+  profileError.value = ''
   try {
-    const { url } = await $fetch<{ url: string }>('/api/stripe/billing-portal', {
-      method: 'POST'
-    })
-    window.location.href = url
+    await userStore.verifyPhoneCode(verificationCode.value.trim())
+    phoneVerified.value = true
+    showVerificationInput.value = false
+    verificationCode.value = ''
+    toast.add({ title: t('dashboard.settings.phoneVerified'), color: 'success' })
+  } catch {
+    profileError.value = t('dashboard.settings.phoneCodeInvalid')
   } finally {
-    isLoadingPortal.value = false
+    isVerifyingPhone.value = false
+  }
+}
+
+async function resendVerificationCode() {
+  isResendingCode.value = true
+  profileError.value = ''
+  try {
+    await userStore.resendPhoneCode()
+    toast.add({ title: t('dashboard.settings.phoneCodeResent'), color: 'success' })
+  } catch (err: unknown) {
+    const message = err && typeof err === 'object' && 'data' in err
+      && typeof (err as { data?: { message?: string } }).data?.message === 'string'
+      ? (err as { data: { message: string } }).data.message
+      : t('dashboard.settings.tryAgain')
+    profileError.value = message
+  } finally {
+    isResendingCode.value = false
   }
 }
 
@@ -66,16 +136,14 @@ const planLabels = computed(() => ({
 </script>
 
 <template>
-  <div class="p-6 space-y-8 max-w-2xl mx-auto">
-    <div>
-      <h1 class="text-2xl font-bold tracking-tight">{{ t('dashboard.settings.title') }}</h1>
-      <p class="text-sm text-muted mt-1">{{ t('dashboard.settings.subtitle') }}</p>
-    </div>
+  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-2xl mx-auto">
+    <DashboardPageHeader
+      :title="t('dashboard.settings.title')"
+      :description="t('dashboard.settings.subtitle')"
+    />
 
-    <UCard>
-      <template #header>
-        <h2 class="font-semibold">{{ t('dashboard.settings.profile') }}</h2>
-      </template>
+    <UCard :ui="{ body: 'p-6 sm:p-8' }">
+      <h2 class="font-display text-lg mb-6">{{ t('dashboard.settings.profile') }}</h2>
 
       <div class="space-y-4">
         <UAlert
@@ -84,6 +152,14 @@ const planLabels = computed(() => ({
           color="success"
           variant="subtle"
           icon="i-lucide-check-circle"
+        />
+
+        <UAlert
+          v-if="profileError"
+          :description="profileError"
+          color="error"
+          variant="subtle"
+          icon="i-lucide-alert-circle"
         />
 
         <UFormField :label="t('dashboard.settings.fullName')">
@@ -102,105 +178,127 @@ const planLabels = computed(() => ({
             {{ t('dashboard.settings.emailHelp') }}
           </template>
         </UFormField>
-      </div>
 
-      <template #footer>
-        <div class="flex justify-end">
-          <UButton
-            :label="t('dashboard.settings.saveChanges')"
-            :loading="isSavingProfile"
-            @click="saveProfile"
+        <UFormField :label="t('dashboard.settings.phone')">
+          <UInput
+            v-model="profile.phone"
+            type="tel"
+            autocomplete="tel"
+            :placeholder="t('dashboard.settings.phonePlaceholder')"
+            class="w-full"
           />
-        </div>
-      </template>
-    </UCard>
+          <template #help>
+            <span>{{ t('dashboard.settings.phoneHelp') }}</span>
+            <span class="block mt-1 text-xs text-muted">{{ t('dashboard.settings.phoneFormatHint') }}</span>
+            <span v-if="profile.phone" class="block mt-1">
+              <UBadge
+                v-if="phoneVerified"
+                :label="t('dashboard.settings.phoneVerified')"
+                color="success"
+                variant="subtle"
+                size="xs"
+                icon="i-lucide-check"
+              />
+              <UBadge
+                v-else
+                :label="t('dashboard.settings.phoneUnverified')"
+                color="neutral"
+                variant="subtle"
+                size="xs"
+              />
+            </span>
+          </template>
+        </UFormField>
 
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="font-semibold">{{ t('dashboard.settings.planBilling') }}</h2>
-          <UBadge
-            :label="planLabels[userPlan]?.label ?? t('dashboard.settings.plans.FREE')"
-            :color="planLabels[userPlan]?.color ?? 'neutral'"
-            variant="subtle"
-          />
-        </div>
-      </template>
-
-      <div class="space-y-4">
-        <div v-if="userPlan === 'FREE'">
-          <p class="text-sm text-muted mb-4">
-            {{ t('dashboard.settings.upgradeDescription') }}
+        <div
+          v-if="profile.phone && !phoneVerified && showVerificationInput"
+          class="rounded-lg border border-default p-4 space-y-3 bg-elevated/30"
+        >
+          <p class="text-sm text-muted">
+            {{ t('dashboard.settings.phoneUnverified') }}
           </p>
-          <UButton
-            to="/auth/register?plan=pro"
-            :label="t('dashboard.settings.upgradeCta')"
-            icon="i-lucide-sparkles"
-          />
+          <UFormField :label="t('dashboard.settings.phoneVerifyCode')">
+            <UInput
+              v-model="verificationCode"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="8"
+              :placeholder="t('dashboard.settings.phoneVerifyCodePlaceholder')"
+              class="w-full max-w-xs"
+            />
+          </UFormField>
+          <div class="flex flex-wrap gap-2">
+            <UButton
+              :label="t('dashboard.settings.phoneVerify')"
+              icon="i-lucide-shield-check"
+              :loading="isVerifyingPhone"
+              :disabled="!verificationCode.trim()"
+              @click="verifyPhone"
+            />
+            <UButton
+              :label="t('dashboard.settings.phoneResendCode')"
+              color="neutral"
+              variant="outline"
+              :loading="isResendingCode"
+              @click="resendVerificationCode"
+            />
+          </div>
         </div>
+      </div>
 
-        <div v-else>
-          <p class="text-sm text-muted mb-4">
-            {{ t('dashboard.settings.manageDescription') }}
-          </p>
-          <UButton
-            :label="t('dashboard.settings.billingPortal')"
-            icon="i-lucide-external-link"
-            color="neutral"
-            variant="subtle"
-            :loading="isLoadingPortal"
-            @click="openBillingPortal"
-          />
-        </div>
+      <div class="flex justify-end mt-6">
+        <UButton :label="t('dashboard.settings.saveChanges')" :loading="isSavingProfile" @click="saveProfile" />
       </div>
     </UCard>
 
-    <UCard>
-      <template #header>
-        <h2 class="font-semibold">{{ t('dashboard.settings.connectedServices') }}</h2>
-      </template>
-
-      <div class="divide-y divide-default">
-        <div class="flex items-center justify-between py-3 first:pt-0">
-          <div class="flex items-center gap-3">
-            <UIcon name="i-simple-icons-github" class="w-5 h-5 text-foreground" />
-            <div>
-              <p class="text-sm font-medium">{{ t('dashboard.settings.github') }}</p>
-              <p class="text-xs text-muted">{{ t('dashboard.settings.githubDescription') }}</p>
-            </div>
-          </div>
-          <UButton :label="t('dashboard.settings.connect')" size="xs" color="neutral" variant="subtle" />
-        </div>
-
-        <div class="flex items-center justify-between py-3">
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-cloud" class="w-5 h-5 text-foreground" />
-            <div>
-              <p class="text-sm font-medium">{{ t('dashboard.settings.cloud') }}</p>
-              <p class="text-xs text-muted">{{ t('dashboard.settings.cloudDescription') }}</p>
-            </div>
-          </div>
-          <UButton :label="t('dashboard.settings.connect')" size="xs" color="neutral" variant="subtle" />
-        </div>
-      </div>
-    </UCard>
-
-    <UCard>
-      <template #header>
-        <h2 class="font-semibold text-error">{{ t('dashboard.settings.dangerZone') }}</h2>
-      </template>
-
-      <div class="space-y-3">
-        <p class="text-sm text-muted">
-          {{ t('dashboard.settings.deleteWarning') }}
-        </p>
-        <UButton
-          :label="t('dashboard.settings.deleteAccount')"
-          color="error"
+    <UCard v-if="!isMinor" :ui="{ body: 'p-6 sm:p-8' }">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-display text-lg">{{ t('dashboard.settings.planBilling') }}</h2>
+        <UBadge
+          :label="planLabels[userPlan]?.label ?? t('dashboard.settings.plans.FREE')"
+          :color="planLabels[userPlan]?.color ?? 'neutral'"
           variant="subtle"
-          icon="i-lucide-trash-2"
         />
       </div>
+
+      <div v-if="userPlan === 'FREE'" class="space-y-4">
+        <p class="text-sm text-muted">
+          {{ t('dashboard.settings.upgradeDescription') }}
+        </p>
+        <UButton
+          :label="proPlan ? t('dashboard.settings.upgradeCtaDynamic', { price: proPlan.formattedPrice }) : t('dashboard.settings.upgradeCta')"
+          icon="i-lucide-sparkles"
+          :loading="billingLoading"
+          @click="billingStore.startCheckout('pro')"
+        />
+      </div>
+
+      <div v-else class="space-y-4">
+        <p class="text-sm text-muted">
+          {{ t('dashboard.settings.manageDescription') }}
+        </p>
+        <UButton
+          :label="t('dashboard.settings.billingPortal')"
+          icon="i-lucide-external-link"
+          color="neutral"
+          variant="outline"
+          :loading="billingLoading"
+          @click="billingStore.openPortal()"
+        />
+      </div>
+    </UCard>
+
+    <UCard v-if="!isMinor" :ui="{ body: 'p-6 sm:p-8' }">
+      <h2 class="font-display text-lg mb-4 text-error">{{ t('dashboard.settings.dangerZone') }}</h2>
+      <p class="text-sm text-muted mb-4">
+        {{ t('dashboard.settings.deleteWarning') }}
+      </p>
+      <UButton
+        :label="t('dashboard.settings.deleteAccount')"
+        color="error"
+        variant="subtle"
+        icon="i-lucide-trash-2"
+      />
     </UCard>
   </div>
 </template>

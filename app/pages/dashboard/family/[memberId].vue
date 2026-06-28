@@ -1,82 +1,42 @@
 <script setup lang="ts">
-import { formatCurrencyForLocale } from '~/utils/format'
+import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Child', middleware: 'auth' })
 
-const { t, getLocale } = useAppI18n()
-
+const { t } = useAppI18n()
 const route = useRoute()
-const { activeSpace } = useActiveSpace()
+const familyStore = useFamilyStore()
+const spacesStore = useSpacesStore()
+const { memberTab, saving } = storeToRefs(familyStore)
+
 const memberId = route.params.memberId as string
+const spaceId = computed(() => spacesStore.activeSpace?.id ?? '')
 
-const spaceId = computed(() => activeSpace.value?.id ?? '')
+const { data, pending, refresh } = await useAsyncData(
+  () => `member-financial-${spaceId.value}-${memberId}`,
+  () => spaceId.value
+    ? familyStore.fetchMemberFinancial(spaceId.value, memberId)
+    : Promise.resolve(null),
+  { watch: [spaceId] }
+)
 
-const form = reactive({
-  allowanceAmount: 0,
-  allowanceFrequency: 'WEEKLY' as 'WEEKLY' | 'MONTHLY' | 'YEARLY',
-  learnMode: true
+watch(data, (val) => familyStore.loadAllowanceFromMember(val), { immediate: true })
+
+const summaryItems = computed(() => {
+  if (!data.value) return []
+  return [
+    { label: t('dashboard.family.childBalance'), value: familyStore.fmt(data.value.stats.balance), icon: 'i-lucide-wallet' },
+    { label: t('dashboard.family.spending30d'), value: familyStore.fmt(data.value.stats.spending30d), icon: 'i-lucide-arrow-up-from-line' },
+    { label: t('dashboard.family.income30d'), value: familyStore.fmt(data.value.stats.income30d), icon: 'i-lucide-arrow-down-to-line' },
+    { label: t('dashboard.family.transactionCount'), value: String(data.value.stats.transactionCount), icon: 'i-lucide-receipt' }
+  ]
 })
-const jarName = ref('')
-const saving = ref(false)
 
-const { data: spaceDetail, refresh } = await useFetch(() => `/api/spaces/${spaceId.value}`, {
-  watch: [spaceId]
-})
-
-const member = computed(() => spaceDetail.value?.members?.find((m: { id: string }) => m.id === memberId))
-
-const frequencyItems = computed(() => [
-  { label: t('frequencies.WEEKLY'), value: 'WEEKLY' },
-  { label: t('frequencies.MONTHLY'), value: 'MONTHLY' },
-  { label: t('frequencies.YEARLY'), value: 'YEARLY' }
-])
-
-function roleLabel(role?: string) {
-  if (!role) return ''
-  const key = `roles.${role}`
-  const translated = t(key)
-  return translated !== key ? translated : role.toLowerCase()
-}
-
-watch(member, (m) => {
-  if (m?.childProfile) {
-    form.allowanceAmount = m.childProfile.allowanceAmount ?? 0
-    form.allowanceFrequency = m.childProfile.allowanceFrequency ?? 'WEEKLY'
-    form.learnMode = m.childProfile.learnMode
-  }
-}, { immediate: true })
-
-async function saveProfile() {
-  if (!spaceId.value) return
-  saving.value = true
-  try {
-    await $fetch(`/api/spaces/${spaceId.value}/members/${memberId}/child`, {
-      method: 'PATCH',
-      body: form
-    })
-    await refresh()
-  } finally {
-    saving.value = false
-  }
-}
-
-async function addJar() {
-  if (!spaceId.value || !jarName.value) return
-  await $fetch(`/api/spaces/${spaceId.value}/members/${memberId}/child`, {
-    method: 'POST',
-    body: { name: jarName.value }
-  })
-  jarName.value = ''
-  await refresh()
-}
-
-function fmt(amount: number) {
-  return formatCurrencyForLocale(amount, getLocale(), 'USD')
-}
+const columns = computed(() => familyStore.transactionColumns())
 </script>
 
 <template>
-  <div class="p-6 max-w-xl mx-auto space-y-6">
+  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-7xl mx-auto">
     <div>
       <UButton
         to="/dashboard/family"
@@ -86,42 +46,127 @@ function fmt(amount: number) {
         color="neutral"
         size="sm"
       />
-      <h1 class="text-2xl font-bold mt-2">{{ member?.name ?? t('dashboard.family.childFallback') }}</h1>
-      <p class="text-sm text-muted">
-        {{ t('dashboard.family.accountSuffix', { role: roleLabel(member?.role) }) }}
+      <h1 class="font-display text-3xl mt-4 tracking-tight">{{ data?.member.name ?? t('dashboard.family.childFallback') }}</h1>
+      <p class="text-sm text-muted mt-1">
+        {{ familyStore.roleLabel(data?.member.role ?? '') }}
+        <span v-if="data?.member.email"> · {{ data.member.email }}</span>
+        <span v-if="data?.member.dateOfBirth"> · {{ familyStore.formatDate(data.member.dateOfBirth) }}</span>
       </p>
     </div>
 
-    <UCard>
-      <template #header>
-        <h2 class="font-semibold">{{ t('dashboard.family.child.title') }}</h2>
-      </template>
-      <div class="space-y-4">
-        <UFormField :label="t('dashboard.family.child.allowanceAmount')">
-          <UInput v-model.number="form.allowanceAmount" type="number" min="0" class="w-full" />
-        </UFormField>
-        <UFormField :label="t('dashboard.family.child.frequency')">
-          <USelect v-model="form.allowanceFrequency" :items="frequencyItems" class="w-full" />
-        </UFormField>
-        <UCheckbox v-model="form.learnMode" :label="t('dashboard.family.child.learnMode')" />
-        <UButton :label="t('common.save')" :loading="saving" @click="saveProfile" />
-      </div>
+    <DashboardSummaryStrip :items="summaryItems" :loading="pending" />
+
+    <UTabs v-model="memberTab" :items="familyStore.memberTabs" :content="false" />
+
+    <div v-if="memberTab === 'overview'" class="grid sm:grid-cols-2 gap-6">
+      <UCard :ui="{ body: 'p-6' }">
+        <h3 class="font-display text-lg mb-4">{{ t('dashboard.family.memberTabs.accounts') }}</h3>
+        <p v-if="!data?.accounts.length" class="text-sm text-muted">{{ t('dashboard.family.noLinkedAccounts') }}</p>
+        <div v-else class="space-y-3">
+          <div v-for="acc in data.accounts" :key="acc.id" class="flex justify-between text-sm">
+            <div>
+              <p class="font-medium">{{ acc.name }}</p>
+              <p class="text-xs text-muted">{{ acc.institution ?? acc.type }}</p>
+            </div>
+            <span class="tabular-nums font-medium">{{ familyStore.fmt(acc.balance, acc.currency) }}</span>
+          </div>
+        </div>
+      </UCard>
+
+      <UCard :ui="{ body: 'p-6' }">
+        <h3 class="font-display text-lg mb-4">{{ t('dashboard.family.recentActivity') }}</h3>
+        <p v-if="!data?.transactions.length" class="text-sm text-muted">{{ t('dashboard.family.noTransactions') }}</p>
+        <div v-else class="space-y-3">
+          <div v-for="tx in data.transactions.slice(0, 5)" :key="tx.id" class="flex justify-between text-sm gap-4">
+            <div class="min-w-0">
+              <p class="font-medium truncate">{{ tx.merchant ?? tx.description }}</p>
+              <p class="text-xs text-muted">{{ familyStore.formatDate(tx.date) }}</p>
+            </div>
+            <span class="tabular-nums shrink-0" :class="tx.amount > 0 ? 'text-success' : ''">
+              {{ familyStore.fmt(Math.abs(tx.amount), tx.currency) }}
+            </span>
+          </div>
+        </div>
+      </UCard>
+    </div>
+
+    <UCard v-else-if="memberTab === 'accounts'" :ui="{ body: 'p-0 sm:p-0' }">
+      <UTable
+        :data="data?.accounts ?? []"
+        :columns="[
+          { accessorKey: 'name', header: t('dashboard.transactions.columns.account') },
+          { accessorKey: 'type', header: 'Type' },
+          { accessorKey: 'visibility', header: 'Visibility' },
+          { accessorKey: 'balance', header: t('dashboard.transactions.columns.amount') }
+        ]"
+        :loading="pending"
+      >
+        <template #balance-cell="{ row }">
+          <span class="tabular-nums font-medium">{{ familyStore.fmt(row.original.balance, row.original.currency) }}</span>
+        </template>
+        <template #visibility-cell="{ row }">
+          <UBadge :label="row.original.visibility" variant="subtle" size="xs" />
+        </template>
+        <template #empty>
+          <p class="text-center py-12 text-muted text-sm">{{ t('dashboard.family.noLinkedAccounts') }}</p>
+        </template>
+      </UTable>
     </UCard>
 
-    <UCard>
-      <template #header>
-        <h2 class="font-semibold">{{ t('dashboard.family.child.jarsTitle') }}</h2>
-      </template>
-      <div class="space-y-3">
-        <div v-for="jar in member?.childProfile?.jars" :key="jar.id" class="flex justify-between text-sm">
-          <span>{{ jar.name }}</span>
-          <span class="font-medium">{{ fmt(jar.balance) }}</span>
+    <UCard v-else-if="memberTab === 'transactions'" :ui="{ body: 'p-0 sm:p-0' }">
+      <UTable :data="data?.transactions ?? []" :columns="columns" :loading="pending">
+        <template #date-cell="{ row }">
+          <span class="text-sm text-muted">{{ familyStore.formatDate(row.original.date) }}</span>
+        </template>
+        <template #description-cell="{ row }">
+          <p class="text-sm font-medium truncate">{{ row.original.merchant ?? row.original.description }}</p>
+        </template>
+        <template #category-cell="{ row }">
+          <UBadge :label="familyStore.categoryLabel(row.original.category)" variant="subtle" size="xs" />
+        </template>
+        <template #amount-cell="{ row }">
+          <span class="tabular-nums font-semibold" :class="row.original.amount > 0 ? 'text-success' : ''">
+            {{ row.original.amount > 0 ? '+' : '-' }}{{ familyStore.fmt(Math.abs(row.original.amount), row.original.currency) }}
+          </span>
+        </template>
+        <template #empty>
+          <p class="text-center py-12 text-muted text-sm">{{ t('dashboard.family.noTransactions') }}</p>
+        </template>
+      </UTable>
+    </UCard>
+
+    <div v-else class="grid sm:grid-cols-2 gap-6">
+      <UCard :ui="{ body: 'p-6 sm:p-8' }">
+        <h3 class="font-display text-lg mb-6">{{ t('dashboard.family.child.title') }}</h3>
+        <div class="space-y-4">
+          <UFormField :label="t('dashboard.family.child.allowanceAmount')">
+            <UInput v-model.number="familyStore.allowanceForm.allowanceAmount" type="number" min="0" class="w-full" />
+          </UFormField>
+          <UFormField :label="t('dashboard.family.child.frequency')">
+            <USelect v-model="familyStore.allowanceForm.allowanceFrequency" :items="familyStore.frequencyItems" class="w-full" />
+          </UFormField>
+          <UCheckbox v-model="familyStore.allowanceForm.learnMode" :label="t('dashboard.family.child.learnMode')" />
+          <UButton
+            :label="t('common.save')"
+            :loading="saving"
+            @click="familyStore.saveChildProfile(spaceId, memberId, refresh)"
+          />
+        </div>
+      </UCard>
+
+      <UCard :ui="{ body: 'p-6 sm:p-8' }">
+        <h3 class="font-display text-lg mb-6">{{ t('dashboard.family.child.jarsTitle') }}</h3>
+        <div class="space-y-3 mb-4">
+          <div v-for="jar in data?.member.childProfile?.jars" :key="jar.id" class="flex justify-between text-sm">
+            <span>{{ jar.name }}</span>
+            <span class="font-medium tabular-nums">{{ familyStore.fmt(jar.balance) }}</span>
+          </div>
         </div>
         <div class="flex gap-2">
-          <UInput v-model="jarName" :placeholder="t('dashboard.family.child.jarPlaceholder')" class="flex-1" />
-          <UButton :label="t('common.add')" @click="addJar" />
+          <UInput v-model="familyStore.jarName" :placeholder="t('dashboard.family.child.jarPlaceholder')" class="flex-1" />
+          <UButton :label="t('common.add')" @click="familyStore.addJar(spaceId, memberId, refresh)" />
         </div>
-      </div>
-    </UCard>
+      </UCard>
+    </div>
   </div>
 </template>

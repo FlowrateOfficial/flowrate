@@ -4,6 +4,11 @@ import {
   linkContextFromStripeCustomer,
   upsertFinancialConnectionAccount
 } from '../../lib/stripe'
+import {
+  processCheckoutSessionCompleted,
+  processStripeSubscriptionEvent
+} from '../../lib/billing'
+import { syncAccountTransactions, syncSpaceSubscriptions } from '../../lib/transactionSync'
 
 async function handleFinancialConnectionAccount(stripe: Stripe, fcAccount: Stripe.FinancialConnections.Account) {
   const customerId = fcAccount.account_holder?.customer
@@ -15,24 +20,14 @@ async function handleFinancialConnectionAccount(stripe: Stripe, fcAccount: Strip
   await upsertFinancialConnectionAccount(fcAccount, context)
 }
 
-async function handleSubscriptionChange(stripe: Stripe, sub: Stripe.Subscription, plan: 'PRO' | 'FREE') {
-  const customer = await stripe.customers.retrieve(sub.customer as string)
-  if (customer.deleted) return
-
-  const userId = customer.metadata?.userId
-  if (!userId) return
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { plan: plan as never }
-  })
-}
-
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
 
   if (!config.stripeSecretKey || !config.stripeWebhookSecret) {
-    throw createError({ statusCode: 503, message: 'Stripe is not configured' })
+    console.error(
+      '[stripe/webhook] 503 — set STRIPE_WEBHOOK_SECRET in .env (run `pnpm stripe:listen` and copy the whsec_… value), then restart `pnpm dev`.'
+    )
+    throw createError({ statusCode: 503, message: 'Stripe webhook secret is not configured' })
   }
 
   const stripe = getStripeClient(config.stripeSecretKey)
@@ -54,9 +49,24 @@ export default defineEventHandler(async (event) => {
   switch (stripeEvent.type) {
     case 'financial_connections.account.created':
     case 'financial_connections.account.refreshed_balance':
-    case 'financial_connections.account.reactivated': {
+    case 'financial_connections.account.reactivated':
+    case 'financial_connections.account.refreshed_transactions': {
       const fcAccount = stripeEvent.data.object as Stripe.FinancialConnections.Account
       await handleFinancialConnectionAccount(stripe, fcAccount)
+
+      const customerId = fcAccount.account_holder?.customer
+      if (customerId && typeof customerId === 'string') {
+        const context = await linkContextFromStripeCustomer(stripe, customerId)
+        if (context) {
+          const dbAccount = await prisma.account.findUnique({
+            where: { stripeFcAccountId: fcAccount.id }
+          })
+          if (dbAccount) {
+            await syncAccountTransactions(stripe, dbAccount)
+            await syncSpaceSubscriptions(context.spaceId, context.userId)
+          }
+        }
+      }
       break
     }
 
@@ -64,21 +74,22 @@ export default defineEventHandler(async (event) => {
     case 'financial_connections.account.disconnected': {
       const fcAccount = stripeEvent.data.object as Stripe.FinancialConnections.Account
       await prisma.account.deleteMany({
-        where: { stripeFinancialConnId: fcAccount.id }
+        where: { stripeFcAccountId: fcAccount.id }
       })
       break
     }
 
-    case 'customer.subscription.updated': {
-      const sub = stripeEvent.data.object as Stripe.Subscription
-      const plan = sub.status === 'active' ? 'PRO' : 'FREE'
-      await handleSubscriptionChange(stripe, sub, plan)
+    case 'checkout.session.completed': {
+      const session = stripeEvent.data.object as Stripe.Checkout.Session
+      await processCheckoutSessionCompleted(stripe, session)
       break
     }
 
+    case 'customer.subscription.created':
+    case 'customer.subscription.updated':
     case 'customer.subscription.deleted': {
       const sub = stripeEvent.data.object as Stripe.Subscription
-      await handleSubscriptionChange(stripe, sub, 'FREE')
+      await processStripeSubscriptionEvent(stripe, sub)
       break
     }
   }

@@ -59,6 +59,7 @@ export async function requireAuthUser(event: H3Event): Promise<AuthUser> {
       avatarUrl: user.image ?? null
     },
     update: {
+      email: user.email,
       name: user.name ?? undefined,
       avatarUrl: user.image ?? undefined
     }

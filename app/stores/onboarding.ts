@@ -1,7 +1,10 @@
+import { apiRoutes, useApi } from '~/lib/api'
+
 export const useOnboardingStore = defineStore('onboarding', () => {
   const { t } = useAppI18n()
   const spacesStore = useSpacesStore()
   const router = useRouter()
+  const { api } = useApi()
 
   const step = ref(1)
   const selected = ref<'INDEPENDENT' | 'HOUSEHOLD' | 'FAMILY' | 'COMPANY' | null>(null)
@@ -42,10 +45,10 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     try {
       if (selected.value !== 'INDEPENDENT') {
         const name = spaceName.value || defaultName(selected.value)
-        const api = useApiFetch()
-        const space = await api<{ id: string }>('/api/spaces', {
+        const space = await api<{ id: string }>(apiRoutes.spaces.list, {
           method: 'POST',
-          body: { name, type: selected.value }
+          body: { name, type: selected.value },
+          noSpace: true
         })
         await spacesStore.switchSpace(space.id)
       }

@@ -13,6 +13,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'You do not have access to this space' })
   }
 
+  const minorMembership = await prisma.spaceMember.findFirst({
+    where: { userId: user.id, status: 'ACTIVE', role: { in: ['TEEN', 'CHILD'] } }
+  })
+  if (minorMembership && spaceId !== minorMembership.spaceId) {
+    throw createError({ statusCode: 403, message: 'Child and teen accounts cannot switch spaces' })
+  }
+
   await prisma.user.update({
     where: { id: user.id },
     data: { activeSpaceId: spaceId }

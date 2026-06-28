@@ -11,6 +11,7 @@
     "add": "Add",
     "create": "Create",
     "manage": "Manage",
+    "delete": "Delete",
     "loading": "Loading...",
     "viewAll": "View all",
     "getStarted": "Get started",
@@ -36,9 +37,14 @@
     "accounts": "Accounts",
     "subscriptions": "Subscriptions",
     "budgets": "Budgets",
+    "analytics": "Analytics",
+    "cashflow": "Cash flow",
     "spaces": "Spaces",
     "family": "Family",
-    "company": "Company",
+    "company": "Business",
+    "business": "Business",
+    "businessTeam": "Team",
+    "saasVendors": "SaaS & vendors",
     "myMoney": "My Money"
   },
   "spaceTypes": {
@@ -98,6 +104,13 @@
     "heroSubtitle": "Finance designed for thoughtful people.",
     "heroDescription": "Manage Independent, Household, Family, and Company identities in one calm, intelligent platform — where geometry replaces clutter and clarity replaces noise.",
     "seeHow": "See how it works",
+    "featureStrip": {
+      "spaces": "Financial Spaces",
+      "saasShield": "SaaS Shield",
+      "burnRate": "Burn Rate & Runway",
+      "teen": "Teen & Child Accounts",
+      "ai": "AI Categorization"
+    },
     "heroCards": {
       "balance": "Balance",
       "shared": "Shared",
@@ -199,6 +212,9 @@
       }
     },
     "pricing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "mostPopular": "Most popular",
       "bestForLabel": "Best for",
       "free": {
         "name": "Free",
@@ -280,15 +296,66 @@
       "saasAlerts": "SaaS Shield Alerts",
       "reviewSubscriptions": "Review all subscriptions",
       "stats": {
-        "totalBalance": "Total Balance",
+        "totalBalance": "Cash Balance",
         "monthlySpending": "Monthly Spending",
         "monthlyIncome": "Monthly Income",
-        "netSavings": "Net Savings"
+        "netSavings": "Cash Flow",
+        "burnRate": "Burn Rate",
+        "runway": "Runway"
+      },
+      "cashFlowChart": "Cash flow",
+      "spendingChart": "Spending by category",
+      "viewAnalytics": "Full analytics",
+      "saasShield": "SaaS Shield",
+      "saasShieldHint": "Subscription health at a glance",
+      "saasIssues": "issues found"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Cash flow, categories, net worth, and spending patterns for your active space.",
+      "netWorth": "Net worth",
+      "income": "Income",
+      "spending": "Spending",
+      "savingsRate": "Savings rate",
+      "cashFlow": "Cash flow",
+      "cashFlowHint": "Income vs spending over time",
+      "byCategory": "Spending by category",
+      "byCategoryHint": "Where your money goes",
+      "netWorthTrend": "Net worth trend",
+      "netWorthHint": "Estimated balance over time",
+      "topMerchants": "Top merchants",
+      "topMerchantsHint": "Largest recurring spend",
+      "insightsTitle": "Category insights",
+      "ofSpending": "of spending",
+      "syncData": "Sync from banks",
+      "periodLabel": "Time period",
+      "emptyTitle": "No transaction data yet",
+      "emptyDescription": "Connect a bank account and sync transactions to unlock charts and insights.",
+      "emptyTitleConnected": "No transactions yet",
+      "emptyDescriptionConnected": "Your bank is connected, but there are no transactions in this period. Sync from banks to import activity — sandbox test accounts often have no spending history.",
+      "ranges": {
+        "7d": "7 days",
+        "30d": "30 days",
+        "90d": "90 days",
+        "12m": "12 months"
       }
     },
     "accounts": {
       "title": "Accounts",
+      "subtitle": "Connect banks, choose personal or shared visibility, and keep balances in sync.",
+      "subtitleConnected": "Your banks are connected. Sync from banks anytime to pull the latest balances and transactions.",
+      "teenSubtitle": "Connect your bank to track spending and see where your money goes.",
+      "teenSubtitleConnected": "Your bank is connected. Sync when you spend — test accounts may not have transactions until activity is imported.",
+      "teenEmptyDescription": "Link your bank account to sync transactions and unlock spending insights. Only you and your guardians can see this account.",
       "count": "{count} accounts · Total {total}",
+      "totalBalance": "Total balance",
+      "accountCount": "Accounts",
+      "connected": "connected",
+      "personalBalance": "Personal balance",
+      "sharedBalance": "Shared balance",
+      "filterLabel": "Show accounts",
+      "connectOptions": "Default connection type",
+      "viewTransactions": "Transactions",
       "connectBank": "Connect bank",
       "connectPersonal": "Connect as personal",
       "connectShared": "Connect as shared",
@@ -313,9 +380,21 @@
       "stripeNote": "Powered by Stripe Financial Connections",
       "stripeDescription": "Your bank credentials are never stored. FlowRate uses Stripe's secure, read-only bank link to sync balances and transactions.",
       "connectError": "Failed to connect bank. Please try again.",
+      "syncNoAccounts": "Stripe linked but no accounts were saved. Try Connect again — if it persists, set STRIPE_WEBHOOK_SECRET from `pnpm stripe:listen` in .env and restart `pnpm dev`.",
+      "resyncFromStripe": "Refresh from Stripe",
       "stripeNotConfigured": "Stripe is not configured. Add STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY to your environment.",
       "stripeTestModeTitle": "Stripe test mode",
-      "stripeTestModeDescription": "Only sandbox test banks appear with test API keys. To link real US bank accounts, switch to live keys on a deployed HTTPS site after Stripe approves your Financial Connections application."
+      "stripeTestModeDescription": "Only sandbox test banks appear with test API keys. To link real US bank accounts, switch to live keys on a deployed HTTPS site after Stripe approves your Financial Connections application.",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Remove this bank account and its transactions from FlowRate?",
+      "sharedSpaceHintTitle": "Want shared or family accounts?",
+      "sharedSpaceHintDescription": "Switch to a Household or Family space using the sidebar switcher, then connect banks as Personal or Shared."
+    },
+    "sync": {
+      "complete": "Bank sync complete",
+      "imported": "Imported {count} transactions from {accounts} linked accounts.",
+      "failed": "Sync failed",
+      "tryAgain": "Please try again."
     },
     "spaces": {
       "title": "Financial Spaces",
@@ -332,6 +411,7 @@
       "createFailed": "Failed to create space",
       "tryAgain": "Try again",
       "manageSpaces": "Manage spaces",
+      "minorCannotSwitch": "Your account is linked to your family space only.",
       "types": {
         "household": {
           "label": "Household",
@@ -342,8 +422,8 @@
           "description": "Household + children & teens with supervision"
         },
         "company": {
-          "label": "Company",
-          "description": "Founders & freelancers — burn rate, SaaS Shield"
+          "label": "Business",
+          "description": "Founders & freelancers — runway, SaaS Shield, cloud spend"
         }
       }
     },
@@ -367,15 +447,15 @@
           "description": "Household plus kids — allowances, teen accounts, supervision."
         },
         "company": {
-          "title": "Company",
-          "description": "My business — burn rate, SaaS Shield, cloud spend."
+          "title": "Business",
+          "description": "Separate business money — track runway, SaaS stack, and cloud spend."
         }
       },
       "defaultNames": {
         "independent": "My Finances",
         "household": "Our Household",
         "family": "Our Family",
-        "company": "My Company"
+        "company": "My Business"
       }
     },
     "family": {
@@ -390,7 +470,17 @@
       "sendInvite": "Send invite",
       "membersTitle": "Members",
       "addChildTitle": "Add child or teen",
-      "addChildDescription": "Teens get their own login. Younger children are guardian-managed.",
+      "addChildDescription": "Create a login for your child or teen. They sign in with email and password.",
+      "username": "Username",
+      "usernamePlaceholder": "e.g. alex",
+      "childEmail": "Email",
+      "childEmailPlaceholder": "alex@email.com",
+      "childEmailHelp": "Used to sign in to their account.",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "createAccount": "Create account",
+      "accountCreated": "Account created",
+      "accountCreatedDescription": "{name} can now sign in with their email and password.",
       "childName": "Child's name",
       "teenEmail": "Email (required for teen login)",
       "roleChild": "Child (guardian-managed)",
@@ -399,12 +489,52 @@
       "allowanceNotSet": "Not set",
       "savingsJars": "{count} savings jars",
       "splitsHint": "Configure how shared expenses are split between guardians in Settings → Split Rules.",
+      "splits": {
+        "addTitle": "Add split rule",
+        "namePlaceholder": "Rule name (e.g. Groceries)",
+        "empty": "No split rules yet. Create one to divide shared expenses.",
+        "allCategories": "All categories"
+      },
+      "removeMember": "Remove member",
+      "statusHeader": "Status",
       "displayNamePlaceholder": "Display name",
       "emailPlaceholder": "partner@email.com",
       "teenAccount": "Teen account",
       "guardianManaged": "Guardian-managed",
       "childFallback": "Child",
       "accountSuffix": "{role} account",
+      "dateOfBirth": "Date of birth",
+      "roleLabel": "Role",
+      "childBalance": "Balance",
+      "spending30d": "Spending (30d)",
+      "income30d": "Income (30d)",
+      "transactionCount": "Transactions (30d)",
+      "linkedAccounts": "{count} linked accounts",
+      "viewDetails": "View details",
+      "noChildrenTitle": "No children yet",
+      "noChildrenDescription": "Add a child or teen to start tracking allowances and supervised spending.",
+      "childErrors": {
+        "missingFields": "Username, email, and password are required.",
+        "passwordMismatch": "Passwords do not match.",
+        "passwordTooShort": "Password must be at least 8 characters.",
+        "emailTaken": "An account with this email already exists.",
+        "createFailed": "Could not create the account. Please try again."
+      },
+      "noLinkedAccounts": "No bank accounts linked for this member yet.",
+      "noTransactions": "No transactions synced yet. Connect a bank and run sync from Accounts.",
+      "recentActivity": "Recent activity",
+      "splitsComingTitle": "Split rules coming soon",
+      "hints": {
+        "independent": "Create a Household or Family space to invite partners and manage children.",
+        "household": "Couple finances — connect shared accounts and invite a co-guardian.",
+        "family": "Family finances — manage children, allowances, and supervised accounts."
+      },
+      "memberTabs": {
+        "overview": "Overview",
+        "accounts": "Accounts",
+        "transactions": "Transactions",
+        "allowance": "Allowance & jars"
+      },
       "child": {
         "title": "Allowance & supervision",
         "allowanceAmount": "Allowance amount",
@@ -416,21 +546,75 @@
       }
     },
     "company": {
-      "title": "Company Dashboard",
-      "subtitle": "Burn rate, runway, and SaaS waste — built for solo founders and freelancers.",
-      "switchHint": "Switch to a Company space or create one to view burn rate.",
-      "monthlyBreakdown": "Monthly breakdown",
-      "income": "Income",
-      "expenses": "Expenses",
-      "subscriptions": "Subscriptions",
+      "title": "Business",
+      "subtitle": "Runway, SaaS spend, and cloud costs — built for founders and freelancers.",
+      "switchHint": "Create a Business space to separate company money from personal finances and track burn rate.",
+      "noBusinessTitle": "No business space yet",
+      "createBusinessCta": "Create a business space",
+      "readOnlyTitle": "View-only access",
+      "readOnlyDesc": "You can see burn rate and spending, but only the founder or finance admin can connect banks or edit budgets.",
+      "monthlyBreakdown": "This month",
+      "income": "Revenue in",
+      "expenses": "Cash out",
+      "subscriptions": "SaaS & tools",
       "cloudDev": "Cloud & dev tools",
       "saasShield": "SaaS Shield",
-      "activeSubs": "{count} active subscriptions detected.",
-      "duplicateWaste": "~{amount}/mo in duplicate seats.",
-      "reviewSubs": "Review subscriptions",
+      "activeSubs": "{count} recurring tools detected",
+      "duplicateWaste": "~{amount}/mo in duplicate seats — review and cut.",
+      "reviewSubs": "Review SaaS stack",
+      "topVendors": "Top vendors this month",
+      "noVendors": "Connect your business bank to see where cash goes.",
+      "alertsTitle": "Alerts",
+      "footnote": "Runway = cash on hand ÷ net monthly burn. Keep business accounts in this space only.",
+      "tabs": {
+        "overview": "Overview",
+        "team": "Team"
+      },
+      "setup": {
+        "title": "Set up your business cockpit",
+        "subtitle": "Three steps to see runway, SaaS waste, and cloud spend — all from your business bank.",
+        "step1Title": "Connect your business bank",
+        "step1Desc": "Link the checking account you use for revenue and operating expenses.",
+        "step1Cta": "Connect account",
+        "step2Title": "Sync transactions",
+        "step2Desc": "We pull recent activity to calculate burn rate and categorize SaaS charges.",
+        "step2Cta": "View transactions",
+        "step3Title": "Review SaaS & vendors",
+        "step3Desc": "Spot duplicate subscriptions and cloud spend before they eat your runway.",
+        "step3Cta": "Open SaaS Shield",
+        "syncCta": "Sync accounts"
+      },
+      "alerts": {
+        "CONNECT_BANK": "Connect a business bank account to calculate runway and burn rate.",
+        "SYNC_TRANSACTIONS": "Transactions are syncing — refresh in a moment or open Accounts to sync manually.",
+        "LOW_RUNWAY": "Runway is under {months} months at current burn — consider cutting SaaS or increasing revenue.",
+        "SAAS_WASTE": "You may be paying ~{amount}/mo for duplicate SaaS seats.",
+        "HIGH_CLOUD_SPEND": "Cloud & dev tools are {percent}% of monthly spend — worth a review.",
+        "MANY_SUBSCRIPTIONS": "{count} active subscriptions detected — audit for unused tools."
+      },
+      "team": {
+        "inviteTitle": "Invite your team",
+        "inviteDesc": "We text an invite link and verification code to their phone. Email is optional.",
+        "phone": "Phone number",
+        "phoneHelp": "Required — we send an SMS invite and verification code.",
+        "email": "Email (optional)",
+        "emailOptional": "Optional — for login if they prefer email over phone.",
+        "name": "Name (optional)",
+        "role": "Access level",
+        "sendInvite": "Send invite",
+        "inviteSent": "Invite sent",
+        "inviteFailed": "Could not send invite",
+        "membersTitle": "People with access",
+        "roles": {
+          "financeAdmin": "Finance admin",
+          "financeAdminDesc": "Can connect banks, edit budgets, and invite others.",
+          "guest": "View only",
+          "guestDesc": "Can see runway, burn, and SaaS spend — cannot change anything."
+        }
+      },
       "stats": {
         "cash": "Cash on hand",
-        "burn": "Monthly burn",
+        "burn": "Net burn (month)",
         "runway": "Runway",
         "waste": "SaaS waste",
         "months": "{count} mo",
@@ -446,7 +630,8 @@
       "jarsTitle": "Savings jars",
       "noJars": "No savings jars yet. Ask your guardian to set one up!",
       "learnModeTitle": "Learn mode",
-      "learnModeDescription": "Your spending is grouped into Needs, Wants, and Saved — ask your guardian for details."
+      "learnModeDescription": "Your spending is grouped into Needs, Wants, and Saved — ask your guardian for details.",
+      "connectBank": "Connect my bank"
     },
     "settings": {
       "title": "Settings",
@@ -457,10 +642,28 @@
       "namePlaceholder": "Your name",
       "email": "Email address",
       "emailHelp": "Email is managed through Neon Auth. Change it in your account settings.",
+      "phone": "Phone number",
+      "phonePlaceholder": "+33 6 12 34 56 78",
+      "phoneHelp": "Used for SMS verification via Twilio. International format (E.164): country code, then number without the leading 0. Example: 09 87 76 54 32 → +33987765432.",
+      "phoneFormatHint": "Drop the leading 0 after the country code (e.g. +33987765432, not +330987765432).",
+      "phoneVerified": "Verified",
+      "phoneUnverified": "Not verified — enter the code we sent by SMS",
+      "phoneCodeSent": "Verification code sent to your phone",
+      "phoneCodeResent": "New verification code sent",
+      "phoneCodeInvalid": "Invalid or expired code — try again",
+      "phoneVerifyCode": "Verification code",
+      "phoneVerifyCodePlaceholder": "6-digit code",
+      "phoneVerify": "Verify phone",
+      "phoneResendCode": "Resend code",
+      "phoneVerifyRequired": "Save your number first, then enter the SMS code",
+      "phoneInvalid": "Enter a valid phone number (e.g. +33987765432 or +14155552671)",
+      "phoneVerificationFailed": "Could not send SMS — check your number format and Twilio settings",
+      "phoneTaken": "This phone number is already linked to another account",
       "saveChanges": "Save changes",
       "planBilling": "Plan & Billing",
       "upgradeDescription": "Upgrade to Pro to unlock unlimited bank connections, SaaS Shield alerts, predictive cash flow, and export features.",
       "upgradeCta": "Upgrade to Pro — $12/mo",
+      "upgradeCtaDynamic": "Upgrade to Pro — {price}/mo",
       "manageDescription": "Manage your subscription, update payment method, or download invoices.",
       "billingPortal": "Open billing portal",
       "connectedServices": "Connected Services",
@@ -472,6 +675,11 @@
       "dangerZone": "Danger Zone",
       "deleteWarning": "Permanently delete your account and all associated data. This action cannot be undone.",
       "deleteAccount": "Delete account",
+      "upgradeSuccess": "Welcome to Pro! Your plan is now active.",
+      "upgradeCanceled": "Checkout canceled — you can upgrade anytime from Settings.",
+      "checkoutFailed": "Could not start checkout",
+      "portalFailed": "Could not open billing portal",
+      "tryAgain": "Please try again.",
       "plans": {
         "FREE": "Free",
         "PRO": "Pro",
@@ -480,9 +688,18 @@
     },
     "transactions": {
       "title": "Transactions",
+      "subtitle": "{count} transactions in your active space — search, filter, and export.",
       "total": "{count} total transactions",
       "exportCsv": "Export CSV",
-      "searchPlaceholder": "Search transactions...",
+      "searchPlaceholder": "Search by merchant or description",
+      "filterCategory": "Category",
+      "clearFilters": "Clear filters",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "detailTitle": "Transaction details",
+      "emptyTitle": "No transactions yet",
+      "emptyDescription": "Connect a bank and sync to see your activity here.",
+      "emptyDescriptionConnected": "Your bank is connected but no transactions showed up yet. Sync from banks or try a wider date range — test accounts may stay empty until there is real activity.",
       "all": "All",
       "empty": "No transactions yet",
       "pending": "Pending",
@@ -496,7 +713,9 @@
     },
     "subscriptions": {
       "title": "Subscriptions",
-      "subtitle": "Auto-detected SaaS subscriptions · Monthly total:",
+      "subtitle": "{count} active subscriptions detected",
+      "active": "Active subscriptions",
+      "monthlyTotal": "Monthly total",
       "priceChangeTitle": "{count} price change detected",
       "priceChangeTitlePlural": "{count} price changes detected",
       "priceChangeDescription": "{names} {verb} changed pricing. Review now to avoid surprise charges.",
@@ -528,8 +747,11 @@
     },
     "budgets": {
       "title": "Budgets",
+      "subtitleOne": "1 active budget in this space",
+      "subtitleMany": "{count} active budgets in this space",
       "activeCount": "{count} active budgets",
       "nearLimit": "· {count} near limit",
+      "nearLimitAlert": "{count} budget(s) at 90% or more of their limit",
       "newBudget": "New budget",
       "emptyTitle": "No budgets set",
       "emptyDescription": "Create spending limits by category to take control of your finances.",
@@ -538,11 +760,47 @@
       "nameLabel": "Budget name",
       "namePlaceholder": "e.g. Monthly groceries",
       "categoryLabel": "Category",
-      "limitLabel": "Monthly limit ($)",
+      "limitLabel": "Limit ($)",
       "periodLabel": "Period",
+      "sharedLabel": "Shared with space members",
       "createBudget": "Create budget",
       "percentUsed": "{percent}% used",
-      "overBudget": "— over budget!"
+      "overBudget": "— over budget!",
+      "summary": {
+        "active": "Active budgets",
+        "budgeted": "Total budgeted",
+        "spent": "Spent this period",
+        "atRisk": "Near limit"
+      }
+    },
+    "invite": {
+      "title": "Join {space}",
+      "description": "You've been invited as {role}. Accept to access this financial space.",
+      "accept": "Accept invitation",
+      "acceptedTitle": "You're in!",
+      "loginHint": "Sign in with {email} and the password you just created.",
+      "expiredTitle": "Invitation expired",
+      "expiredDescription": "This invite link is no longer valid. Ask the space owner to send a new one.",
+      "phoneTitle": "Join {space}",
+      "phoneDescription": "Enter the verification code we sent to {phone}.",
+      "verificationCode": "Verification code",
+      "verifyPhone": "Verify phone",
+      "resendCode": "Resend code",
+      "codeInvalid": "Invalid or expired code.",
+      "resendFailed": "Could not resend code. Try again shortly.",
+      "setupTitle": "Set up your access to {space}",
+      "setupDescription": "Choose a password to finish joining. Email is optional.",
+      "yourName": "Your name",
+      "emailOptional": "Email (optional)",
+      "emailOptionalHelp": "Leave blank to sign in with a phone-linked email we generate for you.",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match.",
+      "createAndJoin": "Create account & join",
+      "completeFailed": "Could not complete registration.",
+      "acceptFailed": "Could not accept invitation. Sign in with the invited email first.",
+      "signInToAccept": "Sign in to accept"
     }
   },
   "categories": {
@@ -572,7 +830,10 @@
     "CHILD": "Child",
     "TEEN": "Teen",
     "OWNER": "Owner",
-    "MEMBER": "Member"
+    "MEMBER": "Member",
+    "FINANCE_ADMIN": "Finance admin",
+    "MANAGER": "Manager",
+    "GUEST": "View only"
   },
   "memberStatus": {
     "ACTIVE": "Active",
@@ -622,6 +883,8 @@
     "rateLimit": "Too many requests. Please wait a moment.",
     "server": "Server error. Please try again later.",
     "unavailable": "Service temporarily unavailable.",
-    "codes": {}
+    "codes": {
+      "INVALID_ORIGIN": "This site URL is not authorized for sign-up. Add your deployment URL (e.g. https://your-app.vercel.app) under Neon Console → Auth → Configuration → Domains."
+    }
   }
 }

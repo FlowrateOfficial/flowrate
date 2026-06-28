@@ -1,13 +1,17 @@
 import { z } from 'zod'
 import {
   assertFinancialConnectionOwnership,
+  ensureStripeCustomer,
   requireStripe,
   upsertFinancialConnectionAccount
 } from '../../lib/stripe'
+import { syncSpaceTransactions } from '../../lib/transactionSync'
 
 const bodySchema = z.object({
-  accountIds: z.array(z.string().min(1)).min(1),
-  visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL')
+  accountIds: z.array(z.string().min(1)).optional(),
+  visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL'),
+  /** When true (or accountIds empty), sync all FC accounts on the Stripe customer. */
+  syncAll: z.boolean().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -17,29 +21,45 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'You cannot connect bank accounts in this space' })
   }
 
-  const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
-  const { stripe } = requireStripe(event)
-
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { stripeCustomerId: true }
-  })
-
-  if (!dbUser?.stripeCustomerId) {
-    throw createError({ statusCode: 400, message: 'Stripe customer not found' })
+  if (!canEditFinancials(membership.role, space.type)) {
+    throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
   }
+
+  const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
+  const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
+  const { stripe } = requireStripe(event)
 
   const context = {
     userId: user.id,
     spaceId: space.id,
-    visibility: body.visibility
+    visibility
+  }
+
+  const stripeCustomerId = await ensureStripeCustomer(stripe, user, {
+    userId: user.id,
+    spaceId: space.id,
+    visibility
+  })
+
+  let accountIds = body.accountIds ?? []
+
+  if (accountIds.length === 0 || body.syncAll) {
+    const listed = await stripe.financialConnections.accounts.list({
+      account_holder: { customer: stripeCustomerId },
+      limit: 100
+    })
+    accountIds = listed.data.map(a => a.id)
+  }
+
+  if (!accountIds.length) {
+    return { synced: [], message: 'No linked bank accounts found on your Stripe customer yet' }
   }
 
   const synced = []
 
-  for (const accountId of body.accountIds) {
+  for (const accountId of accountIds) {
     const fcAccount = await stripe.financialConnections.accounts.retrieve(accountId)
-    assertFinancialConnectionOwnership(fcAccount, dbUser.stripeCustomerId)
+    assertFinancialConnectionOwnership(fcAccount, stripeCustomerId)
     const record = await upsertFinancialConnectionAccount(fcAccount, context)
     synced.push({
       id: record.id,
@@ -47,6 +67,8 @@ export default defineEventHandler(async (event) => {
       balance: Number(record.balance)
     })
   }
+
+  await syncSpaceTransactions(stripe, space.id, user.id)
 
   return { synced }
 })

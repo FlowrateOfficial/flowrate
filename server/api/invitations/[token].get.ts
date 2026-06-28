@@ -13,10 +13,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Invitation expired or not found' })
   }
 
+  const maskedPhone = invitation.phone
+    ? invitation.phone.replace(/(\+\d{1,3})(\d+)(\d{2})$/, '$1•••••$3')
+    : null
+
   return {
     spaceName: invitation.space.name,
     spaceType: invitation.space.type,
     role: invitation.role,
-    email: invitation.email
+    email: invitation.email,
+    phone: maskedPhone,
+    displayName: invitation.displayName,
+    requiresPhoneVerification: Boolean(invitation.phone && !invitation.phoneVerifiedAt),
+    requiresRegistration: Boolean(invitation.phone && !invitation.email),
+    phoneVerified: Boolean(invitation.phoneVerifiedAt)
   }
 })
