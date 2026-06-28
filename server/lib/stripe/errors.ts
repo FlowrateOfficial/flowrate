@@ -63,6 +63,14 @@ function mapStripeError(error: Stripe.errors.StripeError): {
     }
   }
 
+  if (error.code === 'parameter_unknown' || error.code === 'invalid_request_error') {
+    return {
+      statusCode: 400,
+      code: 'STRIPE_CONNECT_FAILED',
+      message: error.message || 'Stripe rejected the bank connection request.'
+    }
+  }
+
   if (error.code === 'url_invalid' || text.includes('return_url')) {
     return {
       statusCode: 400,

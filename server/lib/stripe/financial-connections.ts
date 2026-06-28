@@ -40,6 +40,7 @@ export async function createBankLinkSession(
   customerId: string,
   context: StripeLinkContext
 ) {
+  void context
   const returnBase = resolveHttpsBaseUrl(event, appUrl)
 
   return stripe.financialConnections.sessions.create({
@@ -50,12 +51,7 @@ export async function createBankLinkSession(
     permissions: [...FINANCIAL_CONNECTIONS_PERMISSIONS],
     prefetch: [...FINANCIAL_CONNECTIONS_PREFETCH],
     filters: { countries: [...FINANCIAL_CONNECTIONS_BANK_COUNTRIES] },
-    ...(returnBase ? { return_url: `${returnBase}/dashboard/accounts` } : {}),
-    metadata: {
-      userId: context.userId,
-      spaceId: context.spaceId,
-      visibility: context.visibility
-    }
+    ...(returnBase ? { return_url: `${returnBase}/dashboard/accounts` } : {})
   })
 }
 
