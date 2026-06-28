@@ -12,15 +12,14 @@ function sectionKey(sectionId: string, suffix: string) {
 }
 
 function sectionExists(sectionId: string) {
-  const title = t(sectionKey(sectionId, 'title'))
-  return title !== sectionKey(sectionId, 'title')
+  return has(sectionKey(sectionId, 'title'))
 }
 
 function paragraphKeys(sectionId: string): string[] {
   const keys: string[] = []
   for (let i = 1; i <= 12; i++) {
     const key = sectionKey(sectionId, `p${i}`)
-    if (t(key) === key) break
+    if (!has(key)) break
     keys.push(key)
   }
   return keys
