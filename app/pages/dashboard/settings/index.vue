@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { resolveErrorMessage } from '~/utils/errors'
 
 definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: ['auth', 'billing-sync'] })
 
@@ -133,6 +134,40 @@ const planLabels = computed(() => ({
   PRO: { label: t('dashboard.settings.plans.PRO'), color: 'primary' as const },
   ENTERPRISE: { label: t('dashboard.settings.plans.ENTERPRISE'), color: 'success' as const }
 }))
+
+const deleteModalOpen = ref(false)
+const deleteConfirmEmail = ref('')
+const deleteConfirmPassword = ref('')
+const deleteAcknowledged = ref(false)
+const isDeletingAccount = ref(false)
+const deleteError = ref('')
+
+function openDeleteModal() {
+  deleteConfirmEmail.value = profile.email
+  deleteConfirmPassword.value = ''
+  deleteAcknowledged.value = false
+  deleteError.value = ''
+  deleteModalOpen.value = true
+}
+
+async function confirmDeleteAccount() {
+  if (!deleteAcknowledged.value) return
+  isDeletingAccount.value = true
+  deleteError.value = ''
+  try {
+    await userStore.deleteAccount({
+      confirmEmail: deleteConfirmEmail.value.trim(),
+      password: deleteConfirmPassword.value.trim() || undefined
+    })
+    toast.add({ title: t('dashboard.settings.deleteSuccess'), color: 'success' })
+    deleteModalOpen.value = false
+    await navigateTo('/', { replace: true })
+  } catch (err: unknown) {
+    deleteError.value = resolveErrorMessage(err, t, 'dashboard.settings.deleteFailed')
+  } finally {
+    isDeletingAccount.value = false
+  }
+}
 </script>
 
 <template>
@@ -288,17 +323,80 @@ const planLabels = computed(() => ({
       </div>
     </UCard>
 
-    <UCard v-if="!isMinor" :ui="{ body: 'p-6 sm:p-8' }">
+    <UCard :ui="{ body: 'p-6 sm:p-8' }">
       <h2 class="font-display text-lg mb-4 text-error">{{ t('dashboard.settings.dangerZone') }}</h2>
       <p class="text-sm text-muted mb-4">
         {{ t('dashboard.settings.deleteWarning') }}
+      </p>
+      <p class="text-xs text-muted mb-4">
+        <NuxtLink to="/privacy" class="text-primary hover:underline">{{ t('common.privacy') }}</NuxtLink>
       </p>
       <UButton
         :label="t('dashboard.settings.deleteAccount')"
         color="error"
         variant="subtle"
         icon="i-lucide-trash-2"
+        @click="openDeleteModal"
       />
     </UCard>
+
+    <UModal v-model:open="deleteModalOpen" :title="t('dashboard.settings.deleteModalTitle')">
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm text-muted">{{ t('dashboard.settings.deleteModalDescription') }}</p>
+
+          <UAlert
+            v-if="deleteError"
+            :description="deleteError"
+            color="error"
+            variant="subtle"
+            icon="i-lucide-alert-circle"
+          />
+
+          <UFormField :label="t('dashboard.settings.deleteConfirmEmail')">
+            <UInput
+              v-model="deleteConfirmEmail"
+              type="email"
+              autocomplete="off"
+              :placeholder="t('dashboard.settings.deleteConfirmEmailPlaceholder')"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField :label="t('dashboard.settings.deleteConfirmPassword')">
+            <UInput
+              v-model="deleteConfirmPassword"
+              type="password"
+              autocomplete="current-password"
+              :placeholder="t('dashboard.settings.deleteConfirmPasswordPlaceholder')"
+              class="w-full"
+            />
+            <template #help>{{ t('dashboard.settings.deleteConfirmPasswordHelp') }}</template>
+          </UFormField>
+
+          <UCheckbox
+            v-model="deleteAcknowledged"
+            :label="t('dashboard.settings.deleteConfirmPhrase')"
+          />
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton
+            :label="t('dashboard.settings.deleteCancel')"
+            color="neutral"
+            variant="outline"
+            @click="deleteModalOpen = false"
+          />
+          <UButton
+            :label="t('dashboard.settings.deleteConfirmAction')"
+            color="error"
+            :loading="isDeletingAccount"
+            :disabled="!deleteAcknowledged || !deleteConfirmEmail.trim()"
+            @click="confirmDeleteAccount"
+          />
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

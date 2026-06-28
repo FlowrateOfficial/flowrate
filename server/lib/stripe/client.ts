@@ -5,6 +5,23 @@ export function getStripeClient(secretKey: string): Stripe {
   return new Stripe(secretKey)
 }
 
+function assertMatchingStripeKeyModes(secretKey: string, publishableKey: string | undefined) {
+  if (!publishableKey) return
+
+  const secretLive = secretKey.startsWith('sk_live_')
+  const publishableLive = publishableKey.startsWith('pk_live_')
+  const secretTest = secretKey.startsWith('sk_test_')
+  const publishableTest = publishableKey.startsWith('pk_test_')
+
+  if ((secretLive && !publishableLive) || (secretTest && !publishableTest)) {
+    throw createError({
+      statusCode: 503,
+      message: 'Stripe publishable and secret keys must both be test or both be live.',
+      data: { code: 'STRIPE_KEY_MISMATCH' }
+    })
+  }
+}
+
 export function requireStripe(event: H3Event) {
   const config = useRuntimeConfig(event)
   const secretKey = config.stripeSecretKey
@@ -12,6 +29,8 @@ export function requireStripe(event: H3Event) {
   if (!secretKey) {
     throw createError({ statusCode: 503, message: 'Stripe is not configured' })
   }
+
+  assertMatchingStripeKeyModes(secretKey, config.public.stripePublishableKey as string | undefined)
 
   return {
     config,

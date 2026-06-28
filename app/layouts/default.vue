@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { t } = useAppI18n()
+const { isLoggedIn, homePath } = useSessionUser()
+const { show: showBreadcrumbs } = useBreadcrumbs()
 
 const navLinks = computed(() => [
   { label: t('nav.features'), to: '/#features' },
@@ -11,7 +13,7 @@ const navLinks = computed(() => [
   <div class="min-h-screen flex flex-col surface-page">
     <header class="sticky top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-bg/85 dark:bg-flow-bg-dark/85 backdrop-blur-md">
       <UContainer class="flex items-center justify-between h-16 sm:h-[4.5rem]">
-        <NuxtLink to="/" class="font-display text-xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
+        <NuxtLink :to="homePath" class="font-display text-xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
           FlowRate
         </NuxtLink>
 
@@ -29,20 +31,32 @@ const navLinks = computed(() => [
         <div class="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
           <UColorModeButton color="neutral" variant="ghost" size="sm" />
+          <template v-if="!isLoggedIn">
+            <NuxtLink
+              to="/auth/login"
+              class="hidden sm:inline text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors px-3 py-2"
+            >
+              {{ t('common.signIn') }}
+            </NuxtLink>
+            <NuxtLink to="/auth/register" class="btn-primary-editorial !px-5 !py-2.5 text-sm">
+              {{ t('common.getStarted') }}
+            </NuxtLink>
+          </template>
           <NuxtLink
-            to="/auth/login"
-            class="hidden sm:inline text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors px-3 py-2"
+            v-else
+            to="/dashboard"
+            class="btn-primary-editorial !px-5 !py-2.5 text-sm"
           >
-            {{ t('common.signIn') }}
-          </NuxtLink>
-          <NuxtLink to="/auth/register" class="btn-primary-editorial !px-5 !py-2.5 text-sm">
-            {{ t('common.getStarted') }}
+            {{ t('nav.overview') }}
           </NuxtLink>
         </div>
       </UContainer>
     </header>
 
     <UMain class="flex-1">
+      <UContainer v-if="showBreadcrumbs" class="pt-8 pb-0">
+        <AppBreadcrumbs />
+      </UContainer>
       <slot />
     </UMain>
 
@@ -65,8 +79,22 @@ const navLinks = computed(() => [
             <NuxtLink to="/terms" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
               {{ t('common.terms') }}
             </NuxtLink>
-            <NuxtLink to="/auth/login" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+            <a href="mailto:mathieu.lievre.pro@outlook.com" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+              mathieu.lievre.pro@outlook.com
+            </a>
+            <NuxtLink
+              v-if="!isLoggedIn"
+              to="/auth/login"
+              class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+            >
               {{ t('common.signIn') }}
+            </NuxtLink>
+            <NuxtLink
+              v-else
+              to="/dashboard"
+              class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+            >
+              {{ t('nav.overview') }}
             </NuxtLink>
           </div>
         </div>

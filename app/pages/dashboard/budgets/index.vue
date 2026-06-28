@@ -20,6 +20,16 @@ const subtitle = computed(() =>
     : t('dashboard.budgets.subtitleMany', { count: budgets.value.length })
 )
 
+const spaceId = computed(() => useSpacesStore().activeSpace?.id)
+await useAsyncData(
+  () => `budgets-${spaceId.value}`,
+  async () => {
+    await budgetsStore.fetchBudgets()
+    return null
+  },
+  { watch: [spaceId] }
+)
+
 useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appName')}` })
 </script>
 

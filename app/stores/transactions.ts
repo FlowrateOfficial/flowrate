@@ -28,6 +28,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const selectedTx = ref<TransactionRow | null>(null)
   const detailOpen = ref(false)
 
+  let fetchSeq = 0
+  let abortController: AbortController | null = null
+
   const columns = computed<TableColumn<TransactionRow>[]>(() => [
     { accessorKey: 'date', header: t('dashboard.transactions.columns.date') },
     { accessorKey: 'description', header: t('dashboard.transactions.columns.description') },
@@ -41,6 +44,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   ])
 
   const rows = computed(() => data.value?.items ?? [])
+  const totalPages = computed(() => Math.max(1, data.value?.pages ?? 1))
 
   const categorySelectItems = computed(() =>
     CATEGORY_OPTIONS.map(cat => ({
@@ -85,9 +89,14 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
   async function fetchTransactions() {
     if (!spacesStore.activeSpace) return
+
+    const seq = ++fetchSeq
+    abortController?.abort()
+    abortController = new AbortController()
+
     pending.value = true
     try {
-      data.value = await api<TransactionsResponse>(apiRoutes.transactions.list, {
+      const result = await api<TransactionsResponse>(apiRoutes.transactions.list, {
         query: {
           category: selectedCategory.value === 'ALL' ? undefined : selectedCategory.value,
           search: search.value || undefined,
@@ -95,11 +104,33 @@ export const useTransactionsStore = defineStore('transactions', () => {
           dateTo: dateTo.value ? new Date(dateTo.value).toISOString() : undefined,
           page: page.value,
           limit: PAGE_SIZE
-        }
+        },
+        signal: abortController.signal
       })
+
+      if (seq !== fetchSeq) return
+
+      data.value = result
+
+      const maxPage = Math.max(1, result.pages ?? 1)
+      if (page.value > maxPage) {
+        page.value = maxPage
+      }
+    } catch (error) {
+      if (seq !== fetchSeq) return
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      throw error
     } finally {
-      pending.value = false
+      if (seq === fetchSeq) pending.value = false
     }
+  }
+
+  function requestPageOne() {
+    if (page.value !== 1) {
+      page.value = 1
+      return
+    }
+    fetchTransactions()
   }
 
   async function exportCsv() {
@@ -113,19 +144,20 @@ export const useTransactionsStore = defineStore('transactions', () => {
     URL.revokeObjectURL(url)
   }
 
-  watch([selectedCategory, search, dateFrom, dateTo], () => {
-    if (page.value !== 1) {
-      page.value = 1
-      return
-    }
-    fetchTransactions()
-  })
+  watchDebounced(search, requestPageOne, { debounce: 300 })
+
+  watch([selectedCategory, dateFrom, dateTo], requestPageOne)
 
   watch(page, () => fetchTransactions())
 
-  watch(() => spacesStore.activeSpace?.id, (id) => {
-    if (id) fetchTransactions()
-  }, { immediate: true })
+  watch(() => spacesStore.activeSpace?.id, (id, previousId) => {
+    if (!id) return
+    if (id !== previousId) {
+      page.value = 1
+      data.value = null
+    }
+    fetchTransactions()
+  })
 
   return {
     selectedCategory,
@@ -140,6 +172,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     detailOpen,
     columns,
     rows,
+    totalPages,
     categorySelectItems,
     formatAmount,
     formatDate,

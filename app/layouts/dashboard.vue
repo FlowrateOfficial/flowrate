@@ -1,28 +1,20 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
-const route = useRoute()
 const { t } = useAppI18n()
+const { show: showBreadcrumbs } = useBreadcrumbs()
 
 const spacesStore = useSpacesStore()
 const userStore = useUserStore()
-const { user, plan, navItems, bottomItems, userMenuItems } = storeToRefs(userStore)
+const { user, plan, navItems, bottomItems } = storeToRefs(userStore)
 const { isMinor, activeSpace } = storeToRefs(spacesStore)
-
-onMounted(async () => {
-  // Runs after hydration — refreshes spaces with cookie-backed active space and loads user profile.
-  await Promise.all([
-    spacesStore.fetchSpaces(),
-    userStore.fetchUser()
-  ])
-})
 </script>
 
 <template>
   <div class="flex h-screen overflow-hidden surface-page">
     <aside class="hidden lg:flex flex-col w-[17rem] shrink-0 border-r border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-warm/60 dark:bg-flow-warm-dark/40">
       <div class="px-8 py-10 border-b border-flow-border/30 dark:border-flow-border-dark/30">
-        <NuxtLink to="/" class="font-display text-2xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
+        <NuxtLink to="/dashboard" class="font-display text-2xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
           FlowRate
         </NuxtLink>
       </div>
@@ -68,7 +60,7 @@ onMounted(async () => {
           {{ item.label }}
         </NuxtLink>
 
-        <UDropdownMenu :items="userMenuItems">
+        <UDropdownMenu :items="userStore.userMenuItems">
           <button class="w-full flex items-center gap-3 px-4 py-3 rounded-flow text-sm hover:bg-flow-secondary/50 dark:hover:bg-flow-secondary-dark/50 transition-all duration-300 mt-2">
             <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="xs" />
             <div class="flex-1 min-w-0 text-left">
@@ -83,7 +75,7 @@ onMounted(async () => {
 
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
       <header class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-flow-border/60 dark:border-flow-border-dark/60">
-        <NuxtLink to="/" class="font-display text-lg text-flow-ink dark:text-flow-ink-dark">
+        <NuxtLink to="/dashboard" class="font-display text-lg text-flow-ink dark:text-flow-ink-dark">
           FlowRate
         </NuxtLink>
         <div class="flex items-center gap-1">
@@ -92,9 +84,17 @@ onMounted(async () => {
         </div>
       </header>
 
-      <header class="hidden lg:flex items-center justify-between px-10 lg:px-14 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30">
-        <p class="text-sm text-flow-muted dark:text-flow-muted-dark font-display tracking-wide">
-          {{ route.meta.title ?? t('nav.overview') }}
+      <div
+        v-if="showBreadcrumbs"
+        class="lg:hidden px-5 py-3 border-b border-flow-border/40 dark:border-flow-border-dark/40 bg-flow-bg/50 dark:bg-flow-bg-dark/50"
+      >
+        <AppBreadcrumbs />
+      </div>
+
+      <header class="hidden lg:flex items-center justify-between px-10 lg:px-14 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30 gap-6">
+        <AppBreadcrumbs v-if="showBreadcrumbs" class="min-w-0 flex-1" />
+        <p v-else class="text-sm text-flow-muted dark:text-flow-muted-dark font-display tracking-wide">
+          {{ t('nav.overview') }}
         </p>
         <div class="flex items-center gap-3">
           <LanguageSwitcher />
@@ -124,5 +124,8 @@ onMounted(async () => {
     </div>
 
     <DashboardMobileNav />
+    <ClientOnly>
+      <DashboardMobileAccountMenu />
+    </ClientOnly>
   </div>
 </template>

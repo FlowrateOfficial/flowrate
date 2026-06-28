@@ -1,19 +1,8 @@
 <script setup lang="ts">
+import type { SubscriptionItem } from '~/types/financial'
 import { formatCurrencyForLocale } from '~/utils/format'
 
-interface Subscription {
-  id: string
-  name: string
-  amount: number
-  currency: string
-  frequency: string
-  status: string
-  icon?: string | null
-  nextCharge?: string | null
-  priceAlert: boolean
-}
-
-defineProps<{ subscription: Subscription }>()
+defineProps<{ subscription: SubscriptionItem }>()
 
 const { t, getLocale, intlLocale } = useAppI18n()
 
@@ -30,7 +19,8 @@ function statusLabel(status: string) {
   return translated !== key ? translated : status
 }
 
-function frequencyLabel(freq: string) {
+function frequencyLabel(freq: string | null) {
+  if (!freq) return '—'
   const key = `dashboard.subscriptions.frequency.${freq}`
   const translated = t(key)
   return translated !== key ? translated : freq

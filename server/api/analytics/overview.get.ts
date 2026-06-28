@@ -4,6 +4,7 @@ import {
   netWorthHistory,
   rangeToDates,
   spendingByCategory,
+  topMerchantsFromTransactions,
   type AnalyticsRange
 } from '../../utils/analytics'
 
@@ -32,14 +33,22 @@ export default defineEventHandler(async (event) => {
           accountId: { in: accountIds },
           date: { gte: from, lte: to }
         },
-        select: { date: true, amount: true, category: true }
+        select: {
+          date: true,
+          amount: true,
+          category: true,
+          merchant: true,
+          description: true
+        }
       })
     : []
 
   const normalized = txs.map(tx => ({
     date: tx.date,
     amount: Number(tx.amount),
-    category: tx.category
+    category: tx.category,
+    merchant: tx.merchant,
+    description: tx.description
   }))
 
   const spending = normalized.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0)
@@ -59,39 +68,12 @@ export default defineEventHandler(async (event) => {
       spending: Math.round(spending * 100) / 100,
       net: Math.round((income - spending) * 100) / 100,
       savingsRate: income > 0 ? Math.round(((income - spending) / income) * 1000) / 10 : 0,
-      transactionCount: txs.length
+      transactionCount: txs.length,
+      linkedAccountCount: accounts.length
     },
     cashFlow: buildCashFlowSeries(normalized, from, to, bucket),
     categories: spendingByCategory(normalized),
     netWorth: netWorthHistory(accountBalances, normalized, from, to),
-    topMerchants: await topMerchants(space.id, from, to, accountFilter)
+    topMerchants: topMerchantsFromTransactions(normalized)
   }
 })
-
-async function topMerchants(
-  spaceId: string,
-  from: Date,
-  to: Date,
-  accountFilter: ReturnType<typeof accountVisibilityFilter>
-) {
-  const txs = await prisma.transaction.findMany({
-    where: {
-      spaceId,
-      date: { gte: from, lte: to },
-      amount: { lt: 0 },
-      account: accountFilter
-    },
-    select: { merchant: true, description: true, amount: true }
-  })
-
-  const totals = new Map<string, number>()
-  for (const tx of txs) {
-    const key = tx.merchant ?? tx.description
-    totals.set(key, (totals.get(key) ?? 0) + Math.abs(Number(tx.amount)))
-  }
-
-  return [...totals.entries()]
-    .map(([name, amount]) => ({ name, amount: Math.round(amount * 100) / 100 }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 8)
-}

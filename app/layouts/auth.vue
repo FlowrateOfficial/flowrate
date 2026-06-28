@@ -1,8 +1,12 @@
+<script setup lang="ts">
+const { homePath } = useSessionUser()
+</script>
+
 <template>
   <div class="min-h-screen flex items-center justify-center surface-page p-6 sm:p-8">
     <div class="w-full max-w-md">
       <div class="text-center mb-12">
-        <NuxtLink to="/" class="font-display text-3xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
+        <NuxtLink :to="homePath" class="font-display text-3xl tracking-tight text-flow-ink dark:text-flow-ink-dark">
           FlowRate
         </NuxtLink>
         <p class="text-sm text-flow-muted dark:text-flow-muted-dark mt-3 italic font-display">

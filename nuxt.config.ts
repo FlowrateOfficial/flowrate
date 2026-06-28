@@ -12,7 +12,9 @@ export default defineNuxtConfig({
       defaultLocale: 'en',
       localeCookie: 'user-locale',
       translationDir: 'locales',
-      strategy: 'no_prefix'
+      strategy: 'no_prefix',
+      // All copy lives in locales/en.json + fr.json; per-page files caused broken merges.
+      disablePageLocales: true
     }]
   ],
 
@@ -41,6 +43,7 @@ export default defineNuxtConfig({
     twilioVerifyServiceSid: process.env.TWILIO_VERIFY_SERVICE_SID ?? '',
     neonApiKey: process.env.NEON_API_KEY,
     stackProjectId: process.env.STACK_PROJECT_ID,
+    neonBranchId: process.env.NEON_BRANCH_ID ?? '',
     neonAuthCookieSecret: process.env.NUXT_SESSION_PASSWORD ?? process.env.NEON_AUTH_COOKIE_SECRET ?? '',
     public: {
       neonAuthUrl: process.env.NUXT_NEON_AUTH_URL ?? '',

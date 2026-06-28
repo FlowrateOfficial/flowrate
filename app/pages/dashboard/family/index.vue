@@ -13,6 +13,27 @@ useSeoMeta({ title: () => `${t('dashboard.family.title')} — ${t('common.appNam
 
 const spaceId = computed(() => spacesStore.activeSpace?.id ?? '')
 
+const deleteChildModalOpen = ref(false)
+const childToDelete = ref<{ id: string, name: string } | null>(null)
+const isDeletingChild = ref(false)
+
+function promptDeleteChild(child: { id: string, name: string | null }) {
+  childToDelete.value = { id: child.id, name: child.name ?? t('dashboard.family.childFallback') }
+  deleteChildModalOpen.value = true
+}
+
+async function confirmDeleteChild() {
+  if (!childToDelete.value || !spaceId.value) return
+  isDeletingChild.value = true
+  try {
+    await familyStore.deleteChildAccount(spaceId.value, childToDelete.value.id, refresh)
+    deleteChildModalOpen.value = false
+    childToDelete.value = null
+  } finally {
+    isDeletingChild.value = false
+  }
+}
+
 const { data: spaceDetail, pending, refresh } = await useAsyncData(
   () => `family-space-${spaceId.value}`,
   () => spaceId.value ? familyStore.fetchSpaceDetail(spaceId.value) : Promise.resolve(null),
@@ -226,6 +247,15 @@ const spaceTypeHint = computed(() => {
             block
             :to="`/dashboard/family/${child.id}`"
           />
+          <UButton
+            class="mt-2"
+            :label="t('dashboard.family.deleteChildAccount')"
+            icon="i-lucide-trash-2"
+            color="error"
+            variant="outline"
+            block
+            @click="promptDeleteChild(child)"
+          />
         </UCard>
       </div>
     </div>
@@ -253,5 +283,30 @@ const spaceTypeHint = computed(() => {
         </UCard>
       </div>
     </div>
+
+    <UModal
+      v-model:open="deleteChildModalOpen"
+      :title="childToDelete ? t('dashboard.family.deleteChildTitle', { name: childToDelete.name }) : ''"
+    >
+      <template #body>
+        <p class="text-sm text-muted">{{ t('dashboard.family.deleteChildDescription') }}</p>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton
+            :label="t('dashboard.settings.deleteCancel')"
+            color="neutral"
+            variant="outline"
+            @click="deleteChildModalOpen = false"
+          />
+          <UButton
+            :label="t('dashboard.family.deleteChildConfirm')"
+            color="error"
+            :loading="isDeletingChild"
+            @click="confirmDeleteChild"
+          />
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

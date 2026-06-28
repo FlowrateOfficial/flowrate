@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'auth' })
+definePageMeta({ layout: 'auth', middleware: 'guest' })
 
 const route = useRoute()
 const { t } = useAppI18n()
@@ -66,12 +66,22 @@ useSeoMeta({ title: () => t('auth.register.title') })
         <UInput v-model="registerForm.confirmPassword" type="password" :placeholder="t('auth.login.passwordPlaceholder')" autocomplete="new-password" class="w-full" variant="outline" />
       </UFormField>
 
-      <p class="text-xs text-flow-muted dark:text-flow-muted-dark leading-relaxed">
-        {{ t('auth.register.termsPrefix') }}
-        <NuxtLink to="/terms" class="underline underline-offset-2">{{ t('auth.register.termsOfService') }}</NuxtLink>
-        {{ t('auth.register.termsAnd') }}
-        <NuxtLink to="/privacy" class="underline underline-offset-2">{{ t('auth.register.privacyPolicy') }}</NuxtLink>.
-      </p>
+      <UFormField name="agreedToTerms" required>
+        <UCheckbox v-model="registerForm.agreedToTerms">
+          <template #label>
+            <span class="text-xs text-flow-muted dark:text-flow-muted-dark leading-relaxed">
+              {{ t('auth.register.termsCheckboxPrefix') }}
+              <NuxtLink to="/terms" target="_blank" class="underline underline-offset-2 hover:text-flow-ink dark:hover:text-flow-ink-dark">
+                {{ t('auth.register.termsOfService') }}
+              </NuxtLink>
+              {{ t('auth.register.termsAnd') }}
+              <NuxtLink to="/privacy" target="_blank" class="underline underline-offset-2 hover:text-flow-ink dark:hover:text-flow-ink-dark">
+                {{ t('auth.register.privacyPolicy') }}
+              </NuxtLink>.
+            </span>
+          </template>
+        </UCheckbox>
+      </UFormField>
 
       <UButton
         type="submit"
@@ -79,12 +89,19 @@ useSeoMeta({ title: () => t('auth.register.title') })
         block
         :loading="loading"
         color="neutral"
-        class="!bg-charcoal dark:!bg-flow-warm !text-flow-warm dark:!text-charcoal rounded-flow"
+        class="bg-charcoal! dark:bg-flow-warm! text-flow-warm! dark:text-charcoal! rounded-flow"
       />
     </UForm>
 
     <USeparator :label="t('common.or')" />
 
     <AuthSocialButtons />
+
+    <p class="text-xs text-flow-muted dark:text-flow-muted-dark leading-relaxed text-center">
+      {{ t('auth.register.termsPrefix') }}
+      <NuxtLink to="/terms" target="_blank" class="underline underline-offset-2">{{ t('auth.register.termsOfService') }}</NuxtLink>
+      {{ t('auth.register.termsAnd') }}
+      <NuxtLink to="/privacy" target="_blank" class="underline underline-offset-2">{{ t('auth.register.privacyPolicy') }}</NuxtLink>.
+    </p>
   </div>
 </template>

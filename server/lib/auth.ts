@@ -68,5 +68,38 @@ export async function requireAuthUser(event: H3Event): Promise<AuthUser> {
   await ensureDefaultIndependentSpace(user.id, dbUser.name)
   await acceptPendingInvitations(user.id, user.email)
 
+  event.context.flowrateAuth = user
+  return user
+}
+
+/** Session + existing DB user only — no provisioning (use after /api/user/bootstrap). */
+export async function requireSessionUser(event: H3Event): Promise<AuthUser> {
+  if (event.context.flowrateAuth) {
+    return event.context.flowrateAuth
+  }
+
+  const session = await getAuthSession(event)
+  if (!session?.user) {
+    throw createError({ statusCode: 401, message: 'Unauthorized' })
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, email: true, name: true, avatarUrl: true }
+  })
+
+  if (!dbUser) {
+    throw createError({ statusCode: 401, message: 'Unauthorized' })
+  }
+
+  const user: AuthUser = {
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    emailVerified: session.user.emailVerified,
+    image: dbUser.avatarUrl
+  }
+
+  event.context.flowrateAuth = user
   return user
 }

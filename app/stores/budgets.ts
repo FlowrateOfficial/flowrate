@@ -127,9 +127,9 @@ export const useBudgetsStore = defineStore('budgets', () => {
     await fetchBudgets()
   }
 
-  watch(() => spacesStore.activeSpace?.id, (id) => {
-    if (id) fetchBudgets()
-  }, { immediate: true })
+  watch(() => spacesStore.activeSpace?.id, () => {
+    fetchBudgets()
+  })
 
   return {
     budgets,

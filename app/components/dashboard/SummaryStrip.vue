@@ -19,11 +19,11 @@ defineProps<{
       :key="index"
       :ui="{ body: 'p-4 sm:p-5' }"
     >
-      <div v-if="loading" class="space-y-2 animate-pulse">
+      <div v-show="loading" class="space-y-2 animate-pulse">
         <div class="h-3 w-20 bg-muted/40 rounded" />
         <div class="h-7 w-28 bg-muted/30 rounded" />
       </div>
-      <template v-else>
+      <div v-show="!loading">
         <div class="flex items-start justify-between gap-2">
           <p class="text-xs text-flow-muted dark:text-flow-muted-dark">{{ item.label }}</p>
           <UIcon v-if="item.icon" :name="item.icon" class="w-4 h-4 text-flow-muted shrink-0 stroke-[1.25]" />
@@ -32,7 +32,7 @@ defineProps<{
           {{ item.value }}
         </p>
         <p v-if="item.hint" class="text-xs text-flow-muted dark:text-flow-muted-dark mt-1">{{ item.hint }}</p>
-      </template>
+      </div>
     </UCard>
   </div>
 </template>

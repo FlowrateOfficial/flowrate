@@ -12,6 +12,7 @@ export const useUserStore = defineStore('user', () => {
   const phoneVerified = ref(false)
   const plan = ref<'FREE' | 'PRO' | 'ENTERPRISE'>('FREE')
   const loading = ref(false)
+  const bootstrapped = ref(false)
 
   const navItems = computed(() => {
     if (spacesStore.isChildManaged) {
@@ -80,18 +81,46 @@ export const useUserStore = defineStore('user', () => {
     return path.startsWith(to)
   }
 
+  async function deleteAccount(input: { confirmEmail: string, password?: string }) {
+    await api(apiRoutes.user.account, {
+      method: 'DELETE',
+      body: input,
+      noSpace: true
+    })
+    await signOut()
+    resetSession()
+    spacesStore.clearSession()
+  }
+
   async function logout() {
     await signOut()
-    user.value = null
-    plan.value = 'FREE'
+    resetSession()
     spacesStore.clearSession()
+    await refreshNuxtData('neon-auth-session')
     await navigateTo('/', { replace: true })
   }
 
-  const userMenuItems = computed(() => [[
-    { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' },
-    { label: t('common.signOut'), icon: 'i-lucide-log-out', onSelect: () => logout() }
-  ]])
+  function getAccountMenuLinks() {
+    const items: Array<{ label: string, icon: string, to: string }> = []
+    if (!spacesStore.isMinor) {
+      items.push({ label: t('nav.spaces'), icon: 'i-lucide-layers', to: '/dashboard/spaces' })
+    }
+    items.push(
+      { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' },
+      { label: t('common.privacy'), icon: 'i-lucide-shield', to: '/privacy' },
+      { label: t('common.terms'), icon: 'i-lucide-file-text', to: '/terms' }
+    )
+    return items
+  }
+
+  const accountMenuLinks = computed(getAccountMenuLinks)
+
+  const userMenuItems = computed(() => [
+    accountMenuLinks.value,
+    [
+      { label: t('common.signOut'), icon: 'i-lucide-log-out', onSelect: () => logout() }
+    ]
+  ])
 
   function applyProfile(profile: UserProfile) {
     user.value = {
@@ -105,7 +134,9 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function bootstrap() {
+    if (bootstrapped.value) return
     await api(apiRoutes.user.bootstrap, { noSpace: true })
+    bootstrapped.value = true
   }
 
   async function fetchProfile(syncBilling = false): Promise<UserProfile | null> {
@@ -124,6 +155,13 @@ export const useUserStore = defineStore('user', () => {
 
     applyProfile(data)
     return data
+  }
+
+  function resetSession() {
+    user.value = null
+    plan.value = 'FREE'
+    phoneVerified.value = false
+    bootstrapped.value = false
   }
 
   async function fetchUser() {
@@ -188,15 +226,19 @@ export const useUserStore = defineStore('user', () => {
     loading,
     navItems,
     bottomItems,
+    accountMenuLinks,
+    getAccountMenuLinks,
     userMenuItems,
     isActive,
     bootstrap,
+    bootstrapped,
     fetchProfile,
     fetchUser,
     updateProfile,
     verifyPhoneCode,
     resendPhoneCode,
     syncSubscriptionPlan,
+    deleteAccount,
     logout
   }
 })

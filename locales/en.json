@@ -27,7 +27,12 @@
     "terms": "Terms",
     "language": "Language",
     "english": "English",
-    "french": "French"
+    "french": "French",
+    "home": "Home"
+  },
+  "breadcrumbs": {
+    "label": "Breadcrumb",
+    "invitation": "Invitation"
   },
   "nav": {
     "features": "Features",
@@ -81,6 +86,7 @@
       "passwordPlaceholder": "Min. 8 characters",
       "proBadge": "Starting with Pro plan",
       "termsPrefix": "By creating an account, you agree to our",
+      "termsCheckboxPrefix": "I agree to the",
       "termsOfService": "Terms of Service",
       "termsAnd": "and",
       "privacyPolicy": "Privacy Policy",
@@ -379,6 +385,7 @@
       "notSynced": "Not yet synced",
       "stripeNote": "Powered by Stripe Financial Connections",
       "stripeDescription": "Your bank credentials are never stored. FlowRate uses Stripe's secure, read-only bank link to sync balances and transactions.",
+      "bankRegionNote": "Links US checking, savings, and credit accounts through Stripe. Financial Connections is available to businesses in the US, UK, EU, and other supported regions — linked institutions are US-only today.",
       "connectError": "Failed to connect bank. Please try again.",
       "syncNoAccounts": "Stripe linked but no accounts were saved. Try Connect again — if it persists, set STRIPE_WEBHOOK_SECRET from `pnpm stripe:listen` in .env and restart `pnpm dev`.",
       "resyncFromStripe": "Refresh from Stripe",
@@ -496,6 +503,12 @@
         "allCategories": "All categories"
       },
       "removeMember": "Remove member",
+      "deleteChildAccount": "Delete account permanently",
+      "deleteChildTitle": "Delete {name}'s account?",
+      "deleteChildDescription": "This permanently deletes their login, linked banks, transactions, and allowance data from FlowRate. This cannot be undone.",
+      "deleteChildConfirm": "Delete permanently",
+      "deleteChildSuccess": "Account deleted",
+      "deleteChildFailed": "Could not delete account",
       "statusHeader": "Status",
       "displayNamePlaceholder": "Display name",
       "emailPlaceholder": "partner@email.com",
@@ -673,8 +686,20 @@
       "cloudDescription": "Cloud infrastructure spend tracking",
       "connect": "Connect",
       "dangerZone": "Danger Zone",
-      "deleteWarning": "Permanently delete your account and all associated data. This action cannot be undone.",
-      "deleteAccount": "Delete account",
+      "deleteWarning": "Permanently delete your FlowRate account. This disconnects all linked banks, removes transactions, budgets, and subscriptions stored in FlowRate, cancels billing, and deletes your login. This cannot be undone.",
+      "deleteAccount": "Delete my account",
+      "deleteModalTitle": "Delete your account permanently?",
+      "deleteModalDescription": "Type your email and password to confirm. All bank connections, transactions, and personal data in FlowRate will be erased. Shared family spaces you own will be transferred to another guardian when possible.",
+      "deleteConfirmEmail": "Confirm your email",
+      "deleteConfirmEmailPlaceholder": "you@example.com",
+      "deleteConfirmPassword": "Password",
+      "deleteConfirmPasswordPlaceholder": "Your account password",
+      "deleteConfirmPasswordHelp": "Required for email/password accounts. OAuth-only accounts may leave this blank if prompted.",
+      "deleteConfirmPhrase": "I understand this is permanent",
+      "deleteConfirmAction": "Permanently delete account",
+      "deleteCancel": "Cancel",
+      "deleteSuccess": "Your account has been deleted",
+      "deleteFailed": "Could not delete account. Please try again or contact mathieu.lievre.pro@outlook.com.",
       "upgradeSuccess": "Welcome to Pro! Your plan is now active.",
       "upgradeCanceled": "Checkout canceled — you can upgrade anytime from Settings.",
       "checkoutFailed": "Could not start checkout",
@@ -852,24 +877,240 @@
     "privacy": {
       "title": "Privacy Policy",
       "seoTitle": "Privacy Policy — FlowRate",
-      "lastUpdated": "Last updated: June 26, 2025",
-      "p1": "FlowRate collects information you provide when creating an account (such as your name and email) and financial data you choose to connect through our bank sync partners.",
-      "p2": "We use this data solely to provide and improve the service. We do not sell your personal information to third parties.",
-      "p3": "Bank credentials are never stored on our servers. Account connections are handled securely through Stripe Financial Connections.",
-      "p4": "You may request deletion of your account and associated data at any time by contacting"
+      "lastUpdated": "Last updated: June 26, 2026",
+      "seeAlsoTerms": "See also: Terms of Service",
+      "intro": "FlowRate (“we”, “us”, “our”) is a personal and household finance application. This Privacy Policy explains what information we collect, how we use it, who we share it with, where it is stored, and the choices you have. We aim to be transparent so you can make informed decisions about using FlowRate.",
+      "contact": "Questions about this policy or your data? Contact us at",
+      "table": {
+        "provider": "Provider",
+        "purpose": "Purpose",
+        "location": "Data location"
+      },
+      "sections": {
+        "overview": {
+          "title": "1. Overview",
+          "p1": "FlowRate helps individuals, families, and small teams understand their money. You can connect bank accounts (via Stripe Financial Connections), view transactions, assign categories, track budgets, detect recurring subscriptions, and—when you choose—share selected accounts within a Household, Family, or Company space.",
+          "p2": "We do not sell your personal information. We do not share Financial Connections data with unrelated third parties for their own marketing or product development."
+        },
+        "dataCollected": {
+          "title": "2. Information we collect",
+          "p1": "The data we process depends on how you use FlowRate:",
+          "items": [
+            "Account information: name, email address, optional phone number, profile settings, and authentication data managed through Neon Auth.",
+            "Financial space data: space names, membership roles, invitations, and visibility preferences (personal vs shared accounts).",
+            "Connected bank data (when you choose to link): institution name, account display name, account type, last four digits, balances, and transaction history received through Stripe Financial Connections.",
+            "Derived data: transaction categories (including rule-based auto-categorization), budget entries, detected subscriptions, analytics summaries, and split rules you configure.",
+            "Billing data: subscription plan and Stripe Billing customer identifiers if you upgrade to a paid plan.",
+            "Technical data: server logs, IP addresses, and request metadata generated when you use the app (for example through our hosting provider)."
+          ]
+        },
+        "financialConnections": {
+          "title": "3. Stripe Financial Connections",
+          "p1": "When you connect a bank, you are redirected through Stripe’s Financial Connections flow. You authenticate directly with your financial institution or through Stripe’s secure interface. FlowRate never receives or stores your bank login credentials.",
+          "p2": "With your explicit consent in the Stripe flow, we request read-only access to balances and transactions for the accounts you select. We use this data only to provide FlowRate features described in this policy.",
+          "p3": "Linked institutions are US financial accounts, as supported by Stripe Financial Connections. You can disconnect a linked account at any time from the Accounts page in FlowRate, which removes the account and its imported transactions from our database and disconnects access through Stripe where applicable.",
+          "items": [
+            "We do not use Financial Connections data for credit underwriting, lending decisions, or selling leads.",
+            "We do not request payment-method or ownership permissions unless we explicitly add those features and update this policy first.",
+            "We do not share raw Financial Connections data with advertisers, data brokers, or unrelated third parties."
+          ]
+        },
+        "howWeUse": {
+          "title": "4. How we use your information",
+          "p1": "We use the information above to operate and improve FlowRate, including:",
+          "items": [
+            "Displaying account balances and transaction lists in your dashboard.",
+            "Categorizing transactions automatically and letting you review or adjust categories.",
+            "Powering budgets, spending analytics, subscription detection, and space-specific views (for example family or company burn-rate summaries).",
+            "Enforcing visibility rules you set (personal vs shared accounts within a space).",
+            "Authenticating you, securing sessions, preventing abuse, and responding to support requests.",
+            "Processing optional paid subscriptions through Stripe Billing."
+          ],
+          "p2": "We may use aggregated or de-identified statistics (that cannot reasonably identify you) to understand product usage and improve the service."
+        },
+        "analytics": {
+          "title": "5. Analytics and tracking",
+          "p1": "FlowRate’s “Analytics” features refer to spending insights calculated from your own financial data inside the app—not third-party advertising or cross-site tracking.",
+          "p2": "We do not use Google Analytics, advertising pixels, or sell behavioral profiles. Our hosting and infrastructure providers may record standard server logs (timestamps, URLs, error codes) for reliability and security.",
+          "p3": "If we introduce optional product analytics in the future, we will update this policy and describe what is collected and how to opt out where required by law."
+        },
+        "sharing": {
+          "title": "6. How we share information",
+          "p1": "We share information only in these situations:",
+          "items": [
+            "Service providers (subprocessors): companies that host, authenticate, connect banks, or verify phone numbers on our behalf, solely to provide FlowRate to you. They may not use Financial Connections data for their own independent purposes.",
+            "Within your spaces: when you mark an account or data as shared, authorized members of that space (for example guardians in a Family space) can see it according to their role.",
+            "Legal requirements: if required by law, court order, or to protect rights, safety, and security.",
+            "Business transfers: if FlowRate is involved in a merger or acquisition, data may transfer subject to this policy."
+          ],
+          "p2": "We do not share Financial Connections data with affiliates for their independent use, data brokers, or unrelated third parties that would use the data to improve their own products."
+        },
+        "subprocessors": {
+          "title": "7. Service providers (subprocessors)",
+          "p1": "We rely on the following categories of providers. Each processes data only to deliver services to FlowRate:",
+          "table": [
+            {
+              "name": "Stripe",
+              "purpose": "Financial Connections (bank linking), balance and transaction access, subscription billing",
+              "location": "United States (and regions where Stripe operates)"
+            },
+            {
+              "name": "Neon",
+              "purpose": "User authentication (Neon Auth) and PostgreSQL database hosting",
+              "location": "United States and/or European Union"
+            },
+            {
+              "name": "Vercel",
+              "purpose": "Application hosting and content delivery",
+              "location": "United States and/or European Union"
+            },
+            {
+              "name": "Twilio",
+              "purpose": "Optional phone number verification (if you add a phone number)",
+              "location": "United States"
+            }
+          ]
+        },
+        "storage": {
+          "title": "8. Where we store data",
+          "p1": "We store application data only in the United States and/or countries within the European Union, using infrastructure providers that maintain data residency in those regions.",
+          "p2": "We do not intentionally store Financial Connections or personal data in countries outside the US or EU. If you require EU-only storage, contact us and we will work with you on supported configuration options for your account."
+        },
+        "retention": {
+          "title": "9. How long we keep data",
+          "p1": "We retain your data while your account is active and as needed to provide the service.",
+          "items": [
+            "Profile and space data: until you delete your account or ask us to remove it.",
+            "Connected bank data: until you disconnect the account in FlowRate or delete your account.",
+            "Transactions and derived analytics: tied to the connected account or space; removed when you disconnect or delete.",
+            "Server logs: typically retained for a limited period for security and troubleshooting, then deleted or aggregated."
+          ]
+        },
+        "yourRights": {
+          "title": "10. Your choices and rights",
+          "p1": "Depending on where you live, you may have rights to access, correct, delete, export, or restrict processing of your personal data. FlowRate supports the following directly in the product or on request:",
+          "items": [
+            "Access and update: edit your name and phone number in Settings; view your transactions, accounts, and budgets in the dashboard.",
+            "Disconnect banks: remove a linked account from the Accounts page (deletes imported transactions for that account in FlowRate).",
+            "Shared visibility: choose Personal or Shared when connecting banks in Household, Family, or Company spaces.",
+            "Delete account: use Settings → Delete my account for your own profile.",
+            "Guardians: delete a child or teen account from Family → child card or member details (permanent erasure of their FlowRate data and login).",
+            "Export: email mathieu.lievre.pro@outlook.com to request a copy of your data in a portable format.",
+            "Marketing: we do not send third-party advertising based on Financial Connections data."
+          ],
+          "p2": "EU/UK users may also lodge a complaint with their local data protection authority. We will respond to verified requests within applicable legal timeframes."
+        },
+        "security": {
+          "title": "11. Security",
+          "p1": "We use industry-standard measures including HTTPS encryption in transit, authenticated API access, and role-based permissions within financial spaces. Bank credentials are handled by Stripe and your financial institution—not stored on FlowRate servers.",
+          "p2": "No method of transmission or storage is 100% secure. Please use a strong, unique password and notify us promptly if you suspect unauthorized access."
+        },
+        "spaces": {
+          "title": "12. Household, Family, and Company spaces",
+          "p1": "When you join or create a shared space, certain information is visible to other members according to their role (owner, guardian, teen, finance admin, etc.). Teens and children may have supervised views with limited permissions.",
+          "p2": "You are responsible for inviting only people you trust and for choosing Personal vs Shared visibility when connecting accounts."
+        },
+        "children": {
+          "title": "13. Children and teens",
+          "p1": "Family spaces may include teen or child profiles managed by a parent or guardian. We collect only what is needed for supervised money management within those spaces. Guardians control invitations and visibility.",
+          "p2": "FlowRate is not directed at children under 13 to create standalone accounts without parental involvement. If you believe we have collected data from a child improperly, contact mathieu.lievre.pro@outlook.com."
+        },
+        "cookies": {
+          "title": "14. Cookies and similar technologies",
+          "p1": "We use essential cookies and similar storage for authentication sessions, locale preferences, and security. These are required for the app to function.",
+          "p2": "We do not use advertising cookies or cross-site tracking cookies. You can clear cookies through your browser, but you may need to sign in again."
+        },
+        "international": {
+          "title": "15. International users",
+          "p1": "FlowRate may be used by people in multiple countries. If you access the service from outside the US or EU, you understand that your data may be processed in the US and/or EU as described above.",
+          "p2": "Where local law grants additional rights, we honor those rights to the extent applicable."
+        },
+        "changes": {
+          "title": "16. Changes to this policy",
+          "p1": "We may update this Privacy Policy from time to time. We will post the revised version on this page and update the “Last updated” date. Material changes may also be communicated in the app or by email where appropriate.",
+          "p2": "Continued use of FlowRate after changes take effect means you accept the updated policy."
+        }
+      }
     },
     "terms": {
       "title": "Terms of Service",
       "seoTitle": "Terms of Service — FlowRate",
-      "lastUpdated": "Last updated: June 26, 2025",
-      "p1": "By using FlowRate, you agree to these terms. FlowRate provides personal finance tracking tools including bank account sync, budgeting, and subscription monitoring.",
-      "p2": "You are responsible for maintaining the security of your account and for all activity under it. Do not use FlowRate for any unlawful purpose.",
-      "p3": "We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the updated terms.",
-      "p4": "Questions? Contact us at"
+      "lastUpdated": "Last updated: June 26, 2026",
+      "seeAlsoPrivacy": "See also: Privacy Policy",
+      "intro": "These Terms of Service (“Terms”) govern your access to and use of FlowRate. By creating an account or using the service, you agree to these Terms and our Privacy Policy.",
+      "contact": "Questions about these Terms? Contact us at",
+      "sections": {
+        "agreement": {
+          "title": "1. Agreement",
+          "p1": "These Terms form a binding agreement between you and FlowRate. If you use FlowRate on behalf of an organization, you represent that you have authority to bind that organization."
+        },
+        "service": {
+          "title": "2. The service",
+          "p1": "FlowRate provides tools to view connected account balances and transactions, categorize spending, set budgets, detect subscriptions, and collaborate in optional financial spaces (Independent, Household, Family, or Company).",
+          "p2": "Features may change over time. We may add, modify, or discontinue features with reasonable notice where practical."
+        },
+        "eligibility": {
+          "title": "3. Eligibility",
+          "p1": "You must be at least 18 years old to create a FlowRate account, unless you are a teen or child profile invited under a parent or guardian’s Family space.",
+          "p2": "You must provide accurate registration information and keep it up to date."
+        },
+        "account": {
+          "title": "4. Your account",
+          "p1": "You are responsible for safeguarding your login credentials and for all activity under your account. Notify us immediately at mathieu.lievre.pro@outlook.com if you suspect unauthorized access.",
+          "p2": "You may update profile information in Settings. Account deletion requests can be sent to mathieu.lievre.pro@outlook.com."
+        },
+        "financialData": {
+          "title": "5. Bank connections and financial data",
+          "p1": "Bank linking is provided through Stripe Financial Connections. By connecting an account, you authorize Stripe and your financial institution to share the balances and transactions you select with FlowRate for the purposes described in our Privacy Policy.",
+          "p2": "You represent that you have the right to connect each account you link. FlowRate does not verify ownership beyond what Stripe and your institution provide.",
+          "p3": "Disconnecting an account in FlowRate stops future syncs and removes that account’s data from our application database, subject to backup retention described in our Privacy Policy."
+        },
+        "spaces": {
+          "title": "6. Shared spaces and visibility",
+          "p1": "When you join a Household, Family, or Company space, you agree to respect the roles and permissions defined for that space. Information you mark as Shared may be visible to other authorized members.",
+          "p2": "You are responsible for how you configure visibility and whom you invite. FlowRate is not responsible for disputes between members about shared financial information."
+        },
+        "billing": {
+          "title": "7. Paid plans and billing",
+          "p1": "Some features may require a paid subscription processed by Stripe Billing. Prices and plan details are shown at checkout. Subscriptions renew automatically until canceled through the billing portal or by contacting support.",
+          "p2": "Refunds are handled according to the policy displayed at purchase and applicable law."
+        },
+        "acceptableUse": {
+          "title": "8. Acceptable use",
+          "p1": "You agree not to:",
+          "items": [
+            "Use FlowRate for any unlawful purpose or to violate others’ rights.",
+            "Attempt to access another user’s data without authorization.",
+            "Reverse engineer, scrape, or overload the service.",
+            "Misrepresent your identity or your authority to connect financial accounts.",
+            "Resell or redistribute Financial Connections data obtained through FlowRate."
+          ]
+        },
+        "disclaimers": {
+          "title": "9. Not financial advice",
+          "p1": "FlowRate is for informational and organizational purposes only. We do not provide financial, investment, tax, or legal advice. Categorizations, subscription detection, and analytics are automated estimates—you should verify important decisions with qualified professionals and your official bank records."
+        },
+        "liability": {
+          "title": "10. Disclaimers and limitation of liability",
+          "p1": "FlowRate is provided “as is” and “as available” without warranties of any kind, to the fullest extent permitted by law. We do not guarantee uninterrupted or error-free service, or that data synced from banks will always be complete or current.",
+          "p2": "To the maximum extent permitted by law, FlowRate and its operators will not be liable for indirect, incidental, special, consequential, or punitive damages, or for loss of profits, data, or goodwill arising from your use of the service."
+        },
+        "termination": {
+          "title": "11. Suspension and termination",
+          "p1": "We may suspend or terminate access if you violate these Terms, pose a security risk, or where required by law. You may stop using FlowRate at any time and request account deletion as described in the Privacy Policy.",
+          "p2": "Sections that by their nature should survive termination (including disclaimers and limitation of liability) will survive."
+        },
+        "changes": {
+          "title": "12. Changes to these Terms",
+          "p1": "We may update these Terms from time to time. We will post the updated version on this page and update the “Last updated” date. Continued use after changes take effect constitutes acceptance.",
+          "p2": "If you do not agree to updated Terms, you must stop using FlowRate and may request account deletion."
+        }
+      }
     }
   },
   "validation": {
-    "passwordMismatch": "Passwords do not match"
+    "passwordMismatch": "Passwords do not match",
+    "agreeToTerms": "You must agree to the Terms of Service and Privacy Policy"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -884,7 +1125,12 @@
     "server": "Server error. Please try again later.",
     "unavailable": "Service temporarily unavailable.",
     "codes": {
-      "INVALID_ORIGIN": "This site URL is not authorized for sign-up. Add your deployment URL (e.g. https://your-app.vercel.app) under Neon Console → Auth → Configuration → Domains."
+      "INVALID_ORIGIN": "This site URL is not authorized for sign-up. Add your deployment URL (e.g. https://your-app.vercel.app) under Neon Console → Auth → Configuration → Domains.",
+      "STRIPE_KEY_MISMATCH": "Stripe keys are mismatched — publishable and secret keys must both be test or both be live in Vercel.",
+      "STRIPE_LIVEMODE_MISMATCH": "A test-mode Stripe customer is linked to this account. Disconnect old banks or contact support after switching to live keys.",
+      "STRIPE_FC_NOT_ENABLED": "Financial Connections is not approved for live mode. Complete Stripe's Financial Connections application in your Dashboard.",
+      "STRIPE_FC_PERMISSION_DENIED": "Your Stripe Financial Connections application does not include balances and transactions permissions.",
+      "STRIPE_CONNECT_FAILED": "Could not start bank connection. Check Stripe live keys and Financial Connections settings."
     }
   }
 }

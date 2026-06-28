@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const { user, space, membership } = await requireSpaceAccess(event)
+  const { user, space, membership } = await requireSpaceAccess(event, { withChildProfile: true })
 
   if (!isChildRole(membership.role)) {
     throw createError({ statusCode: 403, message: 'Teen dashboard only' })

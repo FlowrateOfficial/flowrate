@@ -25,7 +25,7 @@ export const useSpacesStore = defineStore('spaces', () => {
   const createSchema = createSpaceSchema()
   const { api } = useApi()
 
-  const isMinor = computed(() => spaces.value.some(s => isTeenOrChild(s.role)))
+  const isMinor = computed(() => (spaces.value ?? []).some(s => isTeenOrChild(s.role)))
   const minorSpace = computed(() => spaces.value.find(s => isTeenOrChild(s.role)) ?? null)
   const isTeenView = computed(() => minorSpace.value?.role === 'TEEN')
   const isChildManaged = computed(() => minorSpace.value?.role === 'CHILD')

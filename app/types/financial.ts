@@ -55,6 +55,7 @@ export interface AnalyticsOverview {
     net: number
     savingsRate: number
     transactionCount: number
+    linkedAccountCount: number
   }
   cashFlow: Array<{ period: string, income: number, spending: number }>
   categories: Array<{ category: string, amount: number }>

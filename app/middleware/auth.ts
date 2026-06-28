@@ -34,7 +34,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const userStore = useUserStore()
 
   try {
-    await userStore.bootstrap()
+    if (!userStore.bootstrapped) {
+      await userStore.bootstrap()
+    }
   } catch {
     return navigateTo('/auth/login')
   }
@@ -46,6 +48,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
       await spacesStore.fetchSpaces()
     } catch {
       return navigateTo('/auth/login')
+    }
+  }
+
+  if (!userStore.user) {
+    try {
+      await userStore.fetchUser()
+    } catch {
+      // Session exists but profile failed — layout can retry
     }
   }
 

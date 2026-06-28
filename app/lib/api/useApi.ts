@@ -1,4 +1,5 @@
 import type { FetchOptions } from 'ofetch'
+import { buildRequestKey, dedupeRequest } from './dedupe'
 
 export type ApiMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -7,6 +8,8 @@ export interface ApiRequestOptions extends Omit<FetchOptions, 'method' | 'body'>
   body?: unknown
   /** Do not attach active-space header (global/user routes). */
   noSpace?: boolean
+  /** Skip in-flight deduplication for this request. */
+  noDedupe?: boolean
 }
 
 /**
@@ -18,17 +21,27 @@ export function useApi() {
   const spacesStore = useSpacesStore()
 
   async function api<T>(url: string, options: ApiRequestOptions = {}): Promise<T> {
-    const { noSpace, method, body, headers, ...rest } = options
+    const { noSpace, noDedupe, method, body, query, headers, ...rest } = options
+    const verb = method ?? 'GET'
+    const spaceId = noSpace ? null : spacesStore.activeSpace?.id
 
-    return http<T>(url, {
-      method: method ?? 'GET',
+    const run = () => http<T>(url, {
+      method: verb,
       body: body as BodyInit | Record<string, unknown> | null | undefined,
+      query,
       ...rest,
       headers: {
         ...(noSpace ? {} : spacesStore.spaceHeaders()),
         ...(headers as Record<string, string> | undefined)
       }
     })
+
+    if (noDedupe || verb !== 'GET') {
+      return run() as Promise<T>
+    }
+
+    const key = buildRequestKey(verb, url, spaceId, query as Record<string, unknown> | undefined)
+    return dedupeRequest(key, run) as Promise<T>
   }
 
   return {

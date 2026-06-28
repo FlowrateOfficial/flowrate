@@ -1,14 +1,35 @@
 import type { H3Event } from 'h3'
 import type Stripe from 'stripe'
 import type { AccountType } from '~/generated/prisma'
-import { resolveHttpsBaseUrl } from './client'
+import {
+  FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
+  FINANCIAL_CONNECTIONS_PERMISSIONS,
+  FINANCIAL_CONNECTIONS_PREFETCH
+} from '#shared/stripe-financial-connections'
 import { linkStripeCustomerToUser, resolveUserIdFromStripeCustomer } from './customer'
 import type { StripeLinkContext } from './types'
 
-/** @see https://docs.stripe.com/financial-connections/fundamentals */
-const FINANCIAL_CONNECTIONS_PERMISSIONS = ['balances', 'transactions'] as const
-const FINANCIAL_CONNECTIONS_PREFETCH = ['balances', 'transactions'] as const
-const FINANCIAL_CONNECTIONS_COUNTRIES = ['US'] as const
+export {
+  FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
+  FINANCIAL_CONNECTIONS_BUSINESS_COUNTRIES,
+  FINANCIAL_CONNECTIONS_DOCS_URL,
+  FINANCIAL_CONNECTIONS_PERMISSIONS,
+  FINANCIAL_CONNECTIONS_PREFETCH
+} from '#shared/stripe-financial-connections'
+
+function pickPrimaryCurrencyAmount(
+  amounts: Record<string, number> | null | undefined
+): { currency: string, cents: number } | null {
+  if (!amounts) return null
+
+  let best: { currency: string, cents: number } | null = null
+  for (const [currency, cents] of Object.entries(amounts)) {
+    if (!best || Math.abs(cents) > Math.abs(best.cents)) {
+      best = { currency, cents }
+    }
+  }
+  return best
+}
 
 export async function createBankLinkSession(
   stripe: Stripe,
@@ -17,8 +38,12 @@ export async function createBankLinkSession(
   customerId: string,
   context: StripeLinkContext
 ) {
-  const httpsBase = resolveHttpsBaseUrl(event, appUrl)
+  void event
+  void appUrl
+  void context
 
+  // Web flow uses stripe.collectFinancialConnectionsAccounts (on-page modal).
+  // return_url is for mobile webview only and can cause live-mode session errors.
   return stripe.financialConnections.sessions.create({
     account_holder: {
       type: 'customer',
@@ -26,43 +51,65 @@ export async function createBankLinkSession(
     },
     permissions: [...FINANCIAL_CONNECTIONS_PERMISSIONS],
     prefetch: [...FINANCIAL_CONNECTIONS_PREFETCH],
-    filters: { countries: [...FINANCIAL_CONNECTIONS_COUNTRIES] },
-    ...(httpsBase
-      ? { return_url: `${httpsBase}/dashboard/accounts?visibility=${context.visibility}&spaceId=${context.spaceId}` }
-      : {})
+    filters: { countries: [...FINANCIAL_CONNECTIONS_BANK_COUNTRIES] }
   })
 }
 
-export function mapFinancialConnectionSubcategory(subcategory: string | null | undefined): AccountType {
-  switch (subcategory) {
+export function mapFinancialConnectionSubcategory(
+  account: Pick<Stripe.FinancialConnections.Account, 'category' | 'subcategory'>
+): AccountType {
+  if (account.category === 'credit') return 'CREDIT'
+  if (account.category === 'investment') return 'INVESTMENT'
+
+  switch (account.subcategory) {
     case 'checking':
       return 'CHECKING'
     case 'savings':
-    case 'money_market':
       return 'SAVINGS'
     case 'credit_card':
     case 'line_of_credit':
     case 'mortgage':
       return 'CREDIT'
-    case 'investment':
-    case 'brokerage':
-      return 'INVESTMENT'
     default:
       return 'CHECKING'
   }
 }
 
 export function balanceFromFinancialConnectionAccount(account: Stripe.FinancialConnections.Account): number {
+  return balanceAndCurrencyFromFinancialConnectionAccount(account).balance
+}
+
+export function balanceAndCurrencyFromFinancialConnectionAccount(
+  account: Stripe.FinancialConnections.Account
+): { balance: number, currency: string } {
   const balance = account.balance
-  if (!balance) return 0
+  if (!balance) return { balance: 0, currency: 'USD' }
 
-  const cashUsd = balance.cash?.available?.usd
-  if (cashUsd != null) return cashUsd / 100
+  const cashAvailable = pickPrimaryCurrencyAmount(balance.cash?.available)
+  if (cashAvailable) {
+    return {
+      balance: cashAvailable.cents / 100,
+      currency: cashAvailable.currency.toUpperCase()
+    }
+  }
 
-  const creditUsd = balance.credit?.used?.usd
-  if (creditUsd != null) return -(creditUsd / 100)
+  const creditUsed = pickPrimaryCurrencyAmount(balance.credit?.used)
+  if (creditUsed) {
+    return {
+      balance: -(creditUsed.cents / 100),
+      currency: creditUsed.currency.toUpperCase()
+    }
+  }
 
-  return 0
+  const current = pickPrimaryCurrencyAmount(balance.current)
+  if (current) {
+    return {
+      balance: current.cents / 100,
+      currency: current.currency.toUpperCase()
+    }
+  }
+
+  return { balance: 0, currency: 'USD' }
 }
 
 export function accountNameFromFinancialConnection(account: Stripe.FinancialConnections.Account): string {
@@ -81,21 +128,58 @@ export function assertFinancialConnectionOwnership(
   }
 }
 
+/** Subscribe to daily transaction refreshes per Stripe data-product guidance. */
+export async function ensureFinancialConnectionSubscriptions(
+  stripe: Stripe,
+  fcAccountId: string
+) {
+  try {
+    await stripe.financialConnections.accounts.subscribe(fcAccountId, {
+      features: ['transactions']
+    })
+  } catch {
+    // Already subscribed or unavailable in the current Stripe mode.
+  }
+}
+
+export async function refreshFinancialConnectionAccount(
+  stripe: Stripe,
+  fcAccountId: string
+): Promise<Stripe.FinancialConnections.Account> {
+  try {
+    return await stripe.financialConnections.accounts.refresh(fcAccountId, {
+      features: ['balance', 'transactions']
+    })
+  } catch {
+    return stripe.financialConnections.accounts.retrieve(fcAccountId)
+  }
+}
+
 export async function upsertFinancialConnectionAccount(
+  stripe: Stripe,
   fcAccount: Stripe.FinancialConnections.Account,
   context: StripeLinkContext
 ) {
-  return prisma.account.upsert({
+  if (fcAccount.status === 'disconnected') {
+    await prisma.account.deleteMany({
+      where: { stripeFcAccountId: fcAccount.id }
+    })
+    return null
+  }
+
+  const { balance, currency } = balanceAndCurrencyFromFinancialConnectionAccount(fcAccount)
+
+  const record = await prisma.account.upsert({
     where: { stripeFcAccountId: fcAccount.id },
     create: {
       userId: context.userId,
       spaceId: context.spaceId,
       name: accountNameFromFinancialConnection(fcAccount),
       institution: fcAccount.institution_name ?? undefined,
-      type: mapFinancialConnectionSubcategory(fcAccount.subcategory),
+      type: mapFinancialConnectionSubcategory(fcAccount),
       visibility: context.visibility,
-      balance: balanceFromFinancialConnectionAccount(fcAccount),
-      currency: 'USD',
+      balance,
+      currency,
       stripeFcAccountId: fcAccount.id,
       lastSynced: new Date()
     },
@@ -104,12 +188,16 @@ export async function upsertFinancialConnectionAccount(
       spaceId: context.spaceId,
       name: accountNameFromFinancialConnection(fcAccount),
       institution: fcAccount.institution_name ?? undefined,
-      type: mapFinancialConnectionSubcategory(fcAccount.subcategory),
+      type: mapFinancialConnectionSubcategory(fcAccount),
       visibility: context.visibility,
-      balance: balanceFromFinancialConnectionAccount(fcAccount),
+      balance,
+      currency,
       lastSynced: new Date()
     }
   })
+
+  await ensureFinancialConnectionSubscriptions(stripe, fcAccount.id)
+  return record
 }
 
 export async function linkContextFromStripeCustomer(

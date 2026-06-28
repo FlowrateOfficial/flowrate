@@ -10,9 +10,14 @@ const { subscriptions, loading, monthlyTotal, activeCount } = storeToRefs(subscr
 
 const spaceId = computed(() => spacesStore.activeSpace?.id ?? '')
 
-watch(spaceId, (id) => {
-  if (id) subscriptionsStore.fetchSubscriptions(id)
-}, { immediate: true })
+await useAsyncData(
+  () => `subscriptions-${spaceId.value}`,
+  async () => {
+    await subscriptionsStore.fetchSubscriptions(spaceId.value)
+    return null
+  },
+  { watch: [spaceId] }
+)
 
 function formatMoney(amount: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)

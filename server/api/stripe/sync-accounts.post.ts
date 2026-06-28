@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   assertFinancialConnectionOwnership,
   ensureStripeCustomer,
+  refreshFinancialConnectionAccount,
   requireStripe,
   upsertFinancialConnectionAccount
 } from '../../lib/stripe'
@@ -58,13 +59,15 @@ export default defineEventHandler(async (event) => {
   const synced = []
 
   for (const accountId of accountIds) {
-    const fcAccount = await stripe.financialConnections.accounts.retrieve(accountId)
+    const fcAccount = await refreshFinancialConnectionAccount(stripe, accountId)
     assertFinancialConnectionOwnership(fcAccount, stripeCustomerId)
-    const record = await upsertFinancialConnectionAccount(fcAccount, context)
+    const record = await upsertFinancialConnectionAccount(stripe, fcAccount, context)
+    if (!record) continue
     synced.push({
       id: record.id,
       name: record.name,
-      balance: Number(record.balance)
+      balance: Number(record.balance),
+      currency: record.currency
     })
   }
 

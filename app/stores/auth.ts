@@ -7,7 +7,7 @@ export const useAuthStore = defineStore('auth', () => {
   const { signIn, signUp, requestPasswordReset } = useNeonAuth()
 
   const loginForm = reactive({ email: '', password: '' })
-  const registerForm = reactive({ name: '', email: '', password: '', confirmPassword: '' })
+  const registerForm = reactive({ name: '', email: '', password: '', confirmPassword: '', agreedToTerms: false })
   const forgotForm = reactive({ email: '' })
 
   const loading = ref(false)
@@ -41,13 +41,11 @@ export const useAuthStore = defineStore('auth', () => {
       const result = await signIn(loginForm.email, loginForm.password)
       if (result.error) {
         error.value = resolveErrorMessage(result.error, t, 'auth.login.errorInvalid')
-        return false
+        return
       }
       await navigateTo('/dashboard')
-      return true
     } catch (e) {
       error.value = resolveErrorMessage(e, t, 'auth.login.errorGeneric')
-      return false
     } finally {
       loading.value = false
     }
@@ -60,20 +58,18 @@ export const useAuthStore = defineStore('auth', () => {
       const result = await signUp(registerForm.email, registerForm.password, registerForm.name)
       if (result.error) {
         error.value = resolveErrorMessage(result.error, t, 'auth.register.errorGeneric')
-        return false
+        return
       }
 
       if (route.query.plan === 'pro') {
         const billing = useBillingStore()
         await billing.startCheckout('pro')
-        return true
+        return
       }
 
       await navigateTo('/dashboard/onboarding')
-      return true
     } catch (e) {
       error.value = resolveErrorMessage(e, t, 'auth.register.errorGeneric')
-      return false
     } finally {
       loading.value = false
     }
@@ -86,13 +82,11 @@ export const useAuthStore = defineStore('auth', () => {
       const result = await requestPasswordReset(forgotForm.email)
       if (result.error) {
         error.value = resolveErrorMessage(result.error, t, 'auth.forgot.errorGeneric')
-        return false
+        return
       }
       forgotSent.value = true
-      return true
     } catch (e) {
       error.value = resolveErrorMessage(e, t, 'auth.forgot.errorGeneric')
-      return false
     } finally {
       loading.value = false
     }

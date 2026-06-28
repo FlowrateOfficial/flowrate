@@ -338,6 +338,7 @@ model Transaction {
 
   @@index([userId])
   @@index([spaceId])
+  @@index([spaceId, date])
   @@index([accountId])
   @@index([date])
   @@map("transactions")

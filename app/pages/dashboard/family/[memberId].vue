@@ -5,6 +5,7 @@ definePageMeta({ layout: 'dashboard', title: 'Child', middleware: 'auth' })
 
 const { t } = useAppI18n()
 const route = useRoute()
+const { setBreadcrumbTail } = useBreadcrumbs()
 const familyStore = useFamilyStore()
 const spacesStore = useSpacesStore()
 const { memberTab, saving } = storeToRefs(familyStore)
@@ -22,6 +23,12 @@ const { data, pending, refresh } = await useAsyncData(
 
 watch(data, (val) => familyStore.loadAllowanceFromMember(val), { immediate: true })
 
+watch(
+  () => data.value?.member.name,
+  (name) => setBreadcrumbTail(name ?? null),
+  { immediate: true }
+)
+
 const summaryItems = computed(() => {
   if (!data.value) return []
   return [
@@ -33,6 +40,27 @@ const summaryItems = computed(() => {
 })
 
 const columns = computed(() => familyStore.transactionColumns())
+
+const isChildMember = computed(() => {
+  const role = data.value?.member.role
+  return role === 'CHILD' || role === 'TEEN'
+})
+
+const deleteChildModalOpen = ref(false)
+const isDeletingChild = ref(false)
+
+async function confirmDeleteChild() {
+  if (!spaceId.value) return
+  isDeletingChild.value = true
+  try {
+    await familyStore.deleteChildAccount(spaceId.value, memberId, async () => {
+      await navigateTo('/dashboard/family')
+    })
+    deleteChildModalOpen.value = false
+  } finally {
+    isDeletingChild.value = false
+  }
+}
 </script>
 
 <template>
@@ -168,5 +196,42 @@ const columns = computed(() => familyStore.transactionColumns())
         </div>
       </UCard>
     </div>
+
+    <UCard v-if="isChildMember" :ui="{ body: 'p-6 sm:p-8' }">
+      <h3 class="font-display text-lg mb-2 text-error">{{ t('dashboard.settings.dangerZone') }}</h3>
+      <p class="text-sm text-muted mb-4">{{ t('dashboard.family.deleteChildDescription') }}</p>
+      <UButton
+        :label="t('dashboard.family.deleteChildAccount')"
+        color="error"
+        variant="outline"
+        icon="i-lucide-trash-2"
+        @click="deleteChildModalOpen = true"
+      />
+    </UCard>
+
+    <UModal
+      v-model:open="deleteChildModalOpen"
+      :title="t('dashboard.family.deleteChildTitle', { name: data?.member.name ?? t('dashboard.family.childFallback') })"
+    >
+      <template #body>
+        <p class="text-sm text-muted">{{ t('dashboard.family.deleteChildDescription') }}</p>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton
+            :label="t('dashboard.settings.deleteCancel')"
+            color="neutral"
+            variant="outline"
+            @click="deleteChildModalOpen = false"
+          />
+          <UButton
+            :label="t('dashboard.family.deleteChildConfirm')"
+            color="error"
+            :loading="isDeletingChild"
+            @click="confirmDeleteChild"
+          />
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

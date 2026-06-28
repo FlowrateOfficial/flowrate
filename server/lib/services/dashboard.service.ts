@@ -2,8 +2,7 @@ import type { SpaceContext } from '../domain/context'
 import { accountWhereForSpace } from '../repositories/account.repository'
 import {
   pctChange,
-  transactionPeriodStats,
-  transactionsInRange
+  spendingIncomeInRange
 } from '../repositories/transaction.repository'
 
 export async function getDashboardStats(ctx: SpaceContext) {
@@ -14,10 +13,13 @@ export async function getDashboardStats(ctx: SpaceContext) {
 
   const accountFilter = accountWhereForSpace(ctx, 'all')
 
-  const [accounts, currentMonthTx, lastMonthTx, memberCount, subscriptionAlerts] = await Promise.all([
-    prisma.account.findMany({ where: accountFilter }),
-    transactionsInRange(ctx.spaceId, startOfMonth),
-    transactionsInRange(ctx.spaceId, startOfLastMonth, endOfLastMonth),
+  const [accounts, current, last, memberCount, subscriptionAlerts] = await Promise.all([
+    prisma.account.findMany({
+      where: accountFilter,
+      select: { balance: true, visibility: true, userId: true }
+    }),
+    spendingIncomeInRange(ctx.spaceId, startOfMonth),
+    spendingIncomeInRange(ctx.spaceId, startOfLastMonth, endOfLastMonth),
     prisma.spaceMember.count({ where: { spaceId: ctx.spaceId, status: 'ACTIVE' } }),
     prisma.detectedSubscription.count({
       where: {
@@ -27,9 +29,6 @@ export async function getDashboardStats(ctx: SpaceContext) {
       }
     })
   ])
-
-  const current = transactionPeriodStats(currentMonthTx)
-  const last = transactionPeriodStats(lastMonthTx)
 
   const totalBalance = accounts.reduce((sum, acc) => sum + Number(acc.balance), 0)
   const sharedBalance = accounts

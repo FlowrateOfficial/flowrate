@@ -137,7 +137,7 @@ export const useLandingStore = defineStore('landing', () => {
         t('landing.pricing.enterprise.features.support')
       ],
       cta: t('landing.pricing.enterprise.cta'),
-      to: 'mailto:hello@flowrate.app',
+      to: 'mailto:mathieu.lievre.pro@outlook.com',
       highlight: false
     }
     ]

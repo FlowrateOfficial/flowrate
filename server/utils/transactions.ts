@@ -38,6 +38,7 @@ export function mapStripeFcTransaction(
   const merchant = extractMerchant(description)
   return {
     amount: Number(tx.amount) / 100,
+    currency: tx.currency.toUpperCase(),
     description,
     merchant,
     category: categorizeTransaction(description, merchant),

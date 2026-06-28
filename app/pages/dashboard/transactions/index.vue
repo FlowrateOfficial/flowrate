@@ -6,8 +6,6 @@ definePageMeta({ layout: 'dashboard', title: 'Transactions', middleware: 'auth' 
 const { t } = useAppI18n()
 const transactionsStore = useTransactionsStore()
 const syncStore = useSyncStore()
-const accountsStore = useAccountsStore()
-const { accounts } = storeToRefs(accountsStore)
 const {
   search,
   dateFrom,
@@ -21,11 +19,22 @@ const {
 } = storeToRefs(transactionsStore)
 const { isSyncing } = storeToRefs(syncStore)
 
-const hasConnectedAccounts = computed(() => accounts.value.length > 0)
+const hasConnectedAccounts = computed(() => accountsStore.accounts.length > 0)
 
-onMounted(() => {
-  if (!accounts.value.length) accountsStore.fetchAccounts()
-})
+const spaceId = computed(() => useSpacesStore().activeSpace?.id)
+const accountsStore = useAccountsStore()
+
+await useAsyncData(
+  () => `transactions-${spaceId.value}`,
+  async () => {
+    await Promise.all([
+      transactionsStore.fetchTransactions(),
+      accountsStore.accounts.length ? Promise.resolve() : accountsStore.fetchAccounts()
+    ])
+    return null
+  },
+  { watch: [spaceId] }
+)
 
 async function syncAndRefresh() {
   await syncStore.syncTransactions(() => transactionsStore.fetchTransactions())
@@ -133,7 +142,7 @@ useSeoMeta({ title: () => `${t('dashboard.transactions.title')} — ${t('common.
           </div>
         </template>
       </UTable>
-      <div v-if="data?.total" class="flex justify-center p-4 border-t border-default">
+      <div v-if="data && data.pages > 1" class="flex justify-center p-4 border-t border-default">
         <UPagination v-model:page="page" :total="data.total" :items-per-page="pageSize" />
       </div>
     </UCard>

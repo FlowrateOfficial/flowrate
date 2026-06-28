@@ -19,7 +19,7 @@ export function mapAccountDto(
     currency: acc.currency,
     lastSynced: acc.lastSynced?.toISOString() ?? null,
     isMine: acc.userId === viewerId,
-    ownerName: acc.user.name ?? acc.user.email
+    ownerName: acc.user.name
   }
 }
 

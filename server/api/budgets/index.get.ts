@@ -19,18 +19,40 @@ export default defineEventHandler(async (event) => {
     orderBy: { createdAt: 'asc' }
   })
 
-  const results = await Promise.all(budgets.map(async (b) => {
+  if (!budgets.length || !visibleAccountIds.length) {
+    return budgets.map(b => ({
+      id: b.id,
+      name: b.name,
+      category: b.category,
+      amount: Number(b.amount),
+      currency: 'USD',
+      spent: 0,
+      period: b.period,
+      isShared: b.isShared,
+      isMine: b.userId === user.id
+    }))
+  }
+
+  const earliestFrom = budgets.reduce((min, b) => {
     const from = periodStart(b.period, now)
-    const agg = await prisma.transaction.aggregate({
-      where: {
-        spaceId: space.id,
-        accountId: { in: visibleAccountIds },
-        category: b.category,
-        date: { gte: from },
-        amount: { lt: 0 }
-      },
-      _sum: { amount: true }
-    })
+    return from < min ? from : min
+  }, periodStart(budgets[0]!.period, now))
+
+  const spendingTxs = await prisma.transaction.findMany({
+    where: {
+      spaceId: space.id,
+      accountId: { in: visibleAccountIds },
+      date: { gte: earliestFrom },
+      amount: { lt: 0 }
+    },
+    select: { amount: true, category: true, date: true }
+  })
+
+  return budgets.map((b) => {
+    const from = periodStart(b.period, now)
+    const spent = spendingTxs
+      .filter(tx => tx.category === b.category && tx.date >= from)
+      .reduce((sum, tx) => sum + Math.abs(Number(tx.amount)), 0)
 
     return {
       id: b.id,
@@ -38,12 +60,10 @@ export default defineEventHandler(async (event) => {
       category: b.category,
       amount: Number(b.amount),
       currency: 'USD',
-      spent: Math.abs(Number(agg._sum.amount ?? 0)),
+      spent,
       period: b.period,
       isShared: b.isShared,
       isMine: b.userId === user.id
     }
-  }))
-
-  return results
+  })
 })

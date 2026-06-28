@@ -67,7 +67,7 @@ function getCookieConfig(event: H3Event): CookieConfig {
   }
 }
 
-function extractNeonAuthCookies(cookieHeader: string): string {
+export function extractNeonAuthCookies(cookieHeader: string): string {
   if (!cookieHeader) return ''
   const parsed = parseCookies(cookieHeader)
   const parts: string[] = []
@@ -130,6 +130,12 @@ function parseSetCookies(setCookieHeader: string) {
   return cookies
 }
 
+function toDate(value: unknown): Date {
+  if (value instanceof Date) return value
+  if (typeof value === 'string' || typeof value === 'number') return new Date(value)
+  return new Date(0)
+}
+
 function parseSessionData(json: unknown): SessionData {
   if (!json || typeof json !== 'object') {
     return { session: null, user: null }
@@ -138,19 +144,19 @@ function parseSessionData(json: unknown): SessionData {
   if (!data.session || !data.user) {
     return { session: null, user: null }
   }
-  const session = data.session as Record<string, string>
-  const user = data.user as Record<string, string>
+  const session = data.session as Record<string, unknown>
+  const user = data.user as Record<string, unknown>
   return {
     session: {
       ...(data.session as object),
-      expiresAt: new Date(session.expiresAt),
-      createdAt: new Date(session.createdAt),
-      updatedAt: new Date(session.updatedAt)
+      expiresAt: toDate(session.expiresAt),
+      createdAt: toDate(session.createdAt),
+      updatedAt: toDate(session.updatedAt)
     } as SessionData['session'],
     user: {
       ...(data.user as object),
-      createdAt: new Date(user.createdAt),
-      updatedAt: new Date(user.updatedAt)
+      createdAt: toDate(user.createdAt),
+      updatedAt: toDate(user.updatedAt)
     } as SessionData['user']
   }
 }
@@ -177,7 +183,11 @@ async function signSessionDataCookie(
 }
 
 async function fetchSessionWithCookie(sessionTokenCookie: string, baseUrl: string) {
-  const [name, ...valueParts] = sessionTokenCookie.split(';')[0].trim().split('=')
+  const cookiePair = sessionTokenCookie.split(';')[0]?.trim()
+  if (!cookiePair) {
+    throw new Error('Invalid session token cookie')
+  }
+  const [name, ...valueParts] = cookiePair.split('=')
   const response = await fetch(`${baseUrl}/get-session`, {
     headers: { Cookie: `${name}=${valueParts.join('=')}` }
   })
@@ -232,7 +242,9 @@ async function mintSessionDataFromResponse(
       maxAge: 0
     })
   }
-  return mintSessionDataFromToken(sessionTokenCookie.split(';')[0], baseUrl, cookieConfig)
+  const sessionTokenPair = sessionTokenCookie.split(';')[0]
+  if (!sessionTokenPair) return null
+  return mintSessionDataFromToken(sessionTokenPair, baseUrl, cookieConfig)
 }
 
 function appendSetCookies(event: H3Event, response: Response, cookieConfig: CookieConfig) {

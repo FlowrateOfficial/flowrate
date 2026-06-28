@@ -220,9 +220,9 @@ export const useAccountsStore = defineStore('accounts', () => {
 
   watch(visibilityFilter, () => fetchAccounts())
 
-  watch(() => spacesStore.activeSpace?.id, (id) => {
-    if (id) fetchAccounts()
-  }, { immediate: true })
+  watch(() => spacesStore.activeSpace?.id, () => {
+    visibilityFilter.value = 'all'
+  })
 
   return {
     accounts,

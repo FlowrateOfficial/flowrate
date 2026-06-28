@@ -5,8 +5,6 @@ definePageMeta({ layout: 'dashboard', title: 'Analytics', middleware: 'auth' })
 
 const { t } = useAppI18n()
 const analyticsStore = useAnalyticsStore()
-const accountsStore = useAccountsStore()
-const { accounts } = storeToRefs(accountsStore)
 const {
   range,
   data,
@@ -25,11 +23,17 @@ const {
   isSyncing
 } = storeToRefs(analyticsStore)
 
-const hasConnectedAccounts = computed(() => accounts.value.length > 0)
+const hasConnectedAccounts = computed(() => (data.value?.summary.linkedAccountCount ?? 0) > 0)
 
-onMounted(() => {
-  if (!accounts.value.length) accountsStore.fetchAccounts()
-})
+const spaceId = computed(() => useSpacesStore().activeSpace?.id)
+await useAsyncData(
+  () => `analytics-${spaceId.value}-${range.value}`,
+  async () => {
+    await analyticsStore.fetchOverview()
+    return null
+  },
+  { watch: [spaceId, range] }
+)
 
 useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.appName')}` })
 </script>

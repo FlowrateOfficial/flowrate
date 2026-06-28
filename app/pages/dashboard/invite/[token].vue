@@ -5,6 +5,7 @@ definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
 const { t } = useAppI18n()
+const { setBreadcrumbTail } = useBreadcrumbs()
 const { getSession } = useNeonAuth()
 const invitesStore = useInvitesStore()
 const token = route.params.token as string
@@ -32,6 +33,12 @@ const displayName = ref('')
 const formError = ref('')
 
 await useAsyncData(() => `invite-${token}`, () => invitesStore.fetchInvite(token))
+
+watch(
+  () => invite.value?.spaceName,
+  (name) => setBreadcrumbTail(name ?? null),
+  { immediate: true }
+)
 
 watch(invite, (val) => {
   if (val?.displayName) displayName.value = val.displayName

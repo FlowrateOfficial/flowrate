@@ -14,7 +14,10 @@ export function createRegisterSchema(t: (key: string) => string) {
     name: z.string().min(2),
     email: z.email(),
     password: z.string().min(8),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    agreedToTerms: z.boolean().refine(val => val === true, {
+      message: t('validation.agreeToTerms')
+    })
   }).superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
       ctx.addIssue({

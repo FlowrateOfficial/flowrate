@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
+definePageMeta({ middleware: 'guest' })
+
 const landing = useLandingStore()
 const billingStore = useBillingStore()
 const {

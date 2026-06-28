@@ -6,6 +6,7 @@ export const apiRoutes = {
   user: {
     bootstrap: '/api/user/bootstrap',
     profile: '/api/user/profile',
+    account: '/api/user/account',
     phoneVerify: '/api/user/phone/verify',
     phoneResend: '/api/user/phone/resend'
   },

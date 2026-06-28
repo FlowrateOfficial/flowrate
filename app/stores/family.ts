@@ -260,6 +260,14 @@ export const useFamilyStore = defineStore('family', () => {
     await refresh()
   }
 
+  async function deleteChildAccount(spaceId: string, memberId: string, refresh: () => Promise<void>) {
+    await api(apiRoutes.spaces.member(spaceId, memberId), {
+      method: 'DELETE',
+      body: { purge: true }
+    })
+    await refresh()
+  }
+
   function loadAllowanceFromMember(data: MemberFinancial | null) {
     const profile = data?.member.childProfile
     if (!profile) return
@@ -300,6 +308,7 @@ export const useFamilyStore = defineStore('family', () => {
     fetchSplits,
     createSplit,
     removeMember,
+    deleteChildAccount,
     loadAllowanceFromMember
   }
 })

@@ -115,3 +115,20 @@ export function netWorthHistory(
 
   return points
 }
+
+export function topMerchantsFromTransactions(
+  txs: Array<{ amount: number, merchant?: string | null, description?: string | null }>
+) {
+  const totals = new Map<string, number>()
+
+  for (const tx of txs) {
+    if (tx.amount >= 0) continue
+    const key = tx.merchant ?? tx.description ?? 'Unknown'
+    totals.set(key, (totals.get(key) ?? 0) + Math.abs(tx.amount))
+  }
+
+  return [...totals.entries()]
+    .map(([name, amount]) => ({ name, amount: Math.round(amount * 100) / 100 }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 8)
+}

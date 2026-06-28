@@ -2,8 +2,10 @@ import type Stripe from 'stripe'
 import {
   findUserIdByStripeCustomerId,
   getStripeCustomerId,
-  setStripeCustomerId
+  setStripeCustomerId,
+  clearStripeCustomerId
 } from '../billing/repository'
+import { isLivemodeMismatch } from './errors'
 import type { StripeUserRef } from './types'
 
 /** Persist Stripe customer ↔ app user link (DB + Stripe metadata). */
@@ -48,7 +50,10 @@ export async function findAndLinkStripeCustomer(
       await stripe.customers.retrieve(storedId)
       await linkStripeCustomerToUser(stripe, user.id, storedId, metadata)
       return storedId
-    } catch {
+    } catch (error) {
+      if (isLivemodeMismatch(error)) {
+        await clearStripeCustomerId(user.id)
+      }
       // Stored customer invalid (e.g. test vs live) — search below.
     }
   }

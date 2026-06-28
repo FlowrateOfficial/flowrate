@@ -62,11 +62,10 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     await syncStore.syncTransactions(fetchOverview)
   }
 
-  watch(range, () => fetchOverview())
-
-  watch(() => spacesStore.activeSpace?.id, (id) => {
-    if (id) fetchOverview()
-  }, { immediate: true })
+  watch(() => spacesStore.activeSpace?.id, () => {
+    data.value = null
+    fetchOverview()
+  })
 
   return {
     range,

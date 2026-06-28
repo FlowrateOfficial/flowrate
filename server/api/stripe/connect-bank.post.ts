@@ -2,7 +2,10 @@ import { z } from 'zod'
 import {
   createBankLinkSession,
   ensureStripeCustomer,
-  requireStripe
+  FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
+  FINANCIAL_CONNECTIONS_DOCS_URL,
+  requireStripe,
+  throwStripeApiError
 } from '../../lib/stripe'
 
 const bodySchema = z.object({
@@ -22,26 +25,39 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
   const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
-  const { config, stripe } = requireStripe(event)
 
-  const context = {
-    userId: user.id,
-    spaceId: space.id,
-    visibility
+  try {
+    const { config, stripe } = requireStripe(event)
+
+    const context = {
+      userId: user.id,
+      spaceId: space.id,
+      visibility
+    }
+
+    const customerId = await ensureStripeCustomer(stripe, user, {
+      userId: user.id,
+      spaceId: space.id,
+      visibility
+    })
+    const session = await createBankLinkSession(
+      stripe,
+      event,
+      String(config.public.appUrl ?? ''),
+      customerId,
+      context
+    )
+
+    return {
+      clientSecret: session.client_secret,
+      visibility,
+      bankCountries: [...FINANCIAL_CONNECTIONS_BANK_COUNTRIES],
+      docsUrl: FINANCIAL_CONNECTIONS_DOCS_URL
+    }
+  } catch (error) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error
+    }
+    throwStripeApiError(error)
   }
-
-  const customerId = await ensureStripeCustomer(stripe, user, {
-    userId: user.id,
-    spaceId: space.id,
-    visibility
-  })
-  const session = await createBankLinkSession(
-    stripe,
-    event,
-    String(config.public.appUrl ?? ''),
-    customerId,
-    context
-  )
-
-  return { clientSecret: session.client_secret, visibility }
 })

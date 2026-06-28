@@ -1,5 +1,31 @@
 import type { Prisma } from '~/generated/prisma'
 
+export async function spendingIncomeInRange(
+  spaceId: string,
+  from: Date,
+  to?: Date
+) {
+  const dateFilter: Prisma.DateTimeFilter = { gte: from }
+  if (to) dateFilter.lte = to
+
+  const baseWhere = { spaceId, date: dateFilter }
+
+  const [spendingAgg, incomeAgg] = await Promise.all([
+    prisma.transaction.aggregate({
+      where: { ...baseWhere, amount: { lt: 0 } },
+      _sum: { amount: true }
+    }),
+    prisma.transaction.aggregate({
+      where: { ...baseWhere, amount: { gt: 0 } },
+      _sum: { amount: true }
+    })
+  ])
+
+  const spending = Math.abs(Number(spendingAgg._sum.amount ?? 0))
+  const income = Number(incomeAgg._sum.amount ?? 0)
+  return { spending, income, net: income - spending }
+}
+
 export async function transactionsInRange(
   spaceId: string,
   from: Date,

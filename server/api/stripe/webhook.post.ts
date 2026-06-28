@@ -17,7 +17,7 @@ async function handleFinancialConnectionAccount(stripe: Stripe, fcAccount: Strip
   const context = await linkContextFromStripeCustomer(stripe, customerId)
   if (!context) return
 
-  await upsertFinancialConnectionAccount(fcAccount, context)
+  await upsertFinancialConnectionAccount(stripe, fcAccount, context)
 }
 
 export default defineEventHandler(async (event) => {

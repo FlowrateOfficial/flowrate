@@ -40,6 +40,16 @@ const accountsDescription = computed(() => {
     : t('dashboard.accounts.subtitle')
 })
 
+const spaceId = computed(() => spacesStore.activeSpace?.id)
+await useAsyncData(
+  () => `accounts-${spaceId.value}`,
+  async () => {
+    await accountsStore.fetchAccounts()
+    return null
+  },
+  { watch: [spaceId] }
+)
+
 useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appName')}` })
 </script>
 
@@ -84,6 +94,14 @@ useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appN
       color="warning"
       variant="subtle"
       icon="i-lucide-flask-conical"
+    />
+
+    <UAlert
+      :title="t('dashboard.accounts.stripeNote')"
+      :description="t('dashboard.accounts.bankRegionNote')"
+      color="neutral"
+      variant="subtle"
+      icon="i-lucide-landmark"
     />
 
     <UAlert
@@ -157,18 +175,16 @@ useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appN
     </div>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-      <template v-if="pending">
-        <UCard v-for="i in 3" :key="i" class="animate-pulse">
-          <div class="space-y-3 p-1">
-            <div class="h-4 bg-muted/50 rounded w-3/4" />
-            <div class="h-8 bg-muted/30 rounded w-1/2" />
-          </div>
-        </UCard>
-      </template>
+      <UCard v-if="pending" v-for="i in 3" :key="`skeleton-${i}`" class="animate-pulse">
+        <div class="space-y-3 p-1">
+          <div class="h-4 bg-muted/50 rounded w-3/4" />
+          <div class="h-8 bg-muted/30 rounded w-1/2" />
+        </div>
+      </UCard>
 
       <DashboardAccountCard
+        v-if="!pending"
         v-for="account in accounts"
-        v-else
         :key="account.id"
         :account="account"
       />

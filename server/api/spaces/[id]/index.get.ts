@@ -21,13 +21,54 @@ export default defineEventHandler(async (event) => {
       select: { id: true, name: true, balance: true, visibility: true, userId: true, type: true }
     })
 
+    const childMembers = members.filter(
+      m => (m.role === 'CHILD' || m.role === 'TEEN') && m.userId
+    )
+    const childUserIds = childMembers.map(m => m.userId!)
+
+    const childSummaries = new Map<string, { balance: number, spending30d: number, accountCount: number }>()
+
+    if (childUserIds.length) {
+      const since = new Date()
+      since.setDate(since.getDate() - 30)
+
+      const [childAccounts, childSpendingTxs] = await Promise.all([
+        prisma.account.findMany({
+          where: { spaceId, userId: { in: childUserIds } },
+          select: { userId: true, balance: true }
+        }),
+        prisma.transaction.findMany({
+          where: {
+            spaceId,
+            userId: { in: childUserIds },
+            date: { gte: since },
+            amount: { lt: 0 }
+          },
+          select: { userId: true, amount: true }
+        })
+      ])
+
+      for (const userId of childUserIds) {
+        const accountsForChild = childAccounts.filter(a => a.userId === userId)
+        const spending30d = childSpendingTxs
+          .filter(tx => tx.userId === userId)
+          .reduce((sum, tx) => sum + Math.abs(Number(tx.amount)), 0)
+
+        childSummaries.set(userId, {
+          balance: accountsForChild.reduce((sum, a) => sum + Number(a.balance), 0),
+          spending30d,
+          accountCount: accountsForChild.length
+        })
+      }
+    }
+
     return {
       id: space.id,
       name: space.name,
       type: space.type,
       role: membership.role,
       settings: space.settings,
-      members: await Promise.all(members.map(async (m) => {
+      members: members.map((m) => {
         const base = {
           id: m.id,
           userId: m.userId,
@@ -50,31 +91,11 @@ export default defineEventHandler(async (event) => {
                 }))
               }
             : null,
-          financialSummary: null as { balance: number, spending30d: number, accountCount: number } | null
-        }
-
-        if ((m.role === 'CHILD' || m.role === 'TEEN') && m.userId) {
-          const since = new Date()
-          since.setDate(since.getDate() - 30)
-          const [accounts, recentTxs] = await Promise.all([
-            prisma.account.findMany({
-              where: { spaceId, userId: m.userId },
-              select: { balance: true }
-            }),
-            prisma.transaction.findMany({
-              where: { spaceId, userId: m.userId, date: { gte: since }, amount: { lt: 0 } },
-              select: { amount: true }
-            })
-          ])
-          base.financialSummary = {
-            balance: accounts.reduce((s, a) => s + Number(a.balance), 0),
-            spending30d: recentTxs.reduce((s, t) => s + Math.abs(Number(t.amount)), 0),
-            accountCount: accounts.length
-          }
+          financialSummary: m.userId ? childSummaries.get(m.userId) ?? null : null
         }
 
         return base
-      })),
+      }),
       accounts: accounts.map(a => ({
         id: a.id,
         name: a.name,

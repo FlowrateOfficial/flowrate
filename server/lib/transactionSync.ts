@@ -1,4 +1,5 @@
 import type Stripe from 'stripe'
+import { ensureFinancialConnectionSubscriptions } from './stripe'
 import { detectSubscriptionsFromTransactions } from '../utils/subscriptions'
 import { mapStripeFcTransaction } from '../utils/transactions'
 
@@ -15,11 +16,13 @@ export async function syncAccountTransactions(
 
   try {
     await stripe.financialConnections.accounts.refresh(account.stripeFcAccountId, {
-      features: ['transactions', 'balance']
+      features: ['balance', 'transactions']
     })
   } catch {
     // Refresh may fail in test mode — still attempt listing
   }
+
+  await ensureFinancialConnectionSubscriptions(stripe, account.stripeFcAccountId)
 
   let imported = 0
   let startingAfter: string | undefined

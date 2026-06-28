@@ -24,6 +24,13 @@ export async function setStripeCustomerId(userId: string, stripeCustomerId: stri
   })
 }
 
+export async function clearStripeCustomerId(userId: string) {
+  await prisma.userBilling.updateMany({
+    where: { userId },
+    data: { stripeCustomerId: null }
+  })
+}
+
 export async function findUserIdByStripeCustomerId(stripeCustomerId: string): Promise<string | null> {
   const billing = await prisma.userBilling.findUnique({
     where: { stripeCustomerId },

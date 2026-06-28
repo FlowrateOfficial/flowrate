@@ -98,11 +98,28 @@ export async function migrateUserDataToSpace(userId: string, spaceId: string) {
   ])
 }
 
-export async function getUserMembership(userId: string, spaceId: string) {
+export async function getUserMembership(
+  userId: string,
+  spaceId: string,
+  options?: { withChildProfile?: boolean }
+) {
   return prisma.spaceMember.findFirst({
     where: { spaceId, userId, status: 'ACTIVE' },
-    include: { space: true, childProfile: { include: { jars: true } } }
+    include: {
+      space: true,
+      ...(options?.withChildProfile
+        ? { childProfile: { include: { jars: true } } }
+        : {})
+    }
   })
+}
+
+async function hasActiveMembership(userId: string, spaceId: string) {
+  const row = await prisma.spaceMember.findFirst({
+    where: { spaceId, userId, status: 'ACTIVE' },
+    select: { id: true }
+  })
+  return Boolean(row)
 }
 
 export async function resolveActiveSpaceId(event: Parameters<typeof getRequestHeaders>[0], userId: string) {
@@ -115,18 +132,16 @@ export async function resolveActiveSpaceId(event: Parameters<typeof getRequestHe
   }
 
   const cookieSpaceId = getCookie(event, ACTIVE_SPACE_COOKIE)
-  if (cookieSpaceId) {
-    const membership = await getUserMembership(userId, cookieSpaceId)
-    if (membership) return cookieSpaceId
+  if (cookieSpaceId && await hasActiveMembership(userId, cookieSpaceId)) {
+    return cookieSpaceId
   }
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { activeSpaceId: true }
   })
-  if (user?.activeSpaceId) {
-    const membership = await getUserMembership(userId, user.activeSpaceId)
-    if (membership) return user.activeSpaceId
+  if (user?.activeSpaceId && await hasActiveMembership(userId, user.activeSpaceId)) {
+    return user.activeSpaceId
   }
 
   const firstMembership = await prisma.spaceMember.findFirst({
@@ -138,10 +153,17 @@ export async function resolveActiveSpaceId(event: Parameters<typeof getRequestHe
 
 export async function requireSpaceAccess(
   event: Parameters<typeof getRequestHeaders>[0],
-  options?: { spaceId?: string, minRoles?: SpaceRole[] }
+  options?: { spaceId?: string, minRoles?: SpaceRole[], withChildProfile?: boolean }
 ) {
-  const user = await requireNeonAuth(event)
-  await ensureDefaultIndependentSpace(user.id, user.name ?? null)
+  if (event.context.flowrateSpaceAccess && !options?.withChildProfile) {
+    const cached = event.context.flowrateSpaceAccess
+    if (options?.minRoles?.length && !options.minRoles.includes(cached.membership.role)) {
+      throw createError({ statusCode: 403, message: 'Insufficient permissions' })
+    }
+    return cached
+  }
+
+  const user = await requireSessionUser(event)
 
   const querySpaceId = getQuery(event).spaceId as string | undefined
   const headerSpaceId = getRequestHeader(event, 'x-flowrate-space') ?? undefined
@@ -151,7 +173,9 @@ export async function requireSpaceAccess(
     throw createError({ statusCode: 400, message: 'No active financial space' })
   }
 
-  const membership = await getUserMembership(user.id, spaceId)
+  const membership = await getUserMembership(user.id, spaceId, {
+    withChildProfile: options?.withChildProfile
+  })
   if (!membership) {
     throw createError({ statusCode: 403, message: 'You do not have access to this space' })
   }
@@ -160,7 +184,11 @@ export async function requireSpaceAccess(
     throw createError({ statusCode: 403, message: 'Insufficient permissions' })
   }
 
-  return { user, space: membership.space, membership }
+  const access = { user, space: membership.space, membership }
+  if (!options?.withChildProfile) {
+    event.context.flowrateSpaceAccess = access
+  }
+  return access
 }
 
 export function accountVisibilityFilter(userId: string, role: SpaceRole) {

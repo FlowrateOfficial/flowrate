@@ -47,7 +47,18 @@ export async function listAccounts(ctx: SpaceContext, filter: AccountListFilter 
   return prisma.account.findMany({
     where: accountWhereForSpace(ctx, filter),
     orderBy: { createdAt: 'asc' },
-    include: { user: { select: { id: true, name: true, email: true } } }
+    select: {
+      id: true,
+      name: true,
+      institution: true,
+      type: true,
+      visibility: true,
+      balance: true,
+      currency: true,
+      lastSynced: true,
+      userId: true,
+      user: { select: { id: true, name: true } }
+    }
   })
 }
 
