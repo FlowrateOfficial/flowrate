@@ -5,6 +5,7 @@ definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
 const { t } = useAppI18n()
+const appToast = useAppToast()
 const { setBreadcrumbTail } = useBreadcrumbs()
 const { getSession } = useNeonAuth()
 const invitesStore = useInvitesStore()
@@ -29,8 +30,7 @@ const verificationCode = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const optionalEmail = ref('')
-const displayName = ref('')
-const formError = ref('')
+const name = ref('')
 
 await useAsyncData(() => `invite-${token}`, () => invitesStore.fetchInvite(token))
 
@@ -41,7 +41,7 @@ watch(
 )
 
 watch(invite, (val) => {
-  if (val?.displayName) displayName.value = val.displayName
+  if (val?.name) name.value = val.name
   if (val?.email) optionalEmail.value = val.email
 }, { immediate: true })
 
@@ -56,149 +56,150 @@ const showEmailAccept = computed(() =>
 )
 
 async function verifyPhone() {
-  formError.value = ''
   if (!verificationCode.value.trim()) return
   try {
     await invitesStore.verifyPhone(token, verificationCode.value.trim())
+    appToast.success(t('dashboard.settings.phoneVerified'))
   } catch {
-    formError.value = t('dashboard.invite.codeInvalid')
+    appToast.errorMessage(t('dashboard.invite.codeInvalid'))
   }
 }
 
 async function resendCode() {
-  formError.value = ''
   try {
     await invitesStore.resendPhoneCode(token)
+    appToast.success(t('dashboard.settings.phoneCodeResent'))
   } catch {
-    formError.value = t('dashboard.invite.resendFailed')
+    appToast.errorMessage(t('dashboard.invite.resendFailed'))
   }
 }
 
 async function completeRegistration() {
-  formError.value = ''
   if (password.value.length < 8) {
-    formError.value = t('dashboard.invite.passwordTooShort')
+    appToast.errorMessage(t('dashboard.invite.passwordTooShort'))
     return
   }
   if (password.value !== confirmPassword.value) {
-    formError.value = t('dashboard.invite.passwordMismatch')
+    appToast.errorMessage(t('dashboard.invite.passwordMismatch'))
     return
   }
   try {
     await invitesStore.completeRegistration(token, {
       password: password.value,
       email: optionalEmail.value.trim() || undefined,
-      name: displayName.value.trim() || undefined
+      name: name.value.trim() || undefined
     })
+    appToast.success(t('dashboard.invite.acceptedTitle'))
   } catch (e: unknown) {
     const message = e && typeof e === 'object' && 'data' in e
       && typeof (e as { data?: { message?: string } }).data?.message === 'string'
       ? (e as { data: { message: string } }).data.message
       : t('dashboard.invite.completeFailed')
-    formError.value = message
+    appToast.errorMessage(message)
   }
 }
 
 async function accept() {
-  formError.value = ''
   try {
     await invitesStore.acceptInvite(token)
+    appToast.success(t('dashboard.invite.acceptedTitle'))
   } catch {
-    formError.value = t('dashboard.invite.acceptFailed')
+    appToast.errorMessage(t('dashboard.invite.acceptFailed'))
   }
 }
 </script>
 
 <template>
-  <div class="px-6 py-16 max-w-lg mx-auto text-center space-y-6">
-    <div v-if="error">
-      <h1 class="font-display text-2xl">{{ t('dashboard.invite.expiredTitle') }}</h1>
-      <p class="text-muted mt-2">{{ t('dashboard.invite.expiredDescription') }}</p>
-      <UButton to="/dashboard" class="mt-6" :label="t('nav.overview')" />
-    </div>
+  <DashboardPageShell max-width="md">
+    <UCard v-if="error" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <h1 class="text-xl font-semibold">{{ t('dashboard.invite.expiredTitle') }}</h1>
+      <p class="mt-2 text-sm text-muted">{{ t('dashboard.invite.expiredDescription') }}</p>
+      <UButton to="/dashboard" class="mt-4" :label="t('nav.overview')" />
+    </UCard>
 
-    <div v-else-if="accepted">
-      <h1 class="font-display text-2xl">{{ t('dashboard.invite.acceptedTitle') }}</h1>
-      <p v-if="loginEmail" class="text-sm text-muted mt-2">
+    <UCard v-else-if="accepted" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <h1 class="text-xl font-semibold">{{ t('dashboard.invite.acceptedTitle') }}</h1>
+      <p v-if="loginEmail" class="mt-2 text-sm text-muted">
         {{ t('dashboard.invite.loginHint', { email: loginEmail }) }}
       </p>
-      <UButton to="/auth/login" class="mt-6" :label="t('common.signIn')" />
-    </div>
+      <UButton to="/auth/login" class="mt-4" :label="t('common.signIn')" />
+    </UCard>
 
-    <div v-else-if="invite && showPhoneStep" class="text-left space-y-4">
-      <h1 class="font-display text-2xl text-center">{{ t('dashboard.invite.phoneTitle', { space: invite.spaceName }) }}</h1>
-      <p class="text-sm text-muted text-center">
+    <UCard v-else-if="invite && showPhoneStep" :ui="{ body: 'p-4 sm:p-5' }">
+      <h1 class="mb-1 text-center text-xl font-semibold">{{ t('dashboard.invite.phoneTitle', { space: invite.spaceName }) }}</h1>
+      <p class="mb-4 text-center text-sm text-muted">
         {{ t('dashboard.invite.phoneDescription', { phone: invite.phone ?? '' }) }}
       </p>
-      <UAlert v-if="formError" :description="formError" color="error" variant="subtle" />
-      <UFormField :label="t('dashboard.invite.verificationCode')">
-        <UInput
-          v-model="verificationCode"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          maxlength="8"
-          class="w-full"
-        />
-      </UFormField>
-      <div class="flex flex-wrap gap-2 justify-center">
+      <div class="space-y-4">
+        <UFormField :label="t('dashboard.invite.verificationCode')">
+          <UInput
+            v-model="verificationCode"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="8"
+            class="w-full"
+          />
+        </UFormField>
+        <div class="flex flex-wrap justify-center gap-2">
+          <UButton
+            :label="t('dashboard.invite.verifyPhone')"
+            :loading="verifyingPhone"
+            :disabled="!verificationCode.trim()"
+            @click="verifyPhone"
+          />
+          <UButton
+            :label="t('dashboard.invite.resendCode')"
+            color="neutral"
+            variant="outline"
+            :loading="resendingCode"
+            @click="resendCode"
+          />
+        </div>
+      </div>
+    </UCard>
+
+    <UCard v-else-if="invite && showRegisterStep" :ui="{ body: 'p-4 sm:p-5' }">
+      <h1 class="mb-1 text-center text-xl font-semibold">{{ t('dashboard.invite.setupTitle', { space: invite.spaceName }) }}</h1>
+      <p class="mb-4 text-center text-sm text-muted">{{ t('dashboard.invite.setupDescription') }}</p>
+      <div class="space-y-4">
+        <UFormField :label="t('dashboard.invite.yourName')">
+          <UInput v-model="name" class="w-full" />
+        </UFormField>
+        <UFormField :label="t('dashboard.invite.emailOptional')">
+          <UInput v-model="optionalEmail" type="email" class="w-full" />
+          <template #help>{{ t('dashboard.invite.emailOptionalHelp') }}</template>
+        </UFormField>
+        <UFormField :label="t('dashboard.invite.password')">
+          <UInput v-model="password" type="password" autocomplete="new-password" class="w-full" />
+        </UFormField>
+        <UFormField :label="t('dashboard.invite.confirmPassword')">
+          <UInput v-model="confirmPassword" type="password" autocomplete="new-password" class="w-full" />
+        </UFormField>
         <UButton
-          :label="t('dashboard.invite.verifyPhone')"
-          :loading="verifyingPhone"
-          :disabled="!verificationCode.trim()"
-          @click="verifyPhone"
-        />
-        <UButton
-          :label="t('dashboard.invite.resendCode')"
-          color="neutral"
-          variant="outline"
-          :loading="resendingCode"
-          @click="resendCode"
+          block
+          :label="t('dashboard.invite.createAndJoin')"
+          :loading="completing"
+          @click="completeRegistration"
         />
       </div>
-    </div>
+    </UCard>
 
-    <div v-else-if="invite && showRegisterStep" class="text-left space-y-4">
-      <h1 class="font-display text-2xl text-center">{{ t('dashboard.invite.setupTitle', { space: invite.spaceName }) }}</h1>
-      <p class="text-sm text-muted text-center">{{ t('dashboard.invite.setupDescription') }}</p>
-      <UAlert v-if="formError" :description="formError" color="error" variant="subtle" />
-      <UFormField :label="t('dashboard.invite.yourName')">
-        <UInput v-model="displayName" class="w-full" />
-      </UFormField>
-      <UFormField :label="t('dashboard.invite.emailOptional')">
-        <UInput v-model="optionalEmail" type="email" class="w-full" />
-        <template #help>{{ t('dashboard.invite.emailOptionalHelp') }}</template>
-      </UFormField>
-      <UFormField :label="t('dashboard.invite.password')">
-        <UInput v-model="password" type="password" autocomplete="new-password" class="w-full" />
-      </UFormField>
-      <UFormField :label="t('dashboard.invite.confirmPassword')">
-        <UInput v-model="confirmPassword" type="password" autocomplete="new-password" class="w-full" />
-      </UFormField>
-      <UButton
-        block
-        :label="t('dashboard.invite.createAndJoin')"
-        :loading="completing"
-        @click="completeRegistration"
-      />
-    </div>
-
-    <div v-else-if="invite && showEmailAccept">
-      <h1 class="font-display text-2xl">{{ t('dashboard.invite.title', { space: invite.spaceName }) }}</h1>
-      <p class="text-muted mt-2">{{ t('dashboard.invite.description', { role: invite.role }) }}</p>
-      <UAlert v-if="formError" :description="formError" color="error" variant="subtle" class="mt-4" />
+    <UCard v-else-if="invite && showEmailAccept" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <h1 class="text-xl font-semibold">{{ t('dashboard.invite.title', { space: invite.spaceName }) }}</h1>
+      <p class="mt-2 text-sm text-muted">{{ t('dashboard.invite.description', { role: invite.role }) }}</p>
       <UButton
         v-if="isLoggedIn"
         :loading="accepting"
-        class="mt-6"
+        class="mt-4"
         :label="t('dashboard.invite.accept')"
         @click="accept"
       />
       <UButton
         v-else
-        class="mt-6"
+        class="mt-4"
         :label="t('dashboard.invite.signInToAccept')"
         :to="`/auth/login?redirect=${encodeURIComponent(loginReturnUrl)}`"
       />
-    </div>
-  </div>
+    </UCard>
+  </DashboardPageShell>
 </template>

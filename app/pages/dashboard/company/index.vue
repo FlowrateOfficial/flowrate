@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { formatCurrencyForLocale } from '~/utils/format'
 import type { BusinessOverview } from '~/types/dashboard'
 
 definePageMeta({ layout: 'dashboard', title: 'Business', middleware: 'auth' })
 
 const route = useRoute()
-const { t, getLocale } = useAppI18n()
+const { t, formatCurrency } = useAppI18n()
 const spacesStore = useSpacesStore()
 const businessStore = useBusinessStore()
 const { tab, inviting, overview, overviewPending } = storeToRefs(businessStore)
@@ -14,7 +13,7 @@ const { isBusinessReadOnly, canManageBusiness } = storeToRefs(spacesStore)
 
 useSeoMeta({ title: () => `${t('dashboard.company.title')} — ${t('common.appName')}` })
 
-const spaceId = computed(() => spacesStore.activeSpace?.id ?? '')
+const spaceId = computed(() => spacesStore.space?.id ?? '')
 
 const { data: spaceDetail, refresh: refreshTeam } = await useAsyncData(
   () => `business-team-${spaceId.value}`,
@@ -42,7 +41,7 @@ watch(() => route.query.tab, (val) => {
 const teamMembers = computed(() => spaceDetail.value?.members ?? [])
 
 function fmt(n: number) {
-  return formatCurrencyForLocale(n, getLocale(), 'USD')
+  return formatCurrency(n)
 }
 
 function runwayLabel(months: number | null | undefined) {
@@ -84,7 +83,7 @@ const setupSteps = computed(() => [
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-6xl mx-auto">
+  <DashboardPageShell max-width="6xl">
     <DashboardPageHeader
       :title="t('dashboard.company.title')"
       :description="t('dashboard.company.subtitle')"
@@ -109,20 +108,20 @@ const setupSteps = computed(() => [
       icon="i-lucide-eye"
     />
 
-    <div v-if="spacesStore.activeSpace?.type !== 'COMPANY'" class="text-center py-16 editorial-card">
-      <UIcon name="i-lucide-rocket" class="w-12 h-12 mx-auto text-muted opacity-50 mb-4 stroke-[1.25]" />
-      <h2 class="font-display text-xl mb-2">{{ t('dashboard.company.noBusinessTitle') }}</h2>
-      <p class="text-sm text-muted max-w-md mx-auto mb-6">{{ t('dashboard.company.switchHint') }}</p>
+    <UCard v-if="spacesStore.space?.type !== 'COMPANY'" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <UIcon name="i-lucide-rocket" class="mx-auto mb-3 size-10 text-muted opacity-50" />
+      <h2 class="mb-1 text-lg font-semibold">{{ t('dashboard.company.noBusinessTitle') }}</h2>
+      <p class="mx-auto mb-4 max-w-md text-sm text-muted">{{ t('dashboard.company.switchHint') }}</p>
       <UButton to="/dashboard/spaces" :label="t('dashboard.company.createBusinessCta')" icon="i-lucide-plus" />
-    </div>
+    </UCard>
 
     <template v-else>
       <UTabs v-if="canManageBusiness" v-model="tab" :items="businessStore.tabs" :content="false" class="mb-2" />
 
-      <div v-if="tab === 'team' && canManageBusiness" class="space-y-6">
-        <UCard :ui="{ body: 'p-6 sm:p-8' }">
-          <h2 class="font-display text-lg mb-1">{{ t('dashboard.company.team.inviteTitle') }}</h2>
-          <p class="text-sm text-muted mb-6">{{ t('dashboard.company.team.inviteDesc') }}</p>
+      <div v-if="tab === 'team' && canManageBusiness" class="space-y-4">
+        <UCard :ui="{ body: 'p-4 sm:p-5' }">
+          <h2 class="mb-1 text-base font-semibold">{{ t('dashboard.company.team.inviteTitle') }}</h2>
+          <p class="mb-4 text-sm text-muted">{{ t('dashboard.company.team.inviteDesc') }}</p>
 
           <div class="grid sm:grid-cols-2 gap-4">
             <UFormField :label="t('dashboard.company.team.phone')">
@@ -134,7 +133,7 @@ const setupSteps = computed(() => [
               <template #help>{{ t('dashboard.company.team.emailOptional') }}</template>
             </UFormField>
             <UFormField :label="t('dashboard.company.team.name')">
-              <UInput v-model="businessStore.inviteForm.displayName" class="w-full" />
+              <UInput v-model="businessStore.inviteForm.name" class="w-full" />
             </UFormField>
           </div>
 
@@ -155,7 +154,7 @@ const setupSteps = computed(() => [
           </UFormField>
 
           <UButton
-            class="mt-6"
+            class="mt-4"
             :label="t('dashboard.company.team.sendInvite')"
             icon="i-lucide-mail"
             :loading="inviting"
@@ -164,14 +163,14 @@ const setupSteps = computed(() => [
         </UCard>
 
         <UCard :ui="{ body: 'p-0' }">
-          <div class="px-6 py-4 border-b border-default">
-            <h2 class="font-display text-lg">{{ t('dashboard.company.team.membersTitle') }}</h2>
+          <div class="border-b border-default px-4 py-3 sm:px-5">
+            <h2 class="text-base font-semibold">{{ t('dashboard.company.team.membersTitle') }}</h2>
           </div>
           <ul class="divide-y divide-default">
             <li
               v-for="member in teamMembers"
               :key="member.id"
-              class="flex items-center justify-between gap-4 px-6 py-4"
+              class="flex items-center justify-between gap-4 px-4 py-3 sm:px-5"
             >
               <div class="min-w-0">
                 <p class="font-medium truncate">{{ member.name ?? member.email }}</p>
@@ -187,17 +186,22 @@ const setupSteps = computed(() => [
       </div>
 
       <template v-else>
-        <div v-if="pending" class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div v-for="i in 4" :key="i" class="editorial-card h-32 animate-pulse bg-elevated/40" />
+        <div v-if="pending" class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
+          <UCard v-for="i in 4" :key="i" :ui="{ body: 'p-3 sm:p-4' }">
+            <div class="animate-pulse space-y-2">
+              <div class="h-3.5 w-20 rounded bg-elevated" />
+              <div class="h-7 w-28 rounded bg-elevated/70" />
+            </div>
+          </UCard>
         </div>
 
         <template v-else-if="overview">
       <!-- NOTE - Guided setup when empty -->
-          <UCard v-if="!overview.setup.complete" :ui="{ body: 'p-6 sm:p-8' }">
-            <h2 class="font-display text-xl mb-2">{{ t('dashboard.company.setup.title') }}</h2>
-            <p class="text-sm text-muted mb-8 max-w-2xl">{{ t('dashboard.company.setup.subtitle') }}</p>
+          <UCard v-if="!overview.setup.complete" :ui="{ body: 'p-4 sm:p-5' }">
+            <h2 class="mb-1 text-base font-semibold sm:text-lg">{{ t('dashboard.company.setup.title') }}</h2>
+            <p class="mb-5 max-w-2xl text-sm text-muted">{{ t('dashboard.company.setup.subtitle') }}</p>
 
-            <ol class="space-y-6">
+            <ol class="space-y-4">
               <li
                 v-for="(step, index) in setupSteps"
                 :key="index"
@@ -226,8 +230,8 @@ const setupSteps = computed(() => [
           </UCard>
 
           <!-- NOTE - Alerts -->
-          <div v-if="overview.alerts.length" class="space-y-3">
-            <h2 class="font-display text-lg">{{ t('dashboard.company.alertsTitle') }}</h2>
+          <div v-if="overview.alerts.length" class="space-y-2">
+            <h2 class="text-base font-semibold">{{ t('dashboard.company.alertsTitle') }}</h2>
             <UAlert
               v-for="(alert, i) in overview.alerts"
               :key="`${alert.code}-${i}`"
@@ -239,7 +243,7 @@ const setupSteps = computed(() => [
           </div>
 
           <!-- NOTE - Metrics -->
-          <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
             <DashboardStatsCard
               :title="t('dashboard.company.stats.cash')"
               :value="fmt(overview.cash)"
@@ -262,9 +266,9 @@ const setupSteps = computed(() => [
             />
           </div>
 
-          <div class="grid lg:grid-cols-3 gap-4">
-            <UCard class="lg:col-span-1" :ui="{ body: 'p-6' }">
-              <h2 class="font-display text-lg mb-4">{{ t('dashboard.company.monthlyBreakdown') }}</h2>
+          <div class="grid gap-3 lg:grid-cols-3">
+            <UCard class="lg:col-span-1" :ui="{ body: 'p-4 sm:p-5' }">
+              <h2 class="mb-3 text-base font-semibold">{{ t('dashboard.company.monthlyBreakdown') }}</h2>
               <dl class="space-y-3 text-sm">
                 <div class="flex justify-between gap-4">
                   <dt class="text-muted">{{ t('dashboard.company.income') }}</dt>
@@ -280,13 +284,15 @@ const setupSteps = computed(() => [
                 </div>
                 <div class="flex justify-between gap-4">
                   <dt class="text-muted">{{ t('dashboard.company.cloudDev') }}</dt>
-                  <dd class="font-medium tabular-nums">{{ fmt(overview.cloudSpend) }}</dd>
+                  <dd class="font-medium tabular-nums">
+                    {{ overview.cloudSpend != null ? fmt(overview.cloudSpend) : '—' }}
+                  </dd>
                 </div>
               </dl>
             </UCard>
 
-            <UCard class="lg:col-span-1" :ui="{ body: 'p-6' }">
-              <h2 class="font-display text-lg mb-2">{{ t('dashboard.company.saasShield') }}</h2>
+            <UCard class="lg:col-span-1" :ui="{ body: 'p-4 sm:p-5' }">
+              <h2 class="mb-2 text-base font-semibold">{{ t('dashboard.company.saasShield') }}</h2>
               <p class="text-sm text-muted mb-4">
                 {{ t('dashboard.company.activeSubs', { count: overview.activeSubscriptions }) }}
               </p>
@@ -301,8 +307,8 @@ const setupSteps = computed(() => [
               />
             </UCard>
 
-            <UCard class="lg:col-span-1" :ui="{ body: 'p-6' }">
-              <h2 class="font-display text-lg mb-4">{{ t('dashboard.company.topVendors') }}</h2>
+            <UCard class="lg:col-span-1" :ui="{ body: 'p-4 sm:p-5' }">
+              <h2 class="mb-3 text-base font-semibold">{{ t('dashboard.company.topVendors') }}</h2>
               <ul v-if="overview.topVendors.length" class="space-y-3 text-sm">
                 <li
                   v-for="vendor in overview.topVendors"
@@ -317,11 +323,11 @@ const setupSteps = computed(() => [
             </UCard>
           </div>
 
-          <p class="text-xs text-muted text-center pt-4">
+          <p class="text-center text-xs text-muted">
             {{ t('dashboard.company.footnote') }}
           </p>
         </template>
       </template>
     </template>
-  </div>
+  </DashboardPageShell>
 </template>

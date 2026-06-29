@@ -8,7 +8,7 @@ export const PAID_BILLING_STATUSES = new Set([
   'PAST_DUE'
 ] as const)
 
-export type BillingSubscriptionStatus =
+export type SubStatus =
   | 'INCOMPLETE'
   | 'INCOMPLETE_EXPIRED'
   | 'TRIALING'
@@ -18,7 +18,7 @@ export type BillingSubscriptionStatus =
   | 'UNPAID'
   | 'PAUSED'
 
-const STRIPE_STATUS_MAP: Record<string, BillingSubscriptionStatus> = {
+const STRIPE_STATUS_MAP: Record<string, SubStatus> = {
   incomplete: 'INCOMPLETE',
   incomplete_expired: 'INCOMPLETE_EXPIRED',
   trialing: 'TRIALING',
@@ -29,10 +29,21 @@ const STRIPE_STATUS_MAP: Record<string, BillingSubscriptionStatus> = {
   paused: 'PAUSED'
 }
 
-export function billingStatusFromStripe(status: string): BillingSubscriptionStatus {
+export function billingStatusFromStripe(status: string): SubStatus {
   return STRIPE_STATUS_MAP[status] ?? 'CANCELED'
 }
 
-export function appPlanFromBillingStatus(status: BillingSubscriptionStatus): AppPlan {
-  return (PAID_BILLING_STATUSES as ReadonlySet<string>).has(status) ? 'PRO' : 'FREE'
+export function appPlanFromStripeSubscription(
+  status: SubStatus,
+  planKey?: string | null
+): AppPlan {
+  if (!(PAID_BILLING_STATUSES as ReadonlySet<string>).has(status)) return 'FREE'
+  const key = (planKey ?? 'pro').trim().toLowerCase()
+  if (key === 'enterprise') return 'ENTERPRISE'
+  return 'PRO'
+}
+
+/** @deprecated Use appPlanFromStripeSubscription with planKey when available */
+export function appPlanFromBillingStatus(status: SubStatus): AppPlan {
+  return appPlanFromStripeSubscription(status, 'pro')
 }

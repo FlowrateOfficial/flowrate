@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// ANCHOR: Header logo — mark image + optional FlowRate wordmark
+// NOTE - ANCHOR: Header logo — mark image + optional FlowRate wordmark
 withDefaults(defineProps<{
   markSize?: number | string
   showWordmark?: boolean

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { TransactionRow } from '~/types/financial'
-
 const transactionsStore = useTransactionsStore()
 const { selectedTx, detailOpen } = storeToRefs(transactionsStore)
 const { t } = useAppI18n()
@@ -31,33 +29,66 @@ async function saveCategory() {
 </script>
 
 <template>
-  <UModal v-model:open="detailOpen" :title="t('dashboard.transactions.detailTitle')">
+  <UDrawer
+    v-model:open="detailOpen"
+    direction="right"
+    :title="t('dashboard.transactions.detailTitle')"
+    :description="selectedTx?.merchant ?? selectedTx?.description"
+  >
     <template v-if="selectedTx" #body>
-      <div class="space-y-6">
-        <div>
-          <p class="font-display text-xl">{{ selectedTx.merchant ?? selectedTx.description }}</p>
-          <p v-if="selectedTx.merchant" class="text-sm text-muted mt-1">{{ selectedTx.description }}</p>
-        </div>
+      <div class="space-y-6 p-4 sm:p-6">
         <div class="grid grid-cols-2 gap-4">
-          <div>
-            <p class="text-xs text-muted mb-1">{{ t('dashboard.transactions.columns.amount') }}</p>
-            <p class="text-xl font-light tabular-nums">
-              {{ selectedTx.amount > 0 ? '+' : '−' }}{{ transactionsStore.formatAmount(selectedTx.amount, selectedTx.currency) }}
-            </p>
-          </div>
-          <div>
-            <p class="text-xs text-muted mb-1">{{ t('dashboard.transactions.columns.date') }}</p>
-            <p class="text-sm">{{ transactionsStore.formatDate(selectedTx.date) }}</p>
-          </div>
+          <UFormField :label="t('dashboard.transactions.columns.amount')">
+            <UBadge
+              size="lg"
+              :color="selectedTx.amount > 0 ? 'success' : 'neutral'"
+              variant="subtle"
+              class="tabular-nums text-base font-semibold"
+              :label="`${selectedTx.amount > 0 ? '+' : '−'}${transactionsStore.formatAmount(selectedTx.amount, selectedTx.currency)}`"
+            />
+          </UFormField>
+          <UFormField :label="t('dashboard.transactions.columns.date')">
+            <UBadge
+              color="neutral"
+              variant="subtle"
+              size="lg"
+              :label="transactionsStore.formatDate(selectedTx.date)"
+            />
+          </UFormField>
         </div>
+
+        <USeparator />
+
         <UFormField :label="t('dashboard.transactions.columns.category')">
-          <USelect v-model="editCategory" :items="categoryItems" class="w-full" @update:model-value="saveCategory" />
+          <USelect
+            v-model="editCategory"
+            :items="categoryItems"
+            size="lg"
+            class="w-full"
+            @update:model-value="saveCategory"
+          />
         </UFormField>
-        <div>
-          <p class="text-xs text-muted mb-1">{{ t('dashboard.transactions.columns.account') }}</p>
-          <p class="text-sm">{{ selectedTx.account?.name ?? '—' }}</p>
-        </div>
+
+        <UFormField :label="t('dashboard.transactions.columns.account')">
+          <UBadge
+            color="neutral"
+            variant="outline"
+            size="lg"
+            :label="selectedTx.account?.name ?? '—'"
+            icon="i-lucide-landmark"
+          />
+        </UFormField>
       </div>
     </template>
-  </UModal>
+    <template #footer>
+      <div class="flex justify-end p-4 sm:p-6">
+        <UButton
+          :label="t('common.cancel')"
+          color="neutral"
+          variant="outline"
+          @click="detailOpen = false"
+        />
+      </div>
+    </template>
+  </UDrawer>
 </template>

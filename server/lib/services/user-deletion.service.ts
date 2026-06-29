@@ -18,17 +18,17 @@ async function disconnectUserBankAccounts(
   userId: string
 ): Promise<number> {
   const accounts = await prisma.account.findMany({
-    where: { userId, stripeFcAccountId: { not: null } },
-    select: { stripeFcAccountId: true }
+    where: { userId, stripeId: { not: null } },
+    select: { stripeId: true }
   })
 
   if (!stripe) return accounts.length
 
   let disconnected = 0
   for (const account of accounts) {
-    if (!account.stripeFcAccountId) continue
+    if (!account.stripeId) continue
     try {
-      await stripe.financialConnections.accounts.disconnect(account.stripeFcAccountId)
+      await stripe.financialConnections.accounts.disconnect(account.stripeId)
       disconnected++
     } catch {
       // NOTE - Already disconnected at Stripe
@@ -44,18 +44,18 @@ async function cancelStripeBilling(stripe: Stripe | null, userId: string) {
     where: { userId },
     include: { subscription: true }
   })
-  if (!billing?.stripeCustomerId) return
+  if (!billing?.customerId) return
 
-  if (billing.subscription?.stripeSubscriptionId) {
+  if (billing.subscription?.subId) {
     try {
-      await stripe.subscriptions.cancel(billing.subscription.stripeSubscriptionId)
+      await stripe.subscriptions.cancel(billing.subscription.subId)
     } catch {
       // NOTE - Subscription may already be canceled
     }
   }
 
   try {
-    await stripe.customers.del(billing.stripeCustomerId)
+    await stripe.customers.del(billing.customerId)
   } catch {
     // NOTE - Stripe customer may already be deleted
   }
@@ -141,8 +141,8 @@ export async function purgeUserApplicationData(
 
   if (deletedSpaceIds.length) {
     await prisma.user.updateMany({
-      where: { activeSpaceId: { in: deletedSpaceIds } },
-      data: { activeSpaceId: null }
+      where: { spaceId: { in: deletedSpaceIds } },
+      data: { spaceId: null }
     })
   }
 

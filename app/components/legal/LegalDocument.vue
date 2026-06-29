@@ -64,6 +64,10 @@ function tableRows(sectionId: string): Array<{ name: string, purpose: string, lo
         {{ t(sectionKey(sectionId, 'title')) }}
       </h2>
 
+      <p class="legal-beta-section-notice">
+        {{ t('legal.betaSectionNotice') }}
+      </p>
+
       <p
         v-for="key in paragraphKeys(sectionId)"
         :key="key"

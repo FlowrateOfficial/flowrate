@@ -16,7 +16,7 @@ export async function linkStripeCustomerToUser(
   metadata: Record<string, string> = {}
 ): Promise<void> {
   const conflict = await prisma.userBilling.findFirst({
-    where: { stripeCustomerId: customerId, NOT: { userId } },
+    where: { customerId: customerId, NOT: { userId } },
     select: { userId: true }
   })
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { resolveErrorMessage } from '~/utils/errors'
 
 definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: ['auth', 'billing-sync'] })
 
@@ -9,13 +8,11 @@ const { t } = useAppI18n()
 const billingStore = useBillingStore()
 const userStore = useUserStore()
 const spacesStore = useSpacesStore()
-const { loading: billingLoading, proPlan } = storeToRefs(billingStore)
-const { plan: userPlan } = storeToRefs(userStore)
 const { isMinor } = storeToRefs(spacesStore)
 
 useSeoMeta({ title: () => `${t('dashboard.settings.title')} — ${t('common.appName')}` })
 
-const toast = useToast()
+const appToast = useAppToast()
 
 const profile = reactive({
   name: '',
@@ -28,28 +25,8 @@ const isVerifyingPhone = ref(false)
 const isResendingCode = ref(false)
 const showVerificationInput = ref(false)
 const isSavingProfile = ref(false)
-const profileSaved = ref(false)
-const profileError = ref('')
 
-onMounted(async () => {
-  await billingStore.fetchPlans()
-
-  if (route.query.upgraded === '1') {
-    toast.add({ title: t('dashboard.settings.upgradeSuccess'), color: 'success' })
-    await navigateTo({ path: '/dashboard/settings' }, { replace: true })
-  }
-  if (route.query.canceled === '1') {
-    toast.add({ title: t('dashboard.settings.upgradeCanceled'), color: 'neutral' })
-    await navigateTo({ path: '/dashboard/settings' }, { replace: true })
-  }
-
-  await loadProfile()
-})
-
-async function loadProfile() {
-  const data = await userStore.fetchProfile(true)
-  if (!data) return
-
+function applyProfileForm(data: NonNullable<Awaited<ReturnType<typeof userStore.fetchProfile>>>) {
   profile.name = data.name ?? ''
   profile.email = data.email
   profile.phone = data.phone ?? ''
@@ -57,39 +34,97 @@ async function loadProfile() {
   showVerificationInput.value = Boolean(data.phone && !data.phoneVerified)
 }
 
+async function loadBillingProfile(checkoutSessionId?: string) {
+  await billingStore.fetchPlans()
+  const data = await userStore.fetchProfile({
+    syncBilling: true,
+    checkoutSessionId
+  })
+  if (!data) return null
+
+  billingStore.applyBillingContext(data.billing, data.plan)
+
+  if (data.plan !== 'FREE' && data.billing?.subscription?.priceId) {
+    try {
+      await billingStore.previewChange()
+    } catch {
+      // NOTE - Preview optional on load
+    }
+  }
+
+  return data
+}
+
+const checkoutSessionId = computed(() =>
+  route.query.upgraded === '1' && typeof route.query.session_id === 'string'
+    ? route.query.session_id
+    : undefined
+)
+
+const billingDataKey = computed(() =>
+  checkoutSessionId.value
+    ? `dashboard-settings-billing-${checkoutSessionId.value}`
+    : 'dashboard-settings-billing'
+)
+
+const { data: billingProfile, pending: billingPending, refresh: refreshBilling } = await useAsyncData(
+  billingDataKey,
+  () => loadBillingProfile(checkoutSessionId.value)
+)
+
+if (billingProfile.value) {
+  applyProfileForm(billingProfile.value)
+}
+
+watch(billingProfile, (data) => {
+  if (data) applyProfileForm(data)
+})
+
+onMounted(async () => {
+  if (route.query.upgraded === '1') {
+    appToast.success(t('dashboard.settings.upgradeSuccess'))
+    await navigateTo({ path: '/dashboard/settings' }, { replace: true })
+  }
+  if (route.query.canceled === '1') {
+    appToast.neutral(t('dashboard.settings.upgradeCanceled'))
+    await navigateTo({ path: '/dashboard/settings' }, { replace: true })
+  }
+})
+
+async function refreshProfile() {
+  await refreshBilling()
+}
+
 async function saveProfile() {
   isSavingProfile.value = true
-  profileSaved.value = false
-  profileError.value = ''
   try {
     const data = await userStore.updateProfile({
       name: profile.name,
       phone: profile.phone.trim() || null
     })
-    profile.name = data.name ?? ''
-    profile.email = data.email
-    profile.phone = data.phone ?? ''
-    phoneVerified.value = data.phoneVerified
-    showVerificationInput.value = Boolean(data.phone && !data.phoneVerified)
+    applyProfileForm(data)
     if (data.verificationSent) {
-      toast.add({ title: t('dashboard.settings.phoneCodeSent'), color: 'success' })
+      appToast.success(t('dashboard.settings.phoneCodeSent'))
     }
     if (data.verificationError) {
-      profileError.value = t('dashboard.settings.phoneVerificationFailed')
-      toast.add({ title: data.verificationError, color: 'warning' })
+      appToast.warning(
+        t('dashboard.settings.phoneVerificationFailed'),
+        data.verificationError
+      )
     }
-    profileSaved.value = true
-    setTimeout(() => { profileSaved.value = false }, 3000)
+    appToast.success(t('dashboard.settings.profileSaved'))
   } catch (err: unknown) {
     const message = err && typeof err === 'object' && 'data' in err
       && typeof (err as { data?: { message?: string } }).data?.message === 'string'
       ? (err as { data: { message: string } }).data.message
       : t('dashboard.settings.tryAgain')
-    profileError.value = message.includes('already')
-      ? t('dashboard.settings.phoneTaken')
-      : message.includes('E.164') || message.includes('valid')
-        ? t('dashboard.settings.phoneInvalid')
-        : message
+    appToast.errorMessage(
+      message.includes('already')
+        ? t('dashboard.settings.phoneTaken')
+        : message.includes('E.164') || message.includes('valid')
+          ? t('dashboard.settings.phoneInvalid')
+          : message
+    )
   } finally {
     isSavingProfile.value = false
   }
@@ -98,15 +133,14 @@ async function saveProfile() {
 async function verifyPhone() {
   if (!verificationCode.value.trim()) return
   isVerifyingPhone.value = true
-  profileError.value = ''
   try {
     await userStore.verifyPhoneCode(verificationCode.value.trim())
     phoneVerified.value = true
     showVerificationInput.value = false
     verificationCode.value = ''
-    toast.add({ title: t('dashboard.settings.phoneVerified'), color: 'success' })
+    appToast.success(t('dashboard.settings.phoneVerified'))
   } catch {
-    profileError.value = t('dashboard.settings.phoneCodeInvalid')
+    appToast.errorMessage(t('dashboard.settings.phoneCodeInvalid'))
   } finally {
     isVerifyingPhone.value = false
   }
@@ -114,56 +148,46 @@ async function verifyPhone() {
 
 async function resendVerificationCode() {
   isResendingCode.value = true
-  profileError.value = ''
   try {
     await userStore.resendPhoneCode()
-    toast.add({ title: t('dashboard.settings.phoneCodeResent'), color: 'success' })
+    appToast.success(t('dashboard.settings.phoneCodeResent'))
   } catch (err: unknown) {
     const message = err && typeof err === 'object' && 'data' in err
       && typeof (err as { data?: { message?: string } }).data?.message === 'string'
       ? (err as { data: { message: string } }).data.message
       : t('dashboard.settings.tryAgain')
-    profileError.value = message
+    appToast.errorMessage(message)
   } finally {
     isResendingCode.value = false
   }
 }
-
-const planLabels = computed(() => ({
-  FREE: { label: t('dashboard.settings.plans.FREE'), color: 'neutral' as const },
-  PRO: { label: t('dashboard.settings.plans.PRO'), color: 'primary' as const },
-  ENTERPRISE: { label: t('dashboard.settings.plans.ENTERPRISE'), color: 'success' as const }
-}))
 
 const deleteModalOpen = ref(false)
 const deleteConfirmEmail = ref('')
 const deleteConfirmPassword = ref('')
 const deleteAcknowledged = ref(false)
 const isDeletingAccount = ref(false)
-const deleteError = ref('')
 
 function openDeleteModal() {
   deleteConfirmEmail.value = profile.email
   deleteConfirmPassword.value = ''
   deleteAcknowledged.value = false
-  deleteError.value = ''
   deleteModalOpen.value = true
 }
 
 async function confirmDeleteAccount() {
   if (!deleteAcknowledged.value) return
   isDeletingAccount.value = true
-  deleteError.value = ''
   try {
     await userStore.deleteAccount({
       confirmEmail: deleteConfirmEmail.value.trim(),
       password: deleteConfirmPassword.value.trim() || undefined
     })
-    toast.add({ title: t('dashboard.settings.deleteSuccess'), color: 'success' })
+    appToast.success(t('dashboard.settings.deleteSuccess'))
     deleteModalOpen.value = false
     await navigateTo('/', { replace: true })
   } catch (err: unknown) {
-    deleteError.value = resolveErrorMessage(err, t, 'dashboard.settings.deleteFailed')
+    appToast.errorFrom(err, 'dashboard.settings.deleteFailed')
   } finally {
     isDeletingAccount.value = false
   }
@@ -171,32 +195,16 @@ async function confirmDeleteAccount() {
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-2xl mx-auto">
+  <DashboardPageShell max-width="md">
     <DashboardPageHeader
       :title="t('dashboard.settings.title')"
       :description="t('dashboard.settings.subtitle')"
     />
 
-    <UCard :ui="{ body: 'p-6 sm:p-8' }">
-      <h2 class="font-display text-lg mb-6">{{ t('dashboard.settings.profile') }}</h2>
+    <UCard :ui="{ body: 'p-4 sm:p-5' }">
+      <h2 class="mb-4 text-base font-semibold">{{ t('dashboard.settings.profile') }}</h2>
 
       <div class="space-y-4">
-        <UAlert
-          v-if="profileSaved"
-          :description="t('dashboard.settings.profileSaved')"
-          color="success"
-          variant="subtle"
-          icon="i-lucide-check-circle"
-        />
-
-        <UAlert
-          v-if="profileError"
-          :description="profileError"
-          color="error"
-          variant="subtle"
-          icon="i-lucide-alert-circle"
-        />
-
         <UFormField :label="t('dashboard.settings.fullName')">
           <UInput v-model="profile.name" :placeholder="t('dashboard.settings.namePlaceholder')" class="w-full" />
         </UFormField>
@@ -281,50 +289,25 @@ async function confirmDeleteAccount() {
         </div>
       </div>
 
-      <div class="flex justify-end mt-6">
+      <div class="mt-4 flex justify-end">
         <UButton :label="t('dashboard.settings.saveChanges')" :loading="isSavingProfile" @click="saveProfile" />
       </div>
     </UCard>
 
-    <UCard v-if="!isMinor" :ui="{ body: 'p-6 sm:p-8' }">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="font-display text-lg">{{ t('dashboard.settings.planBilling') }}</h2>
-        <UBadge
-          :label="planLabels[userPlan]?.label ?? t('dashboard.settings.plans.FREE')"
-          :color="planLabels[userPlan]?.color ?? 'neutral'"
-          variant="subtle"
-        />
+    <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-base font-semibold">{{ t('dashboard.settings.planBilling') }}</h2>
+        <AppBetaBadge size="sm" />
       </div>
 
-      <div v-if="userPlan === 'FREE'" class="space-y-4">
-        <p class="text-sm text-muted">
-          {{ t('dashboard.settings.upgradeDescription') }}
-        </p>
-        <UButton
-          :label="proPlan ? t('dashboard.settings.upgradeCtaDynamic', { price: proPlan.formattedPrice }) : t('dashboard.settings.upgradeCta')"
-          icon="i-lucide-sparkles"
-          :loading="billingLoading"
-          @click="billingStore.startCheckout('pro')"
-        />
-      </div>
-
-      <div v-else class="space-y-4">
-        <p class="text-sm text-muted">
-          {{ t('dashboard.settings.manageDescription') }}
-        </p>
-        <UButton
-          :label="t('dashboard.settings.billingPortal')"
-          icon="i-lucide-external-link"
-          color="neutral"
-          variant="outline"
-          :loading="billingLoading"
-          @click="billingStore.openPortal()"
-        />
-      </div>
+      <DashboardBillingPanel
+        :ready="!billingPending"
+        @refreshed="refreshProfile"
+      />
     </UCard>
 
-    <UCard :ui="{ body: 'p-6 sm:p-8' }">
-      <h2 class="font-display text-lg mb-4 text-error">{{ t('dashboard.settings.dangerZone') }}</h2>
+    <UCard :ui="{ body: 'p-4 sm:p-5' }">
+      <h2 class="mb-3 text-base font-semibold text-error">{{ t('dashboard.settings.dangerZone') }}</h2>
       <p class="text-sm text-muted mb-4">
         {{ t('dashboard.settings.deleteWarning') }}
       </p>
@@ -344,14 +327,6 @@ async function confirmDeleteAccount() {
       <template #body>
         <div class="space-y-4">
           <p class="text-sm text-muted">{{ t('dashboard.settings.deleteModalDescription') }}</p>
-
-          <UAlert
-            v-if="deleteError"
-            :description="deleteError"
-            color="error"
-            variant="subtle"
-            icon="i-lucide-alert-circle"
-          />
 
           <UFormField :label="t('dashboard.settings.deleteConfirmEmail')">
             <UInput
@@ -398,5 +373,5 @@ async function confirmDeleteAccount() {
         </div>
       </template>
     </UModal>
-  </div>
+  </DashboardPageShell>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// ANCHOR: App mark — served from /public/flowrate_logo.png
+// NOTE - ANCHOR: App mark — served from /public/flowrate_logo.png
 const LOGO_SRC = '/flowrate_logo.png'
 
 withDefaults(defineProps<{

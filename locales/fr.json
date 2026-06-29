@@ -6,12 +6,14 @@
     "or": "ou",
     "back": "Retour",
     "cancel": "Annuler",
+    "clear": "Effacer",
     "continue": "Continuer",
     "save": "Enregistrer",
     "add": "Ajouter",
     "create": "Créer",
     "manage": "Gérer",
     "delete": "Supprimer",
+    "edit": "Modifier",
     "loading": "Chargement...",
     "viewAll": "Tout voir",
     "getStarted": "Commencer",
@@ -28,8 +30,13 @@
     "glba": "Confidentialité financière (GLBA)",
     "language": "Langue",
     "english": "Anglais",
+    "englishUS": "Anglais (États-Unis)",
+    "englishUK": "Anglais (Royaume-Uni)",
     "french": "Français",
-    "home": "Accueil"
+    "home": "Accueil",
+    "beta": "Bêta",
+    "betaHint": "Accès anticipé — en cours de développement",
+    "betaInProgress": "En cours"
   },
   "breadcrumbs": {
     "label": "Fil d'Ariane",
@@ -44,14 +51,15 @@
     "subscriptions": "Abonnements",
     "budgets": "Budgets",
     "analytics": "Analyses",
-    "cashflow": "Flux de trésorerie",
+    "cashflow": "Trésorerie",
     "spaces": "Espaces",
     "family": "Famille",
     "company": "Activité",
     "business": "Activité",
     "businessTeam": "Équipe",
     "saasVendors": "SaaS & fournisseurs",
-    "myMoney": "Mon argent"
+    "myMoney": "Mon argent",
+    "admin": "Admin"
   },
   "spaceTypes": {
     "INDEPENDENT": "Indépendant",
@@ -74,7 +82,7 @@
       "passwordPlaceholder": "••••••••",
       "forgotPassword": "Mot de passe oublié ?",
       "submit": "Se connecter",
-      "errorInvalid": "E-mail ou mot de passe invalide.",
+      "errorInvalid": "E-mail ou mot de passe incorrect.",
       "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
       "errorOAuth": "Échec de la connexion Google ou GitHub. Veuillez réessayer."
     },
@@ -94,28 +102,45 @@
       "submit": "Créer un compte",
       "errorGeneric": "Échec de la création du compte. Veuillez réessayer.",
       "inviteTitle": "Rejoindre {spaceName}",
-      "inviteDescription": "Vous avez été invité en tant que {role}."
+      "inviteDescription": "Vous avez été invité·e en tant que {role}.",
+      "planFreeDescription": "Gratuit — espace indépendant, 1 connexion bancaire",
+      "planProDescription": "Espaces illimités, SaaS Shield, comptes ados"
     },
     "forgot": {
       "title": "Réinitialiser votre mot de passe",
       "remember": "Vous vous souvenez de votre mot de passe ?",
       "checkEmailTitle": "Vérifiez vos e-mails",
-      "checkEmailDescription": "Si un compte existe pour cette adresse, nous avons envoyé un lien de réinitialisation.",
+      "checkEmailDescription": "Si un compte existe pour cette adresse, nous avons envoyé un lien pour réinitialiser votre mot de passe.",
       "submit": "Envoyer le lien",
       "errorGeneric": "Échec de l'envoi de l'e-mail. Veuillez réessayer."
     }
   },
   "landing": {
-    "heroTagline": "Votre système d'exploitation financier",
-    "heroTitle": "La finance pour tous ceux qui gèrent",
-    "heroSubtitle": "La finance conçue pour les esprits réfléchis.",
-    "heroDescription": "Gérez vos identités Indépendant, Foyer, Famille et Entreprise dans une plateforme calme et intelligente — où la géométrie remplace le désordre et la clarté remplace le bruit.",
-    "seeHow": "Voir comment ça marche",
+    "nav": {
+      "demo": "Aperçu live"
+    },
+    "heroTagline": "Votre centre de pilotage financier",
+    "heroTitle": "Une connexion. Toutes vos casquettes.",
+    "heroSubtitle": "L'argent mérite le même soin que tout le reste.",
+    "heroDescription": "FlowRate réunit Indépendant, Foyer, Famille et Entreprise dans des espaces séparés — une seule maison calme. Connectez vos banques une fois, changez de contexte en un tap, et voyez l'essentiel sans le bruit des tableurs.",
+    "heroTrust": "Gratuit pour commencer — sans carte bancaire",
+    "heroTitleLine1": "Une connexion.",
+    "scrollHint": "Défiler",
+    "seeHow": "Voir l'app s'adapter",
+    "morph": {
+      "independent": "Finances personnelles.",
+      "household": "Foyers partagés.",
+      "family": "Argent de poche familial.",
+      "company": "Runway d'entreprise."
+    },
     "heroCards": {
       "balance": "Solde",
       "shared": "Partagé",
       "allowance": "Argent de poche",
       "runway": "Runway",
+      "perMonth": " / mois",
+      "perMonthShort": "mois",
+      "months": "mois",
       "independent": {
         "metric": "12 480 €"
       },
@@ -129,64 +154,124 @@
         "metric": "14 mois"
       }
     },
-    "testimonials": {
-      "title": "Confiance tranquille",
-      "description": "Des personnes réfléchies, des finances plus calmes.",
-      "one": {
-        "quote": "Enfin un logiciel qui traite l'argent avec le même soin que moi. FlowRate, c'est ouvrir un livre bien édité — pas un tableur.",
-        "author": "Elena Laurent",
-        "role": "Consultante indépendante"
-      },
-      "two": {
-        "quote": "Nous avons arrêté de nous disputer sur les comptes. Foyer et personnel vivent dans des espaces séparés, mais nous voyons l'essentiel ensemble.",
-        "author": "Marcus & Riya",
-        "role": "Espace Foyer"
-      },
-      "three": {
-        "quote": "Burn rate, runway, abonnements — tout en une vue qui ne crie pas. C'est le système d'exploitation que mon entreprise méritait.",
-        "author": "Sofia Chen",
-        "role": "Fondatrice solo"
-      }
-    },
     "howItWorks": {
-      "title": "Comment FlowRate fonctionne",
-      "description": "Trois étapes pour passer de comptes dispersés à une vision claire.",
+      "title": "De l'éparpillé au clair en trois gestes",
+      "description": "Pas de configuration interminable. Liez une banque, choisissez votre espace, et FlowRate vous montre la situation — pas seulement les relevés.",
+      "previews": {
+        "connect": "Plaid & Stripe — identifiants chez eux",
+        "organize": "4 types d'espaces, un sélecteur",
+        "act": "Burn rate, SaaS Shield, argent de poche"
+      },
       "steps": {
         "connect": {
           "title": "Connectez vos banques",
           "description": "Liez comptes personnels, joints ou professionnels en toute sécurité via Stripe. Vos identifiants ne transitent jamais par nos serveurs."
         },
         "organize": {
-          "title": "Organisez en Espaces",
-          "description": "Indépendant, Foyer, Famille ou Entreprise — chaque espace garde ses comptes, budgets et permissions."
+          "title": "Organisez par espaces",
+          "description": "Indépendant, foyer, famille ou entreprise — chaque espace conserve ses comptes, budgets et autorisations."
         },
         "act": {
           "title": "Agissez en confiance",
-          "description": "Suivez le burn rate, détectez les SaaS en double, partagez les dépenses et apprenez l'épargne aux ados — depuis un seul tableau de bord."
+          "description": "Suivez le burn rate, repérez les abonnements en double, partagez les dépenses et initiez les ados à l'épargne — depuis un seul tableau de bord."
         }
       }
     },
-    "spacesTitle": "Conçu pour votre vraie vie",
-    "spacesDescription": "La plupart des apps supposent une seule vie. FlowRate sait que vous portez plusieurs casquettes — et donne à chacune son espace sans perdre la vue d'ensemble.",
-    "featuresTitle": "Différent des trackers passifs",
-    "featuresDescription": "FlowRate ne se contente pas d'enregistrer le passé. Il protège, anticipe et s'adapte à votre façon de gérer l'argent.",
+    "spacesTitle": "Quatre espaces pour quatre versions de vous",
+    "spacesDescription": "Vous n'êtes pas un seul budget. FlowRate donne à chaque chapitre de votre vie financière sa propre pièce — sans perdre la vue d'ensemble.",
+    "featuresTitle": "Plus qu'un registre qui acquiesce",
+    "featuresDescription": "Les trackers passifs racontent le passé. FlowRate repère les abonnements qui dérivent, modélise la runway et aide les familles à apprendre l'épargne — avant la fin du mois.",
     "pricingTitle": "Des offres pour chaque étape",
     "pricingDescription": "Chaque formule cible un profil précis. Commencez gratuitement, évoluez quand votre vie ou votre activité grandit.",
-    "ctaTitle": "Votre argent. Vos espaces. Un seul flux.",
-    "ctaDescription": "Que vous soyez fondateur suivant votre burn rate, couple partageant les courses, ou parent apprenant l'épargne à un ado — FlowRate s'adapte à vous.",
+    "ctaTitle": "Ouvrez votre premier espace en quelques minutes",
+    "ctaDescription": "Les fondateurs suivent la runway. Les couples se répartissent équitablement. Les parents offrent une vue encadrée aux ados. Commencez gratuitement — évoluez quand la vie se complique.",
     "ctaButton": "Créer un compte gratuit",
+    "ctaCompare": "Comparer les offres",
+    "demo": {
+      "eyebrow": "02 — Aperçu live",
+      "title": "La même app, un chapitre différent",
+      "description": "Touchez un espace. Le tableau de bord se transforme — soldes, alertes et activité qui correspondent vraiment à ce que vous gérez.",
+      "caption": "Démo illustrative — vos chiffres réels arrivent après connexion bancaire.",
+      "recentActivity": "Activité récente",
+      "sharedSplit": "Partagé vs personnel",
+      "familyActivity": "Activité familiale",
+      "vendorSpend": "Dépenses fournisseurs",
+      "stats": {
+        "balance": "Solde de trésorerie",
+        "cashFlow": "Flux net",
+        "shared": "Pot commun",
+        "personal": "Vos comptes",
+        "allowance": "Argent de poche ado",
+        "jars": "Tirelires",
+        "burn": "Burn mensuel",
+        "runway": "Runway"
+      },
+      "scenes": {
+        "independent": {
+          "hint": "Comptes perso, revenus annexes, abonnements",
+          "delta": "+4,2 % ce mois",
+          "cashFlow": "+840 €",
+          "cashDelta": "vs mois dernier",
+          "row1": "Café du matin",
+          "row2": "Virement freelance",
+          "row3": "Streaming (doublon ?)"
+        },
+        "household": {
+          "hint": "Factures communes, comptes séparés, parts équitables",
+          "personal": "9 120 €",
+          "row1": "Courses — commun",
+          "row2": "Énergie — commun",
+          "row3": "Répartition 60 / 40"
+        },
+        "family": {
+          "hint": "Argent de poche, tirelires, ados supervisés",
+          "jars": "3 actives",
+          "row1": "Maya — déjeuner",
+          "row2": "Argent de poche hebdo",
+          "row3": "Tirelire études +40 €"
+        },
+        "company": {
+          "hint": "Burn, runway, gaspillage SaaS, cloud",
+          "burnDelta": "↑ 8 % vs mois dernier",
+          "runwayLabel": "14 mois",
+          "alertTitle": "SaaS Shield a détecté une hausse",
+          "alertMessage": "Outil design renouvelé +22 % — vérifiez les sièges",
+          "row1": "Notion",
+          "row2": "Figma — prix en hausse",
+          "row3": "AWS"
+        }
+      }
+    },
+    "proof": {
+      "spaces": {
+        "value": "4",
+        "label": "Espaces financiers en une connexion — Indépendant à Entreprise"
+      },
+      "bank": {
+        "value": "1 clic",
+        "label": "Lien bancaire via Plaid — gratuit avec une connexion"
+      },
+      "shield": {
+        "value": "Pro",
+        "label": "SaaS Shield repère doublons et hausses de prix"
+      },
+      "export": {
+        "value": "CSV",
+        "label": "Export sur toutes les offres — audit sur Entreprise"
+      }
+    },
     "audiences": {
       "independent": {
         "title": "Indépendant",
-        "description": "Juste vous — comptes personnels, revenus annexes, abonnements et objectifs d'épargne en une vue claire."
+        "description": "Vous seul·e — comptes personnels, revenus annexes, abonnements et objectifs d'épargne en une vue claire."
       },
       "household": {
         "title": "Foyer",
-        "description": "Couples et colocataires — mélangez comptes joints et séparés, fixez des budgets partagés et répartissez les factures."
+        "description": "Couples et colocataires — mélangez comptes joints et séparés, fixez des budgets communs et répartissez les factures récurrentes."
       },
       "family": {
         "title": "Famille",
-        "description": "Parents et tuteurs — gérez le foyer, fixez l'argent de poche, créez des tirelires et donnez aux ados un accès supervisé."
+        "description": "Parents et tuteurs — gérez le foyer, versez l'argent de poche, créez des tirelires et offrez aux ados un accès encadré."
       },
       "company": {
         "title": "Entreprise",
@@ -196,11 +281,11 @@
     "features": {
       "spaces": {
         "title": "Espaces financiers",
-        "description": "Basculez entre Indépendant, Foyer, Famille et Entreprise. Une connexion, tous vos rôles."
+        "description": "Passez de l'individuel au foyer, à la famille ou à l'entreprise. Une seule connexion, tous vos profils."
       },
       "accounts": {
-        "title": "Toute configuration de comptes",
-        "description": "Connectez des banques en personnel ou partagé. Mélangez comptes joints et séparés — FlowRate agrège ce que vous choisissez de partager."
+        "title": "Comptes à votre mesure",
+        "description": "Connectez des comptes en personnel ou en partagé. Mélangez comptes joints et séparés — FlowRate agrège ce que vous choisissez de partager."
       },
       "saasShield": {
         "title": "SaaS Shield",
@@ -225,7 +310,7 @@
         "name": "Gratuit",
         "price": "0 €",
         "target": "Particuliers qui débutent",
-        "targetDetail": "Gérez vos finances personnelles sans payer — parfait pour votre premier budget.",
+        "targetDetail": "Suivez vos finances personnelles sans rien payer — idéal pour votre premier budget.",
         "bestFor": {
           "personal": "Budget personnel",
           "starter": "Premiers pas en finance",
@@ -245,19 +330,19 @@
         "price": "12 €",
         "period": "/mois",
         "target": "Freelances, fondateurs & couples",
-        "targetDetail": "Quand argent perso et pro se croisent — ou quand vous partagez les finances en couple.",
+        "targetDetail": "Quand finances personnelles et professionnelles se croisent — ou quand vous gérez l'argent à deux.",
         "bestFor": {
           "freelancer": "Freelances & consultants",
-          "founder": "Fondateurs solo & side projects",
+          "founder": "Fondateurs solo et projets annexes",
           "couple": "Couples avec budget partagé"
         },
-        "description": "Pour freelances et fondateurs sérieux.",
+        "description": "Pour freelances et fondateurs qui passent à la vitesse supérieure.",
         "badge": "Le plus populaire",
         "cta": "Essai Pro",
         "features": {
           "spaces": "Espaces illimités (Foyer, Famille, Entreprise)",
           "banks": "Connexions bancaires illimitées",
-          "shield": "SaaS Shield et taux de consommation",
+          "shield": "SaaS Shield et burn rate",
           "ai": "Analyses IA optionnelles (opt-in)",
           "teen": "Comptes adolescents",
           "cloud": "Suivi des dépenses cloud"
@@ -268,14 +353,14 @@
         "price": "49 €",
         "period": "/mois",
         "target": "Équipes & entreprises en croissance",
-        "targetDetail": "Plusieurs personnes gèrent l'argent de l'entreprise avec rôles, pistes d'audit et support prioritaire.",
+        "targetDetail": "Plusieurs personnes gèrent la trésorerie de l'entreprise, avec rôles, traçabilité et support prioritaire.",
         "bestFor": {
           "team": "Petites équipes finance",
           "agency": "Agences & studios",
           "growing": "LLC en croissance avec employés"
         },
         "description": "Équipes et entreprises en croissance.",
-        "cta": "Nous contacter",
+        "cta": "Démarrer Entreprise",
         "features": {
           "pro": "Tout ce qui est dans Pro",
           "members": "Jusqu'à 10 membres entreprise",
@@ -293,17 +378,63 @@
       "saasShield": "SaaS Shield",
       "burnRate": "Burn rate & runway",
       "teen": "Comptes ado & enfant",
-      "ai": "Analyses IA optionnelles (opt-in)"
+      "ai": "Analyses IA en option"
     }
   },
   "dashboard": {
+    "layout": {
+      "currentSpace": "Votre espace",
+      "mobileNav": "Navigation principale"
+    },
+    "dateField": {
+      "pickDate": "Choisir une date",
+      "help": "Choisissez une date dans le calendrier."
+    },
+    "dateRange": {
+      "pickRange": "Choisir une période",
+      "timeFrom": "Heure de début",
+      "timeTo": "Heure de fin",
+      "last7Days": "7 derniers jours",
+      "last14Days": "14 derniers jours",
+      "last30Days": "30 derniers jours",
+      "last3Months": "3 derniers mois",
+      "last6Months": "6 derniers mois",
+      "lastYear": "Dernière année"
+    },
+    "guide": {
+      "child": {
+        "title": "Pour les enfants",
+        "description": "Voici votre page argent. Votre parent l'a configurée pour voir l'épargne et l'argent de poche — appuyez sur les boutons pour naviguer.",
+        "steps": "Appuyez sur Mon argent pour voir les tirelires|Appuyez sur Comptes pour connecter une banque avec un parent|Appuyez sur Paramètres pour demander de l'aide"
+      },
+      "teen": {
+        "title": "Pour les ados",
+        "description": "Suivez votre argent de poche, vos tirelires et vos dépenses. Menu en bas sur mobile, menu à gauche sur grand écran.",
+        "steps": "Mon argent pour les tirelires et l'argent de poche|Comptes pour connecter une banque|Transactions pour voir les dépenses"
+      },
+      "parent": {
+        "title": "Pour les parents",
+        "description": "Gérez l'argent familial au même endroit. Connectez les banques, invitez votre conjoint·e et supervisez les enfants.",
+        "steps": "Comptes pour connecter une banque|Famille pour inviter|Budgets pour les plafonds|Changez d'espace via le menu en haut à gauche"
+      },
+      "business": {
+        "title": "Pour votre entreprise",
+        "description": "Suivez la trésorerie, le burn rate et les abonnements. Connectez d'abord le compte pro.",
+        "steps": "Entreprise pour la runway|Comptes pour la banque|Abonnements pour le SaaS"
+      },
+      "general": {
+        "title": "Premiers pas",
+        "description": "Bienvenue ! Commencez par connecter une banque, puis explorez transactions et budgets. Sur mobile : barre du bas. Sur grand écran : menu à gauche.",
+        "steps": "Comptes pour connecter une banque|Transactions pour l'activité|Budgets pour les limites"
+      }
+    },
     "overview": {
       "title": "Aperçu",
-      "subtitle": "Aperçu financier de {name} ce mois-ci",
+      "subtitle": "Vue d'ensemble financière de {name} ce mois-ci",
       "members": "{count} membres",
       "combined": "Combiné",
       "sharedAccounts": "Comptes partagés",
-      "yourPersonal": "Votre personnel",
+      "yourPersonal": "Votre espace personnel",
       "recentTransactions": "Transactions récentes",
       "accounts": "Comptes",
       "noAccounts": "Aucun compte connecté",
@@ -314,7 +445,7 @@
         "totalBalance": "Solde total",
         "monthlySpending": "Dépenses mensuelles",
         "monthlyIncome": "Revenus mensuels",
-        "netSavings": "Épargne nette",
+        "netSavings": "Flux net",
         "burnRate": "Burn rate",
         "runway": "Runway"
       },
@@ -323,11 +454,11 @@
       "viewAnalytics": "Analyses complètes",
       "saasShield": "SaaS Shield",
       "saasShieldHint": "Santé des abonnements en un coup d'œil",
-      "saasIssues": "problèmes détectés"
+      "saasIssues": "alertes"
     },
     "analytics": {
       "title": "Analyses",
-      "subtitle": "Flux de trésorerie, catégories, patrimoine net et habitudes de dépenses pour votre espace actif.",
+      "subtitle": "Trésorerie, catégories, patrimoine net et habitudes de dépenses pour votre espace actif.",
       "netWorth": "Patrimoine net",
       "income": "Revenus",
       "spending": "Dépenses",
@@ -338,16 +469,16 @@
       "byCategoryHint": "Où va votre argent",
       "netWorthTrend": "Évolution du patrimoine",
       "netWorthHint": "Solde estimé dans le temps",
-      "topMerchants": "Principaux marchands",
-      "topMerchantsHint": "Plus grosses dépenses récurrentes",
-      "insightsTitle": "Aperçu par catégorie",
+      "topMerchants": "Principaux commerçants",
+      "topMerchantsHint": "Dépenses récurrentes les plus élevées",
+      "insightsTitle": "Détail par catégorie",
       "ofSpending": "des dépenses",
       "syncData": "Synchroniser les banques",
       "periodLabel": "Période",
       "emptyTitle": "Aucune donnée de transaction",
       "emptyDescription": "Connectez un compte bancaire et synchronisez les transactions pour débloquer les graphiques.",
       "emptyTitleConnected": "Aucune transaction pour l'instant",
-      "emptyDescriptionConnected": "Votre banque est connectée, mais aucune transaction sur cette période. Synchronisez depuis les banques — les comptes test n'ont souvent pas d'historique.",
+      "emptyDescriptionConnected": "Votre banque est connectée, mais aucune transaction sur cette période. Lancez une synchronisation — les comptes de test n'ont souvent pas d'historique.",
       "ranges": {
         "7d": "7 jours",
         "30d": "30 jours",
@@ -357,6 +488,14 @@
     },
     "accounts": {
       "title": "Comptes",
+      "eyebrow": "Connexions bancaires",
+      "subtitleSimple": "Liez votre banque ici pour voir soldes et transactions automatiquement.",
+      "emptyDescriptionSimple": "Suivez les étapes ci-dessous — nous ne stockons jamais votre mot de passe bancaire.",
+      "filtersTitle": "Affichage et connexion",
+      "filterHelp": "Choisissez quels comptes afficher dans cette liste.",
+      "connectHelp": "Le mode personnel reste privé. Le mode partagé est visible par les tuteurs de cet espace.",
+      "steps": "Appuyez sur Connecter votre première banque|Connectez-vous à votre banque (Europe ou États-Unis)|Revenez ici — les soldes apparaissent en général en une minute",
+      "disconnectTitle": "Retirer cette banque ?",
       "subtitle": "Connectez vos banques, choisissez la visibilité personnelle ou partagée, et gardez les soldes à jour.",
       "subtitleConnected": "Vos banques sont connectées. Synchronisez à tout moment pour récupérer les derniers soldes et transactions.",
       "teenSubtitle": "Connecte ta banque pour suivre tes dépenses et voir où va ton argent.",
@@ -385,7 +524,7 @@
       "personal": "Personnel",
       "connectedBy": "Connecté par {name}",
       "mixedAccountsTitle": "Comptes mixtes et séparés",
-      "mixedAccountsDescription": "Chaque membre connecte ses propres banques. Marquez les comptes comme Personnel (vous seul) ou Partagé (visible par les tuteurs). Les espaces Entreprise fonctionnent de la même façon pour fondateurs et équipe.",
+      "mixedAccountsDescription": "Chaque membre connecte ses propres banques. Marquez les comptes en personnel (vous seul) ou en partagé (visible par les tuteurs). Les espaces entreprise fonctionnent de la même façon pour fondateurs et équipe.",
       "synced": "Synchronisé {time}",
       "syncedJustNow": "à l'instant",
       "syncedMinutes": "il y a {count} min",
@@ -393,8 +532,21 @@
       "syncedDays": "il y a {count} j",
       "notSynced": "Pas encore synchronisé",
       "stripeNote": "Propulsé par Stripe Financial Connections",
-      "stripeDescription": "Vos identifiants bancaires ne sont jamais stockés. FlowRate utilise la liaison bancaire sécurisée en lecture seule de Stripe.",
-      "bankRegionNote": "Connecte des comptes courants, d'épargne et de crédit américains via Stripe. Financial Connections est disponible pour les entreprises aux États-Unis, au Royaume-Uni, dans l'UE et d'autres régions prises en charge — les établissements liés sont uniquement américains pour l'instant.",
+      "bankProvidersTitle": "Connexions bancaires",
+      "bankRegionNote": "Connectez des banques européennes (France, Allemagne, Royaume-Uni, etc.) via Plaid, ou des banques américaines via Stripe Financial Connections. Vos identifiants bancaires ne sont jamais stockés — seuls les soldes et transactions en lecture seule.",
+      "connectEuropean": "Banque européenne (Plaid)",
+      "connectEuropeanShared": "Banque européenne — partagé (Plaid)",
+      "connectUs": "Banque américaine (Stripe)",
+      "connectUsShared": "Banque américaine — partagé (Stripe)",
+      "plaidLinkLoadError": "Impossible de charger Plaid Link. Autorisez cdn.plaid.com ou désactivez les bloqueurs de publicités, puis réessayez.",
+      "plaidSandboxTitle": "Plaid sandbox",
+      "plaidSandboxDescription": "Banques de test uniquement. Connectez-vous avec user_good / pass_good. Les vraies banques européennes nécessitent PLAID_ENV=production, une clé production et PLAID_REDIRECT_URI enregistrée dans le tableau de bord Plaid.",
+      "plaidNotConfigured": "Plaid n'est pas configuré. Ajoutez PLAID_CLIENT_ID et PLAID_SECRET à votre environnement.",
+      "plaidOAuthTitle": "Finalisation de la connexion bancaire",
+      "plaidOAuthPending": "Finalisation de votre connexion bancaire…",
+      "plaidOAuthMissingSession": "La session de connexion a expiré. Réessayez depuis Comptes.",
+      "plaidOAuthInvalid": "Retour de connexion bancaire invalide. Réessayez depuis Comptes.",
+      "plaidOAuthBack": "Retour aux comptes",
       "connectError": "Échec de la connexion bancaire. Veuillez réessayer.",
       "syncNoAccounts": "Stripe a lié le compte mais rien n'a été enregistré. Réessayez — si le problème persiste, ajoutez STRIPE_WEBHOOK_SECRET depuis `pnpm stripe:listen` dans .env et redémarrez `pnpm dev`.",
       "resyncFromStripe": "Actualiser depuis Stripe",
@@ -404,11 +556,11 @@
       "disconnect": "Déconnecter",
       "disconnectConfirm": "Retirer ce compte bancaire et ses transactions de FlowRate ?",
       "sharedSpaceHintTitle": "Vous voulez des comptes partagés ou familiaux ?",
-      "sharedSpaceHintDescription": "Passez à un espace Foyer ou Famille via le sélecteur de la barre latérale, puis connectez vos banques en Personnel ou Partagé."
+      "sharedSpaceHintDescription": "Passez à un espace Foyer ou Famille via le sélecteur dans la barre latérale, puis connectez vos banques en personnel ou en partagé."
     },
     "spaces": {
       "title": "Espaces financiers",
-      "subtitle": "Indépendant, Foyer, Famille ou Entreprise — gérez chaque contexte séparément.",
+      "subtitle": "Indépendant, foyer, famille ou entreprise — gérez chaque contexte séparément.",
       "newSpace": "Nouvel espace",
       "createTitle": "Créer un espace financier",
       "nameLabel": "Nom de l'espace",
@@ -422,6 +574,8 @@
       "tryAgain": "Réessayer",
       "manageSpaces": "Gérer les espaces",
       "minorCannotSwitch": "Votre compte est lié uniquement à l'espace familial.",
+      "upgradeForShared": "Les espaces Foyer, Famille et Activité sont disponibles avec Pro et Enterprise.",
+      "upgradeCta": "Changer d'offre",
       "types": {
         "household": {
           "label": "Foyer",
@@ -450,15 +604,15 @@
         },
         "household": {
           "title": "Foyer",
-          "description": "Mon/ma partenaire et moi — budgets partagés, comptes séparés ou joints."
+          "description": "Mon partenaire et moi — budgets communs, comptes séparés ou joints."
         },
         "family": {
           "title": "Famille",
-          "description": "Foyer plus enfants — argent de poche, comptes ado, supervision."
+          "description": "Le foyer, plus les enfants — argent de poche, comptes ados, supervision."
         },
         "company": {
           "title": "Activité",
-          "description": "Séparer l'argent pro — runway, stack SaaS, dépenses cloud."
+          "description": "Séparer l'argent professionnel — runway, abonnements SaaS, dépenses cloud."
         }
       },
       "defaultNames": {
@@ -470,7 +624,7 @@
     },
     "family": {
       "title": "Famille & foyer",
-      "subtitle": "Gérez les tuteurs, les enfants et les finances partagées.",
+      "subtitle": "Gérez les tuteurs, les enfants et les finances communes.",
       "tabs": {
         "members": "Membres",
         "children": "Enfants & ados",
@@ -480,7 +634,7 @@
       "sendInvite": "Envoyer l'invitation",
       "membersTitle": "Membres",
       "addChildTitle": "Ajouter un enfant ou un ado",
-      "addChildDescription": "Créez une connexion pour votre enfant ou ado. Ils se connectent avec e-mail et mot de passe.",
+      "addChildDescription": "Créez un compte pour votre enfant ou adolescent. Il ou elle se connecte avec son e-mail et son mot de passe.",
       "username": "Nom d'utilisateur",
       "usernamePlaceholder": "ex. alex",
       "childEmail": "E-mail",
@@ -493,13 +647,13 @@
       "accountCreatedDescription": "{name} peut se connecter avec son e-mail et mot de passe.",
       "childName": "Prénom de l'enfant",
       "teenEmail": "E-mail (requis pour la connexion ado)",
-      "roleChild": "Enfant (géré par tuteur)",
-      "roleTeen": "Ado (compte propre)",
+      "roleChild": "Enfant (compte géré par un tuteur)",
+      "roleTeen": "Adolescent (compte autonome)",
       "allowance": "Argent de poche : {amount}",
       "allowanceNotSet": "Non défini",
       "savingsJars": "{count} tirelires",
       "splitsHint": "Configurez le partage des dépenses communes dans Paramètres → Règles de partage.",
-      "displayNamePlaceholder": "Nom affiché",
+      "namePlaceholder": "Nom affiché",
       "emailPlaceholder": "partenaire@email.com",
       "teenAccount": "Compte ado",
       "guardianManaged": "Géré par tuteur",
@@ -507,7 +661,7 @@
       "accountSuffix": "Compte {role}",
       "child": {
         "title": "Argent de poche & supervision",
-        "allowanceAmount": "Montant",
+        "allowance": "Montant",
         "frequency": "Fréquence",
         "learnMode": "Mode apprentissage (vue simplifiée)",
         "jarsTitle": "Tirelires",
@@ -528,7 +682,7 @@
       "deleteChildSuccess": "Compte supprimé",
       "deleteChildFailed": "Impossible de supprimer le compte",
       "statusHeader": "Statut",
-      "dateOfBirth": "Date de naissance",
+      "birthday": "Date de naissance",
       "roleLabel": "Rôle",
       "childBalance": "Solde",
       "spending30d": "Dépenses (30 j)",
@@ -546,9 +700,9 @@
         "createFailed": "Impossible de créer le compte. Réessayez."
       },
       "noLinkedAccounts": "Aucun compte bancaire lié pour ce membre.",
-      "noTransactions": "Aucune transaction synchronisée. Connectez une banque et lancez la sync depuis Comptes.",
+      "noTransactions": "Aucune transaction synchronisée. Connectez une banque et lancez une sync depuis Comptes.",
       "recentActivity": "Activité récente",
-      "splitsComingTitle": "Règles de partage bientôt disponibles",
+      "splitsComingTitle": "Règles de partage — bientôt",
       "hints": {
         "independent": "Créez un espace Foyer ou Famille pour inviter votre partenaire et gérer les enfants.",
         "household": "Finances de couple — connectez des comptes partagés et invitez un co-tuteur.",
@@ -558,7 +712,7 @@
         "overview": "Aperçu",
         "accounts": "Comptes",
         "transactions": "Transactions",
-        "allowance": "Argent de poche & tirelires"
+        "allowance": "Argent de poche et tirelires"
       }
     },
     "company": {
@@ -568,15 +722,15 @@
       "noBusinessTitle": "Pas encore d'espace activité",
       "createBusinessCta": "Créer un espace activité",
       "readOnlyTitle": "Accès lecture seule",
-      "readOnlyDesc": "Vous voyez le runway et les dépenses, mais seul le fondateur ou l'admin finance peut modifier les données.",
+      "readOnlyDesc": "Vous pouvez consulter la runway et les dépenses, mais seul·e le fondateur·rice ou l'admin finance peut modifier les données.",
       "monthlyBreakdown": "Ce mois-ci",
-      "income": "Revenus",
-      "expenses": "Sorties",
+      "income": "Encaissements",
+      "expenses": "Décaissements",
       "subscriptions": "SaaS & outils",
       "cloudDev": "Cloud & outils dev",
       "saasShield": "SaaS Shield",
       "activeSubs": "{count} outils récurrents détectés",
-      "duplicateWaste": "~{amount}/mois en sièges en double — à couper.",
+      "duplicateWaste": "~{amount}/mois de sièges en double — à couper.",
       "reviewSubs": "Voir la stack SaaS",
       "topVendors": "Top fournisseurs ce mois",
       "noVendors": "Connectez votre compte pro pour voir où part l'argent.",
@@ -587,8 +741,8 @@
         "team": "Équipe"
       },
       "setup": {
-        "title": "Configurez votre cockpit business",
-        "subtitle": "Trois étapes pour voir runway, gaspillage SaaS et dépenses cloud.",
+        "title": "Configurez votre tableau de bord pro",
+        "subtitle": "Trois étapes pour visualiser la runway, le gaspillage SaaS et les dépenses cloud.",
         "step1Title": "Connecter la banque pro",
         "step1Desc": "Liez le compte courant utilisé pour les revenus et charges.",
         "step1Cta": "Connecter un compte",
@@ -596,21 +750,21 @@
         "step2Desc": "On calcule le burn rate et catégorise les charges SaaS.",
         "step2Cta": "Voir les transactions",
         "step3Title": "Passer en revue SaaS & fournisseurs",
-        "step3Desc": "Repérez les doublons et le cloud avant qu'ils mangent votre runway.",
+        "step3Desc": "Repérez les doublons et le cloud avant qu'ils grignotent votre runway.",
         "step3Cta": "Ouvrir SaaS Shield",
         "syncCta": "Synchroniser"
       },
       "alerts": {
         "CONNECT_BANK": "Connectez un compte pro pour calculer runway et burn rate.",
         "SYNC_TRANSACTIONS": "Synchronisation en cours — actualisez ou ouvrez Comptes.",
-        "LOW_RUNWAY": "Runway inférieur à {months} mois au burn actuel — réduisez le SaaS ou augmentez les revenus.",
-        "SAAS_WASTE": "Vous payez peut-être ~{amount} $/mois en sièges SaaS en double.",
-        "HIGH_CLOUD_SPEND": "Cloud & dev = {percent} % des dépenses du mois — à vérifier.",
+        "LOW_RUNWAY": "Runway inférieure à {months} mois au burn actuel — réduisez les abonnements ou augmentez les revenus.",
+        "SAAS_WASTE": "Vous payez peut-être ~{amount}/mois en abonnements SaaS en double.",
+        "HIGH_CLOUD_SPEND": "Cloud et outils dev : {percent} % des dépenses du mois — à revoir.",
         "MANY_SUBSCRIPTIONS": "{count} abonnements actifs — auditez les outils inutilisés."
       },
       "team": {
         "inviteTitle": "Inviter l'équipe",
-        "inviteDesc": "Nous envoyons un lien et un code de vérification par SMS. L'e-mail est optionnel.",
+        "inviteDesc": "Nous envoyons un lien d'invitation et un code de vérification par SMS. L'e-mail est facultatif.",
         "phone": "Numéro de téléphone",
         "phoneHelp": "Requis — nous envoyons une invitation et un code par SMS.",
         "email": "E-mail (optionnel)",
@@ -660,9 +814,33 @@
       "emailHelp": "L'e-mail est géré par Neon Auth. Modifiez-le dans les paramètres de votre compte.",
       "saveChanges": "Enregistrer les modifications",
       "planBilling": "Offre et facturation",
-      "upgradeDescription": "Passez à Pro pour débloquer les connexions bancaires illimitées, les alertes SaaS Shield, la prévision de trésorerie et les exports.",
+      "currentPlan": "Offre actuelle",
+      "choosePlan": "Choisir une offre",
+      "billingCycle": "Période de facturation",
+      "upgradeDescription": "Passez à Pro pour débloquer les connexions bancaires illimitées, les alertes SaaS Shield, les prévisions de trésorerie et les exports.",
       "upgradeCta": "Passer à Pro — 12 €/mois",
-      "manageDescription": "Gérez votre abonnement, mettez à jour votre moyen de paiement ou téléchargez vos factures.",
+      "upgradeCtaDynamic": "Passer à Pro — {price}/mois",
+      "upgradeCtaWithPlan": "Passer à {plan} — {price}",
+      "billingMonthly": "Mensuel",
+      "billingYearly": "Annuel (économisez ~17 %)",
+      "updatePlan": "Mettre à jour l'offre",
+      "planUpdated": "Votre abonnement a été mis à jour.",
+      "planUnchanged": "Vous êtes déjà sur cette offre.",
+      "planChangeFailed": "Impossible de mettre à jour l'abonnement",
+      "previewLoading": "Calcul du prorata…",
+      "prorationCharge": "À payer aujourd'hui (prorata) : {amount}",
+      "prorationCredit": "Crédit sur le compte (prorata) : {amount}",
+      "currentSelection": "C'est votre offre actuelle.",
+      "renewsOn": "Renouvellement le {date}",
+      "cancelsOn": "Résiliation le {date}",
+      "cancelViaPortal": "Pour résilier ou modifier votre moyen de paiement, utilisez le portail de facturation.",
+      "planOptions": {
+        "pro": "Pro",
+        "enterprise": "Enterprise",
+        "proPrice": "À partir de {price}/mois",
+        "enterprisePrice": "À partir de {price}/mois"
+      },
+      "manageDescription": "Passez du mensuel à l'annuel ou changez d'offre. Stripe calcule automatiquement le prorata.",
       "billingPortal": "Ouvrir le portail de facturation",
       "connectedServices": "Services connectés",
       "github": "GitHub",
@@ -671,7 +849,7 @@
       "cloudDescription": "Suivi des dépenses d'infrastructure cloud",
       "connect": "Connecter",
       "dangerZone": "Zone de danger",
-      "deleteWarning": "Supprimez définitivement votre compte FlowRate. Cela déconnecte toutes les banques liées, supprime transactions, budgets et abonnements stockés dans FlowRate, annule la facturation et supprime votre connexion. Action irréversible.",
+      "deleteWarning": "Supprime définitivement votre compte FlowRate : déconnexion de toutes les banques, suppression des transactions, budgets et abonnements stockés, résiliation de la facturation et suppression de votre accès. Action irréversible.",
       "deleteAccount": "Supprimer mon compte",
       "deleteModalTitle": "Supprimer définitivement votre compte ?",
       "deleteModalDescription": "Saisissez votre e-mail et mot de passe pour confirmer. Toutes les connexions bancaires, transactions et données personnelles dans FlowRate seront effacées. Les espaces familiaux partagés dont vous êtes propriétaire seront transférés à un autre tuteur si possible.",
@@ -706,9 +884,7 @@
       "phoneVerifyRequired": "Enregistrez d'abord votre numéro, puis saisissez le code SMS",
       "phoneInvalid": "Entrez un numéro valide (ex. +33987765432 ou +33612345678)",
       "phoneVerificationFailed": "Impossible d'envoyer le SMS — vérifiez le format du numéro et la config Twilio",
-      "phoneTaken": "Ce numéro est déjà associé à un autre compte",
-      "upgradeCtaDynamic": "Passer à Pro — {price}/mois",
-      "upgradeSuccess": "Bienvenue sur Pro ! Votre offre est active.",
+      "phoneTaken": "Ce numéro est déjà associé à un autre compte",      "upgradeSuccess": "Bienvenue sur Pro ! Votre offre est active.",
       "upgradeCanceled": "Paiement annulé — vous pouvez passer à Pro à tout moment depuis Paramètres.",
       "checkoutFailed": "Impossible de démarrer le paiement",
       "portalFailed": "Impossible d'ouvrir le portail de facturation",
@@ -719,7 +895,14 @@
       "subtitle": "{count} transactions dans votre espace actif — recherchez, filtrez et exportez.",
       "total": "{count} transactions au total",
       "exportCsv": "Exporter CSV",
-      "searchPlaceholder": "Rechercher par marchand ou description",
+      "exportAuditCsv": "Export audit",
+      "searchPlaceholder": "Rechercher un commerçant ou une description",
+      "searchLabel": "Rechercher",
+      "showingCount": "{loaded} sur {total} affichées",
+      "loadingMore": "Chargement…",
+      "scrollForMore": "Faites défiler pour en voir plus",
+      "noResultsTitle": "Aucune transaction correspondante",
+      "noResultsDescription": "Essayez d'autres mots-clés ou ajustez vos filtres.",
       "filterCategory": "Catégorie",
       "clearFilters": "Effacer les filtres",
       "emptyTitle": "Aucune transaction",
@@ -741,10 +924,10 @@
     },
     "subscriptions": {
       "title": "Abonnements",
-      "subtitle": "Abonnements SaaS détectés automatiquement · Total mensuel :",
+      "subtitle": "{count} abonnements actifs détectés",
       "priceChangeTitle": "{count} changement de prix détecté",
       "priceChangeTitlePlural": "{count} changements de prix détectés",
-      "priceChangeDescription": "{names} {verb} modifié leur tarif. Vérifiez maintenant pour éviter les surprises.",
+      "priceChangeDescription": "{names} {verb} changé de tarif. Vérifiez maintenant pour éviter les mauvaises surprises.",
       "priceChangeVerbSingular": "a",
       "priceChangeVerbPlural": "ont",
       "filters": {
@@ -754,9 +937,9 @@
         "cancelled": "Annulés"
       },
       "emptyTitle": "Aucun abonnement détecté",
-      "emptyDescription": "Connectez vos comptes bancaires et FlowRate détectera automatiquement les abonnements récurrents.",
+      "emptyDescription": "Connectez vos comptes bancaires : FlowRate détectera automatiquement les abonnements récurrents.",
       "shieldTitle": "SaaS Shield est actif",
-      "shieldDescription": "FlowRate surveille vos abonnements pour les changements de prix et les services inutilisés. Vous serez notifié immédiatement en cas de changement.",
+      "shieldDescription": "FlowRate surveille vos abonnements (hausse de prix, services inutilisés). Vous êtes prévenu·e dès qu'il y a un changement.",
       "priceUp": "Prix ↑",
       "nextCharge": "Prochain : {date}",
       "status": {
@@ -779,17 +962,18 @@
       "nearLimit": "· {count} proche de la limite",
       "newBudget": "Nouveau budget",
       "emptyTitle": "Aucun budget défini",
-      "emptyDescription": "Créez des limites de dépenses par catégorie pour reprendre le contrôle de vos finances.",
+      "emptyDescription": "Fixez des plafonds par catégorie pour reprendre la main sur vos dépenses.",
       "createFirst": "Créer le premier budget",
       "modalTitle": "Nouveau budget",
+      "editModalTitle": "Modifier le budget",
       "nameLabel": "Nom du budget",
-      "namePlaceholder": "ex. Courses mensuelles",
+      "namePlaceholder": "ex. Courses du mois",
       "categoryLabel": "Catégorie",
-      "limitLabel": "Limite mensuelle ($)",
+      "limitLabel": "Plafond mensuel",
       "periodLabel": "Période",
       "createBudget": "Créer le budget",
       "percentUsed": "{percent} % utilisé",
-      "overBudget": "— budget dépassé !",
+      "overBudget": "— dépassement !",
       "subtitleOne": "1 budget actif dans cet espace",
       "subtitleMany": "{count} budgets actifs dans cet espace",
       "nearLimitAlert": "{count} budget(s) à 90 % ou plus de leur limite",
@@ -803,15 +987,15 @@
     },
     "sync": {
       "complete": "Synchronisation terminée",
-      "imported": "{count} transactions importées depuis {accounts} comptes liés.",
+      "imported": "{count} transactions importées depuis {accounts} compte(s) lié(s).",
       "failed": "Échec de la synchronisation",
       "tryAgain": "Veuillez réessayer."
     },
     "invite": {
       "title": "Rejoindre {space}",
-      "description": "Vous avez été invité en tant que {role}. Acceptez pour accéder à cet espace financier.",
+      "description": "Vous avez été invité·e en tant que {role}. Acceptez pour accéder à cet espace financier.",
       "accept": "Accepter l'invitation",
-      "acceptedTitle": "Vous êtes inscrit !",
+      "acceptedTitle": "Bienvenue !",
       "loginHint": "Connectez-vous avec {email} et le mot de passe que vous venez de créer.",
       "expiredTitle": "Invitation expirée",
       "expiredDescription": "Ce lien n'est plus valide. Demandez au propriétaire de l'espace d'en envoyer un nouveau.",
@@ -823,7 +1007,7 @@
       "codeInvalid": "Code invalide ou expiré.",
       "resendFailed": "Impossible de renvoyer le code. Réessayez plus tard.",
       "setupTitle": "Configurer votre accès à {space}",
-      "setupDescription": "Choisissez un mot de passe pour terminer. L'e-mail est optionnel.",
+      "setupDescription": "Choisissez un mot de passe pour finaliser. L'e-mail est facultatif.",
       "yourName": "Votre nom",
       "emailOptional": "E-mail (optionnel)",
       "emailOptionalHelp": "Laissez vide pour vous connecter avec un e-mail lié au téléphone.",
@@ -846,7 +1030,7 @@
     "UTILITIES": "Services",
     "HEALTHCARE": "Santé",
     "ENTERTAINMENT": "Loisirs",
-    "SHOPPING": "Shopping",
+    "SHOPPING": "Achats",
     "SAVINGS": "Épargne",
     "INCOME": "Revenus",
     "CLOUD_INFRA": "Cloud",
@@ -866,8 +1050,8 @@
     "OWNER": "Propriétaire",
     "MEMBER": "Membre",
     "FINANCE_ADMIN": "Admin finance",
-    "MANAGER": "Manager",
-    "GUEST": "Lecture seule"
+    "MANAGER": "Gestionnaire",
+    "GUEST": "Consultation seule"
   },
   "memberStatus": {
     "ACTIVE": "Actif",
@@ -883,13 +1067,15 @@
     "CLOUD": "Cloud"
   },
   "legal": {
+    "betaNotice": "FlowRate est en bêta active. Les fonctionnalités, connexions bancaires, facturation, disponibilité et ces documents juridiques peuvent changer sans préavis. Le service peut être incomplet, instable ou temporairement indisponible. Rien ici ne constitue une promesse de livrer une fonctionnalité précise à une date précise. En utilisant FlowRate pendant la bêta, vous acceptez ces limites et comprenez que les politiques et le produit peuvent évoluer.",
+    "betaSectionNotice": "Avis bêta : les pratiques décrites dans cette section reflètent le produit actuel et peuvent être mises à jour au fil du développement de FlowRate.",
     "privacy": {
       "title": "Politique de confidentialité",
       "seoTitle": "Politique de confidentialité — FlowRate",
       "lastUpdated": "Dernière mise à jour : 28 juin 2026",
       "seeAlsoTerms": "Voir aussi : Conditions d'utilisation",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
-      "intro": "FlowRate (« nous ») est une application de gestion des finances personnelles et familiales. Cette politique explique quelles informations nous collectons, comment nous les utilisons, avec qui nous les partageons, où elles sont stockées et quels choix vous avez. Nous visons une transparence maximale pour que vous puissiez utiliser FlowRate en toute connaissance de cause.",
+      "intro": "FlowRate (« nous ») est une application de gestion des finances personnelles et familiales, actuellement en bêta. Cette politique explique quelles informations nous collectons, comment nous les utilisons, avec qui nous les partageons, où elles sont stockées et quels choix vous avez. Nous visons une transparence maximale pour que vous puissiez utiliser FlowRate en toute connaissance de cause pendant le développement du produit.",
       "contact": "Des questions sur cette politique ou vos données ? Contactez-nous à",
       "table": {
         "provider": "Fournisseur",
@@ -1067,7 +1253,7 @@
       "lastUpdated": "Dernière mise à jour : 26 juin 2026",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
-      "intro": "Les présentes Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation de FlowRate. En créant un compte ou en utilisant le service, vous acceptez ces Conditions et notre Politique de confidentialité.",
+      "intro": "Les présentes Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation de FlowRate pendant la phase bêta. En créant un compte ou en utilisant le service, vous acceptez ces Conditions et notre Politique de confidentialité, y compris les limites applicables pendant le développement actif.",
       "contact": "Des questions sur ces Conditions ? Contactez-nous à",
       "sections": {
         "agreement": {
@@ -1146,7 +1332,7 @@
       "lastUpdated": "Dernière mise à jour : 28 juin 2026",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoTerms": "Conditions d'utilisation",
-      "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation.",
+      "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles, actuellement en bêta. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation et peut être mis à jour à mesure que le produit mûrit.",
       "contact": "Des questions sur cet avis ou vos IPNP ? Contactez-nous à",
       "sections": {
         "purpose": {
@@ -1250,18 +1436,18 @@
   },
   "validation": {
     "passwordMismatch": "Les mots de passe ne correspondent pas",
-    "agreeToTerms": "Vous devez accepter les Conditions d'utilisation et la Politique de confidentialité"
+    "agreeToTerms": "Vous devez accepter les Conditions d'utilisation et la Politique de confidentialité."
   },
   "errors": {
     "generic": "Une erreur est survenue. Veuillez réessayer.",
     "network": "Erreur réseau. Vérifiez votre connexion et réessayez.",
     "badRequest": "Requête invalide. Vérifiez vos informations.",
-    "unauthorized": "Vous devez vous connecter pour continuer.",
-    "forbidden": "Vous n'avez pas la permission d'effectuer cette action.",
+    "unauthorized": "Connectez-vous pour continuer.",
+    "forbidden": "Vous n'êtes pas autorisé·e à effectuer cette action.",
     "notFound": "La ressource demandée est introuvable.",
     "conflict": "Cette action entre en conflit avec des données existantes.",
     "validation": "Vérifiez vos informations et réessayez.",
-    "rateLimit": "Trop de requêtes. Veuillez patienter.",
+    "rateLimit": "Trop de tentatives. Patientez un instant.",
     "server": "Erreur serveur. Veuillez réessayer plus tard.",
     "unavailable": "Service temporairement indisponible.",
     "codes": {
@@ -1271,7 +1457,16 @@
       "STRIPE_FC_NOT_ENABLED": "Financial Connections n'est pas approuvé en mode live. Complétez la demande dans le Dashboard Stripe.",
       "STRIPE_FC_PERMISSION_DENIED": "Votre demande Financial Connections n'inclut pas les permissions soldes et transactions.",
       "STRIPE_CONNECT_FAILED": "Impossible de démarrer la connexion bancaire. Vérifiez les clés live et les paramètres Financial Connections.",
-      "NO_ACTIVE_SPACE": "Aucun espace financier actif. Ouvrez Espaces, sélectionnez un espace, puis réessayez."
+      "NO_ACTIVE_SPACE": "Aucun espace financier actif. Ouvrez Espaces, sélectionnez un espace, puis réessayez.",
+      "PLAN_LIMIT_BANKS": "L’offre gratuite inclut une connexion bancaire. Passez à Pro pour en ajouter d’autres.",
+      "PLAN_LIMIT_SPACES": "L’offre gratuite inclut un espace financier. Passez à Pro pour les espaces Foyer, Famille et Activité.",
+      "PLAN_LIMIT_SPACE_TYPE": "Les espaces Foyer, Famille et Activité nécessitent Pro ou Enterprise.",
+      "PLAN_LIMIT_SYNC_COOLDOWN": "La synchronisation gratuite est limitée à une fois par jour. Passez à Pro pour la synchro automatique.",
+      "PLAN_LIMIT_SAAS_SHIELD": "SaaS Shield et les métriques de burn rate nécessitent Pro ou Enterprise.",
+      "PLAN_LIMIT_TEEN_ACCOUNTS": "Les comptes ado et enfant nécessitent Pro ou Enterprise.",
+      "PLAN_LIMIT_COMPANY_TEAM": "Les invitations d’équipe entreprise nécessitent Enterprise.",
+      "PLAN_LIMIT_COMPANY_MEMBERS": "Cet espace entreprise a atteint sa limite de membres. Passez à Enterprise pour jusqu’à 10 membres.",
+      "PLAN_LIMIT_AUDIT_EXPORT": "Les exports audit nécessitent Enterprise."
     }
   }
 }

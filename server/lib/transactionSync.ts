@@ -1,8 +1,10 @@
-// ANCHOR: Stripe FC transaction import and subscription detection
+// ANCHOR: Stripe FC transaction import
 import type Stripe from 'stripe'
 import { ensureFinancialConnectionSubscriptions } from './stripe'
-import { detectSubscriptionsFromTransactions } from '../utils/subscriptions'
+import { syncSpaceSubscriptions } from './subscriptionSync'
 import { mapStripeFcTransaction } from '../utils/transactions'
+
+export { syncSpaceSubscriptions } from './subscriptionSync'
 
 export async function syncAccountTransactions(
   stripe: Stripe,
@@ -10,27 +12,27 @@ export async function syncAccountTransactions(
     id: string
     userId: string
     spaceId: string
-    stripeFcAccountId: string | null
+    stripeId: string | null
   }
 ) {
-  if (!account.stripeFcAccountId) return { imported: 0 }
+  if (!account.stripeId) return { imported: 0 }
 
   try {
-    await stripe.financialConnections.accounts.refresh(account.stripeFcAccountId, {
+    await stripe.financialConnections.accounts.refresh(account.stripeId, {
       features: ['balance', 'transactions']
     })
   } catch {
     // NOTE - Refresh may fail in test mode — still attempt listing
   }
 
-  await ensureFinancialConnectionSubscriptions(stripe, account.stripeFcAccountId)
+  await ensureFinancialConnectionSubscriptions(stripe, account.stripeId)
 
   let imported = 0
   let startingAfter: string | undefined
 
   for (let page = 0; page < 5; page++) {
     const batch = await stripe.financialConnections.transactions.list({
-      account: account.stripeFcAccountId,
+      account: account.stripeId,
       limit: 100,
       ...(startingAfter ? { starting_after: startingAfter } : {})
     })
@@ -40,12 +42,12 @@ export async function syncAccountTransactions(
       const mapped = mapStripeFcTransaction(tx, description)
 
       await prisma.transaction.upsert({
-        where: { stripeTransactionId: tx.id },
+        where: { stripeId: tx.id },
         create: {
           userId: account.userId,
           spaceId: account.spaceId,
           accountId: account.id,
-          stripeTransactionId: tx.id,
+          stripeId: tx.id,
           ...mapped
         },
         update: mapped
@@ -60,64 +62,9 @@ export async function syncAccountTransactions(
   return { imported }
 }
 
-export async function syncSpaceSubscriptions(spaceId: string, userId: string) {
-  const since = new Date()
-  since.setMonth(since.getMonth() - 6)
-
-  const txs = await prisma.transaction.findMany({
-    where: { spaceId, date: { gte: since }, amount: { lt: 0 } },
-    select: { merchant: true, description: true, amount: true, date: true, category: true }
-  })
-
-  const detected = detectSubscriptionsFromTransactions(
-    txs.map(tx => ({
-      merchant: tx.merchant,
-      description: tx.description,
-      amount: Number(tx.amount),
-      date: tx.date,
-      category: tx.category
-    }))
-  )
-
-  for (const sub of detected) {
-    const existing = await prisma.detectedSubscription.findFirst({
-      where: { spaceId, userId, name: sub.name }
-    })
-
-    if (existing) {
-      const priceChanged = Math.abs(Number(existing.amount) - sub.amount) > 0.01
-      await prisma.detectedSubscription.update({
-        where: { id: existing.id },
-        data: {
-          amount: sub.amount,
-          frequency: sub.frequency,
-          category: sub.category,
-          lastCharged: sub.lastCharged,
-          nextCharge: sub.nextCharge,
-          priceAlert: priceChanged || existing.priceAlert,
-          status: 'ACTIVE'
-        }
-      })
-    } else {
-      await prisma.detectedSubscription.create({
-        data: {
-          userId,
-          spaceId,
-          name: sub.name,
-          amount: sub.amount,
-          frequency: sub.frequency,
-          category: sub.category,
-          lastCharged: sub.lastCharged,
-          nextCharge: sub.nextCharge
-        }
-      })
-    }
-  }
-}
-
 export async function syncSpaceTransactions(stripe: Stripe, spaceId: string, userId: string) {
   const accounts = await prisma.account.findMany({
-    where: { spaceId, stripeFcAccountId: { not: null } }
+    where: { spaceId, stripeId: { not: null } }
   })
 
   let total = 0

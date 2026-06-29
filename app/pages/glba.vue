@@ -24,14 +24,18 @@ useSeoMeta({ title: () => t('legal.glba.seoTitle') })
 
 <template>
   <UContainer class="py-16 max-w-3xl">
-    <p class="text-sm text-primary font-medium mb-3 flex flex-wrap gap-x-4 gap-y-1">
-      <NuxtLink to="/privacy" class="hover:underline">{{ t('legal.glba.seeAlsoPrivacy') }}</NuxtLink>
-      <NuxtLink to="/terms" class="hover:underline">{{ t('legal.glba.seeAlsoTerms') }}</NuxtLink>
-    </p>
-
-    <h1 class="text-3xl font-bold mb-2">{{ t('legal.glba.title') }}</h1>
-    <p class="text-sm text-muted mb-4">{{ t('legal.glba.lastUpdated') }}</p>
-    <p class="text-muted leading-relaxed mb-10">{{ t('legal.glba.intro') }}</p>
+    <LegalPageIntro
+      :title="t('legal.glba.title')"
+      :last-updated="t('legal.glba.lastUpdated')"
+      :intro="t('legal.glba.intro')"
+    >
+      <template #see-also>
+        <p class="text-sm text-primary font-medium mb-3 flex flex-wrap gap-x-4 gap-y-1">
+          <NuxtLink to="/privacy" class="hover:underline">{{ t('legal.glba.seeAlsoPrivacy') }}</NuxtLink>
+          <NuxtLink to="/terms" class="hover:underline">{{ t('legal.glba.seeAlsoTerms') }}</NuxtLink>
+        </p>
+      </template>
+    </LegalPageIntro>
 
     <LegalDocument base-key="legal.glba" :section-ids="sectionIds" />
 

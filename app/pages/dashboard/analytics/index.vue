@@ -20,12 +20,13 @@ const {
   netWorthLabels,
   netWorthValues,
   hasData,
+  summaryCurrency,
   isSyncing
 } = storeToRefs(analyticsStore)
 
 const hasConnectedAccounts = computed(() => (data.value?.summary.linkedAccountCount ?? 0) > 0)
 
-const spaceId = computed(() => useSpacesStore().activeSpace?.id)
+const spaceId = computed(() => useSpacesStore().space?.id)
 await useAsyncData(
   () => `analytics-${spaceId.value}-${range.value}`,
   async () => {
@@ -39,7 +40,7 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-7xl mx-auto">
+  <DashboardPageShell :show-guide="false">
     <DashboardPageHeader
       :title="t('dashboard.analytics.title')"
       :description="t('dashboard.analytics.subtitle')"
@@ -50,6 +51,7 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
           icon="i-lucide-refresh-cw"
           color="neutral"
           variant="outline"
+          size="sm"
           :loading="isSyncing"
           @click="analyticsStore.syncTransactions()"
         />
@@ -58,18 +60,19 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
           icon="i-lucide-landmark"
           color="neutral"
           variant="ghost"
+          size="sm"
           to="/dashboard/accounts"
         />
       </template>
     </DashboardPageHeader>
 
-    <UCard :ui="{ body: 'p-4' }">
+    <UCard :ui="{ body: 'p-3 sm:p-4' }">
       <UFormField :label="t('dashboard.analytics.periodLabel')">
         <UTabs v-model="range" :items="rangeTabs" :content="false" class="w-full" />
       </UFormField>
     </UCard>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
       <DashboardStatsCard
         :title="t('dashboard.analytics.netWorth')"
         :value="data?.summary.totalBalance != null ? analyticsStore.fmt(data.summary.totalBalance) : '—'"
@@ -96,21 +99,16 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
       />
     </div>
 
-    <UCard v-if="!pending && !hasData" class="text-center py-16">
-      <UIcon name="i-lucide-bar-chart-3" class="w-10 h-10 mx-auto mb-4 text-flow-muted opacity-40" />
-      <h3 class="font-display text-xl mb-2">
+    <UCard v-if="!pending && !hasData" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <UIcon name="i-lucide-bar-chart-3" class="mx-auto mb-3 size-8 text-muted opacity-40" />
+      <h3 class="mb-1 text-base font-semibold">
         {{ hasConnectedAccounts ? t('dashboard.analytics.emptyTitleConnected') : t('dashboard.analytics.emptyTitle') }}
       </h3>
-      <p class="text-sm text-flow-muted dark:text-flow-muted-dark max-w-md mx-auto mb-6">
+      <p class="mx-auto mb-4 max-w-md text-sm text-muted">
         {{ hasConnectedAccounts ? t('dashboard.analytics.emptyDescriptionConnected') : t('dashboard.analytics.emptyDescription') }}
       </p>
-      <div class="flex flex-wrap justify-center gap-2">
-        <UButton
-          v-if="!hasConnectedAccounts"
-          :label="t('dashboard.overview.connectBank')"
-          to="/dashboard/accounts"
-          icon="i-lucide-landmark"
-        />
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <DashboardConnectBank v-if="!hasConnectedAccounts" />
         <UButton
           :label="t('dashboard.analytics.syncData')"
           icon="i-lucide-refresh-cw"
@@ -122,7 +120,7 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
       </div>
     </UCard>
 
-    <div v-else class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div v-else class="grid grid-cols-1 gap-4 xl:grid-cols-2">
       <DashboardChartsChartCard
         :title="t('dashboard.analytics.cashFlow')"
         :subtitle="t('dashboard.analytics.cashFlowHint')"
@@ -131,6 +129,7 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
           :labels="cashFlowLabels"
           :income="cashFlowIncome"
           :spending="cashFlowSpending"
+          :currency="summaryCurrency"
         />
       </DashboardChartsChartCard>
 
@@ -141,6 +140,7 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
         <DashboardChartsCategoryChart
           :labels="categoryLabels"
           :values="categoryValues"
+          :currency="summaryCurrency"
         />
       </DashboardChartsChartCard>
 
@@ -151,6 +151,7 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
         <DashboardChartsNetWorthChart
           :labels="netWorthLabels"
           :values="netWorthValues"
+          :currency="summaryCurrency"
         />
       </DashboardChartsChartCard>
 
@@ -161,33 +162,34 @@ useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.app
         <DashboardChartsMerchantChart
           :labels="merchantLabels"
           :values="merchantValues"
+          :currency="summaryCurrency"
         />
       </DashboardChartsChartCard>
     </div>
 
-    <UCard v-if="data?.categories?.length" :ui="{ body: 'p-6 sm:p-8' }">
-      <h3 class="font-display text-lg mb-6">{{ t('dashboard.analytics.insightsTitle') }}</h3>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <UCard v-if="data?.categories?.length" :ui="{ body: 'p-4 sm:p-5' }">
+      <h3 class="mb-3 text-base font-semibold">{{ t('dashboard.analytics.insightsTitle') }}</h3>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <UCard
           v-for="cat in data.categories.slice(0, 6)"
           :key="cat.category"
-          :ui="{ body: 'p-4' }"
+          :ui="{ body: 'p-3 sm:p-4' }"
           variant="subtle"
         >
-          <p class="text-xs text-flow-muted dark:text-flow-muted-dark mb-1">{{ analyticsStore.categoryLabel(cat.category) }}</p>
-          <p class="text-xl font-light tabular-nums">{{ analyticsStore.fmt(cat.amount) }}</p>
+          <p class="mb-0.5 text-xs font-medium text-muted">{{ analyticsStore.categoryLabel(cat.category) }}</p>
+          <p class="text-lg font-semibold tabular-nums">{{ analyticsStore.fmt(cat.amount) }}</p>
           <UProgress
-            class="mt-3"
+            class="mt-2"
             :model-value="data.summary.spending > 0 ? (cat.amount / data.summary.spending) * 100 : 0"
             color="primary"
             size="xs"
           />
-          <p class="text-xs text-flow-muted mt-2">
+          <p class="mt-1.5 text-xs text-muted">
             {{ data.summary.spending > 0 ? Math.round((cat.amount / data.summary.spending) * 100) : 0 }}%
             {{ t('dashboard.analytics.ofSpending') }}
           </p>
         </UCard>
       </div>
     </UCard>
-  </div>
+  </DashboardPageShell>
 </template>

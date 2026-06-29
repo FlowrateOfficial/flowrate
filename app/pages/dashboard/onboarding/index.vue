@@ -19,33 +19,34 @@ useSeoMeta({ title: () => `${t('dashboard.onboarding.welcome')} — ${t('common.
 </script>
 
 <template>
-  <div class="p-6 max-w-2xl mx-auto py-16 space-y-8">
+  <DashboardPageShell max-width="lg">
     <div class="text-center">
-      <h1 class="text-3xl font-bold">{{ t('dashboard.onboarding.title') }}</h1>
-      <p class="text-muted mt-2">{{ t('dashboard.onboarding.subtitle') }}</p>
+      <h1 class="text-2xl font-semibold sm:text-3xl">{{ t('dashboard.onboarding.title') }}</h1>
+      <p class="mt-1 text-sm text-muted sm:text-base">{{ t('dashboard.onboarding.subtitle') }}</p>
     </div>
 
-    <div v-if="step === 1" class="grid sm:grid-cols-2 gap-4">
+    <div v-if="step === 1" class="grid gap-3 sm:grid-cols-2">
       <UCard
         v-for="opt in options"
         :key="opt.type"
         class="cursor-pointer transition-all"
         :class="selected === opt.type ? 'ring-2 ring-primary bg-primary/5' : 'hover:ring-1 hover:ring-primary/30'"
+        :ui="{ body: 'p-4' }"
         @click="onboarding.selectType(opt.type)"
       >
-        <UIcon :name="opt.icon" class="w-8 h-8 text-primary mb-3" />
+        <UIcon :name="opt.icon" class="mb-2 size-7 text-primary" />
         <p class="font-semibold">{{ opt.title }}</p>
-        <p class="text-sm text-muted mt-1">{{ opt.description }}</p>
+        <p class="mt-1 text-sm text-muted">{{ opt.description }}</p>
       </UCard>
     </div>
 
-    <div v-else-if="selected && selected !== 'INDEPENDENT'" class="space-y-4">
+    <UCard v-else-if="selected && selected !== 'INDEPENDENT'" :ui="{ body: 'p-4 sm:p-5' }">
       <UFormField :label="t('dashboard.onboarding.spaceNameLabel')">
         <UInput v-model="spaceName" :placeholder="onboarding.defaultName(selected)" class="w-full" />
       </UFormField>
-    </div>
+    </UCard>
 
-    <div class="flex justify-between">
+    <div class="flex justify-between gap-3">
       <UButton
         v-if="step > 1"
         :label="t('common.back')"
@@ -67,5 +68,5 @@ useSeoMeta({ title: () => `${t('dashboard.onboarding.welcome')} — ${t('common.
         @click="onboarding.finish"
       />
     </div>
-  </div>
+  </DashboardPageShell>
 </template>

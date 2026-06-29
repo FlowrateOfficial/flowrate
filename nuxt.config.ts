@@ -6,14 +6,15 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     ['nuxt-i18n-micro', {
       locales: [
-        { code: 'en', iso: 'en-US', name: 'English', displayName: 'English' },
+        { code: 'en', iso: 'en-US', name: 'English (US)', displayName: 'English (US)' },
+        { code: 'en-GB', iso: 'en-GB', name: 'English (UK)', displayName: 'English (UK)', fallbackLocale: 'en' },
         { code: 'fr', iso: 'fr-FR', name: 'French', displayName: 'Français' }
       ],
       defaultLocale: 'en',
       localeCookie: 'user-locale',
       translationDir: 'locales',
       strategy: 'no_prefix',
-      // NOTE - All copy in locales/en.json + fr.json — per-page files broke merges
+      // NOTE - All copy in locales/en.json, en-GB.json (UK overrides), fr.json — per-page files broke merges
       disablePageLocales: true
     }]
   ],
@@ -30,13 +31,20 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
-    '/api/stripe/webhook': { cors: false }
+    '/api/stripe/webhook': { cors: false },
+    '/api/plaid/webhook': { cors: false }
   },
 
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
     stripePricePro: process.env.STRIPE_PRICE_PRO ?? '',
+    plaidClientId: process.env.PLAID_CLIENT_ID ?? '',
+    plaidSecret: process.env.PLAID_SECRET ?? '',
+    plaidEnv: process.env.PLAID_ENV ?? 'sandbox',
+    // Must match a URI registered at https://dashboard.plaid.com/team/api
+    plaidRedirectUri: process.env.PLAID_REDIRECT_URI ?? '',
+    plaidWebhookUrl: process.env.PLAID_WEBHOOK_URL ?? '',
     twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? '',
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? '',
     twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER ?? '',
@@ -45,6 +53,7 @@ export default defineNuxtConfig({
     stackProjectId: process.env.STACK_PROJECT_ID,
     neonBranchId: process.env.NEON_BRANCH_ID ?? '',
     neonAuthCookieSecret: process.env.NUXT_SESSION_PASSWORD ?? process.env.NEON_AUTH_COOKIE_SECRET ?? '',
+    adminEmails: process.env.ADMIN_EMAILS ?? '',
     public: {
       neonAuthUrl: process.env.NUXT_NEON_AUTH_URL ?? '',
       neonAuthConfigured: Boolean(
@@ -54,6 +63,9 @@ export default defineNuxtConfig({
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
       stripeConfigured: Boolean(process.env.STRIPE_PUBLISHABLE_KEY && process.env.STRIPE_SECRET_KEY),
       stripeLiveMode: (process.env.STRIPE_PUBLISHABLE_KEY ?? '').startsWith('pk_live_'),
+      plaidConfigured: Boolean(process.env.PLAID_CLIENT_ID && process.env.PLAID_SECRET),
+      plaidEnv: process.env.PLAID_ENV ?? 'sandbox',
+      plaidSandboxMode: (process.env.PLAID_ENV ?? 'sandbox') !== 'production',
       appUrl: process.env.APP_URL
         ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
       twilioConfigured: Boolean(
@@ -66,6 +78,22 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-15',
 
+  icon: {
+    serverBundle: {
+      collections: ['lucide']
+    }
+  },
+
+  typescript: {
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          '~~/generated/prisma': ['../generated/prisma/client.ts']
+        }
+      }
+    }
+  },
+
   nitro: {
     externals: {
       inline: ['@prisma/client', '@prisma/adapter-neon', '~~/generated/prisma']
@@ -74,7 +102,16 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ['@neondatabase/auth', '@neondatabase/auth/vanilla/adapters', 'zod']
+      include: [
+        '@neondatabase/auth',
+        '@neondatabase/auth/vanilla/adapters',
+        '@vueuse/core',
+        'chart.js',
+        'vue-chartjs',
+        'zod',
+        'zod/v4/locales/en.js',
+        'zod/v4/locales/fr.js',
+      ]
     }
   },
 

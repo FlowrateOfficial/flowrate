@@ -1,4 +1,4 @@
-// ANCHOR: API route map — single source of truth for client paths
+// NOTE - ANCHOR: API route map — single source of truth for client paths
 export const apiRoutes = {
   auth: {
     session: '/api/auth/get-session'
@@ -33,6 +33,7 @@ export const apiRoutes = {
   },
   budgets: {
     list: '/api/budgets',
+    patch: (id: string) => `/api/budgets/${id}`,
     delete: (id: string) => `/api/budgets/${id}`
   },
   subscriptions: {
@@ -61,6 +62,14 @@ export const apiRoutes = {
     syncTransactions: '/api/stripe/sync-transactions',
     syncSubscription: '/api/stripe/sync-subscription',
     checkout: '/api/stripe/create-checkout-session',
-    billingPortal: '/api/stripe/billing-portal'
+    billingPortal: '/api/stripe/billing-portal',
+    previewSubscriptionChange: '/api/stripe/preview-subscription-change',
+    changeSubscription: '/api/stripe/change-subscription'
+  },
+  plaid: {
+    linkToken: '/api/plaid/link-token',
+    exchange: '/api/plaid/exchange',
+    syncAccounts: '/api/plaid/sync-accounts',
+    syncTransactions: '/api/plaid/sync-transactions'
   }
 } as const

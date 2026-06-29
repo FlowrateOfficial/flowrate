@@ -1,8 +1,10 @@
 import { periodStart } from '../../utils/budgetPeriod'
+import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
   const now = new Date()
+  const currency = await resolveSpaceDisplayCurrency(space.id, localeFromRequest(event))
 
   const accountFilter = accountVisibilityFilter(user.id, membership.role)
   const visibleAccounts = await prisma.account.findMany({
@@ -25,7 +27,7 @@ export default defineEventHandler(async (event) => {
       name: b.name,
       category: b.category,
       amount: Number(b.amount),
-      currency: 'USD',
+      currency,
       spent: 0,
       period: b.period,
       isShared: b.isShared,
@@ -59,7 +61,7 @@ export default defineEventHandler(async (event) => {
       name: b.name,
       category: b.category,
       amount: Number(b.amount),
-      currency: 'USD',
+      currency,
       spent,
       period: b.period,
       isShared: b.isShared,

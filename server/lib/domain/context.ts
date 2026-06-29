@@ -1,5 +1,5 @@
 // ANCHOR: Space-scoped request context DTO
-import type { FinancialSpace, SpaceMember, SpaceRole, SpaceType } from '~~/generated/prisma'
+import type { FinancialSpace, SpaceMember, SpaceRole, SpaceType } from '~~/generated/prisma/client'
 
 export interface SpaceContext {
   userId: string

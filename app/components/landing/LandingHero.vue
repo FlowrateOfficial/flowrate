@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 
 const { t } = useAppI18n()
 const landing = useLandingStore()
-const { heroSpaceCards } = storeToRefs(landing)
+const { morphPhrases, demoActiveIndex } = storeToRefs(landing)
 
 const featureStrip = computed(() => [
   { icon: 'i-lucide-layers', label: t('landing.featureStrip.spaces') },
@@ -12,18 +12,29 @@ const featureStrip = computed(() => [
   { icon: 'i-lucide-user-round', label: t('landing.featureStrip.teen') },
   { icon: 'i-lucide-sparkles', label: t('landing.featureStrip.ai') }
 ])
+
 </script>
 
 <template>
-  <section class="relative overflow-hidden">
-    <UContainer class="py-20 sm:py-28 lg:py-36">
-      <div class="grid lg:grid-cols-12 gap-16 lg:gap-10 items-center">
-        <div class="lg:col-span-5 xl:col-span-5 space-y-10 animate-flow-fade-up">
-          <p class="flow-section-label text-sage">
-            {{ t('landing.heroTagline') }}
-          </p>
+  <section class="relative overflow-hidden landing-hero-glow min-h-[90vh] flex flex-col">
+    <UContainer class="py-20 sm:py-28 lg:py-32 flex-1 flex flex-col justify-center">
+      <div class="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+        <div class="lg:col-span-5 xl:col-span-5 space-y-8 animate-flow-fade-up">
+          <div class="flex flex-wrap items-center gap-3">
+            <p class="flow-section-label text-sage mb-0">
+              {{ t('landing.heroTagline') }}
+            </p>
+            <AppBetaBadge show-hint />
+          </div>
           <h1 class="text-display-hero text-flow-ink dark:text-flow-ink-dark">
-            {{ t('landing.heroTitle') }}
+            <span class="block">{{ t('landing.heroTitleLine1') }}</span>
+            <LandingMorphText
+              tag="span"
+              class="block text-terracotta italic font-display mt-1"
+              :phrases="morphPhrases"
+              :interval-ms="4800"
+              :active-index="demoActiveIndex"
+            />
           </h1>
           <p class="font-display text-xl sm:text-2xl text-flow-muted dark:text-flow-muted-dark italic leading-relaxed max-w-md">
             {{ t('landing.heroSubtitle') }}
@@ -36,35 +47,22 @@ const featureStrip = computed(() => [
               {{ t('common.getStartedFree') }}
               <UIcon name="i-lucide-arrow-right" class="w-4 h-4 stroke-[1.25]" />
             </NuxtLink>
-            <NuxtLink to="/#how-it-works" class="btn-secondary-editorial">
+            <NuxtLink to="/#demo" class="btn-secondary-editorial">
               {{ t('landing.seeHow') }}
             </NuxtLink>
           </div>
+          <p class="text-sm text-flow-muted dark:text-flow-muted-dark flex items-center gap-2 pt-2">
+            <UIcon name="i-lucide-check-circle" class="size-4 text-sage shrink-0" />
+            {{ t('landing.heroTrust') }}
+          </p>
         </div>
 
-        <div class="lg:col-span-7 xl:col-span-7 relative min-h-[500px] sm:min-h-[560px]">
-          <BrandGeometricArtwork class="absolute inset-0 lg:inset-y-2 lg:right-0 lg:left-[8%] animate-flow-fade-up animate-flow-delay-1 opacity-95" />
-
-          <div class="relative z-10 h-full">
-            <LandingHeroSpaceCard
-              v-for="(card, i) in heroSpaceCards"
-              :key="card.type"
-              :card="card"
-              class="absolute animate-flow-fade-up"
-              :class="[
-                i === 0 && 'top-[2%] left-0 sm:left-[2%]',
-                i === 1 && 'top-[6%] right-0 sm:right-[0%]',
-                i === 2 && 'bottom-[20%] left-[0%] sm:left-[4%]',
-                i === 3 && 'bottom-[6%] right-0 sm:right-[2%]'
-              ]"
-              :style="{ animationDelay: `${0.15 + i * 0.1}s` }"
-            />
-          </div>
+        <div class="lg:col-span-7 xl:col-span-7 animate-flow-fade-up animate-flow-delay-1">
+          <LandingHeroVisual />
         </div>
       </div>
 
-      <!-- NOTE - Feature strip -->
-      <div class="mt-20 sm:mt-28 pt-12 border-t border-flow-border/50 dark:border-flow-border-dark/50">
+      <div class="mt-16 sm:mt-24 pt-10 border-t border-flow-border/50 dark:border-flow-border-dark/50">
         <div class="flex flex-wrap justify-center lg:justify-between gap-x-10 gap-y-6">
           <div
             v-for="item in featureStrip"
@@ -77,5 +75,14 @@ const featureStrip = computed(() => [
         </div>
       </div>
     </UContainer>
+
+    <NuxtLink
+      to="/#demo"
+      class="landing-scroll-hint"
+      :aria-label="t('landing.scrollHint')"
+    >
+      <span class="text-xs tracking-[0.2em] uppercase text-flow-muted">{{ t('landing.scrollHint') }}</span>
+      <UIcon name="i-lucide-arrow-down" class="size-4 landing-scroll-arrow" />
+    </NuxtLink>
   </section>
 </template>

@@ -25,7 +25,7 @@ export async function getDashboardStats(ctx: SpaceContext) {
       where: {
         spaceId: ctx.spaceId,
         status: { in: ['PRICE_CHANGED', 'ACTIVE'] },
-        priceAlert: true
+        alert: true
       }
     })
   ])

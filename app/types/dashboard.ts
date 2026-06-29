@@ -13,8 +13,8 @@ export interface DashboardStats {
   incomeChange: string
   netSavings: number
   savingsChange: string
-  burnRate: number
-  burnRateChange: string
+  burnRate: number | null
+  burnRateChange: string | null
   runwayMonths: number | null
   subscriptionAlerts: number
 }
@@ -28,24 +28,24 @@ export interface BusinessOverview {
   monthlySubscriptions: number
   subscriptionWaste: number
   activeSubscriptions: number
-  cloudSpend: number
+  cloudSpend: number | null
   setup: { hasAccounts: boolean, hasTransactions: boolean, complete: boolean, step: number }
   alerts: Array<{ severity: 'info' | 'warning' | 'critical', code: string, params?: Record<string, string | number> }>
   topVendors: Array<{ name: string, amount: number }>
 }
 
 export interface TeenDashboard {
-  displayName: string | null
+  name: string | null
   role: string
   learnMode: boolean
-  allowanceAmount: number | null
-  allowanceFrequency: string | null
-  spendingLimits: unknown
+  allowance: number | null
+  frequency: string | null
+  limits: unknown
   jars: Array<{
     id: string
     name: string
     balance: number
-    targetAmount: number | null
+    target: number | null
     progress: number | null
   }>
   totalSaved: number

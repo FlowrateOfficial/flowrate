@@ -17,7 +17,7 @@ export function mapAccountDto(
     visibility: acc.visibility,
     balance: Number(acc.balance),
     currency: acc.currency,
-    lastSynced: acc.lastSynced?.toISOString() ?? null,
+    syncedAt: acc.syncedAt?.toISOString() ?? null,
     isMine: acc.userId === viewerId,
     ownerName: acc.user.name
   }

@@ -1,8 +1,8 @@
 import { requireStripe } from '../../lib/stripe'
+import { requirePlaid } from '../../lib/plaid'
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
-  const id = getRouterParam(event, 'id')!
 
   const accountFilter = accountVisibilityFilter(user.id, membership.role)
   const visibleAccountIds = (await prisma.account.findMany({
@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     select: { id: true }
   })).map(a => a.id)
 
+  const id = getRouterParam(event, 'id')!
   if (!visibleAccountIds.includes(id)) {
     throw createError({ statusCode: 404, message: 'Account not found' })
   }
@@ -26,12 +27,36 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Only the account owner can disconnect' })
   }
 
-  if (account.stripeFcAccountId) {
+  if (account.stripeId) {
     try {
       const { stripe } = requireStripe(event)
-      await stripe.financialConnections.accounts.disconnect(account.stripeFcAccountId)
+      await stripe.financialConnections.accounts.disconnect(account.stripeId)
     } catch {
       // NOTE - Stripe may already be disconnected
+    }
+  }
+
+  if (account.plaidId && account.linkId) {
+    try {
+      const { client } = requirePlaid(event)
+      const link = await prisma.plaidLink.findUnique({ where: { id: account.linkId } })
+      if (link) {
+        const remaining = await prisma.account.count({
+          where: { linkId: link.id, id: { not: account.id } }
+        })
+        if (remaining === 0) {
+          try {
+            await client.itemRemove({ access_token: link.token })
+          } catch {
+            // NOTE - Link may already be removed
+          }
+          await prisma.plaidLink.delete({ where: { id: link.id } })
+        }
+      }
+    } catch (error) {
+      if (error && typeof error === 'object' && 'statusCode' in error && (error as { statusCode: number }).statusCode !== 503) {
+        throw error
+      }
     }
   }
 

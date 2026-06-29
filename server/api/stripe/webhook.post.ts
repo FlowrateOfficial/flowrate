@@ -8,6 +8,7 @@ import {
   processCheckoutSessionCompleted,
   processStripeSubscriptionEvent
 } from '../../lib/billing'
+import { allowsWebhookSync, userPlanForId } from '../../lib/billing/enforcement'
 import { syncAccountTransactions, syncSpaceSubscriptions } from '../../lib/transactionSync'
 
 async function handleFinancialConnectionAccount(stripe: Stripe, fcAccount: Stripe.FinancialConnections.Account) {
@@ -58,8 +59,11 @@ export default defineEventHandler(async (event) => {
       if (customerId && typeof customerId === 'string') {
         const context = await linkContextFromStripeCustomer(stripe, customerId)
         if (context) {
+          const plan = await userPlanForId(context.userId)
+          if (!allowsWebhookSync(plan)) break
+
           const dbAccount = await prisma.account.findUnique({
-            where: { stripeFcAccountId: fcAccount.id }
+            where: { stripeId: fcAccount.id }
           })
           if (dbAccount) {
             await syncAccountTransactions(stripe, dbAccount)
@@ -74,7 +78,7 @@ export default defineEventHandler(async (event) => {
     case 'financial_connections.account.disconnected': {
       const fcAccount = stripeEvent.data.object as Stripe.FinancialConnections.Account
       await prisma.account.deleteMany({
-        where: { stripeFcAccountId: fcAccount.id }
+        where: { stripeId: fcAccount.id }
       })
       break
     }

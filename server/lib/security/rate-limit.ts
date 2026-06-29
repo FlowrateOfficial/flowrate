@@ -43,7 +43,7 @@ export function rateLimit(event: H3Event, key: string, options: RateLimitOptions
   existing.count += 1
   if (existing.count > options.max) {
     const retryAfter = Math.ceil((existing.resetAt - now) / 1000)
-    setResponseHeader(event, 'Retry-After', String(retryAfter))
+    setResponseHeader(event, 'Retry-After', retryAfter)
     throw createError({
       statusCode: 429,
       message: 'Too many requests. Please try again later.'

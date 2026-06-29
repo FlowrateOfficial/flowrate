@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { secureAppCookieOptions } from '../../lib/security/cookies'
+import { assertCanCreateSpace } from '../../lib/billing/enforcement'
 
 const createSpaceSchema = z.object({
   name: z.string().min(2).max(80),
@@ -24,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
     const userRow = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { activeSpaceId: true }
+      select: { spaceId: true }
     })
 
     const minorMembership = memberships.find(m => m.role === 'TEEN' || m.role === 'CHILD')
@@ -32,13 +33,13 @@ export default defineEventHandler(async (event) => {
       ? memberships.filter(m => m.spaceId === minorMembership.spaceId)
       : memberships
 
-    const activeSpaceId = minorMembership?.spaceId
-      ?? (userRow?.activeSpaceId && visible.some(m => m.space.id === userRow.activeSpaceId)
-        ? userRow.activeSpaceId
+    const spaceId = minorMembership?.spaceId
+      ?? (userRow?.spaceId && visible.some(m => m.space.id === userRow.spaceId)
+        ? userRow.spaceId
         : visible[0]?.space.id ?? null)
 
     return {
-      activeSpaceId,
+      spaceId,
       spaces: visible.map(m => ({
         id: m.space.id,
         name: m.space.name,
@@ -65,24 +66,9 @@ export default defineEventHandler(async (event) => {
       where: { id: user.id },
       select: { plan: true }
     })
+    const plan = (dbUser?.plan ?? 'FREE') as import('#shared/billing').AppPlan
 
-    const existingSpaces = await prisma.spaceMember.count({
-      where: { userId: user.id, status: 'ACTIVE' }
-    })
-
-    if (dbUser?.plan === 'FREE' && existingSpaces >= 2) {
-      throw createError({
-        statusCode: 402,
-        message: 'Upgrade to Pro to create additional financial spaces'
-      })
-    }
-
-    if (dbUser?.plan === 'FREE' && body.type !== 'HOUSEHOLD' && existingSpaces >= 1) {
-      throw createError({
-        statusCode: 402,
-        message: 'Family and Company spaces require a Pro plan'
-      })
-    }
+    await assertCanCreateSpace(user.id, body.type, plan)
 
     const space = await prisma.financialSpace.create({
       data: {
@@ -94,7 +80,7 @@ export default defineEventHandler(async (event) => {
             userId: user.id,
             role: 'OWNER',
             status: 'ACTIVE',
-            displayName: user.name,
+            name: user.name,
             joinedAt: new Date()
           }
         }
@@ -104,7 +90,7 @@ export default defineEventHandler(async (event) => {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { activeSpaceId: space.id }
+      data: { spaceId: space.id }
     })
 
     setCookie(event, ACTIVE_SPACE_COOKIE, space.id, {

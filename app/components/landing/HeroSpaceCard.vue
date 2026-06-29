@@ -1,10 +1,24 @@
 <script setup lang="ts">
+import type { HTMLAttributes } from 'vue'
 import type { HeroSpaceCard } from '~/stores/landing'
 
-defineProps<{
+const props = defineProps<{
   card: HeroSpaceCard
-  class?: string
+  class?: HTMLAttributes['class']
 }>()
+
+const { formatCurrency, displayCurrency } = useAppI18n()
+
+const metricValue = computed(() => {
+  const { card } = props
+  if (card.metricSuffix && card.type === 'COMPANY') {
+    return `${card.metric} ${card.metricSuffix}`
+  }
+  if (card.metricSuffix && card.type === 'FAMILY') {
+    return `${formatCurrency(card.metric, displayCurrency.value)}${card.metricSuffix}`
+  }
+  return formatCurrency(card.metric, displayCurrency.value)
+})
 </script>
 
 <template>
@@ -22,7 +36,7 @@ defineProps<{
       {{ card.name }}
     </p>
     <p class="text-2xl font-light tabular-nums tracking-tight text-flow-ink dark:text-flow-ink-dark mb-3">
-      {{ card.metric }}
+      {{ metricValue }}
     </p>
     <BrandSparkline :data="card.sparkline" />
   </div>

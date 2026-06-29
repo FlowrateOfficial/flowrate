@@ -6,12 +6,14 @@
     "or": "or",
     "back": "Back",
     "cancel": "Cancel",
+    "clear": "Clear",
     "continue": "Continue",
     "save": "Save",
     "add": "Add",
     "create": "Create",
     "manage": "Manage",
     "delete": "Delete",
+    "edit": "Edit",
     "loading": "Loading...",
     "viewAll": "View all",
     "getStarted": "Get started",
@@ -28,8 +30,13 @@
     "glba": "Financial Privacy (GLBA)",
     "language": "Language",
     "english": "English",
+    "englishUS": "English (US)",
+    "englishUK": "English (UK)",
     "french": "French",
-    "home": "Home"
+    "home": "Home",
+    "beta": "Beta",
+    "betaHint": "Early access — actively in development",
+    "betaInProgress": "In progress"
   },
   "breadcrumbs": {
     "label": "Breadcrumb",
@@ -51,7 +58,8 @@
     "business": "Business",
     "businessTeam": "Team",
     "saasVendors": "SaaS & vendors",
-    "myMoney": "My Money"
+    "myMoney": "My Money",
+    "admin": "Admin"
   },
   "spaceTypes": {
     "INDEPENDENT": "Independent",
@@ -116,11 +124,23 @@
     }
   },
   "landing": {
-    "heroTagline": "Your Financial Operating System",
-    "heroTitle": "Finance for everyone who runs things",
-    "heroSubtitle": "Finance designed for thoughtful people.",
-    "heroDescription": "Manage Independent, Household, Family, and Company identities in one calm, intelligent platform — where geometry replaces clutter and clarity replaces noise.",
-    "seeHow": "See how it works",
+    "nav": {
+      "demo": "Live preview"
+    },
+    "heroTagline": "Your financial operating system",
+    "heroTitleLine1": "One login.",
+    "heroTitle": "One login. Every hat you wear.",
+    "heroSubtitle": "Money deserves the same care you give everything else.",
+    "heroDescription": "FlowRate is where Independent, Household, Family, and Company money live in separate rooms — same calm house. Connect banks once, switch context in a tap, and see what matters without the spreadsheet noise.",
+    "heroTrust": "Free to start — no card required",
+    "scrollHint": "Scroll",
+    "seeHow": "Watch it adapt",
+    "morph": {
+      "independent": "Personal finances.",
+      "household": "Shared households.",
+      "family": "Family allowances.",
+      "company": "Company runway."
+    },
     "featureStrip": {
       "spaces": "Financial Spaces",
       "saasShield": "SaaS Shield",
@@ -133,33 +153,22 @@
       "shared": "Shared",
       "allowance": "Allowance",
       "runway": "Runway",
+      "perMonth": " / mo",
+      "perMonthShort": "mo",
+      "months": "mo",
       "independent": { "metric": "$12,480" },
       "household": { "metric": "$28,340" },
       "family": { "metric": "$420 / mo" },
       "company": { "metric": "14 mo" }
     },
-    "testimonials": {
-      "title": "Quiet confidence",
-      "description": "Thoughtful people, calmer finances.",
-      "one": {
-        "quote": "Finally, software that treats money with the same care I do. FlowRate feels like opening a well-edited book — not a spreadsheet.",
-        "author": "Elena Laurent",
-        "role": "Independent consultant"
-      },
-      "two": {
-        "quote": "We stopped arguing about accounts. Household and personal live in separate spaces, but we still see what matters together.",
-        "author": "Marcus & Riya",
-        "role": "Household space"
-      },
-      "three": {
-        "quote": "Burn rate, runway, subscriptions — all in one view that doesn't shout at me. It's the operating system my company deserved.",
-        "author": "Sofia Chen",
-        "role": "Solo founder"
-      }
-    },
     "howItWorks": {
-      "title": "How FlowRate works",
-      "description": "Three steps from scattered accounts to a clear financial picture.",
+      "title": "From scattered to clear in three moves",
+      "description": "No marathon setup. Link a bank, pick your space, and FlowRate starts showing you the picture — not just the receipts.",
+      "previews": {
+        "connect": "Plaid & Stripe — credentials stay with them",
+        "organize": "4 space types, one switcher",
+        "act": "Burn rate, SaaS Shield, allowances"
+      },
       "steps": {
         "connect": {
           "title": "Connect your banks",
@@ -175,15 +184,89 @@
         }
       }
     },
-    "spacesTitle": "Built for how you actually live and work",
-    "spacesDescription": "Most finance apps assume one life. FlowRate knows you wear multiple hats — and gives each hat its own space without losing the big picture.",
-    "featuresTitle": "Built different from passive trackers",
-    "featuresDescription": "FlowRate doesn't just record what happened. It protects, predicts, and adapts to how you actually manage money.",
+    "spacesTitle": "Four spaces for four versions of you",
+    "spacesDescription": "You are not one budget. FlowRate gives each chapter of your financial life its own room — without losing sight of the whole house.",
+    "featuresTitle": "More than a ledger that nods along",
+    "featuresDescription": "Passive trackers tell you what already happened. FlowRate catches subscription creep, models runway, and helps families teach saving — before the month ends wrong.",
     "pricingTitle": "Plans for every stage",
     "pricingDescription": "Each tier is designed for a specific kind of money manager. Start free, upgrade when your life or business grows.",
-    "ctaTitle": "Your money. Your spaces. One flow.",
-    "ctaDescription": "Whether you're a founder tracking burn rate, a couple splitting groceries, or a parent teaching a teen to save — FlowRate adapts to you.",
+    "ctaTitle": "Open your first space in minutes",
+    "ctaDescription": "Founders watch runway. Couples split fairly. Parents give teens a supervised view. Start free — upgrade when life gets more interesting.",
     "ctaButton": "Create free account",
+    "ctaCompare": "Compare plans",
+    "demo": {
+      "eyebrow": "02 — Live preview",
+      "title": "Same app, different chapter",
+      "description": "Tap a space. Watch the dashboard reshape — balances, alerts, and activity that actually match how you manage that money.",
+      "caption": "Illustrative demo — your real numbers sync after you connect a bank.",
+      "recentActivity": "Recent activity",
+      "sharedSplit": "Shared vs personal",
+      "familyActivity": "Family activity",
+      "vendorSpend": "Top vendor spend",
+      "stats": {
+        "balance": "Cash balance",
+        "cashFlow": "Net cash flow",
+        "shared": "Shared pot",
+        "personal": "Your accounts",
+        "allowance": "Teen allowance",
+        "jars": "Savings jars",
+        "burn": "Monthly burn",
+        "runway": "Runway"
+      },
+      "scenes": {
+        "independent": {
+          "hint": "Personal accounts, side income, subscriptions",
+          "delta": "+4.2% this month",
+          "cashFlow": "+$840",
+          "cashDelta": "vs last month",
+          "row1": "Morning coffee",
+          "row2": "Freelance deposit",
+          "row3": "Streaming (duplicate?)"
+        },
+        "household": {
+          "hint": "Joint bills, separate accounts, fair splits",
+          "personal": "$9,120",
+          "row1": "Groceries — shared",
+          "row2": "Utilities — shared",
+          "row3": "Split 60 / 40"
+        },
+        "family": {
+          "hint": "Allowances, jars, supervised teen logins",
+          "jars": "3 active",
+          "row1": "Maya — lunch",
+          "row2": "Weekly allowance",
+          "row3": "College jar +$40"
+        },
+        "company": {
+          "hint": "Burn, runway, SaaS waste, cloud spend",
+          "burnDelta": "↑ 8% vs last month",
+          "runwayLabel": "14 mo",
+          "alertTitle": "SaaS Shield flagged a price hike",
+          "alertMessage": "Design tool renewed 22% higher — review seat count",
+          "row1": "Notion",
+          "row2": "Figma — price up",
+          "row3": "AWS"
+        }
+      }
+    },
+    "proof": {
+      "spaces": {
+        "value": "4",
+        "label": "Financial spaces in one login — Independent to Company"
+      },
+      "bank": {
+        "value": "1-tap",
+        "label": "Bank link via Plaid — start free with one connection"
+      },
+      "shield": {
+        "value": "Pro",
+        "label": "SaaS Shield catches duplicate subs & price hikes"
+      },
+      "export": {
+        "value": "CSV",
+        "label": "Export on every plan — audit-ready on Enterprise"
+      }
+    },
     "audiences": {
       "independent": {
         "title": "Independent",
@@ -304,6 +387,52 @@
     }
   },
   "dashboard": {
+    "layout": {
+      "currentSpace": "Your space",
+      "mobileNav": "Main navigation"
+    },
+    "dateField": {
+      "pickDate": "Pick a date",
+      "help": "Choose a date on the calendar."
+    },
+    "dateRange": {
+      "pickRange": "Pick a date range",
+      "timeFrom": "Start time",
+      "timeTo": "End time",
+      "last7Days": "Last 7 days",
+      "last14Days": "Last 14 days",
+      "last30Days": "Last 30 days",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "lastYear": "Last year"
+    },
+    "guide": {
+      "child": {
+        "title": "For kids",
+        "description": "This is your money page. Your parent set it up so you can see savings and allowance — tap the big buttons to move around.",
+        "steps": "Tap My Money to see savings jars|Tap Accounts to connect a bank with a parent|Tap Settings if you need help from a grown-up"
+      },
+      "teen": {
+        "title": "For teens",
+        "description": "Track your allowance, savings jars, and spending. Use the menu at the bottom on phone, or the left menu on computer.",
+        "steps": "Check My Money for jars and allowance|Connect a bank from Accounts|See spending in Transactions"
+      },
+      "parent": {
+        "title": "For parents & guardians",
+        "description": "Manage family money in one place. Connect banks, invite partners, and supervise children — each button below is a main area.",
+        "steps": "Connect banks in Accounts|Invite family in Family|Set budgets in Budgets|Switch spaces with the dropdown at top left"
+      },
+      "business": {
+        "title": "For your business",
+        "description": "Watch cash, burn rate, and subscriptions. Connect your business bank first, then review transactions and SaaS spend.",
+        "steps": "Open Business for runway|Connect accounts|Review SaaS in Subscriptions"
+      },
+      "general": {
+        "title": "Getting started",
+        "description": "Welcome! Start by connecting a bank, then explore transactions and budgets. On phone, use the bar at the bottom; on computer, use the menu on the left.",
+        "steps": "Connect a bank in Accounts|See activity in Transactions|Track limits in Budgets"
+      }
+    },
     "overview": {
       "title": "Overview",
       "subtitle": "{name} financial snapshot for this month",
@@ -364,6 +493,14 @@
     },
     "accounts": {
       "title": "Accounts",
+      "eyebrow": "Bank connections",
+      "subtitleSimple": "Link your bank here to see balances and transactions automatically.",
+      "emptyDescriptionSimple": "Follow the steps below — we never store your bank password.",
+      "filtersTitle": "Show & connect options",
+      "filterHelp": "Choose which accounts you want to see in this list.",
+      "connectHelp": "Personal stays private to you. Shared is visible to guardians in this space.",
+      "steps": "Tap Connect your first bank|Sign in with your bank (US or Europe)|Come back here — balances appear in a minute",
+      "disconnectTitle": "Remove this bank?",
       "subtitle": "Connect banks, choose personal or shared visibility, and keep balances in sync.",
       "subtitleConnected": "Your banks are connected. Sync from banks anytime to pull the latest balances and transactions.",
       "teenSubtitle": "Connect your bank to track spending and see where your money goes.",
@@ -400,8 +537,22 @@
       "syncedDays": "{count}d ago",
       "notSynced": "Not yet synced",
       "stripeNote": "Powered by Stripe Financial Connections",
-      "stripeDescription": "Your bank credentials are never stored. FlowRate uses Stripe's secure, read-only bank link to sync balances and transactions.",
-      "bankRegionNote": "Links US checking, savings, and credit accounts through Stripe. Financial Connections is available to businesses in the US, UK, EU, and other supported regions — linked institutions are US-only today.",
+      "bankProvidersTitle": "Bank connections",
+      "bankRegionNote": "Connect European banks (France, Germany, UK, and more) via Plaid, or US banks via Stripe Financial Connections. Your bank credentials are never stored — only read-only balances and transactions.",
+      "connectEuropean": "European bank (Plaid)",
+      "connectEuropeanShared": "European bank — shared (Plaid)",
+      "connectUs": "US bank (Stripe)",
+      "connectUsShared": "US bank — shared (Stripe)",
+      "plaidLinkLoadError": "Failed to load Plaid Link. Allow cdn.plaid.com in your browser or disable ad blockers, then try again.",
+      "plaidLinkLoadError": "Failed to load Plaid Link. Allow cdn.plaid.com in your browser or disable ad blockers, then try again.",
+      "plaidSandboxTitle": "Plaid sandbox",
+      "plaidSandboxDescription": "Use test banks only. Sign in with username user_good and password pass_good. Real European banks need PLAID_ENV=production, a production secret, and PLAID_REDIRECT_URI registered in the Plaid dashboard.",
+      "plaidNotConfigured": "Plaid is not configured. Add PLAID_CLIENT_ID and PLAID_SECRET to your environment.",
+      "plaidOAuthTitle": "Finishing bank connection",
+      "plaidOAuthPending": "Completing your bank login…",
+      "plaidOAuthMissingSession": "Bank connection session expired. Please try connecting again from Accounts.",
+      "plaidOAuthInvalid": "Invalid bank connection callback. Please try again from Accounts.",
+      "plaidOAuthBack": "Back to accounts",
       "connectError": "Failed to connect bank. Please try again.",
       "syncNoAccounts": "Stripe linked but no accounts were saved. Try Connect again — if it persists, set STRIPE_WEBHOOK_SECRET from `pnpm stripe:listen` in .env and restart `pnpm dev`.",
       "resyncFromStripe": "Refresh from Stripe",
@@ -435,6 +586,8 @@
       "tryAgain": "Try again",
       "manageSpaces": "Manage spaces",
       "minorCannotSwitch": "Your account is linked to your family space only.",
+      "upgradeForShared": "Household, Family, and Business spaces are available on Pro and Enterprise.",
+      "upgradeCta": "Upgrade plan",
       "types": {
         "household": {
           "label": "Household",
@@ -526,13 +679,13 @@
       "deleteChildSuccess": "Account deleted",
       "deleteChildFailed": "Could not delete account",
       "statusHeader": "Status",
-      "displayNamePlaceholder": "Display name",
+      "namePlaceholder": "Display name",
       "emailPlaceholder": "partner@email.com",
       "teenAccount": "Teen account",
       "guardianManaged": "Guardian-managed",
       "childFallback": "Child",
       "accountSuffix": "{role} account",
-      "dateOfBirth": "Date of birth",
+      "birthday": "Date of birth",
       "roleLabel": "Role",
       "childBalance": "Balance",
       "spending30d": "Spending (30d)",
@@ -566,7 +719,7 @@
       },
       "child": {
         "title": "Allowance & supervision",
-        "allowanceAmount": "Allowance amount",
+        "allowance": "Allowance amount",
         "frequency": "Frequency",
         "learnMode": "Learn mode (simplified spending view)",
         "jarsTitle": "Savings jars",
@@ -690,10 +843,33 @@
       "phoneTaken": "This phone number is already linked to another account",
       "saveChanges": "Save changes",
       "planBilling": "Plan & Billing",
+      "currentPlan": "Current plan",
+      "choosePlan": "Choose a plan",
+      "billingCycle": "Billing cycle",
       "upgradeDescription": "Upgrade to Pro to unlock unlimited bank connections, SaaS Shield alerts, predictive cash flow, and export features.",
       "upgradeCta": "Upgrade to Pro — $12/mo",
       "upgradeCtaDynamic": "Upgrade to Pro — {price}/mo",
-      "manageDescription": "Manage your subscription, update payment method, or download invoices.",
+      "upgradeCtaWithPlan": "Upgrade to {plan} — {price}",
+      "billingMonthly": "Monthly",
+      "billingYearly": "Yearly (save ~17%)",
+      "updatePlan": "Update plan",
+      "planUpdated": "Your subscription has been updated.",
+      "planUnchanged": "You are already on this plan.",
+      "planChangeFailed": "Could not update subscription",
+      "previewLoading": "Calculating proration…",
+      "prorationCharge": "Due today (prorated): {amount}",
+      "prorationCredit": "Account credit (prorated): {amount}",
+      "currentSelection": "This is your current plan.",
+      "renewsOn": "Renews on {date}",
+      "cancelsOn": "Cancels on {date}",
+      "cancelViaPortal": "To cancel or update your payment method, use the billing portal.",
+      "planOptions": {
+        "pro": "Pro",
+        "enterprise": "Enterprise",
+        "proPrice": "From {price}/mo",
+        "enterprisePrice": "From {price}/mo"
+      },
+      "manageDescription": "Switch between monthly and yearly billing or change your plan. Stripe prorates the difference automatically.",
       "billingPortal": "Open billing portal",
       "connectedServices": "Connected Services",
       "github": "GitHub",
@@ -732,9 +908,16 @@
       "subtitle": "{count} transactions in your active space — search, filter, and export.",
       "total": "{count} total transactions",
       "exportCsv": "Export CSV",
+      "exportAuditCsv": "Audit export",
       "searchPlaceholder": "Search by merchant or description",
+      "searchLabel": "Search",
       "filterCategory": "Category",
       "clearFilters": "Clear filters",
+      "showingCount": "Showing {loaded} of {total}",
+      "loadingMore": "Loading more…",
+      "scrollForMore": "Scroll for more",
+      "noResultsTitle": "No matching transactions",
+      "noResultsDescription": "Try a different search term or adjust your filters.",
       "dateFrom": "From",
       "dateTo": "To",
       "detailTitle": "Transaction details",
@@ -798,6 +981,7 @@
       "emptyDescription": "Create spending limits by category to take control of your finances.",
       "createFirst": "Create first budget",
       "modalTitle": "New Budget",
+      "editModalTitle": "Edit budget",
       "nameLabel": "Budget name",
       "namePlaceholder": "e.g. Monthly groceries",
       "categoryLabel": "Category",
@@ -890,13 +1074,15 @@
     "CLOUD": "Cloud"
   },
   "legal": {
+    "betaNotice": "FlowRate is in active beta. Features, bank connections, billing, availability, and these legal documents may change without prior notice. The service may be incomplete, unstable, or temporarily unavailable. Nothing here is a promise to deliver a specific feature by a specific date. By using FlowRate during beta, you accept these limitations and understand that policies and product behavior may evolve.",
+    "betaSectionNotice": "Beta notice: the practices described in this section reflect our current product and may be updated as FlowRate develops.",
     "privacy": {
       "title": "Privacy Policy",
       "seoTitle": "Privacy Policy — FlowRate",
       "lastUpdated": "Last updated: June 28, 2026",
       "seeAlsoTerms": "See also: Terms of Service",
       "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
-      "intro": "FlowRate (“we”, “us”, “our”) is a personal and household finance application. This Privacy Policy explains what information we collect, how we use it, who we share it with, where it is stored, and the choices you have. We aim to be transparent so you can make informed decisions about using FlowRate.",
+      "intro": "FlowRate (“we”, “us”, “our”) is a personal and household finance application currently in beta. This Privacy Policy explains what information we collect, how we use it, who we share it with, where it is stored, and the choices you have. We aim to be transparent so you can make informed decisions about using FlowRate while the product is still in development.",
       "contact": "Questions about this policy or your data? Contact us at",
       "table": {
         "provider": "Provider",
@@ -1074,7 +1260,7 @@
       "lastUpdated": "Last updated: June 26, 2026",
       "seeAlsoPrivacy": "See also: Privacy Policy",
       "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
-      "intro": "These Terms of Service (“Terms”) govern your access to and use of FlowRate. By creating an account or using the service, you agree to these Terms and our Privacy Policy.",
+      "intro": "These Terms of Service (“Terms”) govern your access to and use of FlowRate while the service is in beta. By creating an account or using the service, you agree to these Terms and our Privacy Policy, including the limitations that apply during active development.",
       "contact": "Questions about these Terms? Contact us at",
       "sections": {
         "agreement": {
@@ -1153,7 +1339,7 @@
       "lastUpdated": "Last updated: June 28, 2026",
       "seeAlsoPrivacy": "See also: Privacy Policy",
       "seeAlsoTerms": "Terms of Service",
-      "intro": "This Financial Privacy Notice describes how FlowRate collects, uses, and shares nonpublic personal information (“NPI”) about consumers in connection with our personal finance application. It is provided to meet transparency expectations under the Gramm-Leach-Bliley Act (“GLBA”) and related U.S. financial privacy rules, including when you connect financial accounts through Stripe Financial Connections. This notice supplements our Privacy Policy and Terms of Service.",
+      "intro": "This Financial Privacy Notice describes how FlowRate collects, uses, and shares nonpublic personal information (“NPI”) about consumers in connection with our personal finance application, which is currently in beta. It is provided to meet transparency expectations under the Gramm-Leach-Bliley Act (“GLBA”) and related U.S. financial privacy rules, including when you connect financial accounts through Stripe Financial Connections. This notice supplements our Privacy Policy and Terms of Service and may be updated as the product matures.",
       "contact": "Questions about this Financial Privacy Notice or your NPI? Contact us at",
       "sections": {
         "purpose": {
@@ -1278,7 +1464,16 @@
       "STRIPE_FC_NOT_ENABLED": "Financial Connections is not approved for live mode. Complete Stripe's Financial Connections application in your Dashboard.",
       "STRIPE_FC_PERMISSION_DENIED": "Your Stripe Financial Connections application does not include balances and transactions permissions.",
       "STRIPE_CONNECT_FAILED": "Could not start bank connection. Check Stripe live keys and Financial Connections settings.",
-      "NO_ACTIVE_SPACE": "No active financial space. Open Spaces and select a space, then try again."
+      "NO_ACTIVE_SPACE": "No active financial space. Open Spaces and select a space, then try again.",
+      "PLAN_LIMIT_BANKS": "Free plan includes one bank connection. Upgrade to Pro to link more accounts.",
+      "PLAN_LIMIT_SPACES": "Free plan includes one financial space. Upgrade to Pro for Household, Family, and Business spaces.",
+      "PLAN_LIMIT_SPACE_TYPE": "Household, Family, and Business spaces require Pro or Enterprise.",
+      "PLAN_LIMIT_SYNC_COOLDOWN": "Free plan sync is limited to once per day. Upgrade to Pro for automatic sync.",
+      "PLAN_LIMIT_SAAS_SHIELD": "SaaS Shield and burn-rate metrics require Pro or Enterprise.",
+      "PLAN_LIMIT_TEEN_ACCOUNTS": "Teen and child accounts require Pro or Enterprise.",
+      "PLAN_LIMIT_COMPANY_TEAM": "Company team invites require Enterprise.",
+      "PLAN_LIMIT_COMPANY_MEMBERS": "This company space has reached its member limit. Upgrade to Enterprise for up to 10 members.",
+      "PLAN_LIMIT_AUDIT_EXPORT": "Audit-ready exports require Enterprise."
     }
   }
 }

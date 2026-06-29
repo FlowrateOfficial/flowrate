@@ -1,19 +1,7 @@
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
-import { formatCurrencyForLocale } from '~/utils/format'
+import type { BudgetItem, BudgetPeriod } from '~/types/budget'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
-
-export interface BudgetItem {
-  id: string
-  name: string
-  category: string
-  amount: number
-  currency: string
-  spent: number
-  period: string
-  isShared: boolean
-  isMine: boolean
-}
 
 const CATEGORIES = [
   'FOOD', 'TRANSPORT', 'SUBSCRIPTIONS', 'HOUSING', 'UTILITIES',
@@ -22,7 +10,7 @@ const CATEGORIES = [
 ] as const
 
 export const useBudgetsStore = defineStore('budgets', () => {
-  const { t, getLocale, categoryLabel } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, resolveCurrency } = useAppI18n()
   const spacesStore = useSpacesStore()
   const { api } = useApi()
 
@@ -30,14 +18,17 @@ export const useBudgetsStore = defineStore('budgets', () => {
   const pending = ref(false)
   const isModalOpen = ref(false)
   const isSaving = ref(false)
+  const editingId = ref<string | null>(null)
 
   const newBudget = reactive({
     name: '',
-    category: 'FOOD',
+    category: 'FOOD' as (typeof CATEGORIES)[number],
     amount: '',
-    period: 'MONTHLY' as 'WEEKLY' | 'MONTHLY' | 'YEARLY',
+    period: 'MONTHLY' as BudgetPeriod,
     isShared: false
   })
+
+  const isEditing = computed(() => editingId.value !== null)
 
   const periodItems = computed(() => [
     { label: t('frequencies.WEEKLY'), value: 'WEEKLY' },
@@ -84,12 +75,41 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   ])
 
-  function fmt(amount: number) {
-    return formatCurrencyForLocale(amount, getLocale(), 'USD')
+  function fmt(amount: number, currency?: string) {
+    return formatCurrency(amount, currency ?? resolveCurrency(budgets.value))
+  }
+
+  function resetForm() {
+    newBudget.name = ''
+    newBudget.amount = ''
+    newBudget.category = 'FOOD'
+    newBudget.period = 'MONTHLY'
+    newBudget.isShared = false
+    editingId.value = null
+  }
+
+  function openCreateModal() {
+    resetForm()
+    isModalOpen.value = true
+  }
+
+  function openEditModal(budget: BudgetItem) {
+    editingId.value = budget.id
+    newBudget.name = budget.name
+    newBudget.category = budget.category as (typeof CATEGORIES)[number]
+    newBudget.amount = String(budget.amount)
+    newBudget.period = budget.period as BudgetPeriod
+    newBudget.isShared = budget.isShared
+    isModalOpen.value = true
+  }
+
+  function closeModal() {
+    isModalOpen.value = false
+    resetForm()
   }
 
   async function fetchBudgets() {
-    if (!spacesStore.activeSpace) return
+    if (!spacesStore.space) return
     pending.value = true
     try {
       budgets.value = await api<BudgetItem[]>(apiRoutes.budgets.list)
@@ -111,15 +131,39 @@ export const useBudgetsStore = defineStore('budgets', () => {
           isShared: newBudget.isShared
         }
       })
-      newBudget.name = ''
-      newBudget.amount = ''
-      newBudget.category = 'FOOD'
-      newBudget.period = 'MONTHLY'
-      newBudget.isShared = false
-      isModalOpen.value = false
+      closeModal()
       await fetchBudgets()
     } finally {
       isSaving.value = false
+    }
+  }
+
+  async function updateBudget() {
+    if (!editingId.value) return
+    isSaving.value = true
+    try {
+      await api(apiRoutes.budgets.patch(editingId.value), {
+        method: 'PATCH',
+        body: {
+          name: newBudget.name,
+          category: newBudget.category,
+          amount: parseFloat(newBudget.amount),
+          period: newBudget.period,
+          isShared: newBudget.isShared
+        }
+      })
+      closeModal()
+      await fetchBudgets()
+    } finally {
+      isSaving.value = false
+    }
+  }
+
+  async function saveBudget() {
+    if (isEditing.value) {
+      await updateBudget()
+    } else {
+      await createBudget()
     }
   }
 
@@ -128,7 +172,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     await fetchBudgets()
   }
 
-  watch(() => spacesStore.activeSpace?.id, () => {
+  watch(() => spacesStore.space?.id, () => {
     fetchBudgets()
   })
 
@@ -137,6 +181,8 @@ export const useBudgetsStore = defineStore('budgets', () => {
     pending,
     isModalOpen,
     isSaving,
+    isEditing,
+    editingId,
     newBudget,
     periodItems,
     categoryItems,
@@ -145,7 +191,12 @@ export const useBudgetsStore = defineStore('budgets', () => {
     fmt,
     categoryLabel,
     fetchBudgets,
+    openCreateModal,
+    openEditModal,
+    closeModal,
     createBudget,
+    updateBudget,
+    saveBudget,
     deleteBudget
   }
 })

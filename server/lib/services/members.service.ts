@@ -1,26 +1,27 @@
 import { createNeonAuthEmailUser } from '../neonAuthUsers'
 import { sendPhoneVerification, sendSms } from '../twilio'
 import { normalizePhone } from '../../utils/phone'
+import type { H3Event } from 'h3'
 
 export interface CreateChildAccountInput {
   username: string
   email: string
   password: string
   role: 'CHILD' | 'TEEN'
-  dateOfBirth?: string
+  birthday?: string
 }
 
 export interface CompanyInviteInput {
   phone: string
   email?: string
   role: 'FINANCE_ADMIN' | 'GUEST'
-  displayName?: string
+  name?: string
 }
 
 export interface FamilyInviteInput {
   email: string
   role: 'CO_GUARDIAN'
-  displayName?: string
+  name?: string
 }
 
 function assertFamilySpace(type: string) {
@@ -62,7 +63,7 @@ export async function createChildAccount(
       id: authUser.id,
       email,
       name: input.username.trim(),
-      dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null
+      birthday: input.birthday ? new Date(input.birthday) : null
     }
   })
 
@@ -73,8 +74,8 @@ export async function createChildAccount(
       email,
       role: input.role,
       status: 'ACTIVE',
-      displayName: input.username.trim(),
-      dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null,
+      name: input.username.trim(),
+      birthday: input.birthday ? new Date(input.birthday) : null,
       invitedBy: guardianId,
       joinedAt: new Date()
     }
@@ -116,7 +117,7 @@ export async function inviteCompanyMember(
           phone,
           role: input.role,
           status: 'ACTIVE',
-          displayName: input.displayName ?? existingUser.name,
+          name: input.name ?? existingUser.name,
           invitedBy: inviterId,
           joinedAt: new Date()
         },
@@ -124,7 +125,7 @@ export async function inviteCompanyMember(
           role: input.role,
           status: 'ACTIVE',
           phone,
-          displayName: input.displayName ?? existingUser.name
+          name: input.name ?? existingUser.name
         }
       })
       return { member, invited: false, inviteUrl: null, token: null }
@@ -143,7 +144,7 @@ export async function inviteCompanyMember(
       spaceId,
       email,
       phone,
-      displayName: input.displayName?.trim() || null,
+      name: input.name?.trim() || null,
       role: input.role,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     }
@@ -156,7 +157,7 @@ export async function inviteCompanyMember(
       phone,
       role: input.role,
       status: 'PENDING',
-      displayName: input.displayName?.trim() || null,
+      name: input.name?.trim() || null,
       invitedBy: inviterId
     }
   })
@@ -201,14 +202,14 @@ export async function inviteFamilyMember(
         email,
         role: input.role,
         status: 'ACTIVE',
-        displayName: input.displayName ?? existingUser.name,
+        name: input.name ?? existingUser.name,
         invitedBy: inviterId,
         joinedAt: new Date()
       },
       update: {
         role: input.role,
         status: 'ACTIVE',
-        displayName: input.displayName ?? existingUser.name
+        name: input.name ?? existingUser.name
       }
     })
     return { member, invited: false, inviteUrl: null, token: null }
@@ -219,7 +220,7 @@ export async function inviteFamilyMember(
       spaceId,
       email,
       role: input.role,
-      displayName: input.displayName?.trim() || null,
+      name: input.name?.trim() || null,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     }
   })
@@ -230,7 +231,7 @@ export async function inviteFamilyMember(
       email,
       role: input.role,
       status: 'PENDING',
-      displayName: input.displayName?.trim() || null,
+      name: input.name?.trim() || null,
       invitedBy: inviterId
     }
   })
@@ -260,7 +261,7 @@ export async function verifyInvitationPhone(token: string, code: string) {
 
   await prisma.spaceInvitation.update({
     where: { id: invitation.id },
-    data: { phoneVerifiedAt: new Date() }
+    data: { phoneVerified: new Date() }
   })
 
   return { verified: true }
@@ -300,7 +301,7 @@ export async function completePhoneInvitation(
   if (!invitation.phone) {
     throw createError({ statusCode: 400, message: 'This invitation does not require registration' })
   }
-  if (!invitation.phoneVerifiedAt) {
+  if (!invitation.phoneVerified) {
     throw createError({ statusCode: 400, message: 'Verify your phone number first' })
   }
 
@@ -308,7 +309,7 @@ export async function completePhoneInvitation(
     || invitation.email?.toLowerCase()
     || phoneLoginEmail(invitation.phone)
 
-  const displayName = input.name?.trim() || invitation.displayName || email.split('@')[0]
+  const name = input.name?.trim() || invitation.name || email.split('@')[0] || 'Member'
 
   let userId: string
 
@@ -319,16 +320,16 @@ export async function completePhoneInvitation(
     const authUser = await createNeonAuthEmailUser({
       email,
       password: input.password,
-      name: displayName
+      name: name
     }, event)
     userId = authUser.id
     await prisma.user.create({
       data: {
         id: authUser.id,
         email,
-        name: displayName,
+        name: name,
         phone: invitation.phone,
-        phoneVerifiedAt: invitation.phoneVerifiedAt
+        phoneVerified: invitation.phoneVerified
       }
     })
   }
@@ -344,7 +345,7 @@ export async function completePhoneInvitation(
       phone: invitation.phone,
       role: invitation.role,
       status: 'ACTIVE',
-      displayName: displayName,
+      name: name,
       joinedAt: new Date()
     },
     update: {
@@ -360,7 +361,7 @@ export async function completePhoneInvitation(
 
   await prisma.user.update({
     where: { id: userId },
-    data: { activeSpaceId: invitation.spaceId }
+    data: { spaceId: invitation.spaceId }
   })
 
   return { spaceId: invitation.spaceId, spaceName: invitation.space.name, userId, loginEmail: email }
@@ -376,7 +377,7 @@ export async function acceptEmailInvitation(token: string, userId: string, userE
     throw createError({ statusCode: 404, message: 'Invitation expired or not found' })
   }
 
-  if (invitation.phone && !invitation.phoneVerifiedAt) {
+  if (invitation.phone && !invitation.phoneVerified) {
     throw createError({ statusCode: 400, message: 'Verify your phone number first' })
   }
 
@@ -397,7 +398,7 @@ export async function acceptEmailInvitation(token: string, userId: string, userE
       phone: invitation.phone,
       role: invitation.role,
       status: 'ACTIVE',
-      displayName: invitation.displayName,
+      name: invitation.name,
       joinedAt: new Date()
     },
     update: {
@@ -413,7 +414,7 @@ export async function acceptEmailInvitation(token: string, userId: string, userE
 
   await prisma.user.update({
     where: { id: userId },
-    data: { activeSpaceId: invitation.spaceId }
+    data: { spaceId: invitation.spaceId }
   })
 
   return { spaceId: invitation.spaceId, spaceName: invitation.space.name }

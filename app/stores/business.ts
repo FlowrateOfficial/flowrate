@@ -1,10 +1,12 @@
 import type { BusinessOverview } from '~/types/dashboard'
+import { planHasFeature } from '#shared/plan-limits'
+import { activePlan } from '~/state/plan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useBusinessStore = defineStore('business', () => {
   const { t } = useAppI18n()
-  const toast = useToast()
+  const appToast = useAppToast()
   const { api } = useApi()
 
   const tab = ref<'overview' | 'team'>('overview')
@@ -16,7 +18,7 @@ export const useBusinessStore = defineStore('business', () => {
     email: '',
     phone: '',
     role: 'GUEST' as 'FINANCE_ADMIN' | 'GUEST',
-    displayName: ''
+    name: ''
   })
 
   const roleItems = computed(() => [
@@ -32,10 +34,23 @@ export const useBusinessStore = defineStore('business', () => {
     }
   ])
 
-  const tabs = computed(() => [
-    { label: t('dashboard.company.tabs.overview'), value: 'overview' },
-    { label: t('dashboard.company.tabs.team'), value: 'team' }
-  ])
+  const tabs = computed(() => {
+    const items: Array<{ label: string, value: 'overview' | 'team' }> = [
+      { label: t('dashboard.company.tabs.overview'), value: 'overview' }
+    ]
+
+    if (planHasFeature(activePlan.value, 'companyTeam')) {
+      items.push({ label: t('dashboard.company.tabs.team'), value: 'team' })
+    }
+
+    return items
+  })
+
+  watch(tabs, (items) => {
+    if (tab.value === 'team' && !items.some(item => item.value === 'team')) {
+      tab.value = 'overview'
+    }
+  })
 
   function roleLabel(role: string) {
     const key = `roles.${role}`
@@ -80,23 +95,17 @@ export const useBusinessStore = defineStore('business', () => {
           phone: inviteForm.phone.trim(),
           email: inviteForm.email.trim() || undefined,
           role: inviteForm.role,
-          displayName: inviteForm.displayName.trim() || undefined
+          name: inviteForm.name.trim() || undefined
         }
       })
       inviteForm.email = ''
       inviteForm.phone = ''
-      inviteForm.displayName = ''
-      toast.add({
-        title: t('dashboard.company.team.inviteSent'),
-        color: 'success'
-      })
+      inviteForm.name = ''
+      appToast.success(t('dashboard.company.team.inviteSent'))
       onSuccess?.()
       return true
     } catch {
-      toast.add({
-        title: t('dashboard.company.team.inviteFailed'),
-        color: 'error'
-      })
+      appToast.error(t('dashboard.company.team.inviteFailed'))
       return false
     } finally {
       inviting.value = false

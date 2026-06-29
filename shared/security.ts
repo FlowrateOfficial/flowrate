@@ -4,6 +4,7 @@ export const CSRF_HEADER = 'x-csrf-token'
 
 export const SECURITY_EXEMPT_PREFIXES = [
   '/api/stripe/webhook',
+  '/api/plaid/webhook',
   '/api/auth/'
 ] as const
 

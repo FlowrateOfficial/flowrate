@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     return {
       member: {
         id: member.id,
-        name: member.displayName ?? member.email,
+        name: member.name ?? member.email,
         role: member.role,
         status: member.status,
         hasAccount: false
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
         visibility: true,
         balance: true,
         currency: true,
-        lastSynced: true
+        syncedAt: true
       }
     }),
     prisma.transaction.findMany({
@@ -78,22 +78,22 @@ export default defineEventHandler(async (event) => {
     member: {
       id: member.id,
       userId: member.userId,
-      name: member.user?.name ?? member.displayName ?? member.email,
+      name: member.user?.name ?? member.name ?? member.email,
       email: member.user?.email ?? member.email,
       role: member.role,
       status: member.status,
-      dateOfBirth: member.dateOfBirth?.toISOString() ?? null,
+      birthday: member.birthday?.toISOString() ?? null,
       hasAccount: true,
       childProfile: member.childProfile
         ? {
-            allowanceAmount: member.childProfile.allowanceAmount ? Number(member.childProfile.allowanceAmount) : null,
-            allowanceFrequency: member.childProfile.allowanceFrequency,
+            allowance: member.childProfile.allowance ? Number(member.childProfile.allowance) : null,
+            frequency: member.childProfile.frequency,
             learnMode: member.childProfile.learnMode,
             jars: member.childProfile.jars.map(j => ({
               id: j.id,
               name: j.name,
               balance: Number(j.balance),
-              targetAmount: j.targetAmount ? Number(j.targetAmount) : null
+              target: j.target ? Number(j.target) : null
             }))
           }
         : null
@@ -106,7 +106,7 @@ export default defineEventHandler(async (event) => {
       visibility: a.visibility,
       balance: Number(a.balance),
       currency: a.currency,
-      lastSynced: a.lastSynced?.toISOString() ?? null
+      syncedAt: a.syncedAt?.toISOString() ?? null
     })),
     transactions: transactions.map(tx => ({
       id: tx.id,

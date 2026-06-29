@@ -20,35 +20,42 @@ onMounted(() => spacesStore.fetchSpaces())
 </script>
 
 <template>
-  <div class="p-6 max-w-4xl mx-auto space-y-8">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold">{{ t('dashboard.spaces.title') }}</h1>
-        <p class="text-sm text-muted mt-1">{{ t('dashboard.spaces.subtitle') }}</p>
-      </div>
-      <UButton :label="t('dashboard.spaces.newSpace')" icon="i-lucide-plus" @click="showCreate = true" />
-    </div>
+  <DashboardPageShell max-width="lg">
+    <DashboardPageHeader
+      :title="t('dashboard.spaces.title')"
+      :description="t('dashboard.spaces.subtitle')"
+    >
+      <template #actions>
+        <UButton
+          v-if="spacesStore.canCreateSharedSpace"
+          :label="t('dashboard.spaces.newSpace')"
+          icon="i-lucide-plus"
+          @click="showCreate = true"
+        />
+      </template>
+    </DashboardPageHeader>
 
-    <div class="grid gap-4">
+    <div class="grid gap-3">
       <UCard
         v-for="space in spaces"
         :key="space.id"
-        class="cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all"
+        class="cursor-pointer transition-all hover:ring-1 hover:ring-primary/30"
+        :ui="{ body: 'p-4' }"
         @click="spacesStore.switchSpace(space.id)"
       >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <UIcon :name="SPACE_TYPE_ICONS[space.type]" class="w-5 h-5 text-primary" />
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex min-w-0 items-center gap-3">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <UIcon :name="SPACE_TYPE_ICONS[space.type]" class="size-5 text-primary" />
             </div>
-            <div>
-              <p class="font-semibold">{{ space.name }}</p>
+            <div class="min-w-0">
+              <p class="truncate font-semibold">{{ space.name }}</p>
               <p class="text-sm text-muted">
                 {{ spacesStore.spaceType(space.type) }} · {{ spacesStore.roleLabel(space.role) }}
               </p>
             </div>
           </div>
-          <div class="text-right text-sm text-muted">
+          <div class="shrink-0 text-right text-xs text-muted sm:text-sm">
             <p>{{ t('dashboard.spaces.members', { count: space.memberCount }) }}</p>
             <p>{{ t('dashboard.spaces.accountCount', { count: space.accountCount ?? 0 }) }}</p>
           </div>
@@ -70,21 +77,30 @@ onMounted(() => spacesStore.fetchSpaces())
 
             <div class="space-y-2">
               <p class="text-sm font-medium">{{ t('dashboard.spaces.typeLabel') }}</p>
-              <div class="grid gap-2">
+              <div v-if="!spaceTypes.length" class="rounded-lg border border-dashed border-default p-4 text-center">
+              <p class="text-sm text-muted">{{ t('dashboard.spaces.upgradeForShared') }}</p>
+              <UButton
+                class="mt-3"
+                :label="t('dashboard.spaces.upgradeCta')"
+                to="/dashboard/settings?tab=billing"
+                size="sm"
+              />
+            </div>
+            <div v-else class="grid gap-2">
                 <UButton
                   v-for="st in spaceTypes"
                   :key="st.value"
                   type="button"
                   color="neutral"
                   :variant="createForm.type === st.value ? 'soft' : 'ghost'"
-                  class="justify-start h-auto p-3"
+                  class="h-auto justify-start p-3"
                   @click="createForm.type = st.value"
                 >
-                  <div class="flex items-start gap-3 text-left w-full">
-                    <UIcon :name="st.icon" class="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                  <div class="flex w-full items-start gap-3 text-left">
+                    <UIcon :name="st.icon" class="mt-0.5 size-5 shrink-0 text-primary" />
                     <div>
-                      <p class="font-medium text-sm">{{ st.label }}</p>
-                      <p class="text-xs text-muted font-normal">{{ st.description }}</p>
+                      <p class="text-sm font-medium">{{ st.label }}</p>
+                      <p class="text-xs font-normal text-muted">{{ st.description }}</p>
                     </div>
                   </div>
                 </UButton>
@@ -95,11 +111,11 @@ onMounted(() => spacesStore.fetchSpaces())
           <template #footer>
             <div class="flex justify-end gap-2">
               <UButton :label="t('common.cancel')" color="neutral" variant="ghost" @click="showCreate = false" />
-              <UButton :label="t('common.create')" :loading="creating" @click="spacesStore.createSpace" />
+              <UButton :label="t('common.create')" :loading="creating" :disabled="!spaceTypes.length" @click="() => void spacesStore.createSpace()" />
             </div>
           </template>
         </UCard>
       </template>
     </UModal>
-  </div>
+  </DashboardPageShell>
 </template>

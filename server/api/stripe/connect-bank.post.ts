@@ -2,11 +2,14 @@ import { z } from 'zod'
 import {
   createBankLinkSession,
   ensureStripeCustomer,
-  FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
-  FINANCIAL_CONNECTIONS_DOCS_URL,
   requireStripe,
   throwStripeApiError
 } from '../../lib/stripe'
+import { assertCanConnectBank } from '../../lib/billing/enforcement'
+import {
+  FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
+  FINANCIAL_CONNECTIONS_DOCS_URL
+} from '#shared/stripe-financial-connections'
 
 const bodySchema = z.object({
   visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL')
@@ -41,6 +44,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     const { config, stripe } = requireStripe(event)
+
+    await assertCanConnectBank(user.id)
 
     const context = {
       userId: user.id,

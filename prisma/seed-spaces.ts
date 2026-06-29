@@ -22,7 +22,7 @@ async function main() {
             userId: user.id,
             role: 'OWNER',
             status: 'ACTIVE',
-            displayName: user.name,
+            name: user.name,
             joinedAt: new Date()
           }
         }
@@ -31,7 +31,7 @@ async function main() {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { activeSpaceId: space.id }
+      data: { spaceId: space.id }
     })
 
     await prisma.$transaction([

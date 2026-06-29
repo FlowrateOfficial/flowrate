@@ -2,19 +2,20 @@
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { AccountSummary } from '~/types/financial'
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
-import { formatCurrencyForLocale } from '~/utils/format'
 import { resolveErrorMessage } from '~/utils/errors'
 import { loadStripe } from '~/lib/load-stripe'
 import { isStripeConnectCancelled } from '~/lib/stripe-errors'
 import { extractFcAccountIds } from '~/utils/stripe-fc'
+import { isPlaidConnectCancelled, openPlaidLink, resolvePlaidLinkErrorMessage, storePlaidLinkSession } from '~/lib/plaid-link'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useAccountsStore = defineStore('accounts', () => {
-  const { t, getLocale } = useAppI18n()
+  const { t, formatCurrency, resolveCurrency } = useAppI18n()
   const spacesStore = useSpacesStore()
   const syncStore = useSyncStore()
   const { public: publicConfig } = useRuntimeConfig()
+  const appToast = useAppToast()
   const { api } = useApi()
 
   const accounts = ref<AccountSummary[]>([])
@@ -22,7 +23,6 @@ export const useAccountsStore = defineStore('accounts', () => {
   const visibilityFilter = ref<'all' | 'shared' | 'personal' | 'mine'>('all')
   const connectVisibility = ref<'PERSONAL' | 'SHARED'>('PERSONAL')
   const isConnecting = ref(false)
-  const connectError = ref('')
 
   const visibilityItems = computed(() => [
     { label: t('dashboard.accounts.filterAll'), value: 'all' },
@@ -48,10 +48,12 @@ export const useAccountsStore = defineStore('accounts', () => {
     accounts.value.filter(a => a.visibility === 'SHARED').reduce((s, a) => s + a.balance, 0)
   )
 
+  const spaceCurrency = computed(() => resolveCurrency(accounts.value))
+
   const summaryItems = computed<SummaryItem[]>(() => [
     {
       label: t('dashboard.accounts.totalBalance'),
-      value: fmt(totalBalance.value, 'USD'),
+      value: fmt(totalBalance.value),
       icon: 'i-lucide-wallet'
     },
     {
@@ -62,23 +64,25 @@ export const useAccountsStore = defineStore('accounts', () => {
     },
     {
       label: t('dashboard.accounts.personalBalance'),
-      value: fmt(personalBalance.value, 'USD'),
+      value: fmt(personalBalance.value),
       icon: 'i-lucide-user'
     },
     {
       label: t('dashboard.accounts.sharedBalance'),
-      value: fmt(sharedBalance.value, 'USD'),
+      value: fmt(sharedBalance.value),
       icon: 'i-lucide-users'
     }
   ])
 
   const stripeTestMode = computed(() => publicConfig.stripeConfigured && !publicConfig.stripeLiveMode)
+  const plaidConfigured = computed(() => publicConfig.plaidConfigured)
+  const plaidSandboxMode = computed(() => publicConfig.plaidConfigured && publicConfig.plaidSandboxMode)
   const isTeenView = computed(() => spacesStore.isTeenView)
 
   const teenSummaryItems = computed<SummaryItem[]>(() => [
     {
       label: t('dashboard.accounts.totalBalance'),
-      value: fmt(totalBalance.value, 'USD'),
+      value: fmt(totalBalance.value),
       icon: 'i-lucide-wallet'
     },
     {
@@ -89,33 +93,60 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   ])
 
-  const connectItems = computed((): DropdownMenuItem[][] => [
-    [
-      {
-        label: t('dashboard.accounts.connectPersonal'),
-        icon: 'i-lucide-user',
+  const connectItems = computed((): DropdownMenuItem[][] => {
+    const items: DropdownMenuItem[] = []
+
+    if (plaidConfigured.value) {
+      items.push({
+        label: t('dashboard.accounts.connectEuropean'),
+        icon: 'i-lucide-globe',
         onSelect: () => {
           connectVisibility.value = 'PERSONAL'
-          connectBank()
+          connectPlaidBank()
         }
-      },
-      {
-        label: t('dashboard.accounts.connectShared'),
-        icon: 'i-lucide-users',
-        onSelect: () => {
-          connectVisibility.value = 'SHARED'
-          connectBank()
-        }
+      })
+      if (!isTeenView.value) {
+        items.push({
+          label: t('dashboard.accounts.connectEuropeanShared'),
+          icon: 'i-lucide-globe',
+          onSelect: () => {
+            connectVisibility.value = 'SHARED'
+            connectPlaidBank()
+          }
+        })
       }
-    ]
-  ])
+    }
 
-  function fmt(balance: number, currency = 'USD') {
-    return formatCurrencyForLocale(balance, getLocale(), currency)
+    if (publicConfig.stripeConfigured) {
+      items.push({
+        label: t('dashboard.accounts.connectUs'),
+        icon: 'i-lucide-flag',
+        onSelect: () => {
+          connectVisibility.value = 'PERSONAL'
+          connectStripeBank()
+        }
+      })
+      if (!isTeenView.value) {
+        items.push({
+          label: t('dashboard.accounts.connectUsShared'),
+          icon: 'i-lucide-flag',
+          onSelect: () => {
+            connectVisibility.value = 'SHARED'
+            connectStripeBank()
+          }
+        })
+      }
+    }
+
+    return items.length ? [items] : []
+  })
+
+  function fmt(balance: number, currency?: string) {
+    return formatCurrency(balance, currency ?? spaceCurrency.value)
   }
 
   async function fetchAccounts() {
-    if (!spacesStore.activeSpace) return
+    if (!spacesStore.space) return
     pending.value = true
     try {
       accounts.value = await api<AccountSummary[]>(apiRoutes.accounts.list, {
@@ -134,7 +165,6 @@ export const useAccountsStore = defineStore('accounts', () => {
 
   async function resyncFromStripe() {
     isConnecting.value = true
-    connectError.value = ''
     try {
       await api(apiRoutes.stripe.syncAccounts, {
         method: 'POST',
@@ -142,23 +172,22 @@ export const useAccountsStore = defineStore('accounts', () => {
       })
       await fetchAccounts()
       if (!accounts.value.length) {
-        connectError.value = t('dashboard.accounts.syncNoAccounts')
+        appToast.warning(t('dashboard.accounts.syncNoAccounts'))
         return false
       }
       return true
     } catch (e) {
-      connectError.value = resolveErrorMessage(e, t, 'dashboard.accounts.connectError')
+      appToast.errorFrom(e, 'dashboard.accounts.connectError')
       return false
     } finally {
       isConnecting.value = false
     }
   }
 
-  async function connectBank() {
+  async function connectStripeBank() {
     if (isConnecting.value) return false
 
     isConnecting.value = true
-    connectError.value = ''
     if (isTeenView.value) {
       connectVisibility.value = 'PERSONAL'
     }
@@ -166,7 +195,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     try {
       const stripe = await loadStripe()
       if (!stripe) {
-        connectError.value = t('dashboard.accounts.stripeNotConfigured')
+        appToast.errorMessage(t('dashboard.accounts.stripeNotConfigured'))
         return false
       }
 
@@ -190,19 +219,18 @@ export const useAccountsStore = defineStore('accounts', () => {
       await fetchAccounts()
 
       if (!result.synced?.length && !accounts.value.length) {
-        connectError.value = t('dashboard.accounts.syncNoAccounts')
+        appToast.warning(t('dashboard.accounts.syncNoAccounts'))
         return false
       }
 
       if (result.synced?.length && !accounts.value.length) {
-        // NOTE - Legacy accounts on wrong space — re-sync to attach to active space
         const retry = await api<{ synced: Array<{ id: string }> }>(apiRoutes.stripe.syncAccounts, {
           method: 'POST',
           body: { syncAll: true, visibility }
         })
         await fetchAccounts()
         if (retry.synced?.length && !accounts.value.length) {
-          connectError.value = t('dashboard.accounts.syncNoAccounts')
+          appToast.warning(t('dashboard.accounts.syncNoAccounts'))
           return false
         }
       }
@@ -210,11 +238,82 @@ export const useAccountsStore = defineStore('accounts', () => {
       return true
     } catch (e) {
       if (isStripeConnectCancelled(e)) return true
-      connectError.value = resolveErrorMessage(e, t, 'dashboard.accounts.connectError')
+      appToast.errorFrom(e, 'dashboard.accounts.connectError')
       return false
     } finally {
       isConnecting.value = false
     }
+  }
+
+  async function connectPlaidBank() {
+    if (isConnecting.value) return false
+
+    isConnecting.value = true
+    if (isTeenView.value) {
+      connectVisibility.value = 'PERSONAL'
+    }
+
+    try {
+      if (!plaidConfigured.value) {
+        appToast.errorMessage(t('dashboard.accounts.plaidNotConfigured'))
+        return false
+      }
+
+      const { linkToken, visibility } = await api<{
+        linkToken: string
+        visibility?: 'PERSONAL' | 'SHARED'
+      }>(apiRoutes.plaid.linkToken, {
+        method: 'POST',
+        body: { visibility: connectVisibility.value }
+      })
+
+      const visibilityValue = visibility ?? connectVisibility.value
+      storePlaidLinkSession(linkToken, visibilityValue)
+
+      const { publicToken, metadata } = await openPlaidLink({ linkToken })
+
+      const result = await api<{ synced: Array<{ id: string, name: string, balance: number }> }>(apiRoutes.plaid.exchange, {
+        method: 'POST',
+        body: {
+          publicToken,
+          visibility: visibilityValue,
+          metadata
+        }
+      })
+
+      await fetchAccounts()
+
+      if (!result.synced?.length && !accounts.value.length) {
+        appToast.warning(t('dashboard.accounts.syncNoAccounts'))
+        return false
+      }
+
+      return true
+    } catch (e) {
+      if (isPlaidConnectCancelled(e)) return true
+      const plaidMessage = resolvePlaidLinkErrorMessage(e)
+      if (e instanceof Error && e.message === 'Failed to load Plaid Link') {
+        appToast.errorMessage(t('dashboard.accounts.plaidLinkLoadError'))
+        return false
+      }
+      appToast.errorMessage(plaidMessage ?? resolveErrorMessage(e, t, 'dashboard.accounts.connectError'))
+      return false
+    } finally {
+      isConnecting.value = false
+    }
+  }
+
+  async function connectBank() {
+    if (plaidConfigured.value && !publicConfig.stripeConfigured) {
+      return connectPlaidBank()
+    }
+    if (publicConfig.stripeConfigured && !plaidConfigured.value) {
+      return connectStripeBank()
+    }
+    if (plaidConfigured.value) {
+      return connectPlaidBank()
+    }
+    return connectStripeBank()
   }
 
   async function disconnectAccount(accountId: string) {
@@ -224,7 +323,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
   watch(visibilityFilter, () => fetchAccounts())
 
-  watch(() => spacesStore.activeSpace?.id, () => {
+  watch(() => spacesStore.space?.id, () => {
     visibilityFilter.value = 'all'
   })
 
@@ -234,11 +333,12 @@ export const useAccountsStore = defineStore('accounts', () => {
     visibilityFilter,
     connectVisibility,
     isConnecting,
-    connectError,
     visibilityItems,
     connectVisibilityItems,
     summaryItems,
     stripeTestMode,
+    plaidConfigured,
+    plaidSandboxMode,
     isTeenView,
     teenSummaryItems,
     connectItems,
@@ -249,6 +349,8 @@ export const useAccountsStore = defineStore('accounts', () => {
     syncTransactions,
     resyncFromStripe,
     connectBank,
+    connectStripeBank,
+    connectPlaidBank,
     disconnectAccount
   }
 })

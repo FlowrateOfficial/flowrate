@@ -1,7 +1,7 @@
 // ANCHOR: Financial Connections — bank link sessions, account sync, subscriptions
 import type { H3Event } from 'h3'
 import type Stripe from 'stripe'
-import type { AccountType } from '~~/generated/prisma'
+import type { AccountType } from '~~/generated/prisma/client'
 import {
   FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
   FINANCIAL_CONNECTIONS_PERMISSIONS,
@@ -10,14 +10,6 @@ import {
 import { linkStripeCustomerToUser, resolveUserIdFromStripeCustomer } from './customer'
 import { resolveHttpsBaseUrl } from './client'
 import type { StripeLinkContext } from './types'
-
-export {
-  FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
-  FINANCIAL_CONNECTIONS_BUSINESS_COUNTRIES,
-  FINANCIAL_CONNECTIONS_DOCS_URL,
-  FINANCIAL_CONNECTIONS_PERMISSIONS,
-  FINANCIAL_CONNECTIONS_PREFETCH
-} from '#shared/stripe-financial-connections'
 
 function pickPrimaryCurrencyAmount(
   amounts: Record<string, number> | null | undefined
@@ -161,7 +153,7 @@ export async function upsertFinancialConnectionAccount(
 ) {
   if (fcAccount.status === 'disconnected') {
     await prisma.account.deleteMany({
-      where: { stripeFcAccountId: fcAccount.id }
+      where: { stripeId: fcAccount.id }
     })
     return null
   }
@@ -169,7 +161,7 @@ export async function upsertFinancialConnectionAccount(
   const { balance, currency } = balanceAndCurrencyFromFinancialConnectionAccount(fcAccount)
 
   const record = await prisma.account.upsert({
-    where: { stripeFcAccountId: fcAccount.id },
+    where: { stripeId: fcAccount.id },
     create: {
       userId: context.userId,
       spaceId: context.spaceId,
@@ -179,8 +171,8 @@ export async function upsertFinancialConnectionAccount(
       visibility: context.visibility,
       balance,
       currency,
-      stripeFcAccountId: fcAccount.id,
-      lastSynced: new Date()
+      stripeId: fcAccount.id,
+      syncedAt: new Date()
     },
     update: {
       userId: context.userId,
@@ -191,7 +183,7 @@ export async function upsertFinancialConnectionAccount(
       visibility: context.visibility,
       balance,
       currency,
-      lastSynced: new Date()
+      syncedAt: new Date()
     }
   })
 
@@ -210,7 +202,7 @@ export async function linkContextFromStripeCustomer(
   if (!userId) return null
 
   const spaceId = customer.metadata?.spaceId
-    ?? (await prisma.user.findUnique({ where: { id: userId }, select: { activeSpaceId: true } }))?.activeSpaceId
+    ?? (await prisma.user.findUnique({ where: { id: userId }, select: { spaceId: true } }))?.spaceId
     ?? (await prisma.spaceMember.findFirst({
       where: { userId, status: 'ACTIVE' },
       select: { spaceId: true },

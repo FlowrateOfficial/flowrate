@@ -1,4 +1,4 @@
-import type { Prisma } from '~~/generated/prisma'
+import type { Prisma } from '~~/generated/prisma/client'
 import type { SpaceContext } from '../domain/context'
 
 export type AccountListFilter = 'all' | 'shared' | 'personal' | 'mine'
@@ -55,7 +55,7 @@ export async function listAccounts(ctx: SpaceContext, filter: AccountListFilter 
       visibility: true,
       balance: true,
       currency: true,
-      lastSynced: true,
+      syncedAt: true,
       userId: true,
       user: { select: { id: true, name: true } }
     }
@@ -77,7 +77,7 @@ export async function deleteAccountCascade(accountId: string) {
 
 export async function countLinkedAccounts(spaceId: string) {
   return prisma.account.count({
-    where: { spaceId, stripeFcAccountId: { not: null } }
+    where: { spaceId, stripeId: { not: null } }
   })
 }
 

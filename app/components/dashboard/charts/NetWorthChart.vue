@@ -5,35 +5,51 @@ import type { ChartData, ChartOptions } from 'chart.js'
 const props = defineProps<{
   labels: string[]
   values: number[]
+  currency?: string
 }>()
 
-const colorMode = useColorMode()
+const theme = useChartTheme()
+const { formatAxis, formatTooltip } = useChartCurrency(computed(() => props.currency))
 
 const chartData = computed<ChartData<'line'>>(() => ({
   labels: props.labels,
   datasets: [{
     data: props.values,
-    borderColor: '#2A2A2A',
-    backgroundColor: colorMode.value === 'dark' ? 'rgba(248, 246, 242, 0.08)' : 'rgba(42, 42, 42, 0.06)',
+    borderColor: theme.isDark.value ? theme.textBright.value : '#2A2A2A',
+    backgroundColor: theme.fillInk.value,
     fill: true,
     tension: 0.3,
     pointRadius: 3,
-    pointBackgroundColor: '#7A8F7A'
+    pointBackgroundColor: theme.sage.value
   }]
 }))
 
 const options = computed<ChartOptions<'line'>>(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: (ctx) => {
+          const value = ctx.parsed.y
+          if (value == null) return ''
+          return formatTooltip(value)
+        }
+      }
+    }
+  },
   scales: {
     x: {
       grid: { display: false },
-      ticks: { color: colorMode.value === 'dark' ? '#A39E97' : '#67635E' }
+      ticks: { color: theme.text.value }
     },
     y: {
-      grid: { color: colorMode.value === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' },
-      ticks: { color: colorMode.value === 'dark' ? '#A39E97' : '#67635E' }
+      grid: { color: theme.gridStrong.value },
+      ticks: {
+        color: theme.text.value,
+        callback: (value) => formatAxis(value)
+      }
     }
   }
 }))

@@ -6,6 +6,7 @@ import {
   requireStripe,
   upsertFinancialConnectionAccount
 } from '../../lib/stripe'
+import { assertCanConnectBank } from '../../lib/billing/enforcement'
 import { syncSpaceTransactions } from '../../lib/transactionSync'
 
 const bodySchema = z.object({
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
     visibility
   }
 
-  const stripeCustomerId = await ensureStripeCustomer(stripe, user, {
+  const customerId = await ensureStripeCustomer(stripe, user, {
     userId: user.id,
     spaceId: space.id,
     visibility
@@ -45,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
   if (accountIds.length === 0 || body.syncAll) {
     const listed = await stripe.financialConnections.accounts.list({
-      account_holder: { customer: stripeCustomerId },
+      account_holder: { customer: customerId },
       limit: 100
     })
     accountIds = listed.data.map(a => a.id)
@@ -58,8 +59,13 @@ export default defineEventHandler(async (event) => {
   const synced = []
 
   for (const accountId of accountIds) {
+    const existing = await prisma.account.findUnique({ where: { stripeId: accountId } })
+    if (!existing) {
+      await assertCanConnectBank(user.id)
+    }
+
     const fcAccount = await refreshFinancialConnectionAccount(stripe, accountId)
-    assertFinancialConnectionOwnership(fcAccount, stripeCustomerId)
+    assertFinancialConnectionOwnership(fcAccount, customerId)
     const record = await upsertFinancialConnectionAccount(stripe, fcAccount, context)
     if (!record) continue
     synced.push({

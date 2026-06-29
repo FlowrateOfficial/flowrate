@@ -1,8 +1,37 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { TransactionRow } from '~/types/financial'
-import { formatCurrencyForLocale } from '~/utils/format'
+import { planHasFeature } from '#shared/plan-limits'
+import { activePlan } from '~/state/plan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
+
+export interface SpaceDetailMember {
+  id: string
+  userId: string | null
+  email: string | null
+  name: string | null
+  role: string
+  status: string
+  birthday: string | null
+  childProfile: {
+    id: string
+    allowance: number | null
+    frequency: string | null
+    learnMode: boolean
+    jars: Array<{ id: string, name: string, balance: number, target: number | null }>
+  } | null
+  financialSummary: { balance: number, spending30d: number, accountCount: number } | null
+}
+
+export interface SpaceDetail {
+  id: string
+  name: string
+  type: string
+  role: string
+  settings: unknown
+  members: SpaceDetailMember[]
+  accounts: unknown[]
+}
 
 export interface MemberFinancial {
   member: {
@@ -12,13 +41,13 @@ export interface MemberFinancial {
     email: string | null
     role: string
     status: string
-    dateOfBirth: string | null
+    birthday: string | null
     hasAccount: boolean
     childProfile?: {
-      allowanceAmount: number | null
-      allowanceFrequency: string | null
+      allowance: number | null
+      frequency: string | null
       learnMode: boolean
-      jars: Array<{ id: string, name: string, balance: number, targetAmount: number | null }>
+      jars: Array<{ id: string, name: string, balance: number, target: number | null }>
     } | null
   }
   accounts: Array<{
@@ -29,7 +58,7 @@ export interface MemberFinancial {
     visibility: string
     balance: number
     currency: string
-    lastSynced: string | null
+    syncedAt: string | null
   }>
   transactions: TransactionRow[]
   stats: {
@@ -41,9 +70,9 @@ export interface MemberFinancial {
 }
 
 export const useFamilyStore = defineStore('family', () => {
-  const { t, getLocale, categoryLabel, intlLocale } = useAppI18n()
+  const { t, categoryLabel, intlLocale, formatCurrency } = useAppI18n()
   const spacesStore = useSpacesStore()
-  const toast = useToast()
+  const appToast = useAppToast()
   const { api } = useApi()
 
   const inviting = ref(false)
@@ -51,28 +80,40 @@ export const useFamilyStore = defineStore('family', () => {
   const tab = ref('members')
   const memberTab = ref('overview')
 
-  const inviteForm = reactive({ email: '', role: 'CO_GUARDIAN', displayName: '' })
+  const inviteForm = reactive({ email: '', role: 'CO_GUARDIAN', name: '' })
   const childForm = reactive({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
     role: 'CHILD' as 'CHILD' | 'TEEN',
-    dateOfBirth: ''
+    birthday: ''
   })
-  const childFormError = ref('')
   const allowanceForm = reactive({
-    allowanceAmount: 0,
-    allowanceFrequency: 'WEEKLY' as 'WEEKLY' | 'MONTHLY' | 'YEARLY',
+    allowance: 0,
+    frequency: 'WEEKLY' as 'WEEKLY' | 'MONTHLY' | 'YEARLY',
     learnMode: true
   })
   const jarName = ref('')
 
-  const tabs = computed(() => [
-    { label: t('dashboard.family.tabs.members'), value: 'members' },
-    { label: t('dashboard.family.tabs.children'), value: 'children' },
-    { label: t('dashboard.family.tabs.splits'), value: 'splits' }
-  ])
+  const tabs = computed(() => {
+    const items = [
+      { label: t('dashboard.family.tabs.members'), value: 'members' }
+    ]
+
+    if (planHasFeature(activePlan.value, 'teenAccounts')) {
+      items.push({ label: t('dashboard.family.tabs.children'), value: 'children' })
+    }
+
+    items.push({ label: t('dashboard.family.tabs.splits'), value: 'splits' })
+    return items
+  })
+
+  watch(tabs, (items) => {
+    if (tab.value === 'children' && !items.some(item => item.value === 'children')) {
+      tab.value = 'members'
+    }
+  })
 
   const childRoleItems = computed(() => [
     { label: t('dashboard.family.roleChild'), value: 'CHILD' },
@@ -99,8 +140,8 @@ export const useFamilyStore = defineStore('family', () => {
     { label: t('dashboard.family.memberTabs.allowance'), value: 'allowance' }
   ])
 
-  function fmt(amount: number, currency = 'USD') {
-    return formatCurrencyForLocale(amount, getLocale(), currency)
+  function fmt(amount: number, currency?: string) {
+    return formatCurrency(amount, currency)
   }
 
   function roleLabel(role: string) {
@@ -137,7 +178,7 @@ export const useFamilyStore = defineStore('family', () => {
   }
 
   async function fetchSpaceDetail(spaceId: string) {
-    return api(apiRoutes.spaces.detail(spaceId))
+    return api<SpaceDetail>(apiRoutes.spaces.detail(spaceId))
   }
 
   async function fetchMemberFinancial(spaceId: string, memberId: string) {
@@ -152,11 +193,11 @@ export const useFamilyStore = defineStore('family', () => {
         body: {
           email: inviteForm.email,
           role: inviteForm.role,
-          displayName: inviteForm.displayName || undefined
+          name: inviteForm.name || undefined
         }
       })
       inviteForm.email = ''
-      inviteForm.displayName = ''
+      inviteForm.name = ''
       await refresh()
     } finally {
       inviting.value = false
@@ -164,17 +205,16 @@ export const useFamilyStore = defineStore('family', () => {
   }
 
   async function addChild(spaceId: string, refresh: () => Promise<void>) {
-    childFormError.value = ''
     if (!childForm.username.trim() || !childForm.email.trim() || !childForm.password) {
-      childFormError.value = 'missingFields'
+      appToast.errorMessage(t('dashboard.family.childErrors.missingFields'))
       return false
     }
     if (childForm.password !== childForm.confirmPassword) {
-      childFormError.value = 'passwordMismatch'
+      appToast.errorMessage(t('dashboard.family.childErrors.passwordMismatch'))
       return false
     }
     if (childForm.password.length < 8) {
-      childFormError.value = 'passwordTooShort'
+      appToast.errorMessage(t('dashboard.family.childErrors.passwordTooShort'))
       return false
     }
 
@@ -188,8 +228,8 @@ export const useFamilyStore = defineStore('family', () => {
           email: childForm.email.trim(),
           password: childForm.password,
           role: childForm.role,
-          dateOfBirth: childForm.dateOfBirth
-            ? new Date(childForm.dateOfBirth).toISOString()
+          birthday: childForm.birthday
+            ? new Date(childForm.birthday).toISOString()
             : undefined
         }
       })
@@ -197,12 +237,11 @@ export const useFamilyStore = defineStore('family', () => {
       childForm.email = ''
       childForm.password = ''
       childForm.confirmPassword = ''
-      childForm.dateOfBirth = ''
-      toast.add({
-        title: t('dashboard.family.accountCreated'),
-        description: t('dashboard.family.accountCreatedDescription', { name: createdName }),
-        color: 'success'
-      })
+      childForm.birthday = ''
+      appToast.success(
+        t('dashboard.family.accountCreated'),
+        t('dashboard.family.accountCreatedDescription', { name: createdName })
+      )
       await refresh()
       return true
     } catch (e: unknown) {
@@ -210,7 +249,11 @@ export const useFamilyStore = defineStore('family', () => {
         && typeof (e as { data?: { message?: string } }).data?.message === 'string'
         ? (e as { data: { message: string } }).data.message
         : ''
-      childFormError.value = message.includes('exist') ? 'emailTaken' : 'createFailed'
+      appToast.errorMessage(
+        message.includes('exist')
+          ? t('dashboard.family.childErrors.emailTaken')
+          : t('dashboard.family.childErrors.createFailed')
+      )
       return false
     } finally {
       inviting.value = false
@@ -240,8 +283,8 @@ export const useFamilyStore = defineStore('family', () => {
     await refresh()
   }
 
-  const splitForm = reactive({ name: '', category: 'FOOD', ruleType: 'EQUAL' as 'EQUAL' | 'PROPORTIONAL' | 'CUSTOM' })
-  const splits = ref<Array<{ id: string, name: string, category: string | null, ruleType: string }>>([])
+  const splitForm = reactive({ name: '', category: 'FOOD', mode: 'EQUAL' as 'EQUAL' | 'PROPORTIONAL' | 'CUSTOM' })
+  const splits = ref<Array<{ id: string, name: string, category: string | null, mode: string }>>([])
 
   async function fetchSplits(spaceId: string) {
     splits.value = await api(apiRoutes.spaces.splits(spaceId))
@@ -272,8 +315,8 @@ export const useFamilyStore = defineStore('family', () => {
   function loadAllowanceFromMember(data: MemberFinancial | null) {
     const profile = data?.member.childProfile
     if (!profile) return
-    allowanceForm.allowanceAmount = profile.allowanceAmount ?? 0
-    allowanceForm.allowanceFrequency = (profile.allowanceFrequency as typeof allowanceForm.allowanceFrequency) ?? 'WEEKLY'
+    allowanceForm.allowance = profile.allowance ?? 0
+    allowanceForm.frequency = (profile.frequency as typeof allowanceForm.frequency) ?? 'WEEKLY'
     allowanceForm.learnMode = profile.learnMode
   }
 
@@ -284,7 +327,6 @@ export const useFamilyStore = defineStore('family', () => {
     memberTab,
     inviteForm,
     childForm,
-    childFormError,
     allowanceForm,
     jarName,
     tabs,

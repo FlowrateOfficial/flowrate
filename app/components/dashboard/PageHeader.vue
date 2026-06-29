@@ -1,22 +1,42 @@
 <script setup lang="ts">
+const { t } = useAppI18n()
+
 defineProps<{
   title: string
   description?: string
+  eyebrow?: string
+  backTo?: string
 }>()
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-    <div class="space-y-1.5 min-w-0">
-      <h1 class="font-display text-3xl sm:text-4xl text-flow-ink dark:text-flow-ink-dark tracking-tight">
+  <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div class="min-w-0 space-y-1">
+      <UButton
+        v-if="backTo"
+        :to="backTo"
+        icon="i-lucide-arrow-left"
+        :label="t('common.back')"
+        variant="ghost"
+        color="neutral"
+        size="xs"
+        class="-ml-1 mb-1"
+      />
+      <p v-if="eyebrow" class="text-xs font-medium uppercase tracking-wide text-muted">
+        {{ eyebrow }}
+      </p>
+      <h1 class="text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
         {{ title }}
       </h1>
-      <p v-if="description" class="text-sm text-flow-muted dark:text-flow-muted-dark max-w-2xl">
+      <p v-if="description" class="max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
         {{ description }}
       </p>
     </div>
-    <div v-if="$slots.actions" class="flex flex-wrap items-center gap-2 shrink-0">
+    <div
+      v-if="$slots.actions"
+      class="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end"
+    >
       <slot name="actions" />
     </div>
-  </div>
+  </header>
 </template>

@@ -5,7 +5,7 @@ definePageMeta({ layout: 'auth', middleware: 'guest' })
 
 const { t } = useAppI18n()
 const auth = useAuthStore()
-const { forgotForm, loading, error, forgotSent, forgotSchema } = storeToRefs(auth)
+const { forgotForm, loading, forgotSent, forgotSchema } = storeToRefs(auth)
 
 useSeoMeta({ title: () => t('auth.forgot.title') })
 </script>
@@ -22,19 +22,13 @@ useSeoMeta({ title: () => t('auth.forgot.title') })
       </p>
     </header>
 
-    <UAlert
-      v-if="forgotSent"
-      :title="t('auth.forgot.checkEmailTitle')"
-      :description="t('auth.forgot.checkEmailDescription')"
-      color="success"
-      variant="subtle"
-      icon="i-lucide-mail"
-    />
+    <div v-if="forgotSent" class="rounded-flow border border-default bg-elevated/30 p-4 text-center space-y-2">
+      <UIcon name="i-lucide-mail" class="mx-auto size-8 text-muted" />
+      <h2 class="text-base font-semibold">{{ t('auth.forgot.checkEmailTitle') }}</h2>
+      <p class="text-sm text-muted">{{ t('auth.forgot.checkEmailDescription') }}</p>
+    </div>
 
-    <template v-else>
-      <UAlert v-if="error" :description="error" color="error" variant="subtle" icon="i-lucide-alert-circle" />
-
-      <UForm :schema="forgotSchema" :state="forgotForm" class="space-y-5" @submit="auth.forgotPassword">
+    <UForm v-else :schema="forgotSchema" :state="forgotForm" class="space-y-5" @submit="auth.forgotPassword">
         <UFormField :label="t('auth.login.email')" name="email" required>
           <UInput v-model="forgotForm.email" type="email" :placeholder="t('auth.login.emailPlaceholder')" autocomplete="email" class="w-full" variant="outline" />
         </UFormField>
@@ -48,6 +42,5 @@ useSeoMeta({ title: () => t('auth.forgot.title') })
           class="!bg-charcoal dark:!bg-flow-warm !text-flow-warm dark:!text-charcoal rounded-flow"
         />
       </UForm>
-    </template>
   </div>
 </template>

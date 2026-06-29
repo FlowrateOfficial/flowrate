@@ -1,4 +1,6 @@
 // ANCHOR: Server-side Neon Auth user provisioning
+import type { H3Event } from 'h3'
+
 export interface CreatedAuthUser {
   id: string
   email: string

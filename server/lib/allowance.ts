@@ -3,8 +3,8 @@ export async function processAllowancePayouts(spaceId: string) {
   const profiles = await prisma.childProfile.findMany({
     where: {
       spaceId,
-      allowanceAmount: { not: null },
-      allowanceFrequency: { not: null }
+      allowance: { not: null },
+      frequency: { not: null }
     },
     include: { jars: true, member: true }
   })
@@ -12,11 +12,11 @@ export async function processAllowancePayouts(spaceId: string) {
   const now = new Date()
 
   for (const profile of profiles) {
-    const amount = Number(profile.allowanceAmount)
+    const amount = Number(profile.allowance)
     if (!amount || amount <= 0) continue
 
     const lastPaid = profile.updatedAt
-    const due = isAllowanceDue(profile.allowanceFrequency!, lastPaid, now)
+    const due = isAllowanceDue(profile.frequency!, lastPaid, now)
     if (!due) continue
 
     const jar = profile.jars[0]

@@ -1,13 +1,13 @@
 import { z } from 'zod'
 import { secureAppCookieOptions } from '../../lib/security/cookies'
 
-const activeSpaceSchema = z.object({
+const spaceSchema = z.object({
   spaceId: z.string().min(1)
 })
 
 export default defineEventHandler(async (event) => {
   const user = await requireNeonAuth(event)
-  const { spaceId } = await readValidatedBody(event, activeSpaceSchema.parse)
+  const { spaceId } = await readValidatedBody(event, spaceSchema.parse)
 
   const membership = await getUserMembership(user.id, spaceId)
   if (!membership) {
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { activeSpaceId: spaceId }
+    data: { spaceId: spaceId }
   })
 
   setCookie(event, ACTIVE_SPACE_COOKIE, spaceId, {

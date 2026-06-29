@@ -1,9 +1,11 @@
 import type { AppPlan } from '#shared/billing'
-import { requireAuthUser } from '../../lib/auth'
+import { isAdminEmail } from '../../lib/admin'
+import { requireSessionUser } from '../../lib/auth'
 import { getUserBillingSnapshot } from '../../lib/billing'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuthUser(event)
+  const user = await requireSessionUser(event)
+  const config = useRuntimeConfig(event)
 
   const profile = await prisma.user.findUnique({
     where: { id: user.id },
@@ -12,7 +14,7 @@ export default defineEventHandler(async (event) => {
       name: true,
       email: true,
       phone: true,
-      phoneVerifiedAt: true,
+      phoneVerified: true,
       plan: true
     }
   })
@@ -28,16 +30,19 @@ export default defineEventHandler(async (event) => {
     name: profile.name,
     email: profile.email,
     phone: profile.phone,
-    phoneVerified: profile.phoneVerifiedAt != null,
+    phoneVerified: profile.phoneVerified != null,
     plan: profile.plan as AppPlan,
+    isAdmin: isAdminEmail(profile.email, config.adminEmails),
     billing: billing
       ? {
-          stripeCustomerId: billing.stripeCustomerId,
+          customerId: billing.customerId,
           subscription: billing.subscription
             ? {
                 status: billing.subscription.status,
-                currentPeriodEnd: billing.subscription.currentPeriodEnd?.toISOString() ?? null,
-                cancelAtPeriodEnd: billing.subscription.cancelAtPeriodEnd
+                periodEnd: billing.subscription.periodEnd?.toISOString() ?? null,
+                cancelAtEnd: billing.subscription.cancelAtEnd,
+                planKey: billing.subscription.planKey,
+                priceId: billing.subscription.priceId
               }
             : null
         }

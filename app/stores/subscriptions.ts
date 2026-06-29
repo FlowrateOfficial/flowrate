@@ -10,7 +10,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
   const loading = ref(false)
 
   async function fetchSubscriptions(spaceId?: string) {
-    const id = spaceId ?? spacesStore.activeSpace?.id
+    const id = spaceId ?? spacesStore.space?.id
     if (!id) return
     loading.value = true
     try {

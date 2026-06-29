@@ -10,9 +10,12 @@ export default defineNuxtPlugin({
 
     if (!i18n?.$switchContext || !i18n.$getLocale) return
 
+    const switchContext = i18n.$switchContext
+    const getLocale = i18n.$getLocale
+
     async function useRootLocale() {
-      const locale = i18n.$getLocale?.() || 'en'
-      await i18n.$switchContext!(locale, 'index')
+      const locale = getLocale() || 'en'
+      await switchContext(locale, 'index')
     }
 
     await useRootLocale()

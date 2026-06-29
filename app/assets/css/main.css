@@ -19,13 +19,16 @@
   --color-flow-success: #7FA26A;
   --color-flow-warning: #C59B4B;
 
-  --color-flow-bg-dark: #141312;
-  --color-flow-card-dark: #1E1D1B;
-  --color-flow-secondary-dark: #252422;
-  --color-flow-warm-dark: #1A1918;
-  --color-flow-ink-dark: #F8F6F2;
-  --color-flow-muted-dark: #A39E97;
-  --color-flow-border-dark: #3D3A36;
+  --color-flow-bg-dark: #0C0B0A;
+  --color-flow-card-dark: #161514;
+  --color-flow-elevated-dark: #1C1B19;
+  --color-flow-secondary-dark: #242220;
+  --color-flow-warm-dark: #131211;
+  --color-flow-ink-dark: #EDEAE4;
+  --color-flow-muted-dark: #9C968D;
+  --color-flow-dim-dark: #6B6560;
+  --color-flow-border-dark: #2E2B27;
+  --color-flow-border-subtle-dark: #211F1D;
 
   --radius-flow: 0.625rem;
   --radius-flow-lg: 0.875rem;
@@ -36,23 +39,55 @@
 :root {
   --ui-radius: 0.625rem;
   --ui-bg: var(--color-flow-bg);
+  --ui-bg-muted: var(--color-flow-warm);
+  --ui-bg-elevated: var(--color-flow-card);
+  --ui-bg-accented: var(--color-flow-secondary);
   --ui-text: var(--color-flow-ink);
   --ui-text-muted: var(--color-flow-muted);
+  --ui-text-dimmed: #8A857D;
   --ui-border: var(--color-flow-border);
+  --ui-border-muted: #E8E2D9;
 }
 
 .dark {
+  /* Nuxt UI semantic surfaces */
   --ui-bg: var(--color-flow-bg-dark);
+  --ui-bg-muted: var(--color-flow-warm-dark);
+  --ui-bg-elevated: var(--color-flow-card-dark);
+  --ui-bg-accented: var(--color-flow-elevated-dark);
+  --ui-bg-inverted: var(--color-flow-ink-dark);
+
   --ui-text: var(--color-flow-ink-dark);
   --ui-text-muted: var(--color-flow-muted-dark);
+  --ui-text-dimmed: var(--color-flow-dim-dark);
+  --ui-text-toned: #B5AFA6;
+  --ui-text-highlighted: #F5F2EC;
+  --ui-text-inverted: var(--color-flow-bg-dark);
+
   --ui-border: var(--color-flow-border-dark);
+  --ui-border-muted: var(--color-flow-border-subtle-dark);
+  --ui-border-accented: #383430;
+  --ui-border-inverted: var(--color-flow-ink-dark);
+
+  --ui-ring: #383430;
+  --ui-ring-accented: #4A4540;
+  --ui-ring-offset: var(--color-flow-bg-dark);
+
+  /* FlowRate editorial tokens */
+  --color-sage: #91A891;
+  --color-terracotta: #D4845F;
+  --color-sand: #C9B896;
+  --color-flow-success: #8FB87A;
+  --color-flow-warning: #D4A84F;
 }
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
+  overflow-x: clip;
   @apply font-sans text-[17px] leading-relaxed antialiased;
   font-feature-settings: 'kern' 1, 'liga' 1;
 }
@@ -69,8 +104,16 @@ body::before {
   background-size: 180px 180px;
 }
 
+.dark body {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -30%, rgba(145, 168, 145, 0.07), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 50%, rgba(212, 132, 95, 0.04), transparent 45%),
+    linear-gradient(180deg, #0C0B0A 0%, #100F0E 40%, #0C0B0A 100%);
+  background-color: var(--color-flow-bg-dark);
+}
+
 .dark body::before {
-  opacity: 0.05;
+  opacity: 0.028;
 }
 
 /* Editorial typography */
@@ -101,16 +144,18 @@ body::before {
 .editorial-card {
   @apply bg-flow-card dark:bg-flow-card-dark border border-flow-border dark:border-flow-border-dark rounded-flow-lg p-6 sm:p-8
     shadow-[0_1px_2px_rgba(25,25,25,0.03)]
-    dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]
-    transition-all duration-[350ms] ease-[var(--ease-flow)]
+    dark:shadow-[0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.35)]
+    transition-[transform,box-shadow] duration-[350ms] ease-[var(--ease-flow)]
     hover:-translate-y-1
     hover:shadow-[0_4px_16px_rgba(25,25,25,0.04)]
-    dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.25)];
+    dark:hover:shadow-[0_1px_0_rgba(255,255,255,0.06),0_12px_32px_rgba(0,0,0,0.45)]
+    max-w-full;
 }
 
 .editorial-card-flat {
   @apply bg-flow-card dark:bg-flow-card-dark border border-flow-border dark:border-flow-border-dark rounded-flow-lg p-6 sm:p-8
-    shadow-[0_1px_2px_rgba(25,25,25,0.02)];
+    shadow-[0_1px_2px_rgba(25,25,25,0.02)]
+    dark:shadow-[0_1px_0_rgba(255,255,255,0.03),0_4px_16px_rgba(0,0,0,0.25)];
 }
 
 .flow-section-label {
@@ -137,10 +182,12 @@ body::before {
 /* Luxury buttons */
 .btn-primary-editorial {
   @apply inline-flex items-center justify-center gap-2
-    bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal
+    bg-charcoal text-flow-warm
+    dark:bg-flow-ink-dark dark:text-flow-bg-dark
     px-7 py-3.5 rounded-flow text-[15px] font-medium
     transition-all duration-300 ease-[var(--ease-flow)]
-    hover:scale-[1.01] active:scale-[0.99];
+    hover:scale-[1.01] active:scale-[0.99]
+    dark:hover:bg-[#F5F2EC];
 }
 
 .btn-secondary-editorial {
@@ -149,7 +196,8 @@ body::before {
     text-flow-ink dark:text-flow-ink-dark
     px-7 py-3.5 rounded-flow text-[15px] font-medium
     transition-all duration-300 ease-[var(--ease-flow)]
-    hover:bg-flow-secondary/50 dark:hover:bg-flow-secondary-dark/50
+    hover:bg-flow-secondary/50 dark:hover:bg-flow-elevated-dark/80
+    dark:hover:border-[#383430]
     hover:scale-[1.01];
 }
 
@@ -177,4 +225,493 @@ body::before {
 .animate-flow-delay-1 { animation-delay: 0.1s; opacity: 0; }
 .animate-flow-delay-2 { animation-delay: 0.2s; opacity: 0; }
 .animate-flow-delay-3 { animation-delay: 0.3s; opacity: 0; }
-.animate-flow-delay-4 { animation-delay: 0.4s; opacity: 0; }
+
+/* Landing page — ambient & motion */
+.landing-hero-glow {
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(122, 143, 122, 0.12), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(196, 111, 74, 0.08), transparent 50%);
+}
+
+.dark .landing-hero-glow {
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 15%, rgba(145, 168, 145, 0.14), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 15% 85%, rgba(212, 132, 95, 0.09), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 85% 70%, rgba(201, 184, 150, 0.06), transparent 45%);
+}
+
+.dark .landing-mesh {
+  background:
+    radial-gradient(circle at 15% 50%, rgba(201, 184, 150, 0.08), transparent 42%),
+    radial-gradient(circle at 85% 30%, rgba(145, 168, 145, 0.1), transparent 38%);
+}
+
+.dark .landing-section-tinted {
+  @apply bg-flow-secondary-dark/50;
+}
+
+.dark .landing-section-tinted::before {
+  opacity: 0.35;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(201, 184, 150, 0.07), transparent 42%),
+    radial-gradient(circle at 85% 30%, rgba(145, 168, 145, 0.08), transparent 38%);
+}
+
+.landing-mesh {
+  background:
+    radial-gradient(circle at 15% 50%, rgba(216, 199, 170, 0.15), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(122, 143, 122, 0.1), transparent 35%);
+}
+
+@keyframes landing-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.landing-float {
+  animation: landing-float 5s ease-in-out infinite;
+}
+
+.landing-float-delay-1 { animation-delay: 0.6s; }
+.landing-float-delay-2 { animation-delay: 1.2s; }
+.landing-float-delay-3 { animation-delay: 1.8s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-float { animation: none; }
+}
+
+.landing-section {
+  @apply relative overflow-x-clip;
+  opacity: 0;
+  transition: opacity 0.85s var(--ease-flow);
+}
+
+.landing-section.is-visible {
+  opacity: 1;
+}
+
+.landing-section.is-visible .landing-section-intro {
+  animation: flow-fade-up 0.7s var(--ease-flow) forwards;
+}
+
+.landing-section.is-visible .landing-section-panel {
+  animation: flow-fade-up 0.7s var(--ease-flow) 0.12s forwards;
+  opacity: 0;
+}
+
+.landing-section.is-visible .landing-stagger {
+  animation: flow-fade-up 0.6s var(--ease-flow) forwards;
+  animation-delay: var(--stagger, 0s);
+}
+
+.landing-section-tinted {
+  @apply bg-flow-secondary/35 dark:bg-flow-secondary-dark/25;
+}
+
+.landing-section-tinted::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(216, 199, 170, 0.15), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(122, 143, 122, 0.1), transparent 35%);
+}
+
+.landing-morph-text {
+  @apply inline-block relative min-h-[1.1em] overflow-hidden;
+}
+
+.landing-morph-text-inner {
+  @apply inline-block;
+}
+
+.landing-morph-enter-active,
+.landing-morph-leave-active {
+  transition:
+    opacity 0.55s var(--ease-flow),
+    transform 0.55s var(--ease-flow),
+    filter 0.55s var(--ease-flow);
+}
+
+.landing-morph-enter-from {
+  opacity: 0;
+  transform: translateY(0.35em);
+  filter: blur(6px);
+}
+
+.landing-morph-leave-to {
+  opacity: 0;
+  transform: translateY(-0.35em);
+  filter: blur(6px);
+}
+
+.landing-scroll-hint {
+  @apply flex flex-col items-center gap-2 pb-8 pt-4 text-flow-muted
+    transition-opacity duration-300 hover:text-flow-ink dark:hover:text-flow-ink-dark;
+}
+
+.landing-scroll-arrow {
+  animation: landing-scroll-bob 2s ease-in-out infinite;
+}
+
+@keyframes landing-scroll-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+.landing-demo-body-app {
+  @apply bg-default text-default min-w-0 flex-1 overflow-y-auto;
+  min-height: 0;
+  max-height: min(28rem, 70vh);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-scroll-arrow { animation: none; }
+  .landing-morph-enter-active,
+  .landing-morph-leave-active { transition: opacity 0.2s; }
+  .landing-morph-enter-from,
+  .landing-morph-leave-to { transform: none; filter: none; }
+}
+
+.landing-reveal {
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-flow);
+}
+
+.landing-reveal.is-visible {
+  opacity: 1;
+}
+
+.landing-stagger {
+  opacity: 0;
+  animation: flow-fade-up 0.6s var(--ease-flow) forwards;
+  animation-delay: var(--stagger, 0s);
+}
+
+.landing-scene-tab {
+  @apply w-full rounded-flow-lg border border-transparent px-4 py-3.5
+    transition-all duration-300 ease-[var(--ease-flow)]
+    hover:bg-flow-secondary/60 dark:hover:bg-flow-secondary-dark/40;
+}
+
+.landing-scene-tab.is-active {
+  @apply bg-flow-card dark:bg-flow-card-dark border-flow-border dark:border-flow-border-dark
+    shadow-[0_2px_12px_rgba(25,25,25,0.04)]
+    dark:shadow-[0_1px_0_rgba(255,255,255,0.04),0_4px_16px_rgba(0,0,0,0.3)]
+    dark:ring-1 dark:ring-flow-border-dark/80;
+}
+
+.landing-demo-frame {
+  @apply rounded-flow-lg border border-flow-border dark:border-flow-border-dark
+    bg-flow-card dark:bg-flow-card-dark overflow-hidden
+    shadow-[0_16px_48px_rgba(25,25,25,0.07)]
+    dark:shadow-[0_1px_0_rgba(255,255,255,0.05),0_20px_56px_rgba(0,0,0,0.5)];
+}
+
+.landing-demo-chrome {
+  @apply grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2.5
+    border-b border-flow-border/60 dark:border-flow-border-dark/80
+    bg-flow-secondary/50 dark:bg-flow-elevated-dark/60;
+}
+
+.landing-demo-chrome-title {
+  @apply text-center text-[11px] font-medium tracking-[0.14em] uppercase
+    text-flow-muted dark:text-flow-muted-dark truncate;
+}
+
+.landing-demo-dot {
+  @apply size-2.5 rounded-full;
+}
+
+.landing-demo-space-badge {
+  @apply inline-flex items-center gap-1.5 text-[10px] leading-none px-2 py-1.5 rounded-full
+    bg-flow-warm dark:bg-flow-elevated-dark border border-flow-border/60 dark:border-flow-border-dark/80
+    text-flow-ink dark:text-flow-ink-dark font-medium;
+}
+
+/* Dashboard shell — depth in dark mode */
+.dark .dashboard-sidebar {
+  background: linear-gradient(180deg, rgba(28, 27, 25, 0.95) 0%, rgba(22, 21, 20, 0.98) 100%);
+}
+
+.dark .dashboard-header-bar {
+  background: rgba(12, 11, 10, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.landing-demo-body {
+  @apply p-3 sm:p-4 min-w-0 flex-1;
+}
+
+.landing-mini-stat {
+  @apply rounded-flow border border-flow-border/50 dark:border-flow-border-dark/50
+    bg-flow-warm/80 dark:bg-flow-elevated-dark/60 px-3 py-3;
+}
+
+.landing-scene-enter-active,
+.landing-scene-leave-active {
+  transition: opacity 0.3s var(--ease-flow);
+}
+
+.landing-scene-enter-from,
+.landing-scene-leave-to {
+  opacity: 0;
+}
+
+.landing-step-card {
+  @apply relative overflow-hidden;
+}
+
+.landing-step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-sage), var(--color-terracotta), var(--color-sand));
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-flow);
+}
+
+.landing-step-card:hover::before {
+  opacity: 1;
+}
+
+/* Segmented control — active pill in light & dark */
+.btn-segment-active {
+  @apply bg-charcoal text-flow-warm dark:bg-flow-ink-dark dark:text-flow-bg-dark;
+}
+
+/* Touch-friendly defaults for dashboard controls */
+.touch-target {
+  @apply min-h-11 min-w-11;
+}
+
+/* Legal — beta disclaimers */
+.legal-beta-notice {
+  @apply flex gap-3 rounded-flow border border-warning/30 bg-warning/8
+    dark:bg-warning/10 px-4 py-3.5 text-default;
+}
+
+.legal-beta-notice-icon {
+  @apply size-5 shrink-0 text-warning mt-0.5;
+}
+
+.legal-beta-section-notice {
+  @apply text-xs leading-relaxed text-muted italic
+    border-l-2 border-warning/40 pl-3 py-0.5;
+}
+
+/* Dashboard billing panel */
+.billing-status-card {
+  @apply rounded-flow border border-default/60 bg-elevated/25 dark:bg-flow-elevated-dark/25 p-4;
+}
+
+.billing-section-label {
+  @apply text-xs font-semibold uppercase tracking-wide text-muted mb-2.5;
+}
+
+.billing-plan-card {
+  @apply rounded-flow border border-default/60 bg-elevated/15 dark:bg-flow-elevated-dark/15
+    p-3.5 text-left transition-all duration-300
+    hover:border-primary/30 hover:bg-elevated/30;
+}
+
+.billing-plan-card.is-selected {
+  @apply border-primary/50 bg-primary/5 ring-1 ring-primary/20;
+}
+
+/* Hero — app window preview */
+.landing-hero-visual {
+  @apply relative mx-auto w-full max-w-lg lg:max-w-none;
+}
+
+.landing-hero-visual-ambient {
+  @apply absolute -inset-6 rounded-[2rem] pointer-events-none;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 40%, rgba(145, 168, 145, 0.12), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212, 132, 95, 0.08), transparent 55%);
+}
+
+.dark .landing-hero-visual-ambient {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 40%, rgba(145, 168, 145, 0.16), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212, 132, 95, 0.1), transparent 55%);
+}
+
+.landing-hero-window {
+  @apply relative rounded-flow-lg border border-flow-border dark:border-flow-border-dark
+    bg-flow-card dark:bg-flow-card-dark overflow-hidden
+    shadow-[0_24px_64px_rgba(25,25,25,0.1)]
+    dark:shadow-[0_1px_0_rgba(255,255,255,0.06),0_28px_72px_rgba(0,0,0,0.55)];
+}
+
+.landing-hero-window-chrome {
+  @apply flex items-center justify-between gap-3 px-4 py-2.5
+    border-b border-flow-border/60 dark:border-flow-border-dark/80
+    bg-flow-secondary/40 dark:bg-flow-elevated-dark/70;
+}
+
+.landing-hero-window-body {
+  @apply flex min-h-[340px] sm:min-h-[380px];
+}
+
+.landing-hero-sidebar {
+  @apply hidden sm:flex w-12 shrink-0 flex-col items-center py-4 px-2
+    border-r border-default/60 bg-muted/30 dark:bg-flow-elevated-dark/40;
+}
+
+.landing-hero-sidebar-logo {
+  @apply mb-5 opacity-80;
+}
+
+.landing-hero-sidebar-nav {
+  @apply flex flex-col gap-2;
+}
+
+.landing-hero-sidebar-item {
+  @apply flex size-8 items-center justify-center rounded-lg text-muted
+    transition-colors;
+}
+
+.landing-hero-sidebar-item.is-active {
+  @apply bg-elevated text-default shadow-sm;
+}
+
+.landing-hero-main {
+  @apply flex-1 p-4 sm:p-5 bg-default text-default;
+}
+
+.landing-hero-stat {
+  @apply rounded-flow border border-default/60 bg-elevated/50 dark:bg-flow-elevated-dark/50 p-2.5;
+}
+
+.landing-hero-panel {
+  @apply rounded-flow border border-default/60 bg-elevated/30 dark:bg-flow-elevated-dark/30 p-3;
+}
+
+.landing-hero-alert {
+  @apply flex items-center gap-2 rounded-flow border border-warning/25
+    bg-warning/8 dark:bg-warning/10 px-3 py-2;
+}
+
+.landing-hero-space-tabs {
+  @apply flex items-center justify-center gap-2 px-4 py-3
+    border-t border-default/60 bg-muted/20 dark:bg-flow-elevated-dark/30;
+}
+
+.landing-hero-space-tab {
+  @apply flex size-8 items-center justify-center rounded-full border border-transparent
+    opacity-40 transition-all duration-300;
+}
+
+.landing-hero-space-tab.is-active {
+  @apply opacity-100 border-flow-border dark:border-flow-border-dark
+    bg-elevated dark:bg-flow-card-dark shadow-sm;
+}
+
+/* Demo — sidebar shell + compact dashboard */
+.landing-demo-shell {
+  @apply flex min-h-0;
+}
+
+.landing-demo-sidebar {
+  @apply hidden md:flex w-12 shrink-0 flex-col items-center py-3 px-1.5
+    border-r border-default/60 bg-muted/25 dark:bg-flow-elevated-dark/35;
+}
+
+.landing-demo-sidebar-item {
+  @apply flex size-8 items-center justify-center rounded-lg text-muted transition-colors;
+}
+
+.landing-demo-sidebar-item.is-active {
+  @apply bg-elevated text-default;
+}
+
+.landing-demo-dashboard {
+  @apply space-y-2.5;
+}
+
+.landing-demo-stats {
+  @apply grid grid-cols-2 gap-2;
+}
+
+.landing-demo-stat-card :deep([data-slot="body"]) {
+  @apply !p-2.5 !space-y-1.5;
+}
+
+.landing-demo-stat-card :deep(.text-base) {
+  @apply !text-sm;
+}
+
+.landing-demo-stat-card :deep(.text-lg),
+.landing-demo-stat-card :deep(.text-xl) {
+  @apply !text-sm !leading-snug;
+}
+
+.landing-demo-stat-card :deep(.truncate) {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: unset;
+}
+
+.landing-demo-stat-card :deep(.size-8) {
+  @apply !size-7;
+}
+
+.landing-demo-saas-row {
+  @apply flex items-center gap-2.5 rounded-flow border border-warning/20
+    bg-warning/6 dark:bg-warning/8 px-2.5 py-2;
+}
+
+.landing-demo-saas-icon {
+  @apply flex size-8 shrink-0 items-center justify-center rounded-lg
+    bg-elevated text-xs font-bold text-default;
+}
+
+.landing-demo-panels {
+  @apply grid gap-2;
+}
+
+.landing-demo-panels-split {
+  @apply sm:grid-cols-2 sm:gap-2.5;
+}
+
+.landing-demo-panel {
+  @apply rounded-flow border border-default/50 bg-elevated/20 dark:bg-flow-elevated-dark/20 p-2.5 min-w-0;
+}
+
+.landing-demo-panel-chart {
+  @apply flex flex-col;
+}
+
+.landing-demo-panel-title {
+  @apply text-[10px] font-semibold uppercase tracking-wide text-muted mb-2;
+}
+
+.landing-demo-chart-wrap {
+  @apply relative flex-1 min-h-[108px] max-h-[128px];
+}
+
+.landing-demo-tx-list {
+  @apply divide-y divide-default/50;
+}
+
+.landing-demo-tx-row {
+  @apply flex items-center justify-between gap-2 py-2 first:pt-0 last:pb-0;
+}
+
+.landing-demo-dashboard :deep(.min-h-\[100px\]) {
+  min-height: 100px !important;
+}
+
+.landing-demo-dashboard :deep(.min-h-\[180px\]) {
+  min-height: 100px !important;
+}
+
+.landing-demo-dashboard :deep(.min-h-\[200px\]) {
+  min-height: 100px !important;
+}

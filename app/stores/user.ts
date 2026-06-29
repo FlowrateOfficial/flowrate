@@ -1,6 +1,8 @@
 // NOTE - ANCHOR: User profile store — bootstrap, nav, settings, account menu
-import type { UserProfile } from '~/types/user'
 import type { AppPlan } from '#shared/billing'
+import { planHasFeature } from '#shared/plan-limits'
+import { activePlan } from '~/state/plan'
+import type { UserProfile } from '~/types/user'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -11,8 +13,10 @@ export const useUserStore = defineStore('user', () => {
   const { api } = useApi()
 
   const user = ref<{ id: string; name: string | null; email: string; phone?: string | null } | null>(null)
+  const billing = ref<UserProfile['billing']>(null)
   const phoneVerified = ref(false)
   const plan = ref<'FREE' | 'PRO' | 'ENTERPRISE'>('FREE')
+  const isAdmin = ref(false)
   const loading = ref(false)
   const bootstrapped = ref(false)
 
@@ -50,11 +54,11 @@ export const useUserStore = defineStore('user', () => {
       { label: t('nav.budgets'), icon: 'i-lucide-pie-chart', to: '/dashboard/budgets' }
     )
 
-    if (spacesStore.isSharedSpace && (spacesStore.activeSpace?.type === 'HOUSEHOLD' || spacesStore.activeSpace?.type === 'FAMILY')) {
+    if (spacesStore.isSharedSpace && (spacesStore.space?.type === 'HOUSEHOLD' || spacesStore.space?.type === 'FAMILY')) {
       items.push({ label: t('nav.family'), icon: 'i-lucide-users', to: '/dashboard/family' })
     }
 
-    if (spacesStore.isCompany && spacesStore.canManageBusiness) {
+    if (spacesStore.isCompany && spacesStore.canManageBusiness && planHasFeature(plan.value, 'companyTeam')) {
       items.push({ label: t('nav.businessTeam'), icon: 'i-lucide-users-round', to: '/dashboard/company?tab=team' })
     }
 
@@ -73,6 +77,9 @@ export const useUserStore = defineStore('user', () => {
     ]
     if (!spacesStore.isMinor) {
       items.unshift({ label: t('nav.spaces'), icon: 'i-lucide-layers', to: '/dashboard/spaces' })
+    }
+    if (isAdmin.value) {
+      items.push({ label: t('nav.admin'), icon: 'i-lucide-shield-check', to: '/dashboard/admin/usage' })
     }
     return items
   })
@@ -119,6 +126,13 @@ export const useUserStore = defineStore('user', () => {
       { label: t('common.glba'), icon: 'i-lucide-landmark', to: '/glba' },
       { label: t('common.terms'), icon: 'i-lucide-file-text', to: '/terms' }
     )
+    if (isAdmin.value) {
+      items.splice(items.length - 4, 0, {
+        label: t('nav.admin'),
+        icon: 'i-lucide-shield-check',
+        to: '/dashboard/admin/usage'
+      })
+    }
     return items
   }
 
@@ -140,6 +154,9 @@ export const useUserStore = defineStore('user', () => {
     }
     phoneVerified.value = profile.phoneVerified
     plan.value = profile.plan
+    activePlan.value = profile.plan
+    billing.value = profile.billing ?? null
+    isAdmin.value = profile.isAdmin ?? false
   }
 
   async function bootstrap() {
@@ -148,18 +165,25 @@ export const useUserStore = defineStore('user', () => {
     bootstrapped.value = true
   }
 
-  async function fetchProfile(syncBilling = false): Promise<UserProfile | null> {
+  async function fetchProfile(options?: {
+    syncBilling?: boolean
+    checkoutSessionId?: string
+  }): Promise<UserProfile | null> {
     let data = await api<UserProfile>(apiRoutes.user.profile, { noSpace: true }).catch(() => null)
     if (!data) return null
 
-    if (syncBilling && data.plan === 'FREE') {
-      const synced = await api<UserProfile>(apiRoutes.stripe.syncSubscription, {
+    const shouldSync = Boolean(options?.checkoutSessionId)
+      || (options?.syncBilling && data.plan === 'FREE')
+
+    if (shouldSync) {
+      await api<{ plan: AppPlan }>(apiRoutes.stripe.syncSubscription, {
         method: 'POST',
+        body: options?.checkoutSessionId ? { sessionId: options.checkoutSessionId } : {},
         noSpace: true
       }).catch(() => null)
-      if (synced?.plan && synced.plan !== 'FREE') {
-        data = { ...data, plan: synced.plan }
-      }
+
+      const refreshed = await api<UserProfile>(apiRoutes.user.profile, { noSpace: true }).catch(() => null)
+      if (refreshed) data = refreshed
     }
 
     applyProfile(data)
@@ -168,7 +192,10 @@ export const useUserStore = defineStore('user', () => {
 
   function resetSession() {
     user.value = null
+    billing.value = null
     plan.value = 'FREE'
+    activePlan.value = 'FREE'
+    isAdmin.value = false
     phoneVerified.value = false
     bootstrapped.value = false
   }
@@ -223,6 +250,7 @@ export const useUserStore = defineStore('user', () => {
     }).catch(() => null)
     if (result?.plan) {
       plan.value = result.plan
+      activePlan.value = result.plan
       return result.plan
     }
     return null
@@ -230,8 +258,10 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     user,
+    billing,
     phoneVerified,
     plan,
+    isAdmin,
     loading,
     navItems,
     bottomItems,

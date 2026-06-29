@@ -13,25 +13,39 @@ defineProps<{
 </script>
 
 <template>
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
     <UCard
       v-for="(item, index) in items"
       :key="index"
-      :ui="{ body: 'p-4 sm:p-5' }"
+      class="min-w-0 overflow-hidden"
+      :ui="{ body: 'p-3 sm:p-4' }"
     >
-      <div v-show="loading" class="space-y-2 animate-pulse">
-        <div class="h-3 w-20 bg-muted/40 rounded" />
-        <div class="h-7 w-28 bg-muted/30 rounded" />
+      <div v-if="loading" class="animate-pulse space-y-2">
+        <div class="h-3.5 w-20 rounded bg-elevated" />
+        <div class="h-7 w-28 rounded bg-elevated/70" />
       </div>
-      <div v-show="!loading">
-        <div class="flex items-start justify-between gap-2">
-          <p class="text-xs text-flow-muted dark:text-flow-muted-dark">{{ item.label }}</p>
-          <UIcon v-if="item.icon" :name="item.icon" class="w-4 h-4 text-flow-muted shrink-0 stroke-[1.25]" />
+      <div v-else class="min-w-0 space-y-2">
+        <div class="flex min-w-0 items-center gap-2">
+          <div
+            v-if="item.icon"
+            class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-elevated sm:size-9"
+            aria-hidden="true"
+          >
+            <UIcon :name="item.icon" class="size-4 text-muted" />
+          </div>
+          <p class="min-w-0 truncate text-xs font-medium text-muted sm:text-sm">
+            {{ item.label }}
+          </p>
         </div>
-        <p class="text-2xl font-light tabular-nums tracking-tight mt-2 text-flow-ink dark:text-flow-ink-dark">
+        <p
+          class="truncate text-base font-semibold tabular-nums tracking-tight sm:text-lg xl:text-xl"
+          :title="item.value"
+        >
           {{ item.value }}
         </p>
-        <p v-if="item.hint" class="text-xs text-flow-muted dark:text-flow-muted-dark mt-1">{{ item.hint }}</p>
+        <p v-if="item.hint" class="truncate text-xs text-muted" :title="item.hint">
+          {{ item.hint }}
+        </p>
       </div>
     </UCard>
   </div>

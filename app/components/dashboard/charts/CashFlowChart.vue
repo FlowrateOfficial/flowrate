@@ -6,9 +6,11 @@ const props = defineProps<{
   labels: string[]
   income: number[]
   spending: number[]
+  currency?: string
 }>()
 
-const colorMode = useColorMode()
+const theme = useChartTheme()
+const { formatAxis, formatTooltip } = useChartCurrency(computed(() => props.currency))
 
 const chartData = computed<ChartData<'line'>>(() => ({
   labels: props.labels,
@@ -16,8 +18,8 @@ const chartData = computed<ChartData<'line'>>(() => ({
     {
       label: 'Income',
       data: props.income,
-      borderColor: '#7A8F7A',
-      backgroundColor: 'rgba(122, 143, 122, 0.05)',
+      borderColor: theme.incomeLine.value.border,
+      backgroundColor: theme.incomeLine.value.fill,
       fill: true,
       tension: 0.4,
       pointRadius: 0,
@@ -27,8 +29,8 @@ const chartData = computed<ChartData<'line'>>(() => ({
     {
       label: 'Spending',
       data: props.spending,
-      borderColor: '#C46F4A',
-      backgroundColor: 'rgba(196, 111, 74, 0.05)',
+      borderColor: theme.spendingLine.value.border,
+      backgroundColor: theme.spendingLine.value.fill,
       fill: true,
       tension: 0.4,
       pointRadius: 0,
@@ -47,13 +49,22 @@ const options = computed<ChartOptions<'line'>>(() => ({
       position: 'bottom',
       align: 'start',
       labels: {
-        color: colorMode.value === 'dark' ? '#A39E97' : '#67635E',
+        color: theme.text.value,
         boxWidth: 8,
         boxHeight: 8,
         usePointStyle: true,
         pointStyle: 'line',
         padding: 20,
         font: { family: 'Inter', size: 12 }
+      }
+    },
+    tooltip: {
+      callbacks: {
+        label: (ctx) => {
+          const value = ctx.parsed.y
+          if (value == null) return ''
+          return `${ctx.dataset.label}: ${formatTooltip(value)}`
+        }
       }
     }
   },
@@ -62,17 +73,18 @@ const options = computed<ChartOptions<'line'>>(() => ({
       grid: { display: false },
       border: { display: false },
       ticks: {
-        color: colorMode.value === 'dark' ? '#A39E97' : '#67635E',
+        color: theme.text.value,
         maxTicksLimit: 7,
         font: { family: 'Inter', size: 11 }
       }
     },
     y: {
       border: { display: false },
-      grid: { color: colorMode.value === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(25,25,25,0.05)' },
+      grid: { color: theme.grid.value },
       ticks: {
-        color: colorMode.value === 'dark' ? '#A39E97' : '#67635E',
-        font: { family: 'Inter', size: 11 }
+        color: theme.text.value,
+        font: { family: 'Inter', size: 11 },
+        callback: (value) => formatAxis(value)
       }
     }
   }

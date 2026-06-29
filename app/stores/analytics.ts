@@ -1,10 +1,9 @@
 import type { AnalyticsOverview, AnalyticsRange } from '~/types/financial'
-import { formatCurrencyForLocale } from '~/utils/format'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useAnalyticsStore = defineStore('analytics', () => {
-  const { t, getLocale, categoryLabel } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, displayCurrency } = useAppI18n()
   const spacesStore = useSpacesStore()
   const syncStore = useSyncStore()
   const { api } = useApi()
@@ -43,12 +42,14 @@ export const useAnalyticsStore = defineStore('analytics', () => {
 
   const hasData = computed(() => (data.value?.summary.transactionCount ?? 0) > 0)
 
+  const summaryCurrency = computed(() => data.value?.summary.currency ?? displayCurrency.value)
+
   function fmt(amount: number) {
-    return formatCurrencyForLocale(amount, getLocale(), 'USD')
+    return formatCurrency(amount, summaryCurrency.value)
   }
 
   async function fetchOverview() {
-    if (!spacesStore.activeSpace) return
+    if (!spacesStore.space) return
     pending.value = true
     try {
       data.value = await api<AnalyticsOverview>(apiRoutes.analytics.overview, {
@@ -63,7 +64,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     await syncStore.syncTransactions(fetchOverview)
   }
 
-  watch(() => spacesStore.activeSpace?.id, () => {
+  watch(() => spacesStore.space?.id, () => {
     data.value = null
     fetchOverview()
   })
@@ -83,6 +84,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     netWorthLabels,
     netWorthValues,
     hasData,
+    summaryCurrency,
     isSyncing: computed(() => syncStore.isSyncing),
     fmt,
     categoryLabel,

@@ -32,9 +32,9 @@ export default defineEventHandler(async (event) => {
     frequency: s.frequency,
     status: s.status,
     icon: s.icon,
-    lastCharged: s.lastCharged?.toISOString() ?? null,
+    lastCharge: s.lastCharge?.toISOString() ?? null,
     nextCharge: s.nextCharge?.toISOString() ?? null,
-    priceAlert: s.priceAlert,
+    alert: s.alert,
     isDuplicate: (nameCounts[s.name.toLowerCase()] ?? 0) > 1
   }))
 })

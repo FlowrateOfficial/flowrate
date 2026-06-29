@@ -1,15 +1,15 @@
 import { z } from 'zod'
 
 const childUpdateSchema = z.object({
-  allowanceAmount: z.number().min(0).optional(),
-  allowanceFrequency: z.enum(['WEEKLY', 'MONTHLY', 'YEARLY']).optional(),
+  allowance: z.number().min(0).optional(),
+  frequency: z.enum(['WEEKLY', 'MONTHLY', 'YEARLY']).optional(),
   learnMode: z.boolean().optional(),
-  spendingLimits: z.record(z.string(), z.number()).optional()
+  limits: z.record(z.string(), z.number()).optional()
 })
 
 const jarSchema = z.object({
   name: z.string().min(1),
-  targetAmount: z.number().min(0).optional()
+  target: z.number().min(0).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -34,10 +34,10 @@ export default defineEventHandler(async (event) => {
     return prisma.childProfile.update({
       where: { id: member.childProfile.id },
       data: {
-        allowanceAmount: body.allowanceAmount,
-        allowanceFrequency: body.allowanceFrequency,
+        allowance: body.allowance,
+        frequency: body.frequency,
         learnMode: body.learnMode,
-        spendingLimits: body.spendingLimits ?? undefined
+        limits: body.limits ?? undefined
       },
       include: { jars: true }
     })
@@ -47,9 +47,9 @@ export default defineEventHandler(async (event) => {
     const body = await readValidatedBody(event, jarSchema.parse)
     return prisma.allowanceJar.create({
       data: {
-        childProfileId: member.childProfile.id,
+        childId: member.childProfile.id,
         name: body.name,
-        targetAmount: body.targetAmount,
+        target: body.target,
         balance: 0
       }
     })

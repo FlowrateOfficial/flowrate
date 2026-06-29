@@ -7,7 +7,7 @@ export interface InviteDetail {
   role: string
   email?: string | null
   phone?: string | null
-  displayName?: string | null
+  name?: string | null
   requiresPhoneVerification: boolean
   requiresRegistration: boolean
   phoneVerified: boolean

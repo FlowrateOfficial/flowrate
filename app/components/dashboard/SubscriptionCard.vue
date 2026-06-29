@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { SubscriptionItem } from '~/types/financial'
-import { formatCurrencyForLocale } from '~/utils/format'
 
 defineProps<{ subscription: SubscriptionItem }>()
 
-const { t, getLocale, intlLocale } = useAppI18n()
+const { t, intlLocale, formatCurrency } = useAppI18n()
 
 const statusColors: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
   ACTIVE: 'success',
@@ -27,7 +26,7 @@ function frequencyLabel(freq: string | null) {
 }
 
 function fmt(amount: number, currency: string): string {
-  return formatCurrencyForLocale(amount, getLocale(), currency)
+  return formatCurrency(amount, currency)
 }
 
 function formatDate(dateStr: string): string {
@@ -45,7 +44,7 @@ function formatDate(dateStr: string): string {
       <div class="flex items-center gap-2">
         <p class="text-sm font-medium text-foreground truncate">{{ subscription.name }}</p>
         <UBadge
-          v-if="subscription.priceAlert"
+          v-if="subscription.alert"
           :label="t('dashboard.subscriptions.priceUp')"
           color="error"
           variant="subtle"

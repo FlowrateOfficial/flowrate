@@ -1,11 +1,13 @@
 import type { AppPlan } from '#shared/billing'
 
 export interface UserBillingInfo {
-  stripeCustomerId: string | null
+  customerId: string | null
   subscription: {
     status: string
-    currentPeriodEnd: string | null
-    cancelAtPeriodEnd: boolean
+    periodEnd: string | null
+    cancelAtEnd: boolean
+    planKey: string | null
+    priceId: string
   } | null
 }
 
@@ -16,6 +18,7 @@ export interface UserProfile {
   phone: string | null
   phoneVerified: boolean
   plan: AppPlan
+  isAdmin?: boolean
   billing?: UserBillingInfo | null
   verificationSent?: boolean
   verificationError?: string | null

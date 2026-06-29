@@ -6,13 +6,19 @@ defineProps<{
 }>()
 
 const { t } = useAppI18n()
+
+const stepPreviews = computed(() => [
+  { icon: 'i-lucide-landmark', metric: t('landing.howItWorks.previews.connect') },
+  { icon: 'i-lucide-layers', metric: t('landing.howItWorks.previews.organize') },
+  { icon: 'i-lucide-trending-up', metric: t('landing.howItWorks.previews.act') }
+])
 </script>
 
 <template>
-  <section id="how-it-works" class="bg-flow-secondary/40 dark:bg-flow-secondary-dark/30">
-    <UContainer class="py-24 sm:py-32">
-      <div class="grid lg:grid-cols-12 gap-16 lg:gap-20">
-        <div class="lg:col-span-4 lg:pt-8">
+  <LandingSection id="how-it-works" index="01" tinted>
+    <template #default>
+      <div class="py-24 sm:py-32">
+        <div class="max-w-2xl mb-16 sm:mb-20 landing-section-intro">
           <p class="text-sm text-sage mb-4">01</p>
           <h2 class="text-display-section text-flow-ink dark:text-flow-ink-dark mb-6">
             {{ t('landing.howItWorks.title') }}
@@ -22,34 +28,34 @@ const { t } = useAppI18n()
           </p>
         </div>
 
-        <div class="lg:col-span-8 space-y-0 divide-y divide-flow-border/60 dark:divide-flow-border-dark/60">
+        <div class="grid md:grid-cols-3 gap-6 lg:gap-8 landing-section-panel">
           <article
             v-for="(item, i) in items"
             :key="item.title"
-            class="grid sm:grid-cols-12 gap-6 py-12 first:pt-0 last:pb-0 group"
+            class="editorial-card landing-step-card landing-stagger"
+            :style="{ '--stagger': `${i * 0.1}s` }"
           >
-            <div class="sm:col-span-2">
+            <div class="flex items-center justify-between mb-6">
               <span class="text-sm text-flow-muted dark:text-flow-muted-dark tabular-nums">
                 {{ String(i + 1).padStart(2, '0') }}
               </span>
+              <UIcon :name="item.icon" class="size-5 text-sage stroke-[1.25]" />
             </div>
-            <div class="sm:col-span-10 flex gap-6">
-              <UIcon
-                :name="item.icon"
-                class="w-5 h-5 text-sage shrink-0 mt-1 stroke-[1.25]"
-              />
-              <div class="space-y-3 max-w-xl">
-                <h3 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark">
-                  {{ item.title }}
-                </h3>
-                <p class="text-flow-muted dark:text-flow-muted-dark leading-relaxed">
-                  {{ item.description }}
-                </p>
-              </div>
+
+            <h3 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark mb-3">
+              {{ item.title }}
+            </h3>
+            <p class="text-flow-muted dark:text-flow-muted-dark leading-relaxed mb-6">
+              {{ item.description }}
+            </p>
+
+            <div class="rounded-flow border border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-warm/70 dark:bg-flow-elevated-dark/50 px-3 py-2.5 flex items-center gap-2">
+              <UIcon :name="stepPreviews[i]!.icon" class="size-4 text-terracotta shrink-0" />
+              <span class="text-sm text-flow-ink dark:text-flow-ink-dark">{{ stepPreviews[i]!.metric }}</span>
             </div>
           </article>
         </div>
       </div>
-    </UContainer>
-  </section>
+    </template>
+  </LandingSection>
 </template>

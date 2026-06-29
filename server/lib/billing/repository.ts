@@ -11,29 +11,29 @@ export async function ensureBillingProfile(userId: string) {
 export async function getStripeCustomerId(userId: string): Promise<string | null> {
   const billing = await prisma.userBilling.findUnique({
     where: { userId },
-    select: { stripeCustomerId: true }
+    select: { customerId: true }
   })
-  return billing?.stripeCustomerId ?? null
+  return billing?.customerId ?? null
 }
 
-export async function setStripeCustomerId(userId: string, stripeCustomerId: string) {
+export async function setStripeCustomerId(userId: string, customerId: string) {
   await ensureBillingProfile(userId)
   await prisma.userBilling.update({
     where: { userId },
-    data: { stripeCustomerId }
+    data: { customerId }
   })
 }
 
 export async function clearStripeCustomerId(userId: string) {
   await prisma.userBilling.updateMany({
     where: { userId },
-    data: { stripeCustomerId: null }
+    data: { customerId: null }
   })
 }
 
-export async function findUserIdByStripeCustomerId(stripeCustomerId: string): Promise<string | null> {
+export async function findUserIdByStripeCustomerId(customerId: string): Promise<string | null> {
   const billing = await prisma.userBilling.findUnique({
-    where: { stripeCustomerId },
+    where: { customerId },
     select: { userId: true }
   })
   return billing?.userId ?? null
@@ -63,14 +63,15 @@ export async function getUserBillingSnapshot(userId: string) {
     prisma.userBilling.findUnique({
       where: { userId },
       select: {
-        stripeCustomerId: true,
+        customerId: true,
         subscription: {
           select: {
-            stripeSubscriptionId: true,
-            stripePriceId: true,
+            subId: true,
+            priceId: true,
+            planKey: true,
             status: true,
-            currentPeriodEnd: true,
-            cancelAtPeriodEnd: true
+            periodEnd: true,
+            cancelAtEnd: true
           }
         }
       }
@@ -83,7 +84,7 @@ export async function getUserBillingSnapshot(userId: string) {
     plan: user.plan as AppPlan,
     email: user.email,
     name: user.name,
-    stripeCustomerId: billing?.stripeCustomerId ?? null,
+    customerId: billing?.customerId ?? null,
     subscription: billing?.subscription ?? null
   }
 }

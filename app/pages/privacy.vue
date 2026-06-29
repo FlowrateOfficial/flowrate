@@ -28,14 +28,18 @@ useSeoMeta({ title: () => t('legal.privacy.seoTitle') })
 
 <template>
   <UContainer class="py-16 max-w-3xl">
-    <p class="text-sm text-primary font-medium mb-3 flex flex-wrap gap-x-4 gap-y-1">
-      <NuxtLink to="/terms" class="hover:underline">{{ t('legal.privacy.seeAlsoTerms') }}</NuxtLink>
-      <NuxtLink to="/glba" class="hover:underline">{{ t('legal.privacy.seeAlsoGlba') }}</NuxtLink>
-    </p>
-
-    <h1 class="text-3xl font-bold mb-2">{{ t('legal.privacy.title') }}</h1>
-    <p class="text-sm text-muted mb-4">{{ t('legal.privacy.lastUpdated') }}</p>
-    <p class="text-muted leading-relaxed mb-10">{{ t('legal.privacy.intro') }}</p>
+    <LegalPageIntro
+      :title="t('legal.privacy.title')"
+      :last-updated="t('legal.privacy.lastUpdated')"
+      :intro="t('legal.privacy.intro')"
+    >
+      <template #see-also>
+        <p class="text-sm text-primary font-medium mb-3 flex flex-wrap gap-x-4 gap-y-1">
+          <NuxtLink to="/terms" class="hover:underline">{{ t('legal.privacy.seeAlsoTerms') }}</NuxtLink>
+          <NuxtLink to="/glba" class="hover:underline">{{ t('legal.privacy.seeAlsoGlba') }}</NuxtLink>
+        </p>
+      </template>
+    </LegalPageIntro>
 
     <LegalDocument base-key="legal.privacy" :section-ids="sectionIds" />
 

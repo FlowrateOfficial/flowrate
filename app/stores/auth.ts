@@ -4,6 +4,7 @@ import { resolveErrorMessage } from '~/utils/errors'
 export const useAuthStore = defineStore('auth', () => {
   const { t } = useAppI18n()
   const route = useRoute()
+  const appToast = useAppToast()
   const { signIn, signUp, requestPasswordReset } = useNeonAuth()
 
   const loginForm = reactive({ email: '', password: '' })
@@ -11,7 +12,6 @@ export const useAuthStore = defineStore('auth', () => {
   const forgotForm = reactive({ email: '' })
 
   const loading = ref(false)
-  const error = ref('')
   const forgotSent = ref(false)
 
   const inviteInfo = ref<{ spaceName: string; role: string; email: string } | null>(null)
@@ -20,10 +20,6 @@ export const useAuthStore = defineStore('auth', () => {
   const loginSchema = createLoginSchema()
   const forgotSchema = createForgotPasswordSchema()
   const registerSchema = computed(() => createRegisterSchema(t))
-
-  function clearError() {
-    error.value = ''
-  }
 
   async function loadInvite(token: string) {
     try {
@@ -37,16 +33,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login() {
     loading.value = true
-    error.value = ''
     try {
       const result = await signIn(loginForm.email, loginForm.password)
       if (result.error) {
-        error.value = resolveErrorMessage(result.error, t, 'auth.login.errorInvalid')
+        appToast.errorMessage(resolveErrorMessage(result.error, t, 'auth.login.errorInvalid'))
         return
       }
       await navigateTo('/dashboard')
     } catch (e) {
-      error.value = resolveErrorMessage(e, t, 'auth.login.errorGeneric')
+      appToast.errorFrom(e, 'auth.login.errorGeneric')
     } finally {
       loading.value = false
     }
@@ -54,11 +49,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function register() {
     loading.value = true
-    error.value = ''
     try {
       const result = await signUp(registerForm.email, registerForm.password, registerForm.name)
       if (result.error) {
-        error.value = resolveErrorMessage(result.error, t, 'auth.register.errorGeneric')
+        appToast.errorFrom(result.error, 'auth.register.errorGeneric')
         return
       }
 
@@ -76,7 +70,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       await navigateTo('/dashboard/onboarding')
     } catch (e) {
-      error.value = resolveErrorMessage(e, t, 'auth.register.errorGeneric')
+      appToast.errorFrom(e, 'auth.register.errorGeneric')
     } finally {
       loading.value = false
     }
@@ -84,16 +78,19 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function forgotPassword() {
     loading.value = true
-    error.value = ''
     try {
       const result = await requestPasswordReset(forgotForm.email)
       if (result.error) {
-        error.value = resolveErrorMessage(result.error, t, 'auth.forgot.errorGeneric')
+        appToast.errorFrom(result.error, 'auth.forgot.errorGeneric')
         return
       }
       forgotSent.value = true
+      appToast.success(
+        t('auth.forgot.checkEmailTitle'),
+        t('auth.forgot.checkEmailDescription')
+      )
     } catch (e) {
-      error.value = resolveErrorMessage(e, t, 'auth.forgot.errorGeneric')
+      appToast.errorFrom(e, 'auth.forgot.errorGeneric')
     } finally {
       loading.value = false
     }
@@ -104,14 +101,12 @@ export const useAuthStore = defineStore('auth', () => {
     registerForm,
     forgotForm,
     loading,
-    error,
     forgotSent,
     inviteInfo,
     selectedPlan,
     loginSchema,
     forgotSchema,
     registerSchema,
-    clearError,
     loadInvite,
     login,
     register,

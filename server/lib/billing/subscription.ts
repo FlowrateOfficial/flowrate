@@ -1,6 +1,6 @@
 import type Stripe from 'stripe'
 import {
-  appPlanFromBillingStatus,
+  appPlanFromStripeSubscription,
   billingStatusFromStripe,
   type AppPlan
 } from '#shared/billing'
@@ -45,32 +45,33 @@ export async function upsertBillingSubscription(
   await ensureBillingProfile(userId)
 
   const status = billingStatusFromStripe(sub.status)
-  const plan = appPlanFromBillingStatus(status)
+  const planKey = sub.metadata?.planKey ?? null
+  const plan = appPlanFromStripeSubscription(status, planKey)
   const period = subscriptionPeriod(sub)
 
   await prisma.billingSubscription.upsert({
     where: { userId },
     create: {
       userId,
-      stripeSubscriptionId: sub.id,
-      stripePriceId: priceIdFromSubscription(sub),
-      stripeProductId: productIdFromSubscription(sub),
+      subId: sub.id,
+      priceId: priceIdFromSubscription(sub),
+      productId: productIdFromSubscription(sub),
       status,
       planKey: sub.metadata?.planKey ?? null,
-      currentPeriodStart: period.start,
-      currentPeriodEnd: period.end,
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      periodStart: period.start,
+      periodEnd: period.end,
+      cancelAtEnd: sub.cancel_at_period_end,
       canceledAt: periodDate(sub.canceled_at)
     },
     update: {
-      stripeSubscriptionId: sub.id,
-      stripePriceId: priceIdFromSubscription(sub),
-      stripeProductId: productIdFromSubscription(sub),
+      subId: sub.id,
+      priceId: priceIdFromSubscription(sub),
+      productId: productIdFromSubscription(sub),
       status,
       planKey: sub.metadata?.planKey ?? null,
-      currentPeriodStart: period.start,
-      currentPeriodEnd: period.end,
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      periodStart: period.start,
+      periodEnd: period.end,
+      cancelAtEnd: sub.cancel_at_period_end,
       canceledAt: periodDate(sub.canceled_at)
     }
   })
@@ -94,7 +95,7 @@ export async function syncUserPlanFromStripe(
   const snapshot = await getUserBillingSnapshot(userId)
   if (!snapshot) return 'FREE'
 
-  let customerId = snapshot.stripeCustomerId
+  let customerId = snapshot.customerId
     ?? await findAndLinkStripeCustomer(stripe, { id: userId, email: snapshot.email, name: snapshot.name })
 
   if (!customerId) {
@@ -156,8 +157,8 @@ export async function syncPlanFromCheckoutSession(
       return upsertBillingSubscription(userId, sub)
     }
 
-    await setUserPlan(userId, 'PRO')
-    return 'PRO'
+    await setUserPlan(userId, appPlanFromStripeSubscription('ACTIVE', session.metadata?.planKey))
+    return appPlanFromStripeSubscription('ACTIVE', session.metadata?.planKey)
   }
 
   return syncUserPlanFromStripe(stripe, userId)
@@ -205,7 +206,7 @@ export async function processCheckoutSessionCompleted(
     return
   }
 
-  await setUserPlan(userId, 'PRO')
+  await setUserPlan(userId, appPlanFromStripeSubscription('ACTIVE', session.metadata?.planKey))
 }
 
 export {

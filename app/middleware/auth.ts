@@ -71,7 +71,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/dashboard')
   }
 
-  if (to.path === '/dashboard/onboarding' && spacesStore.activeSpace) {
+  if (to.path === '/dashboard/onboarding' && spacesStore.space) {
     const hasMultiple = spacesStore.spaces.length > 1
     if (hasMultiple) return navigateTo('/dashboard')
   }

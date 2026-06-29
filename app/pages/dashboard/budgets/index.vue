@@ -10,6 +10,7 @@ const {
   pending,
   isModalOpen,
   isSaving,
+  isEditing,
   overBudgetCount,
   summaryItems
 } = storeToRefs(budgetsStore)
@@ -20,7 +21,11 @@ const subtitle = computed(() =>
     : t('dashboard.budgets.subtitleMany', { count: budgets.value.length })
 )
 
-const spaceId = computed(() => useSpacesStore().activeSpace?.id)
+const modalTitle = computed(() =>
+  isEditing.value ? t('dashboard.budgets.editModalTitle') : t('dashboard.budgets.modalTitle')
+)
+
+const spaceId = computed(() => useSpacesStore().space?.id)
 await useAsyncData(
   () => `budgets-${spaceId.value}`,
   async () => {
@@ -34,7 +39,7 @@ useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appNa
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-5xl mx-auto">
+  <DashboardPageShell max-width="xl" :show-guide="false">
     <DashboardPageHeader
       :title="t('dashboard.budgets.title')"
       :description="subtitle"
@@ -44,8 +49,7 @@ useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appNa
           :label="t('dashboard.budgets.newBudget')"
           icon="i-lucide-plus"
           color="neutral"
-          class="rounded-flow"
-          @click="isModalOpen = true"
+          @click="budgetsStore.openCreateModal()"
         />
       </template>
     </DashboardPageHeader>
@@ -60,34 +64,53 @@ useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appNa
 
     <DashboardSummaryStrip :items="summaryItems" :loading="pending" />
 
-    <div v-if="!pending && !budgets.length" class="editorial-card-flat text-center py-16">
-      <UIcon name="i-lucide-pie-chart" class="w-10 h-10 mx-auto mb-4 text-muted opacity-40 stroke-[1.25]" />
-      <h3 class="font-display text-xl mb-2">{{ t('dashboard.budgets.emptyTitle') }}</h3>
-      <p class="text-sm text-muted max-w-md mx-auto mb-6">{{ t('dashboard.budgets.emptyDescription') }}</p>
-      <UButton
-        :label="t('dashboard.budgets.createFirst')"
-        icon="i-lucide-plus"
-        color="neutral"
-        @click="isModalOpen = true"
-      />
+    <UCard v-if="!pending && !budgets.length" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <UEmpty
+        icon="i-lucide-pie-chart"
+        :title="t('dashboard.budgets.emptyTitle')"
+        :description="t('dashboard.budgets.emptyDescription')"
+        variant="naked"
+      >
+        <template #actions>
+          <UButton
+            :label="t('dashboard.budgets.createFirst')"
+            icon="i-lucide-plus"
+            @click="budgetsStore.openCreateModal()"
+          />
+        </template>
+      </UEmpty>
+    </UCard>
+
+    <div v-else class="grid gap-3 sm:grid-cols-2">
+      <UCard v-for="budget in budgets" :key="budget.id" :ui="{ body: 'p-4 sm:p-5' }">
+        <DashboardBudgetProgress :budget="budget">
+          <template #actions>
+            <UButton
+              icon="i-lucide-pencil"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              :aria-label="t('common.edit')"
+              @click="budgetsStore.openEditModal(budget)"
+            />
+            <UButton
+              icon="i-lucide-trash-2"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              :aria-label="t('common.delete')"
+              @click="budgetsStore.deleteBudget(budget.id)"
+            />
+          </template>
+        </DashboardBudgetProgress>
+      </UCard>
     </div>
 
-    <div v-else class="space-y-4">
-      <div v-for="budget in budgets" :key="budget.id" class="editorial-card-flat relative">
-        <UButton
-          icon="i-lucide-trash-2"
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          class="absolute top-4 right-4"
-          :aria-label="t('common.delete')"
-          @click="budgetsStore.deleteBudget(budget.id)"
-        />
-        <DashboardBudgetProgress :budget="budget" />
-      </div>
-    </div>
-
-    <UModal v-model:open="isModalOpen" :title="t('dashboard.budgets.modalTitle')">
+    <UModal
+      v-model:open="isModalOpen"
+      :title="modalTitle"
+      @update:open="(open) => { if (!open) budgetsStore.closeModal() }"
+    >
       <template #body>
         <div class="space-y-4">
           <UFormField :label="t('dashboard.budgets.nameLabel')">
@@ -103,7 +126,6 @@ useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appNa
             <USelect v-model="budgetsStore.newBudget.period" :items="budgetsStore.periodItems" class="w-full" />
           </UFormField>
           <UCheckbox
-            v-if="budgetsStore.newBudget"
             v-model="budgetsStore.newBudget.isShared"
             :label="t('dashboard.budgets.sharedLabel')"
           />
@@ -111,15 +133,15 @@ useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appNa
       </template>
       <template #footer>
         <div class="flex justify-end gap-2">
-          <UButton :label="t('common.cancel')" color="neutral" variant="ghost" @click="isModalOpen = false" />
+          <UButton :label="t('common.cancel')" color="neutral" variant="ghost" @click="budgetsStore.closeModal()" />
           <UButton
-            :label="t('dashboard.budgets.createBudget')"
+            :label="isEditing ? t('common.save') : t('dashboard.budgets.createBudget')"
             :loading="isSaving"
             :disabled="!budgetsStore.newBudget.name || !budgetsStore.newBudget.amount"
-            @click="budgetsStore.createBudget()"
+            @click="budgetsStore.saveBudget()"
           />
         </div>
       </template>
     </UModal>
-  </div>
+  </DashboardPageShell>
 </template>

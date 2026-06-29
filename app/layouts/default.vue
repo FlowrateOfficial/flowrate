@@ -2,19 +2,26 @@
 const { t } = useAppI18n()
 const { isLoggedIn, homePath } = useSessionUser()
 const { show: showBreadcrumbs } = useBreadcrumbs()
+const route = useRoute()
+
+const isLegalPage = computed(() =>
+  ['/privacy', '/terms', '/glba'].includes(route.path)
+)
 
 const navLinks = computed(() => [
+  { label: t('landing.nav.demo'), to: '/#demo' },
   { label: t('nav.features'), to: '/#features' },
   { label: t('nav.pricing'), to: '/#pricing' }
 ])
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col surface-page">
-    <header class="sticky top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-bg/85 dark:bg-flow-bg-dark/85 backdrop-blur-md">
-      <UContainer class="flex items-center justify-between h-16 sm:h-[4.5rem]">
-        <NuxtLink :to="homePath" class="inline-flex">
+  <div class="min-h-screen flex flex-col surface-page overflow-x-clip">
+    <header class="sticky top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-md dark:backdrop-blur-lg">
+      <UContainer class="flex items-center justify-between h-16 sm:h-[4.5rem] min-w-0">
+        <NuxtLink :to="homePath" class="inline-flex items-center gap-2.5">
           <BrandFlowRateLogo :mark-size="28" />
+          <AppBetaBadge size="sm" :class="isLegalPage ? 'inline-flex' : 'hidden sm:inline-flex'" />
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-10">
@@ -28,7 +35,7 @@ const navLinks = computed(() => [
           </NuxtLink>
         </nav>
 
-        <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
           <LanguageSwitcher />
           <UColorModeButton color="neutral" variant="ghost" size="sm" />
           <template v-if="!isLoggedIn">
@@ -53,7 +60,7 @@ const navLinks = computed(() => [
       </UContainer>
     </header>
 
-    <UMain class="flex-1">
+    <UMain class="flex-1 overflow-x-clip">
       <UContainer v-if="showBreadcrumbs" class="pt-8 pb-0">
         <AppBreadcrumbs />
       </UContainer>

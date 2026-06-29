@@ -1,4 +1,4 @@
-// ANCHOR: API/auth error → i18n keys (never surface raw server messages in UI)
+// NOTE - ANCHOR: API/auth error → i18n keys (never surface raw server messages in UI)
 type TranslateFn = (key: string, params?: Record<string, string | number>) => string
 
 interface FetchErrorLike {

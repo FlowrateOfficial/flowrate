@@ -7,19 +7,20 @@ const props = defineProps<{
   values: number[]
   centerLabel?: string
   centerValue?: string
+  currency?: string
+  compact?: boolean
 }>()
 
-const colorMode = useColorMode()
-
-const palette = ['#7A8F7A', '#C46F4A', '#D8C7AA', '#67635E', '#7FA26A', '#C59B4B', '#2A2A2A', '#A39E97']
+const theme = useChartTheme()
+const { formatTooltip } = useChartCurrency(computed(() => props.currency))
 
 const chartData = computed<ChartData<'doughnut'>>(() => ({
   labels: props.labels,
   datasets: [{
     data: props.values,
-    backgroundColor: props.values.map((_, i) => palette[i % palette.length]),
+    backgroundColor: props.values.map((_, i) => theme.palette.value[i % theme.palette.value.length]),
     borderWidth: 2,
-    borderColor: colorMode.value === 'dark' ? '#1E1D1B' : '#FCFBF8',
+    borderColor: theme.surface.value,
     hoverOffset: 4
   }]
 }))
@@ -27,16 +28,26 @@ const chartData = computed<ChartData<'doughnut'>>(() => ({
 const options = computed<ChartOptions<'doughnut'>>(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  cutout: '72%',
+  cutout: props.compact ? '68%' : '72%',
   plugins: {
     legend: {
+      display: !props.compact,
       position: 'bottom',
       align: 'start',
       labels: {
-        color: colorMode.value === 'dark' ? '#A39E97' : '#67635E',
+        color: theme.text.value,
         boxWidth: 8,
         padding: 14,
         font: { family: 'Inter', size: 11 }
+      }
+    },
+    tooltip: {
+      callbacks: {
+        label: (ctx) => {
+          const value = ctx.parsed
+          if (value == null) return ''
+          return `${ctx.label}: ${formatTooltip(value)}`
+        }
       }
     }
   }
@@ -45,14 +56,25 @@ const options = computed<ChartOptions<'doughnut'>>(() => ({
 
 <template>
   <ClientOnly>
-    <div class="relative h-full min-h-[200px]">
+    <div
+      class="relative h-full"
+      :class="compact ? 'min-h-[100px]' : 'min-h-[200px]'"
+    >
       <Doughnut :data="chartData" :options="options" />
       <div
         v-if="centerLabel"
-        class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-10"
+        class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+        :class="compact ? 'pb-0' : 'pb-10'"
       >
-        <p class="text-2xl font-light tabular-nums text-flow-ink dark:text-flow-ink-dark">{{ centerValue }}</p>
-        <p class="text-xs text-flow-muted dark:text-flow-muted-dark mt-1">{{ centerLabel }}</p>
+        <p
+          class="font-light tabular-nums text-default"
+          :class="compact ? 'text-lg' : 'text-2xl'"
+        >
+          {{ centerValue }}
+        </p>
+        <p class="text-[10px] text-muted mt-0.5 text-center px-2 leading-tight">
+          {{ centerLabel }}
+        </p>
       </div>
     </div>
   </ClientOnly>

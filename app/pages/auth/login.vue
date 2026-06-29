@@ -6,13 +6,15 @@ definePageMeta({ layout: 'auth', middleware: 'guest' })
 const { t } = useAppI18n()
 const route = useRoute()
 const auth = useAuthStore()
-const { loginForm, loading, error, loginSchema } = storeToRefs(auth)
+const { loginForm, loading, loginSchema } = storeToRefs(auth)
 
 useSeoMeta({ title: () => t('auth.login.title') })
 
+const appToast = useAppToast()
+
 onMounted(() => {
   if (route.query.error === 'oauth') {
-    auth.error = t('auth.login.errorOAuth')
+    appToast.errorMessage(t('auth.login.errorOAuth'))
   }
 })
 </script>
@@ -28,14 +30,6 @@ onMounted(() => {
         </NuxtLink>
       </p>
     </header>
-
-    <UAlert
-      v-if="error"
-      :description="error"
-      color="error"
-      variant="subtle"
-      icon="i-lucide-alert-circle"
-    />
 
     <UForm :schema="loginSchema" :state="loginForm" class="space-y-5" @submit="auth.login">
       <UFormField :label="t('auth.login.email')" name="email" required>

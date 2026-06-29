@@ -93,7 +93,7 @@ enum SplitRuleType {
 }
 
 /// Stripe Billing subscription lifecycle (mirrors Stripe API statuses).
-enum BillingSubscriptionStatus {
+enum SubStatus {
   INCOMPLETE
   INCOMPLETE_EXPIRED
   TRIALING
@@ -104,40 +104,68 @@ enum BillingSubscriptionStatus {
   PAUSED
 }
 
+/// Bank link source: Stripe (US) or Plaid (EU).
+enum LinkProvider {
+  STRIPE
+  PLAID
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 /// User profile — ID is sourced from Neon Auth.
 model User {
-  id               String   @id
-  email            String   @unique
-  name             String?
-  phone            String?  @unique
-  phoneVerifiedAt  DateTime?
-  avatarUrl        String?
-  plan             Plan     @default(FREE)
-  activeSpaceId    String?
-  dateOfBirth      DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id            String    @id
+  email         String    @unique
+  name          String?
+  phone         String?   @unique
+  phoneVerified DateTime?
+  avatar        String?
+  plan          Plan      @default(FREE)
+  spaceId       String?
+  birthday      DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  activeSpace      FinancialSpace? @relation("ActiveSpace", fields: [activeSpaceId], references: [id], onDelete: SetNull)
-  ownedSpaces      FinancialSpace[] @relation("SpaceOwner")
-  memberships      SpaceMember[]
-  accounts         Account[]
-  transactions     Transaction[]
-  budgets          Budget[]
-  subscriptions    DetectedSubscription[]
-  billing          UserBilling?
+  space        FinancialSpace? @relation("ActiveSpace", fields: [spaceId], references: [id], onDelete: SetNull)
+  ownedSpaces  FinancialSpace[] @relation("SpaceOwner")
+  memberships  SpaceMember[]
+  accounts     Account[]
+  transactions Transaction[]
+  budgets      Budget[]
+  subscriptions DetectedSubscription[]
+  billing      UserBilling?
+  plaidLinks   PlaidLink[]
+  usage        UserUsage?
 
   @@map("users")
 }
 
+/// One Plaid bank login (item) — stores access token for EU sync.
+model PlaidLink {
+  id          String            @id @default(cuid())
+  userId      String
+  spaceId     String
+  ref         String            @unique
+  token       String
+  institution String?
+  visibility  AccountVisibility @default(PERSONAL)
+  syncCursor  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([spaceId])
+  @@map("plaid_links")
+}
+
 /// Stripe Billing customer profile — one per user (`cus_…`).
 model UserBilling {
-  userId           String   @id
-  stripeCustomerId String?  @unique
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  userId     String   @id
+  customerId String?  @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription BillingSubscription?
@@ -147,24 +175,37 @@ model UserBilling {
 
 /// Stripe subscription record synced from webhooks / checkout (`sub_…`).
 model BillingSubscription {
-  id                   String                    @id @default(cuid())
-  userId               String                    @unique
-  stripeSubscriptionId String                    @unique
-  stripePriceId        String
-  stripeProductId      String?
-  status               BillingSubscriptionStatus
-  planKey              String?
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean                   @default(false)
-  canceledAt           DateTime?
-  createdAt            DateTime                  @default(now())
-  updatedAt            DateTime                  @updatedAt
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  subId       String    @unique
+  priceId     String
+  productId   String?
+  status      SubStatus
+  planKey     String?
+  periodStart DateTime?
+  periodEnd   DateTime?
+  cancelAtEnd Boolean   @default(false)
+  canceledAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   billing UserBilling @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@index([status])
   @@map("billing_subscriptions")
+}
+
+/// Per-user usage counters for plan enforcement and admin reporting.
+model UserUsage {
+  userId         String    @id
+  syncCountMonth Int       @default(0)
+  syncMonthKey   String    @default("")
+  lastSyncAt     DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_usage")
 }
 
 /// A financial space: Independent, Household, Family, or Company.
@@ -177,16 +218,16 @@ model FinancialSpace {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  owner           User                   @relation("SpaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  activeForUsers  User[]                 @relation("ActiveSpace")
-  members         SpaceMember[]
-  invitations     SpaceInvitation[]
-  accounts        Account[]
-  transactions    Transaction[]
-  budgets         Budget[]
-  subscriptions   DetectedSubscription[]
-  childProfiles   ChildProfile[]
-  splitRules      SplitRule[]
+  owner          User                   @relation("SpaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  activeForUsers User[]                 @relation("ActiveSpace")
+  members        SpaceMember[]
+  invitations    SpaceInvitation[]
+  accounts       Account[]
+  transactions   Transaction[]
+  budgets        Budget[]
+  subscriptions  DetectedSubscription[]
+  childProfiles  ChildProfile[]
+  splitRules     SplitRule[]
 
   @@index([ownerId])
   @@map("financial_spaces")
@@ -194,22 +235,22 @@ model FinancialSpace {
 
 /// Membership linking a user (or pending invite) to a space with a role.
 model SpaceMember {
-  id          String       @id @default(cuid())
-  spaceId     String
-  userId      String?
-  email       String?
-  phone       String?
-  role        SpaceRole
-  status      MemberStatus @default(PENDING)
-  displayName String?
-  dateOfBirth DateTime?
-  invitedBy   String?
-  joinedAt    DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        String       @id @default(cuid())
+  spaceId   String
+  userId    String?
+  email     String?
+  phone     String?
+  role      SpaceRole
+  status    MemberStatus @default(PENDING)
+  name      String?
+  birthday  DateTime?
+  invitedBy String?
+  joinedAt  DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
-  space       FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  space        FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user         User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   childProfile ChildProfile?
 
   @@unique([spaceId, userId])
@@ -220,16 +261,16 @@ model SpaceMember {
 }
 
 model SpaceInvitation {
-  id              String    @id @default(cuid())
-  spaceId         String
-  email           String?
-  phone           String?
-  displayName     String?
-  role            SpaceRole
-  token           String    @unique @default(cuid())
-  expiresAt       DateTime
-  phoneVerifiedAt DateTime?
-  createdAt       DateTime  @default(now())
+  id            String    @id @default(cuid())
+  spaceId       String
+  email         String?
+  phone         String?
+  name          String?
+  role          SpaceRole
+  token         String    @unique @default(cuid())
+  expiresAt     DateTime
+  phoneVerified DateTime?
+  createdAt     DateTime  @default(now())
 
   space FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
@@ -241,15 +282,15 @@ model SpaceInvitation {
 
 /// Child/teen profile with allowance and supervision settings.
 model ChildProfile {
-  id                 String        @id @default(cuid())
-  spaceId            String
-  memberId           String        @unique
-  allowanceAmount    Decimal?      @db.Decimal(12, 2)
-  allowanceFrequency BudgetPeriod?
-  spendingLimits     Json          @default("{}")
-  learnMode          Boolean       @default(true)
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  id        String        @id @default(cuid())
+  spaceId   String
+  memberId  String        @unique
+  allowance Decimal?      @db.Decimal(12, 2)
+  frequency BudgetPeriod?
+  limits    Json          @default("{}")
+  learnMode Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   space  FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   member SpaceMember    @relation(fields: [memberId], references: [id], onDelete: Cascade)
@@ -260,30 +301,30 @@ model ChildProfile {
 }
 
 model AllowanceJar {
-  id             String   @id @default(cuid())
-  childProfileId String
-  name           String
-  balance        Decimal  @default(0) @db.Decimal(12, 2)
-  targetAmount   Decimal? @db.Decimal(12, 2)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(cuid())
+  childId   String
+  name      String
+  balance   Decimal  @default(0) @db.Decimal(12, 2)
+  target    Decimal? @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  childProfile ChildProfile @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  child ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
 
-  @@index([childProfileId])
+  @@index([childId])
   @@map("allowance_jars")
 }
 
 /// How expenses are split between space members.
 model SplitRule {
-  id       String               @id @default(cuid())
-  spaceId  String
-  name     String
-  category TransactionCategory?
-  ruleType SplitRuleType        @default(EQUAL)
-  splits   Json                 @default("{}")
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
+  id        String               @id @default(cuid())
+  spaceId   String
+  name      String
+  category  TransactionCategory?
+  mode      SplitRuleType        @default(EQUAL)
+  splits    Json                 @default("{}")
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
 
   space FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 
@@ -292,20 +333,22 @@ model SplitRule {
 }
 
 model Account {
-  id                    String            @id @default(cuid())
-  userId                String
-  spaceId               String
-  name                  String
-  institution           String?
-  type                  AccountType
-  visibility            AccountVisibility @default(PERSONAL)
-  balance               Decimal           @db.Decimal(12, 2)
-  currency              String            @default("USD")
-  /// Stripe Financial Connections account ID (`fca_…`).
-  stripeFcAccountId     String?           @unique @map("stripeFinancialConnId")
-  lastSynced            DateTime?
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  id          String            @id @default(cuid())
+  userId      String
+  spaceId     String
+  name        String
+  institution String?
+  type        AccountType
+  visibility  AccountVisibility @default(PERSONAL)
+  balance     Decimal           @db.Decimal(12, 2)
+  currency    String            @default("USD")
+  provider    LinkProvider      @default(STRIPE)
+  stripeId    String?           @unique
+  plaidId     String?           @unique
+  linkId      String?
+  syncedAt    DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   space        FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
@@ -328,8 +371,8 @@ model Transaction {
   category    TransactionCategory @default(OTHER)
   date        DateTime
   pending     Boolean             @default(false)
-  /// Stripe Financial Connections transaction ID (`fctxn_…`).
-  stripeTransactionId String?       @unique @map("stripeId")
+  stripeId    String?             @unique
+  plaidId     String?             @unique
   createdAt   DateTime            @default(now())
 
   user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -366,21 +409,21 @@ model Budget {
 }
 
 model DetectedSubscription {
-  id          String              @id @default(cuid())
-  userId      String
-  spaceId     String
-  name        String
-  amount      Decimal             @db.Decimal(12, 2)
-  currency    String              @default("USD")
-  frequency   BudgetPeriod
-  category    TransactionCategory @default(SUBSCRIPTIONS)
-  status      SubscriptionStatus  @default(ACTIVE)
-  icon        String?
-  lastCharged DateTime?
-  nextCharge  DateTime?
-  priceAlert  Boolean             @default(false)
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  id         String              @id @default(cuid())
+  userId     String
+  spaceId    String
+  name       String
+  amount     Decimal             @db.Decimal(12, 2)
+  currency   String              @default("USD")
+  frequency  BudgetPeriod
+  category   TransactionCategory @default(SUBSCRIPTIONS)
+  status     SubscriptionStatus  @default(ACTIVE)
+  icon       String?
+  lastCharge DateTime?
+  nextCharge DateTime?
+  alert      Boolean             @default(false)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
 
   user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   space FinancialSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)

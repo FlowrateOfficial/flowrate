@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="relative w-full aspect-4/5 max-w-xl mx-auto select-none" :class="class" aria-hidden="true">
+  <div class="relative w-full aspect-4/5 max-w-xl mx-auto select-none overflow-hidden" :class="class" aria-hidden="true">
     <!-- NOTE - Paper-cut Bauhaus composition -->
     <div class="absolute inset-[5%] rounded-full border border-flow-border/70 dark:border-flow-border-dark/70 bg-sage/4 dark:bg-sage/10" />
     <div class="absolute top-[12%] right-[8%] w-[38%] aspect-square rounded-full border border-sand/50 bg-sand/20 dark:bg-sand/10" />

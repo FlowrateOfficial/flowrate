@@ -1,4 +1,4 @@
-// ANCHOR: Stripe FC user-cancel detection — not an application error
+// NOTE - ANCHOR: Stripe FC user-cancel detection — not an application error
 export function isStripeConnectCancelled(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false
 

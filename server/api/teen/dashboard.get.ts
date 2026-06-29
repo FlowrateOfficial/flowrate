@@ -11,25 +11,25 @@ export default defineEventHandler(async (event) => {
   }
 
   const jars = await prisma.allowanceJar.findMany({
-    where: { childProfileId: profile.id },
+    where: { childId: profile.id },
     orderBy: { createdAt: 'asc' }
   })
 
   const totalSaved = jars.reduce((sum, j) => sum + Number(j.balance), 0)
 
   return {
-    displayName: membership.displayName ?? user.name,
+    name: membership.name ?? user.name,
     role: membership.role,
     learnMode: profile.learnMode,
-    allowanceAmount: profile.allowanceAmount ? Number(profile.allowanceAmount) : null,
-    allowanceFrequency: profile.allowanceFrequency,
-    spendingLimits: profile.spendingLimits,
+    allowance: profile.allowance ? Number(profile.allowance) : null,
+    frequency: profile.frequency,
+    limits: profile.limits,
     jars: jars.map(j => ({
       id: j.id,
       name: j.name,
       balance: Number(j.balance),
-      targetAmount: j.targetAmount ? Number(j.targetAmount) : null,
-      progress: j.targetAmount ? Math.min(100, (Number(j.balance) / Number(j.targetAmount)) * 100) : null
+      target: j.target ? Number(j.target) : null,
+      progress: j.target ? Math.min(100, (Number(j.balance) / Number(j.target)) * 100) : null
     })),
     totalSaved
   }

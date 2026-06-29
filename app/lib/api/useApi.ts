@@ -1,4 +1,4 @@
-// ANCHOR: App HTTP client — CSRF, active space header, SSR cookies, GET dedupe
+// NOTE - ANCHOR: App HTTP client — CSRF, active space header, SSR cookies, GET dedupe
 import type { FetchOptions } from 'ofetch'
 import { CSRF_COOKIE, CSRF_HEADER } from '#shared/security'
 import { readCsrfTokenFromDocument } from '~/utils/csrf'
@@ -26,7 +26,7 @@ export function useApi() {
   async function api<T>(url: string, options: ApiRequestOptions = {}): Promise<T> {
     const { noSpace, noDedupe, method, body, query, headers, ...rest } = options
     const verb = method ?? 'GET'
-    const spaceId = noSpace ? null : spacesStore.activeSpace?.id
+    const spaceId = noSpace ? null : spacesStore.space?.id
 
     const run = () => http<T>(url, {
       method: verb,

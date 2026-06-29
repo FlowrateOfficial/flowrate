@@ -9,10 +9,9 @@ const dashboardStore = useDashboardStore()
 
 useSeoMeta({ title: () => `${t('dashboard.overview.title')} — ${t('common.appName')}` })
 
-const spaceId = computed(() => spacesStore.activeSpace?.id)
+const spaceId = computed(() => spacesStore.space?.id)
 const {
   statsLoading,
-  analyticsLoading,
   txLoading,
   spaceTypeLabel,
   spaceName,
@@ -23,7 +22,9 @@ const {
   categoryLabels,
   categoryValues,
   hasCategoryChart,
+  summaryCurrency,
   saasShieldCenterValue,
+  showSaasShield,
   statCards,
   previewAccounts,
   hasAccounts,
@@ -43,30 +44,24 @@ await useAsyncData(
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 lg:px-14 py-12 sm:py-16 space-y-14 max-w-[90rem] mx-auto">
-    <header class="grid lg:grid-cols-12 gap-6 items-end">
-      <div class="lg:col-span-8 space-y-3">
-        <p class="flow-section-label text-sage">{{ spaceTypeLabel }}</p>
-        <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl text-flow-ink dark:text-flow-ink-dark tracking-tight leading-tight">
-          {{ t('dashboard.overview.title') }}
-        </h1>
-        <p class="text-flow-muted dark:text-flow-muted-dark text-lg max-w-xl leading-relaxed">
-          {{ t('dashboard.overview.subtitle', { name: spaceName }) }}
-        </p>
-      </div>
-      <div class="lg:col-span-4 lg:text-right">
+  <DashboardPageShell max-width="full" :show-guide="false">
+    <DashboardPageHeader
+      :title="t('dashboard.overview.title')"
+      :description="t('dashboard.overview.subtitle', { name: spaceName })"
+      :eyebrow="spaceTypeLabel"
+    >
+      <template #actions>
         <UButton
           :label="t('dashboard.overview.viewAnalytics')"
           to="/dashboard/analytics"
           color="neutral"
           variant="outline"
           trailing-icon="i-lucide-arrow-right"
-          class="rounded-flow"
         />
-      </div>
-    </header>
+      </template>
+    </DashboardPageHeader>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
+    <div class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
       <DashboardStatsCard
         v-for="card in statCards"
         :key="card.key"
@@ -79,28 +74,27 @@ await useAsyncData(
       />
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-      <div class="xl:col-span-8">
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div :class="showSaasShield ? 'xl:col-span-8' : 'xl:col-span-12'">
         <DashboardChartsChartCard
           :title="t('dashboard.overview.cashFlowChart')"
           :subtitle="t('dashboard.analytics.cashFlowHint')"
           large
         >
-          <div class="flow-chart-wrap-lg">
-            <DashboardChartsCashFlowChart
-              v-if="hasCashFlow"
-              :labels="cashFlowLabels"
-              :income="cashFlowIncome"
-              :spending="cashFlowSpending"
-            />
-            <div v-else class="flex items-center justify-center h-full text-sm text-flow-muted">
-              {{ t('dashboard.analytics.emptyDescription') }}
-            </div>
+          <DashboardChartsCashFlowChart
+            v-if="hasCashFlow"
+            :labels="cashFlowLabels"
+            :income="cashFlowIncome"
+            :spending="cashFlowSpending"
+            :currency="summaryCurrency"
+          />
+          <div v-else class="flex h-full items-center justify-center text-sm text-muted">
+            {{ t('dashboard.analytics.emptyDescription') }}
           </div>
         </DashboardChartsChartCard>
       </div>
 
-      <div class="xl:col-span-4 space-y-8">
+      <div v-if="showSaasShield" class="xl:col-span-4">
         <DashboardChartsChartCard
           :title="t('dashboard.overview.saasShield')"
           :subtitle="t('dashboard.overview.saasShieldHint')"
@@ -111,37 +105,40 @@ await useAsyncData(
             :values="categoryValues"
             :center-value="saasShieldCenterValue"
             :center-label="t('dashboard.overview.saasIssues')"
+            :currency="summaryCurrency"
           />
-          <div v-else class="flex flex-col items-center justify-center min-h-[200px] text-center px-4">
-            <p class="text-3xl font-light tabular-nums text-flow-ink dark:text-flow-ink-dark">{{ saasShieldCenterValue }}</p>
-            <p class="text-xs text-flow-muted mt-2">{{ t('dashboard.overview.saasIssues') }}</p>
+          <div v-else class="flex h-full flex-col items-center justify-center text-center">
+            <p class="text-2xl font-semibold tabular-nums">{{ saasShieldCenterValue }}</p>
+            <p class="mt-1 text-xs text-muted">{{ t('dashboard.overview.saasIssues') }}</p>
           </div>
         </DashboardChartsChartCard>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <div class="lg:col-span-7 editorial-card-flat">
-        <div class="flex items-center justify-between mb-10">
-          <h2 class="font-display text-xl sm:text-2xl text-flow-ink dark:text-flow-ink-dark">
-            {{ t('dashboard.overview.recentTransactions') }}
-          </h2>
-          <UButton
-            to="/dashboard/transactions"
-            :label="t('common.viewAll')"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            trailing-icon="i-lucide-arrow-right"
-          />
-        </div>
-        <DashboardTransactionList :transactions="recentTransactions" :loading="txLoading" />
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <UCard :ui="{ body: 'p-4 sm:p-5' }">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold sm:text-lg">
+              {{ t('dashboard.overview.recentTransactions') }}
+            </h2>
+            <UButton
+              to="/dashboard/transactions"
+              :label="t('common.viewAll')"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              trailing-icon="i-lucide-arrow-right"
+            />
+          </div>
+          <DashboardTransactionList :transactions="recentTransactions" :loading="txLoading" />
+        </UCard>
       </div>
 
-      <div class="lg:col-span-5 space-y-8">
-        <div class="editorial-card-flat">
-          <div class="flex items-center justify-between mb-10">
-            <h2 class="font-display text-xl text-flow-ink dark:text-flow-ink-dark">{{ t('dashboard.overview.accounts') }}</h2>
+      <div class="flex flex-col gap-4 lg:col-span-5">
+        <UCard :ui="{ body: 'p-4 sm:p-5' }">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold">{{ t('dashboard.overview.accounts') }}</h2>
             <UButton
               to="/dashboard/accounts"
               :label="t('common.manage')"
@@ -152,42 +149,36 @@ await useAsyncData(
             />
           </div>
 
-          <div v-if="!hasAccounts" class="text-center py-12 text-flow-muted dark:text-flow-muted-dark">
-            <UIcon name="i-lucide-landmark" class="w-8 h-8 mx-auto mb-3 opacity-30 stroke-[1.25]" />
-            <p class="text-sm mb-4">{{ t('dashboard.overview.noAccounts') }}</p>
-            <UButton
-              to="/dashboard/accounts"
-              :label="t('dashboard.overview.connectBank')"
-              size="sm"
-              color="neutral"
-              class="rounded-flow"
-            />
+          <div v-if="!hasAccounts" class="py-6 text-center">
+            <UIcon name="i-lucide-landmark" class="mx-auto mb-2 size-7 text-muted opacity-40" />
+            <p class="mb-3 text-sm text-muted">{{ t('dashboard.overview.noAccounts') }}</p>
+            <DashboardConnectBank size="md" />
           </div>
 
-          <ul v-else class="divide-y divide-flow-border/40 dark:divide-flow-border-dark/40">
+          <ul v-else class="divide-y divide-default">
             <li
               v-for="acc in previewAccounts"
               :key="acc.id"
-              class="flex items-center justify-between py-4 first:pt-0 last:pb-0 gap-4"
+              class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
             >
               <div class="min-w-0">
-                <p class="text-sm font-medium truncate text-flow-ink dark:text-flow-ink-dark">{{ acc.name }}</p>
-                <p class="text-xs text-flow-muted mt-0.5">{{ acc.subtitle }}</p>
+                <p class="truncate text-sm font-medium">{{ acc.name }}</p>
+                <p class="mt-0.5 truncate text-xs text-muted">{{ acc.subtitle }}</p>
               </div>
-              <span class="text-sm font-medium tabular-nums shrink-0 tracking-tight">
+              <span class="shrink-0 text-sm font-semibold tabular-nums">
                 {{ acc.balanceLabel }}
               </span>
             </li>
           </ul>
-        </div>
+        </UCard>
 
-        <div v-if="hasAlertSubs" class="editorial-card-flat border-terracotta/20">
-          <div class="flex items-center gap-2 mb-6">
-            <UIcon name="i-lucide-shield-alert" class="w-4 h-4 text-terracotta stroke-[1.25]" />
-            <h2 class="font-display text-lg text-terracotta">{{ t('dashboard.overview.saasAlerts') }}</h2>
+        <UCard v-if="showSaasShield && hasAlertSubs" :ui="{ body: 'p-4 sm:p-5', root: 'border-warning/30' }">
+          <div class="mb-3 flex items-center gap-2">
+            <UIcon name="i-lucide-shield-alert" class="size-4 text-warning" />
+            <h2 class="text-base font-semibold text-warning">{{ t('dashboard.overview.saasAlerts') }}</h2>
           </div>
-          <ul class="divide-y divide-flow-border/40 dark:divide-flow-border-dark/40">
-            <li v-for="sub in previewAlertSubs" :key="sub.id" class="py-3 first:pt-0">
+          <ul class="divide-y divide-default">
+            <li v-for="sub in previewAlertSubs" :key="sub.id" class="py-2.5 first:pt-0">
               <DashboardSubscriptionCard :subscription="sub" />
             </li>
           </ul>
@@ -198,10 +189,10 @@ await useAsyncData(
             variant="outline"
             size="sm"
             block
-            class="mt-6 rounded-flow"
+            class="mt-3"
           />
-        </div>
+        </UCard>
       </div>
     </div>
-  </div>
+  </DashboardPageShell>
 </template>

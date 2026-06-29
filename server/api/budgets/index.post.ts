@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
 
 const bodySchema = z.object({
   name: z.string().min(1),
@@ -16,6 +17,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readValidatedBody(event, bodySchema.parse)
+  const currency = await resolveSpaceDisplayCurrency(space.id, localeFromRequest(event))
 
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -48,7 +50,7 @@ export default defineEventHandler(async (event) => {
     name: budget.name,
     category: budget.category,
     amount: Number(budget.amount),
-    currency: 'USD',
+    currency,
     spent: Math.abs(Number(result._sum.amount ?? 0)),
     period: budget.period,
     isShared: budget.isShared

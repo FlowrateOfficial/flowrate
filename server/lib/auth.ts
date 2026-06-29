@@ -49,20 +49,28 @@ export async function requireAuthUser(event: H3Event): Promise<AuthUser> {
       id: user.id,
       email: user.email,
       name: user.name,
-      avatarUrl: user.image ?? null
+      avatar: user.image ?? null
     },
     update: {
       email: user.email,
-      name: user.name ?? undefined,
-      avatarUrl: user.image ?? undefined
+      avatar: user.image ?? undefined
+      // NOTE - Name is owned by profile PATCH (DB); synced to Neon Auth + Stripe from there
     }
   })
 
   await ensureDefaultIndependentSpace(user.id, dbUser.name)
   await acceptPendingInvitations(user.id, user.email)
 
-  event.context.flowrateAuth = user
-  return user
+  const authUser: AuthUser = {
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    emailVerified: user.emailVerified,
+    image: dbUser.avatar
+  }
+
+  event.context.flowrateAuth = authUser
+  return authUser
 }
 
 // NOTE - No DB provisioning — call after /api/user/bootstrap
@@ -78,7 +86,7 @@ export async function requireSessionUser(event: H3Event): Promise<AuthUser> {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, email: true, name: true, avatarUrl: true }
+    select: { id: true, email: true, name: true, avatar: true }
   })
 
   if (!dbUser) {
@@ -90,7 +98,7 @@ export async function requireSessionUser(event: H3Event): Promise<AuthUser> {
     email: dbUser.email,
     name: dbUser.name,
     emailVerified: session.user.emailVerified,
-    image: dbUser.avatarUrl
+    image: dbUser.avatar
   }
 
   event.context.flowrateAuth = user

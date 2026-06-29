@@ -1,19 +1,31 @@
 <script setup lang="ts">
 const { getLocale, getLocales, switchLocale, t } = useAppI18n()
 
+const localeLabels: Record<string, string> = {
+  en: 'common.englishUS',
+  'en-GB': 'common.englishUK',
+  fr: 'common.french'
+}
+
+const localeIcons: Record<string, string> = {
+  en: 'i-lucide-dollar-sign',
+  'en-GB': 'i-lucide-pound-sterling',
+  fr: 'i-lucide-euro'
+}
+
 const current = computed(() => getLocale())
 const locales = computed(() => getLocales())
 
 const items = computed(() =>
   locales.value.map(locale => ({
-    label: locale.code === 'fr' ? t('common.french') : t('common.english'),
-    icon: locale.code === 'fr' ? 'i-emojione-flag-for-france' : 'i-emojione-flag-for-united-kingdom',
+    label: t(localeLabels[locale.code] ?? 'common.english'),
+    icon: localeIcons[locale.code] ?? 'i-lucide-globe',
     onSelect: () => switchLocale(locale.code)
   }))
 )
 
 const currentLabel = computed(() =>
-  current.value === 'fr' ? t('common.french') : t('common.english')
+  t(localeLabels[current.value] ?? 'common.english')
 )
 </script>
 

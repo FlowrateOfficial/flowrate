@@ -6,7 +6,7 @@ export interface AccountSummary {
   visibility: 'PERSONAL' | 'SHARED'
   balance: number
   currency: string
-  lastSynced: string | null
+  syncedAt: string | null
   isMine: boolean
   ownerName: string | null
 }
@@ -40,9 +40,9 @@ export interface SubscriptionItem {
   frequency: string | null
   status: string
   icon: string | null
-  lastCharged: string | null
+  lastCharge: string | null
   nextCharge: string | null
-  priceAlert: boolean
+  alert: boolean
   isDuplicate: boolean
 }
 
@@ -56,6 +56,7 @@ export interface AnalyticsOverview {
     savingsRate: number
     transactionCount: number
     linkedAccountCount: number
+    currency: string
   }
   cashFlow: Array<{ period: string, income: number, spending: number }>
   categories: Array<{ category: string, amount: number }>

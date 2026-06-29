@@ -1,6 +1,8 @@
 import { z } from 'zod'
-import { requireAuthUser } from '../../lib/auth'
+import { isAdminEmail } from '../../lib/admin'
+import { requireSessionUser } from '../../lib/auth'
 import { isTwilioVerifyConfigured, sendPhoneVerification } from '../../lib/twilio'
+import { syncUserProfileToIntegrations } from '../../lib/user-profile-sync'
 import { normalizePhone } from '../../utils/phone'
 
 const bodySchema = z.object({
@@ -9,10 +11,11 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuthUser(event)
+  const user = await requireSessionUser(event)
+  const config = useRuntimeConfig(event)
   const body = await readValidatedBody(event, bodySchema.parse)
 
-  const data: { name?: string, phone?: string | null, phoneVerifiedAt?: null } = {}
+  const data: { name?: string, phone?: string | null, phoneVerified?: null } = {}
 
   if (body.name !== undefined) {
     data.name = body.name
@@ -21,7 +24,7 @@ export default defineEventHandler(async (event) => {
   if (body.phone !== undefined) {
     if (body.phone === null || body.phone.trim() === '') {
       data.phone = null
-      data.phoneVerifiedAt = null
+      data.phoneVerified = null
     } else {
       const normalized = normalizePhone(body.phone)
       if (!normalized) {
@@ -45,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
       data.phone = normalized
       if (current?.phone !== normalized) {
-        data.phoneVerifiedAt = null
+        data.phoneVerified = null
       }
     }
   }
@@ -66,15 +69,23 @@ export default defineEventHandler(async (event) => {
       name: true,
       email: true,
       phone: true,
-      phoneVerifiedAt: true,
+      phoneVerified: true,
       plan: true
     }
   })
 
+  if (body.name !== undefined) {
+    await syncUserProfileToIntegrations(event, {
+      userId: updated.id,
+      name: updated.name,
+      email: updated.email
+    })
+  }
+
   let verificationSent = false
   let verificationError: string | null = null
 
-  const shouldSendVerification = body.phone !== undefined && updated.phone && !updated.phoneVerifiedAt
+  const shouldSendVerification = body.phone !== undefined && updated.phone && !updated.phoneVerified
   if (shouldSendVerification && isTwilioVerifyConfigured()) {
     try {
       await sendPhoneVerification(updated.phone!)
@@ -92,8 +103,9 @@ export default defineEventHandler(async (event) => {
     name: updated.name,
     email: updated.email,
     phone: updated.phone,
-    phoneVerified: updated.phoneVerifiedAt != null,
+    phoneVerified: updated.phoneVerified != null,
     plan: updated.plan,
+    isAdmin: isAdminEmail(updated.email, config.adminEmails),
     verificationSent,
     verificationError
   }

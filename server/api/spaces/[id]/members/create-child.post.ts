@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { createChildAccount } from '../../../../lib/services/members.service'
+import { assertTeenAccounts } from '../../../../lib/billing/enforcement'
 
 const bodySchema = z.object({
   username: z.string().min(2).max(50),
   email: z.string().email(),
   password: z.string().min(8).max(128),
   role: z.enum(['CHILD', 'TEEN']),
-  dateOfBirth: z.string().datetime().optional()
+  birthday: z.string().datetime().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -16,6 +17,8 @@ export default defineEventHandler(async (event) => {
   if (!canManageMembers(membership.role, space.type)) {
     throw createError({ statusCode: 403, message: 'Only guardians can create child accounts' })
   }
+
+  await assertTeenAccounts(user.id)
 
   const body = await readValidatedBody(event, bodySchema.parse)
 

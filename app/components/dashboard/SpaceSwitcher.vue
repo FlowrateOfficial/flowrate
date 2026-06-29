@@ -4,11 +4,11 @@ import { SPACE_TYPE_ICONS } from '~/types/space'
 
 const { t } = useAppI18n()
 const spacesStore = useSpacesStore()
-const { activeSpace, spaces, loading } = storeToRefs(spacesStore)
+const { space, spaces, loading } = storeToRefs(spacesStore)
 const switching = ref(false)
 
 async function onSwitch(spaceId: string) {
-  if (spaceId === activeSpace.value?.id) return
+  if (spaceId === space.value?.id) return
   switching.value = true
   try {
     await spacesStore.switchSpace(spaceId)
@@ -29,22 +29,29 @@ const items = computed(() =>
 
 <template>
   <UDropdownMenu :items="[items]" :disabled="loading || switching">
-    <button
-      class="w-full flex items-center gap-3 px-4 py-3 rounded-flow text-sm bg-flow-secondary/60 dark:bg-flow-secondary-dark/60 hover:bg-flow-secondary dark:hover:bg-flow-secondary-dark transition-all duration-300"
+    <UButton
+      color="neutral"
+      variant="outline"
+      block
+      size="lg"
+      class="min-h-12 justify-start gap-3 px-4"
+      :loading="loading || switching"
       :disabled="loading || switching"
     >
       <UIcon
-        v-if="activeSpace"
-        :name="SPACE_TYPE_ICONS[activeSpace.type]"
-        class="w-4 h-4 text-sage shrink-0 stroke-[1.25]"
+        v-if="space"
+        :name="SPACE_TYPE_ICONS[space.type]"
+        class="size-5 shrink-0 text-primary"
       />
-      <div class="flex-1 min-w-0 text-left">
-        <p class="truncate font-medium text-flow-ink dark:text-flow-ink-dark">{{ activeSpace?.name ?? t('common.loading') }}</p>
-        <p v-if="activeSpace" class="text-xs text-flow-muted dark:text-flow-muted-dark truncate">
-          {{ spacesStore.spaceType(activeSpace.type) }}
-        </p>
-      </div>
-      <UIcon name="i-lucide-chevrons-up-down" class="w-3.5 h-3.5 text-flow-muted shrink-0 stroke-[1.25]" />
-    </button>
+      <span class="min-w-0 flex-1 text-left">
+        <span class="block truncate text-base font-semibold">
+          {{ space?.name ?? t('common.loading') }}
+        </span>
+        <span v-if="space" class="block truncate text-sm text-muted">
+          {{ spacesStore.spaceType(space.type) }}
+        </span>
+      </span>
+      <UIcon name="i-lucide-chevrons-up-down" class="size-4 shrink-0 text-muted" />
+    </UButton>
   </UDropdownMenu>
 </template>

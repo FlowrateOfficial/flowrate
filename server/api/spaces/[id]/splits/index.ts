@@ -7,7 +7,7 @@ const splitRuleSchema = z.object({
     'ENTERTAINMENT', 'EDUCATION', 'SHOPPING', 'SAVINGS', 'INCOME', 'CLOUD_INFRA',
     'DEVELOPER_TOOLS', 'OTHER'
   ]).optional(),
-  ruleType: z.enum(['EQUAL', 'PROPORTIONAL', 'CUSTOM']),
+  mode: z.enum(['EQUAL', 'PROPORTIONAL', 'CUSTOM']),
   splits: z.record(z.string(), z.number()).default({})
 })
 
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
         spaceId,
         name: body.name,
         category: body.category,
-        ruleType: body.ruleType,
+        mode: body.mode,
         splits: body.splits
       }
     })

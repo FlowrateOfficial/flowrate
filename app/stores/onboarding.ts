@@ -1,5 +1,7 @@
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
+import { planHasFeature } from '#shared/plan-limits'
+import { activePlan } from '~/state/plan'
 
 export const useOnboardingStore = defineStore('onboarding', () => {
   const { t } = useAppI18n()
@@ -12,12 +14,20 @@ export const useOnboardingStore = defineStore('onboarding', () => {
   const spaceName = ref('')
   const loading = ref(false)
 
-  const options = computed(() => [
-    { type: 'INDEPENDENT' as const, title: t('dashboard.onboarding.types.independent.title'), icon: 'i-lucide-user', description: t('dashboard.onboarding.types.independent.description') },
-    { type: 'HOUSEHOLD' as const, title: t('dashboard.onboarding.types.household.title'), icon: 'i-lucide-heart-handshake', description: t('dashboard.onboarding.types.household.description') },
-    { type: 'FAMILY' as const, title: t('dashboard.onboarding.types.family.title'), icon: 'i-lucide-users', description: t('dashboard.onboarding.types.family.description') },
-    { type: 'COMPANY' as const, title: t('dashboard.onboarding.types.company.title'), icon: 'i-lucide-building-2', description: t('dashboard.onboarding.types.company.description') }
-  ])
+  const options = computed(() => {
+    const all = [
+      { type: 'INDEPENDENT' as const, title: t('dashboard.onboarding.types.independent.title'), icon: 'i-lucide-user', description: t('dashboard.onboarding.types.independent.description') },
+      { type: 'HOUSEHOLD' as const, title: t('dashboard.onboarding.types.household.title'), icon: 'i-lucide-heart-handshake', description: t('dashboard.onboarding.types.household.description') },
+      { type: 'FAMILY' as const, title: t('dashboard.onboarding.types.family.title'), icon: 'i-lucide-users', description: t('dashboard.onboarding.types.family.description') },
+      { type: 'COMPANY' as const, title: t('dashboard.onboarding.types.company.title'), icon: 'i-lucide-building-2', description: t('dashboard.onboarding.types.company.description') }
+    ]
+
+    if (!planHasFeature(activePlan.value, 'sharedSpaces')) {
+      return all.filter(option => option.type === 'INDEPENDENT')
+    }
+
+    return all
+  })
 
   function defaultName(type: string) {
     if (type === 'HOUSEHOLD') return t('dashboard.onboarding.defaultNames.household')

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// ANCHOR: Legacy alias — use BrandFlowRateLogo in new code
+// NOTE - ANCHOR: Legacy alias — use BrandFlowRateLogo in new code
 </script>
 
 <template>

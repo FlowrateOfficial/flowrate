@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     const members = await prisma.spaceMember.findMany({
       where: { spaceId },
       include: {
-        user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        user: { select: { id: true, name: true, email: true, avatar: true } },
         childProfile: { include: { jars: true } }
       },
       orderBy: { createdAt: 'asc' }
@@ -73,21 +73,21 @@ export default defineEventHandler(async (event) => {
           id: m.id,
           userId: m.userId,
           email: m.user?.email ?? m.email,
-          name: m.user?.name ?? m.displayName,
+          name: m.user?.name ?? m.name,
           role: m.role,
           status: m.status,
-          dateOfBirth: m.dateOfBirth?.toISOString() ?? null,
+          birthday: m.birthday?.toISOString() ?? null,
           childProfile: m.childProfile
             ? {
                 id: m.childProfile.id,
-                allowanceAmount: m.childProfile.allowanceAmount ? Number(m.childProfile.allowanceAmount) : null,
-                allowanceFrequency: m.childProfile.allowanceFrequency,
+                allowance: m.childProfile.allowance ? Number(m.childProfile.allowance) : null,
+                frequency: m.childProfile.frequency,
                 learnMode: m.childProfile.learnMode,
                 jars: m.childProfile.jars.map(j => ({
                   id: j.id,
                   name: j.name,
                   balance: Number(j.balance),
-                  targetAmount: j.targetAmount ? Number(j.targetAmount) : null
+                  target: j.target ? Number(j.target) : null
                 }))
               }
             : null,

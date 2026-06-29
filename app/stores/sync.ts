@@ -1,10 +1,9 @@
-import { resolveErrorMessage } from '~/utils/errors'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useSyncStore = defineStore('sync', () => {
   const { t } = useAppI18n()
-  const toast = useToast()
+  const appToast = useAppToast()
   const isSyncing = ref(false)
   const { api } = useApi()
 
@@ -15,18 +14,20 @@ export const useSyncStore = defineStore('sync', () => {
         method: 'POST'
       })
       if (refresh) await refresh()
-      toast.add({
-        title: t('dashboard.sync.complete'),
-        description: t('dashboard.sync.imported', { count: result.imported, accounts: result.accounts }),
-        color: result.imported > 0 ? 'success' : 'neutral'
-      })
+      if (result.imported > 0) {
+        appToast.success(
+          t('dashboard.sync.complete'),
+          t('dashboard.sync.imported', { count: result.imported, accounts: result.accounts })
+        )
+      } else {
+        appToast.neutral(
+          t('dashboard.sync.complete'),
+          t('dashboard.sync.imported', { count: result.imported, accounts: result.accounts })
+        )
+      }
       return result
     } catch (e) {
-      toast.add({
-        title: t('dashboard.sync.failed'),
-        description: resolveErrorMessage(e, t, 'dashboard.sync.tryAgain'),
-        color: 'error'
-      })
+      appToast.errorFrom(e, 'dashboard.sync.tryAgain', t('dashboard.sync.failed'))
       throw e
     } finally {
       isSyncing.value = false

@@ -12,31 +12,43 @@ defineProps<Props>()
 </script>
 
 <template>
-  <div class="editorial-card !p-6 sm:!p-8">
-    <div class="flex items-start justify-between gap-6">
-      <div class="flex-1 min-w-0 space-y-3">
-        <p class="text-xs tracking-wide text-flow-muted dark:text-flow-muted-dark">
+  <UCard class="min-w-0 overflow-hidden" :ui="{ body: 'p-3 sm:p-4' }">
+    <div v-if="loading" class="animate-pulse space-y-2">
+      <div class="h-3.5 w-20 rounded bg-elevated" />
+      <div class="h-7 w-28 rounded bg-elevated/70" />
+    </div>
+    <div v-else class="min-w-0 space-y-2">
+      <div class="flex min-w-0 items-center gap-2">
+        <div
+          class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-elevated sm:size-9"
+          aria-hidden="true"
+        >
+          <UIcon :name="icon" class="size-4 text-muted" />
+        </div>
+        <p class="min-w-0 truncate text-xs font-medium text-muted sm:text-sm">
           {{ title }}
         </p>
-        <div v-if="loading" class="h-9 w-28 bg-flow-secondary dark:bg-flow-secondary-dark rounded animate-pulse" />
-        <p v-else class="text-3xl sm:text-4xl font-light tabular-nums tracking-tight text-flow-ink dark:text-flow-ink-dark">
-          {{ value }}
-        </p>
-        <div v-if="change != null && change !== '' && !loading" class="flex items-center gap-2">
-          <UIcon
-            :name="changePositive ? 'i-lucide-trending-up' : 'i-lucide-trending-down'"
-            class="w-3.5 h-3.5 stroke-[1.25]"
-            :class="changePositive ? 'text-flow-success' : 'text-terracotta'"
-          />
-          <span
-            class="text-xs tabular-nums"
-            :class="changePositive ? 'text-flow-success' : 'text-terracotta'"
-          >
-            {{ change }}
-          </span>
-        </div>
       </div>
-      <UIcon :name="icon" class="w-5 h-5 text-flow-muted dark:text-flow-muted-dark shrink-0 stroke-[1.25]" />
+      <p
+        class="truncate text-base font-semibold tabular-nums tracking-tight sm:text-lg xl:text-xl"
+        :title="value"
+      >
+        {{ value }}
+      </p>
+      <div v-if="change != null && change !== ''" class="flex min-w-0 items-center gap-1">
+        <UIcon
+          :name="changePositive ? 'i-lucide-trending-up' : 'i-lucide-trending-down'"
+          class="size-3 shrink-0"
+          :class="changePositive ? 'text-success' : 'text-warning'"
+        />
+        <span
+          class="truncate text-xs font-medium tabular-nums"
+          :class="changePositive ? 'text-success' : 'text-warning'"
+          :title="change"
+        >
+          {{ change }}
+        </span>
+      </div>
     </div>
-  </div>
+  </UCard>
 </template>

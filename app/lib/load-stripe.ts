@@ -1,4 +1,6 @@
-// ANCHOR: Lazy Stripe.js loader
+// NOTE - ANCHOR: Lazy Stripe.js loader
+import type { StripeInstance } from '~/types/stripe'
+
 let stripeLoader: Promise<StripeInstance | null> | null = null
 
 function injectStripeScript(): Promise<void> {

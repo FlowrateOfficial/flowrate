@@ -23,9 +23,9 @@ export default defineEventHandler(async (event) => {
     role: invitation.role,
     email: invitation.email,
     phone: maskedPhone,
-    displayName: invitation.displayName,
-    requiresPhoneVerification: Boolean(invitation.phone && !invitation.phoneVerifiedAt),
+    name: invitation.name,
+    requiresPhoneVerification: Boolean(invitation.phone && !invitation.phoneVerified),
     requiresRegistration: Boolean(invitation.phone && !invitation.email),
-    phoneVerified: Boolean(invitation.phoneVerifiedAt)
+    phoneVerified: Boolean(invitation.phoneVerified)
   }
 })

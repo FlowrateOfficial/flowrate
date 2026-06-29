@@ -3,19 +3,24 @@ import {
   inviteCompanyMember,
   inviteFamilyMember
 } from '../../../../lib/services/members.service'
+import {
+  assertCompanyMemberCapacity,
+  assertCompanyTeamInvite,
+  userPlanForId
+} from '../../../../lib/billing/enforcement'
 
 const familyInviteSchema = z.object({
   email: z.string().email(),
   role: z.enum(['CO_GUARDIAN', 'TEEN', 'CHILD', 'FINANCE_ADMIN', 'MANAGER', 'MEMBER', 'GUEST']),
-  displayName: z.string().min(1).optional(),
-  dateOfBirth: z.string().datetime().optional()
+  name: z.string().min(1).optional(),
+  birthday: z.string().datetime().optional()
 })
 
 const companyInviteSchema = z.object({
   phone: z.string().min(8).max(20),
   email: z.string().email().optional(),
   role: z.enum(['FINANCE_ADMIN', 'GUEST']),
-  displayName: z.string().min(1).optional()
+  name: z.string().min(1).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -40,6 +45,9 @@ export default defineEventHandler(async (event) => {
     const appUrl = config.public.appUrl as string
 
     if (space.type === 'COMPANY') {
+      const plan = await userPlanForId(user.id)
+      await assertCompanyTeamInvite(user.id, plan)
+      await assertCompanyMemberCapacity(spaceId, plan)
       const body = await readValidatedBody(event, companyInviteSchema.parse)
       return inviteCompanyMember(user.id, spaceId, space.name, space.type, body, appUrl)
     }
@@ -60,7 +68,7 @@ export default defineEventHandler(async (event) => {
     return inviteFamilyMember(user.id, spaceId, space.type, {
       email: body.email,
       role: 'CO_GUARDIAN',
-      displayName: body.displayName
+      name: body.name
     }, appUrl)
   }
 

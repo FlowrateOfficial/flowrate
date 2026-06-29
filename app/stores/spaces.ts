@@ -1,5 +1,7 @@
 import type { ActiveSpace, FinancialSpaceSummary } from '~/types/space'
 import { isTeenOrChild } from '~/types/space'
+import { planHasFeature } from '#shared/plan-limits'
+import { activePlan } from '~/state/plan'
 import { createSpaceSchema } from '~/utils/schemas'
 import { resolveErrorMessage } from '~/utils/errors'
 import { apiRoutes } from '~/lib/api/endpoints'
@@ -7,9 +9,9 @@ import { useApi } from '~/lib/api/useApi'
 
 export const useSpacesStore = defineStore('spaces', () => {
   const { t, spaceType } = useAppI18n()
-  const toast = useToast()
+  const appToast = useAppToast()
 
-  const activeSpace = ref<ActiveSpace | null>(null)
+  const space = ref<ActiveSpace | null>(null)
   const spaces = ref<FinancialSpaceSummary[]>([])
   const loading = ref(false)
   const creating = ref(false)
@@ -23,35 +25,41 @@ export const useSpacesStore = defineStore('spaces', () => {
   const minorSpace = computed(() => spaces.value.find(s => isTeenOrChild(s.role)) ?? null)
   const isTeenView = computed(() => minorSpace.value?.role === 'TEEN')
   const isChildManaged = computed(() => minorSpace.value?.role === 'CHILD')
-  const isCompany = computed(() => activeSpace.value?.type === 'COMPANY')
+  const isCompany = computed(() => space.value?.type === 'COMPANY')
   const isBusinessReadOnly = computed(() =>
-    activeSpace.value?.type === 'COMPANY' && activeSpace.value?.role === 'GUEST'
+    space.value?.type === 'COMPANY' && space.value?.role === 'GUEST'
   )
   const canManageBusiness = computed(() =>
-    activeSpace.value?.type === 'COMPANY'
-    && ['OWNER', 'FINANCE_ADMIN'].includes(activeSpace.value?.role ?? '')
+    space.value?.type === 'COMPANY'
+    && ['OWNER', 'FINANCE_ADMIN'].includes(space.value?.role ?? '')
   )
   const isSharedSpace = computed(() =>
-    activeSpace.value?.type === 'HOUSEHOLD'
-    || activeSpace.value?.type === 'FAMILY'
-    || activeSpace.value?.type === 'COMPANY'
+    space.value?.type === 'HOUSEHOLD'
+    || space.value?.type === 'FAMILY'
+    || space.value?.type === 'COMPANY'
   )
 
-  const spaceTypes = computed(() => [
-    { value: 'HOUSEHOLD' as const, label: t('dashboard.spaces.types.household.label'), icon: 'i-lucide-heart-handshake', description: t('dashboard.spaces.types.household.description') },
-    { value: 'FAMILY' as const, label: t('dashboard.spaces.types.family.label'), icon: 'i-lucide-users', description: t('dashboard.spaces.types.family.description') },
-    { value: 'COMPANY' as const, label: t('dashboard.spaces.types.company.label'), icon: 'i-lucide-building-2', description: t('dashboard.spaces.types.company.description') }
-  ])
+  const spaceTypes = computed(() => {
+    if (!planHasFeature(activePlan.value, 'sharedSpaces')) return []
+
+    return [
+      { value: 'HOUSEHOLD' as const, label: t('dashboard.spaces.types.household.label'), icon: 'i-lucide-heart-handshake', description: t('dashboard.spaces.types.household.description') },
+      { value: 'FAMILY' as const, label: t('dashboard.spaces.types.family.label'), icon: 'i-lucide-users', description: t('dashboard.spaces.types.family.description') },
+      { value: 'COMPANY' as const, label: t('dashboard.spaces.types.company.label'), icon: 'i-lucide-building-2', description: t('dashboard.spaces.types.company.description') }
+    ]
+  })
+
+  const canCreateSharedSpace = computed(() => planHasFeature(activePlan.value, 'sharedSpaces'))
 
   function clearSession() {
-    activeSpace.value = null
+    space.value = null
     spaces.value = []
   }
 
   async function fetchSpaces() {
     loading.value = true
     try {
-      const result = await api<{ activeSpaceId: string | null, spaces: FinancialSpaceSummary[] }>(
+      const result = await api<{ spaceId: string | null, spaces: FinancialSpaceSummary[] }>(
         apiRoutes.spaces.list,
         { noSpace: true }
       )
@@ -60,15 +68,15 @@ export const useSpacesStore = defineStore('spaces', () => {
 
       const minor = list.find(s => isTeenOrChild(s.role))
       const current = minor
-        ?? list.find(s => s.id === result.activeSpaceId)
+        ?? list.find(s => s.id === result.spaceId)
         ?? list.find(s => s.type === 'INDEPENDENT')
         ?? list[0]
 
       if (current) {
-        activeSpace.value = current
+        space.value = current
       }
 
-      if (minor && minor.id !== result.activeSpaceId) {
+      if (minor && minor.id !== result.spaceId) {
         await api<ActiveSpace>(apiRoutes.spaces.active, {
           method: 'POST',
           body: { spaceId: minor.id },
@@ -82,10 +90,7 @@ export const useSpacesStore = defineStore('spaces', () => {
 
   async function switchSpace(spaceId: string) {
     if (isMinor.value && spaceId !== minorSpace.value?.id) {
-      toast.add({
-        title: t('dashboard.spaces.minorCannotSwitch'),
-        color: 'warning'
-      })
+      appToast.warning(t('dashboard.spaces.minorCannotSwitch'))
       return
     }
 
@@ -94,7 +99,7 @@ export const useSpacesStore = defineStore('spaces', () => {
       body: { spaceId },
       noSpace: true
     })
-    activeSpace.value = result
+    space.value = result
     const idx = spaces.value.findIndex(s => s.id === spaceId)
     if (idx >= 0) spaces.value[idx] = { ...spaces.value[idx], ...result }
     await refreshNuxtData()
@@ -113,18 +118,13 @@ export const useSpacesStore = defineStore('spaces', () => {
       await switchSpace(space.id)
       showCreate.value = false
       createForm.name = ''
-      toast.add({
-        title: t('dashboard.spaces.created'),
-        description: t('dashboard.spaces.createdDescription', { name: space.name }),
-        color: 'success'
-      })
+      appToast.success(
+        t('dashboard.spaces.created'),
+        t('dashboard.spaces.createdDescription', { name: space.name })
+      )
       return true
     } catch (e) {
-      toast.add({
-        title: t('dashboard.spaces.createFailed'),
-        description: resolveErrorMessage(e, t, 'dashboard.spaces.tryAgain'),
-        color: 'error'
-      })
+      appToast.errorFrom(e, 'dashboard.spaces.tryAgain', t('dashboard.spaces.createFailed'))
       return false
     } finally {
       creating.value = false
@@ -138,15 +138,15 @@ export const useSpacesStore = defineStore('spaces', () => {
   }
 
   function spaceQuery() {
-    return activeSpace.value ? { spaceId: activeSpace.value.id } : {}
+    return space.value ? { spaceId: space.value.id } : {}
   }
 
   function spaceHeaders(): Record<string, string> {
-    return activeSpace.value ? { 'x-flowrate-space': activeSpace.value.id } : {}
+    return space.value ? { 'x-flowrate-space': space.value.id } : {}
   }
 
   return {
-    activeSpace,
+    space,
     spaces,
     loading,
     creating,
@@ -162,6 +162,7 @@ export const useSpacesStore = defineStore('spaces', () => {
     canManageBusiness,
     isSharedSpace,
     spaceTypes,
+    canCreateSharedSpace,
     fetchSpaces,
     switchSpace,
     createSpace,

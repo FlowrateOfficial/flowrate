@@ -9,8 +9,7 @@ const {
   howItWorks,
   audiences,
   features,
-  pricingPlans,
-  testimonials
+  pricingPlans
 } = storeToRefs(landing)
 const { t } = useAppI18n()
 
@@ -23,13 +22,14 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
+  <div class="overflow-x-clip">
     <LandingHero />
+    <LandingProductDemo />
     <LandingHowItWorks :items="howItWorks" />
     <LandingSpaces :items="audiences" />
     <LandingFeatures :items="features" />
+    <LandingProofStrip />
     <LandingPricing :plans="pricingPlans" />
-    <LandingTestimonials :items="testimonials" />
     <LandingCta />
   </div>
 </template>

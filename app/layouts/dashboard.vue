@@ -6,119 +6,133 @@ const { show: showBreadcrumbs } = useBreadcrumbs()
 
 const spacesStore = useSpacesStore()
 const userStore = useUserStore()
-const { user, plan, navItems, bottomItems } = storeToRefs(userStore)
-const { isMinor, activeSpace } = storeToRefs(spacesStore)
+const { user, plan, isAdmin } = storeToRefs(userStore)
+const { isMinor, space } = storeToRefs(spacesStore)
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden surface-page">
-    <aside class="hidden lg:flex flex-col w-[17rem] shrink-0 border-r border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-warm/60 dark:bg-flow-warm-dark/40">
-      <div class="px-8 py-10 border-b border-flow-border/30 dark:border-flow-border-dark/30">
-        <NuxtLink to="/dashboard" class="inline-flex">
-          <BrandFlowRateLogo :mark-size="30" />
+  <div class="flex h-[100dvh] overflow-hidden bg-default text-default">
+    <aside
+      class="dashboard-sidebar hidden w-72 shrink-0 flex-col border-r border-default bg-elevated/30 lg:flex"
+      aria-label="Sidebar"
+    >
+      <div class="flex h-[4.5rem] shrink-0 items-center gap-2 border-b border-default px-6">
+        <NuxtLink to="/dashboard" class="inline-flex items-center gap-2">
+          <BrandFlowRateLogo :mark-size="32" />
+          <AppBetaBadge size="sm" />
         </NuxtLink>
       </div>
 
-      <div v-if="!isMinor" class="px-5 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30">
+      <div v-if="!isMinor" class="border-b border-default px-4 py-4">
+        <p class="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-muted">
+          {{ t('dashboard.layout.currentSpace') }}
+        </p>
         <DashboardSpaceSwitcher />
       </div>
-      <div v-else-if="activeSpace" class="px-5 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30">
-        <div class="px-4 py-3 rounded-flow bg-flow-secondary/60 dark:bg-flow-secondary-dark/60">
-          <p class="truncate font-medium text-flow-ink dark:text-flow-ink-dark text-sm">{{ activeSpace.name }}</p>
-          <p class="text-xs text-flow-muted dark:text-flow-muted-dark truncate mt-0.5">
-            {{ spacesStore.spaceType(activeSpace.type) }}
+      <div v-else-if="space" class="border-b border-default px-4 py-4">
+        <UCard :ui="{ body: 'p-4' }">
+          <p class="truncate text-base font-semibold">{{ space.name }}</p>
+          <p class="mt-1 truncate text-sm text-muted">
+            {{ spacesStore.spaceType(space.type) }}
           </p>
-        </div>
+        </UCard>
       </div>
 
-      <nav class="flex-1 px-3 py-8 space-y-1 overflow-y-auto">
-        <NuxtLink
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center gap-3 px-4 py-3.5 rounded-flow text-[15px] transition-all duration-300"
-          :class="userStore.isActive(item.to)
-            ? 'bg-flow-secondary/80 dark:bg-flow-secondary-dark text-flow-ink dark:text-flow-ink-dark'
-            : 'text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark hover:bg-flow-secondary/40 dark:hover:bg-flow-secondary-dark/40'"
-        >
-          <UIcon :name="item.icon" class="w-4 h-4 shrink-0 stroke-[1.25]" />
-          {{ item.label }}
-        </NuxtLink>
-      </nav>
+      <DashboardSidebarNav />
 
-      <div class="px-4 pb-6 space-y-0.5 border-t border-flow-border/40 dark:border-flow-border-dark/40 pt-6">
-        <NuxtLink
-          v-for="item in bottomItems"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center gap-3 px-4 py-3 rounded-flow text-sm transition-all duration-300"
-          :class="userStore.isActive(item.to)
-            ? 'bg-flow-secondary dark:bg-flow-secondary-dark text-flow-ink dark:text-flow-ink-dark'
-            : 'text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark'"
-        >
-          <UIcon :name="item.icon" class="w-4 h-4 shrink-0 stroke-[1.25]" />
-          {{ item.label }}
-        </NuxtLink>
-
+      <div class="mt-auto border-t border-default px-4 py-4">
         <UDropdownMenu :items="userStore.userMenuItems">
-          <button class="w-full flex items-center gap-3 px-4 py-3 rounded-flow text-sm hover:bg-flow-secondary/50 dark:hover:bg-flow-secondary-dark/50 transition-all duration-300 mt-2">
-            <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="xs" />
-            <div class="flex-1 min-w-0 text-left">
-              <p class="font-medium text-flow-ink dark:text-flow-ink-dark truncate">{{ user?.name ?? t('common.account') }}</p>
-              <p class="text-xs text-flow-muted dark:text-flow-muted-dark truncate">{{ user?.email }}</p>
-            </div>
-            <UIcon name="i-lucide-chevrons-up-down" class="w-3.5 h-3.5 text-flow-muted shrink-0 stroke-[1.25]" />
-          </button>
+          <UButton
+            color="neutral"
+            variant="ghost"
+            block
+            class="min-h-12 justify-start gap-3 px-3"
+          >
+            <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="sm" />
+            <span class="min-w-0 flex-1 text-left">
+              <span class="block truncate text-sm font-semibold">{{ user?.name ?? t('common.account') }}</span>
+              <span class="block truncate text-xs text-muted">{{ user?.email }}</span>
+            </span>
+            <UIcon name="i-lucide-chevrons-up-down" class="size-4 shrink-0 text-muted" />
+          </UButton>
         </UDropdownMenu>
       </div>
     </aside>
 
-    <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
-      <header class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-flow-border/60 dark:border-flow-border-dark/60">
+    <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <header class="flex items-center justify-between gap-3 border-b border-default px-4 py-2.5 lg:hidden">
         <NuxtLink to="/dashboard" class="inline-flex">
-          <BrandFlowRateLogo :mark-size="26" class="[&_span]:text-lg" />
+          <BrandFlowRateLogo :mark-size="28" class="[&_span]:text-lg" />
         </NuxtLink>
         <div class="flex items-center gap-1">
+          <UButton
+            v-if="isAdmin"
+            to="/dashboard/admin/usage"
+            color="neutral"
+            variant="ghost"
+            size="md"
+            icon="i-lucide-shield-check"
+            :aria-label="t('nav.admin')"
+          />
           <LanguageSwitcher />
-          <UColorModeButton size="sm" color="neutral" variant="ghost" />
+          <UColorModeButton color="neutral" variant="ghost" size="md" />
         </div>
       </header>
 
       <div
         v-if="showBreadcrumbs"
-        class="lg:hidden px-5 py-3 border-b border-flow-border/40 dark:border-flow-border-dark/40 bg-flow-bg/50 dark:bg-flow-bg-dark/50"
+        class="border-b border-default bg-elevated/40 px-4 py-2 lg:hidden"
       >
         <AppBreadcrumbs />
       </div>
 
-      <header class="hidden lg:flex items-center justify-between px-10 lg:px-14 py-6 border-b border-flow-border/30 dark:border-flow-border-dark/30 gap-6">
+      <header class="dashboard-header-bar hidden h-[4.5rem] shrink-0 items-center justify-between gap-4 border-b border-default px-6 lg:flex lg:px-8">
         <AppBreadcrumbs v-if="showBreadcrumbs" class="min-w-0 flex-1" />
-        <p v-else class="text-sm text-flow-muted dark:text-flow-muted-dark font-display tracking-wide">
+        <p v-else class="text-sm text-muted">
           {{ t('nav.overview') }}
         </p>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <UButton
+            v-if="isAdmin"
+            to="/dashboard/admin/usage"
+            color="neutral"
+            variant="ghost"
+            size="md"
+            icon="i-lucide-shield-check"
+            :aria-label="t('nav.admin')"
+          />
           <LanguageSwitcher />
-          <UColorModeButton size="sm" color="neutral" variant="ghost" />
-          <UBadge
-            v-if="!isMinor && plan === 'FREE'"
-            :label="t('common.freePlan')"
-            color="neutral"
-            variant="subtle"
-            size="sm"
-            class="font-normal"
-          />
-          <UBadge
-            v-else-if="!isMinor && plan === 'PRO'"
-            :label="t('common.pro')"
-            color="neutral"
-            variant="outline"
-            size="sm"
-            class="font-normal"
-          />
+          <UColorModeButton color="neutral" variant="ghost" size="md" />
+          <ClientOnly>
+            <UBadge
+              v-if="!isMinor && plan === 'FREE'"
+              :label="t('common.freePlan')"
+              color="neutral"
+              variant="subtle"
+              size="md"
+            />
+            <UBadge
+              v-else-if="!isMinor && plan === 'PRO'"
+              :label="t('common.pro')"
+              color="primary"
+              variant="subtle"
+              size="md"
+            />
+            <UBadge
+              v-else-if="!isMinor && plan === 'ENTERPRISE'"
+              :label="t('dashboard.settings.plans.ENTERPRISE')"
+              color="success"
+              variant="subtle"
+              size="md"
+            />
+            <template #fallback>
+              <span class="inline-block h-6 w-14 rounded-md bg-elevated/50" aria-hidden="true" />
+            </template>
+          </ClientOnly>
         </div>
       </header>
 
-      <main class="flex-1 overflow-y-auto bg-flow-bg dark:bg-flow-bg-dark pb-20 lg:pb-0">
+      <main class="flex-1 overflow-y-auto pb-20 lg:pb-0">
         <slot />
       </main>
     </div>

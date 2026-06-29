@@ -6,14 +6,14 @@ export default defineEventHandler(async (event) => {
 
   const profile = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { phone: true, phoneVerifiedAt: true }
+    select: { phone: true, phoneVerified: true }
   })
 
   if (!profile?.phone) {
     throw createError({ statusCode: 400, message: 'No phone number on file' })
   }
 
-  if (profile.phoneVerifiedAt) {
+  if (profile.phoneVerified) {
     return { sent: false, phoneVerified: true }
   }
 

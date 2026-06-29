@@ -1,4 +1,7 @@
 import type { H3Event } from 'h3'
+import { normalizePlaidEnv } from '#shared/plaid-config'
+
+const PLAID_LINK_SCRIPT = 'https://cdn.plaid.com/link/v2/stable/link-initialize.js'
 
 function isLocalhostOrigin(origin: string): boolean {
   try {
@@ -41,6 +44,21 @@ export function collectAppOrigins(event: H3Event): string[] {
   return [...origins]
 }
 
+function plaidConnectSrc(event: H3Event): string[] {
+  const config = useRuntimeConfig(event)
+  if (!config.plaidClientId || !config.plaidSecret) return []
+
+  const env = normalizePlaidEnv(config.plaidEnv)
+  const apiHost = env === 'production'
+    ? 'https://production.plaid.com'
+    : 'https://sandbox.plaid.com'
+
+  return [
+    'https://cdn.plaid.com',
+    apiHost
+  ]
+}
+
 export function buildContentSecurityPolicy(event: H3Event): string {
   const origins = collectAppOrigins(event)
   const connectSrc = [
@@ -51,7 +69,8 @@ export function buildContentSecurityPolicy(event: H3Event): string {
     'https://accounts.google.com',
     'https://oauth2.googleapis.com',
     'https://github.com',
-    'https://api.github.com'
+    'https://api.github.com',
+    ...plaidConnectSrc(event)
   ]
 
   const neonAuthUrl = useRuntimeConfig(event).public.neonAuthUrl as string
@@ -63,17 +82,21 @@ export function buildContentSecurityPolicy(event: H3Event): string {
     }
   }
 
+  const plaidEnabled = plaidConnectSrc(event).length > 0
+
   return [
-    `default-src 'self'`,
+    `default-src 'self'${plaidEnabled ? ' https://cdn.plaid.com' : ''}`,
     `base-uri 'self'`,
     `form-action 'self'`,
     `frame-ancestors 'none'`,
     `object-src 'none'`,
-    `script-src 'self' 'unsafe-inline' https://js.stripe.com`,
+    `script-src 'self' 'unsafe-inline' https://js.stripe.com${plaidEnabled ? ` ${PLAID_LINK_SCRIPT}` : ''}`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `style-src-attr 'unsafe-inline'`,
     `font-src 'self' https://fonts.gstatic.com data:`,
     `img-src 'self' data: blob: https:`,
     `connect-src ${connectSrc.join(' ')}`,
-    `frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://accounts.google.com`
+    `frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://accounts.google.com${plaidEnabled ? ' https://cdn.plaid.com' : ''}`
   ].join('; ')
 }

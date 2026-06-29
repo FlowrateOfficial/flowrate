@@ -7,6 +7,7 @@ import {
   topMerchantsFromTransactions,
   type AnalyticsRange
 } from '../../utils/analytics'
+import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
 
 const querySchema = z.object({
   range: z.enum(['7d', '30d', '90d', '12m']).default('30d')
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   const accounts = await prisma.account.findMany({
     where: { spaceId: space.id, ...accountFilter },
-    select: { id: true, balance: true, createdAt: true }
+    select: { id: true, balance: true, createdAt: true, currency: true }
   })
 
   const accountIds = accounts.map(a => a.id)
@@ -60,6 +61,8 @@ export default defineEventHandler(async (event) => {
     createdAt: a.createdAt
   }))
 
+  const currency = await resolveSpaceDisplayCurrency(space.id, localeFromRequest(event))
+
   return {
     range,
     summary: {
@@ -69,7 +72,8 @@ export default defineEventHandler(async (event) => {
       net: Math.round((income - spending) * 100) / 100,
       savingsRate: income > 0 ? Math.round(((income - spending) / income) * 1000) / 10 : 0,
       transactionCount: txs.length,
-      linkedAccountCount: accounts.length
+      linkedAccountCount: accounts.length,
+      currency
     },
     cashFlow: buildCashFlowSeries(normalized, from, to, bucket),
     categories: spendingByCategory(normalized),

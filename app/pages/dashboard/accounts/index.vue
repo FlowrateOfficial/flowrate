@@ -11,14 +11,12 @@ const {
   pending,
   visibilityFilter,
   connectVisibility,
-  isConnecting,
-  connectError,
   visibilityItems,
   connectVisibilityItems,
   summaryItems,
   teenSummaryItems,
   stripeTestMode,
-  connectItems,
+  plaidSandboxMode,
   isSharedSpace,
   isSyncing,
   isTeenView
@@ -37,10 +35,10 @@ const accountsDescription = computed(() => {
   }
   return connected
     ? t('dashboard.accounts.subtitleConnected')
-    : t('dashboard.accounts.subtitle')
+    : t('dashboard.accounts.subtitleSimple')
 })
 
-const spaceId = computed(() => spacesStore.activeSpace?.id)
+const spaceId = computed(() => spacesStore.space?.id)
 await useAsyncData(
   () => `accounts-${spaceId.value}`,
   async () => {
@@ -54,7 +52,7 @@ useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appN
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-7xl mx-auto">
+  <DashboardPageShell>
     <DashboardPageHeader
       :title="t('dashboard.accounts.title')"
       :description="accountsDescription"
@@ -66,26 +64,22 @@ useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appN
           icon="i-lucide-refresh-cw"
           color="neutral"
           variant="outline"
+          class="w-full sm:w-auto"
           :loading="isSyncing"
           @click="accountsStore.syncTransactions()"
         />
-        <UDropdownMenu v-if="isSharedSpace && !isTeenView" :items="connectItems">
-          <UButton
-            :label="t('dashboard.accounts.connectBank')"
-            icon="i-lucide-plus"
-            :loading="isConnecting"
-            trailing-icon="i-lucide-chevron-down"
-          />
-        </UDropdownMenu>
-        <UButton
-          v-else
-          :label="t('dashboard.accounts.connectBank')"
-          icon="i-lucide-plus"
-          :loading="isConnecting"
-          @click="accountsStore.connectBank()"
-        />
+        <DashboardConnectBank />
       </template>
     </DashboardPageHeader>
+
+    <UAlert
+      v-if="plaidSandboxMode"
+      :title="t('dashboard.accounts.plaidSandboxTitle')"
+      :description="t('dashboard.accounts.plaidSandboxDescription')"
+      color="info"
+      variant="subtle"
+      icon="i-lucide-flask-conical"
+    />
 
     <UAlert
       v-if="stripeTestMode"
@@ -96,116 +90,83 @@ useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appN
       icon="i-lucide-flask-conical"
     />
 
-    <UAlert
-      :title="t('dashboard.accounts.stripeNote')"
-      :description="t('dashboard.accounts.bankRegionNote')"
-      color="neutral"
-      variant="subtle"
-      icon="i-lucide-landmark"
-    />
-
-    <UAlert
-      v-if="connectError"
-      :description="connectError"
-      color="error"
-      variant="subtle"
-      icon="i-lucide-alert-circle"
-    />
-
     <DashboardSummaryStrip :items="displaySummary" :loading="pending" />
 
-    <UCard v-if="(isSharedSpace && !isTeenView) || accounts.length" :ui="{ body: 'p-4 sm:p-5' }">
-      <div class="flex flex-col lg:flex-row lg:items-end gap-4">
-        <UFormField v-if="isSharedSpace && !isTeenView" :label="t('dashboard.accounts.filterLabel')" class="flex-1 min-w-48">
-          <USelect
-            v-model="visibilityFilter"
-            :items="visibilityItems"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField v-if="isSharedSpace && !isTeenView" :label="t('dashboard.accounts.connectOptions')" class="flex-1 min-w-48">
-          <USelect
-            v-model="connectVisibility"
-            :items="connectVisibilityItems"
-            class="w-full"
-          />
-        </UFormField>
-        <div class="flex flex-wrap gap-2 lg:ml-auto">
-          <UButton
-            :label="t('dashboard.accounts.viewTransactions')"
-            icon="i-lucide-arrow-left-right"
-            color="neutral"
-            variant="ghost"
-            to="/dashboard/transactions"
-          />
-          <UButton
-            :label="t('dashboard.overview.viewAnalytics')"
-            icon="i-lucide-bar-chart-3"
-            color="neutral"
-            variant="ghost"
-            to="/dashboard/analytics"
-          />
+    <UCard v-if="!pending && !accounts.length" :ui="{ body: 'p-6 sm:p-8' }">
+      <div class="mx-auto max-w-md space-y-4 text-center">
+        <div class="mx-auto flex size-12 items-center justify-center rounded-xl bg-elevated">
+          <UIcon name="i-lucide-landmark" class="size-6 text-muted" />
         </div>
+        <div class="space-y-1">
+          <h2 class="text-lg font-semibold">
+            {{ t('dashboard.accounts.emptyTitle') }}
+          </h2>
+          <p class="text-sm text-muted">
+            {{ isTeenView ? t('dashboard.accounts.teenEmptyDescription') : t('dashboard.accounts.emptyDescriptionSimple') }}
+          </p>
+        </div>
+        <DashboardConnectBank
+          :label="t('dashboard.accounts.connectFirst')"
+          show-refresh
+        />
       </div>
     </UCard>
 
-    <div v-if="!pending && !accounts.length">
-      <UCard class="text-center py-16">
-        <UIcon name="i-lucide-landmark" class="w-12 h-12 mx-auto mb-4 text-muted opacity-40" />
-        <h3 class="font-display text-xl mb-2">{{ t('dashboard.accounts.emptyTitle') }}</h3>
-        <p class="text-sm text-muted max-w-md mx-auto mb-6">
-          {{ isTeenView ? t('dashboard.accounts.teenEmptyDescription') : t('dashboard.accounts.emptyDescription') }}
-        </p>
-        <UButton
-          :label="t('dashboard.accounts.connectFirst')"
-          icon="i-lucide-plus"
-          :loading="isConnecting"
-          @click="accountsStore.connectBank()"
-        />
-        <UButton
-          class="mt-3"
-          :label="t('dashboard.accounts.resyncFromStripe')"
-          icon="i-lucide-refresh-cw"
-          color="neutral"
-          variant="outline"
-          :loading="isConnecting"
-          @click="accountsStore.resyncFromStripe()"
-        />
-      </UCard>
-    </div>
-
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-      <UCard v-if="pending" v-for="i in 3" :key="`skeleton-${i}`" class="animate-pulse">
-        <div class="space-y-3 p-1">
-          <div class="h-4 bg-muted/50 rounded w-3/4" />
-          <div class="h-8 bg-muted/30 rounded w-1/2" />
+    <template v-else>
+      <UCard v-if="(isSharedSpace && !isTeenView) || accounts.length" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <UFormField v-if="isSharedSpace && !isTeenView" :label="t('dashboard.accounts.filterLabel')">
+              <USelect
+                v-model="visibilityFilter"
+                :items="visibilityItems"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField v-if="isSharedSpace && !isTeenView" :label="t('dashboard.accounts.connectOptions')">
+              <USelect
+                v-model="connectVisibility"
+                :items="connectVisibilityItems"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <UButton
+              :label="t('dashboard.accounts.viewTransactions')"
+              icon="i-lucide-arrow-left-right"
+              color="neutral"
+              variant="soft"
+              class="flex-1"
+              to="/dashboard/transactions"
+            />
+            <UButton
+              :label="t('dashboard.overview.viewAnalytics')"
+              icon="i-lucide-bar-chart-3"
+              color="neutral"
+              variant="soft"
+              class="flex-1"
+              to="/dashboard/analytics"
+            />
+          </div>
         </div>
       </UCard>
 
-      <DashboardAccountCard
-        v-if="!pending"
-        v-for="account in accounts"
-        :key="account.id"
-        :account="account"
-      />
-    </div>
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <UCard v-if="pending" v-for="i in 3" :key="`skeleton-${i}`" :ui="{ body: 'p-6' }">
+          <div class="animate-pulse space-y-4">
+            <div class="h-5 w-3/4 rounded bg-elevated" />
+            <div class="h-10 w-1/2 rounded bg-elevated/70" />
+          </div>
+        </UCard>
 
-    <UAlert
-      v-if="!isSharedSpace && !spacesStore.isMinor"
-      :title="t('dashboard.accounts.sharedSpaceHintTitle')"
-      :description="t('dashboard.accounts.sharedSpaceHintDescription')"
-      color="neutral"
-      variant="subtle"
-      icon="i-lucide-users"
-    />
-
-    <UAlert
-      v-if="!spacesStore.isMinor"
-      icon="i-lucide-info"
-      :title="t('dashboard.accounts.mixedAccountsTitle')"
-      :description="t('dashboard.accounts.mixedAccountsDescription')"
-      color="neutral"
-      variant="subtle"
-    />
-  </div>
+        <DashboardAccountCard
+          v-if="!pending"
+          v-for="account in accounts"
+          :key="account.id"
+          :account="account"
+        />
+      </div>
+    </template>
+  </DashboardPageShell>
 </template>

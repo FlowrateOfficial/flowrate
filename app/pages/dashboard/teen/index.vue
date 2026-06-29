@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { formatCurrencyForLocale } from '~/utils/format'
 
 definePageMeta({ layout: 'dashboard', title: 'My Money', middleware: 'auth' })
 
-const { t, getLocale } = useAppI18n()
+const { t, formatCurrency } = useAppI18n()
 const teenStore = useTeenStore()
 const { dashboard: teen, pending } = storeToRefs(teenStore)
 
@@ -13,12 +12,12 @@ useSeoMeta({ title: () => `${t('nav.myMoney')} — ${t('common.appName')}` })
 await useAsyncData('teen-dashboard', () => teenStore.fetchDashboard())
 
 function fmt(n: number) {
-  return formatCurrencyForLocale(n, getLocale(), 'USD')
+  return formatCurrency(n)
 }
 
 const greeting = computed(() =>
-  teen.value?.displayName
-    ? t('dashboard.teen.greeting', { name: teen.value.displayName })
+  teen.value?.name
+    ? t('dashboard.teen.greeting', { name: teen.value.name })
     : t('dashboard.teen.greetingDefault')
 )
 
@@ -31,56 +30,60 @@ function frequencyLabel(freq?: string | null) {
 </script>
 
 <template>
-  <div class="p-6 max-w-2xl mx-auto space-y-6">
-    <div class="text-center space-y-4">
-      <div>
-        <h1 class="text-2xl font-bold">{{ greeting }}</h1>
-        <p class="text-sm text-muted mt-1">{{ t('dashboard.teen.subtitle') }}</p>
-      </div>
-      <div class="flex flex-wrap justify-center gap-2">
+  <DashboardPageShell max-width="lg">
+    <DashboardPageHeader
+      :title="greeting"
+      :description="t('dashboard.teen.subtitle')"
+      :eyebrow="t('nav.myMoney')"
+    >
+      <template #actions>
         <UButton
           :label="t('dashboard.teen.connectBank')"
           icon="i-lucide-landmark"
-          size="sm"
+          class="w-full sm:w-auto"
           to="/dashboard/accounts"
         />
         <UButton
           :label="t('nav.analytics')"
           icon="i-lucide-bar-chart-3"
-          size="sm"
           color="neutral"
           variant="outline"
+          class="w-full sm:w-auto"
           to="/dashboard/analytics"
         />
-      </div>
-    </div>
+      </template>
+    </DashboardPageHeader>
 
-    <UCard class="text-center py-8">
-      <p class="text-sm text-muted mb-1">{{ t('dashboard.teen.totalSaved') }}</p>
-      <p class="text-4xl font-bold text-primary">{{ fmt(teen?.totalSaved ?? 0) }}</p>
-      <p v-if="teen?.allowanceAmount" class="text-sm text-muted mt-2">
+    <UCard :ui="{ body: 'p-4 sm:p-6 text-center' }">
+      <p class="text-sm font-medium text-muted">{{ t('dashboard.teen.totalSaved') }}</p>
+      <p class="mt-1 text-3xl font-bold tabular-nums text-primary sm:text-4xl">
+        {{ fmt(teen?.totalSaved ?? 0) }}
+      </p>
+      <p v-if="teen?.allowance" class="mt-2 text-sm text-muted">
         {{ t('dashboard.teen.allowance', {
-          amount: fmt(teen.allowanceAmount),
-          frequency: frequencyLabel(teen.allowanceFrequency)
+          amount: fmt(teen.allowance),
+          frequency: frequencyLabel(teen.frequency)
         }) }}
       </p>
     </UCard>
 
-    <div class="space-y-3">
-      <h2 class="font-semibold">{{ t('dashboard.teen.jarsTitle') }}</h2>
-      <UCard v-for="jar in teen?.jars" :key="jar.id">
-        <div class="flex justify-between items-center mb-2">
-          <p class="font-medium">{{ jar.name }}</p>
-          <p class="font-semibold">{{ fmt(jar.balance) }}</p>
-        </div>
-        <UProgress v-if="jar.targetAmount" :model-value="jar.progress ?? 0" />
-        <p v-if="jar.targetAmount" class="text-xs text-muted mt-1">
-          {{ t('dashboard.family.child.goal', { amount: fmt(jar.targetAmount) }) }}
-        </p>
-      </UCard>
-      <p v-if="!teen?.jars?.length && !pending" class="text-sm text-muted text-center py-4">
-        {{ t('dashboard.teen.noJars') }}
-      </p>
+    <div>
+      <h2 class="mb-3 text-base font-semibold sm:text-lg">{{ t('dashboard.teen.jarsTitle') }}</h2>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <UCard v-for="jar in teen?.jars" :key="jar.id" :ui="{ body: 'p-4' }">
+          <div class="mb-2 flex items-center justify-between gap-3">
+            <p class="font-semibold">{{ jar.name }}</p>
+            <p class="text-lg font-bold tabular-nums">{{ fmt(jar.balance) }}</p>
+          </div>
+          <UProgress v-if="jar.target" :model-value="jar.progress ?? 0" size="sm" />
+          <p v-if="jar.target" class="mt-1.5 text-xs text-muted">
+            {{ t('dashboard.family.child.goal', { amount: fmt(jar.target) }) }}
+          </p>
+        </UCard>
+        <UCard v-if="!teen?.jars?.length && !pending" :ui="{ body: 'p-6 text-center' }" class="sm:col-span-2">
+          <p class="text-sm text-muted">{{ t('dashboard.teen.noJars') }}</p>
+        </UCard>
+      </div>
     </div>
 
     <UAlert
@@ -90,5 +93,5 @@ function frequencyLabel(freq?: string | null) {
       icon="i-lucide-graduation-cap"
       variant="subtle"
     />
-  </div>
+  </DashboardPageShell>
 </template>

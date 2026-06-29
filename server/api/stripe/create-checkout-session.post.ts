@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: authUser.id },
-    select: { id: true, email: true, name: true, activeSpaceId: true }
+    select: { id: true, email: true, name: true, spaceId: true }
   })
 
   if (!dbUser) {
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     select: { id: true }
   })
 
-  const spaceId = dbUser.activeSpaceId ?? defaultSpace?.id ?? ''
+  const spaceId = dbUser.spaceId ?? defaultSpace?.id ?? ''
   const customerId = await ensureStripeCustomer(stripe, dbUser, {
     userId: authUser.id,
     spaceId,

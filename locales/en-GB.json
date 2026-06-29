@@ -1,0 +1,117 @@
+{
+  "common": {
+    "english": "English",
+    "englishUK": "English (UK)"
+  },
+  "nav": {
+    "cashflow": "Cash flow"
+  },
+  "landing": {
+    "pricing": {
+      "free": {
+        "price": "£0"
+      },
+      "pro": {
+        "price": "£12",
+        "yearlyPrice": "£120"
+      },
+      "enterprise": {
+        "price": "£49",
+        "yearlyPrice": "£490"
+      }
+    }
+  },
+  "dashboard": {
+    "guide": {
+      "child": {
+        "description": "This is your money page. Your parent set it up so you can see savings and pocket money — tap the buttons to get around.",
+        "steps": "Tap My Money to see savings jars|Tap Accounts to link a bank with a parent|Tap Settings if you need help from a grown-up"
+      },
+      "teen": {
+        "description": "Track your allowance, savings jars, and spending. Use the menu at the bottom on your phone, or the menu on the left on a larger screen.",
+        "steps": "Check My Money for jars and allowance|Link a bank from Accounts|See spending in Transactions"
+      },
+      "parent": {
+        "description": "Manage family money in one place. Link banks, invite your partner, and keep an eye on the children — each section below is a main area.",
+        "steps": "Link banks in Accounts|Invite family in Family|Set budgets in Budgets|Switch spaces with the dropdown at the top left"
+      },
+      "business": {
+        "description": "Track cash, burn rate, and subscriptions. Link your business bank first, then review transactions and SaaS spend.",
+        "steps": "Open Business for runway|Link accounts|Review SaaS in Subscriptions"
+      },
+      "general": {
+        "description": "Welcome! Start by linking a bank, then explore transactions and budgets. On your phone, use the bar at the bottom; on desktop, use the menu on the left.",
+        "steps": "Link a bank in Accounts|See activity in Transactions|Track limits in Budgets"
+      }
+    },
+    "overview": {
+      "subtitle": "{name}'s financial snapshot for this month",
+      "yourPersonal": "Your personal accounts",
+      "saasIssues": "issues flagged"
+    },
+    "accounts": {
+      "subtitleSimple": "Link your bank here to see balances and transactions automatically.",
+      "steps": "Tap Link your first bank|Sign in with your bank (UK, EU, or US)|Come back here — balances usually appear within a minute",
+      "bankRegionNote": "Link UK and European banks (via Plaid) or US banks (via Stripe Financial Connections). We never store your bank login — only read-only balances and transactions.",
+      "connectEuropean": "UK / European bank (Plaid)",
+      "connectEuropeanShared": "UK / European bank — shared (Plaid)",
+      "teenSubtitle": "Link your bank to track spending and see where your money goes.",
+      "teenEmptyDescription": "Link your bank account to sync transactions and unlock spending insights. Only you and your guardians can see this account."
+    },
+    "onboarding": {
+      "types": {
+        "household": {
+          "description": "Me and my partner — shared budgets, separate or joint accounts."
+        }
+      },
+      "defaultNames": {
+        "household": "Our household",
+        "company": "My business"
+      }
+    },
+    "family": {
+      "addChildDescription": "Create a login for your child or teen. They sign in with email and password.",
+      "splitsHint": "Set up how shared expenses are split between guardians in Settings → Split rules."
+    },
+    "company": {
+      "footnote": "Runway = cash on hand ÷ net monthly burn. Keep business accounts in this space only.",
+      "setup": {
+        "title": "Set up your business dashboard",
+        "subtitle": "Three steps to see runway, SaaS waste, and cloud spend — all from your business bank."
+      },
+      "team": {
+        "inviteDesc": "We'll text an invite link and verification code to their mobile. Email is optional.",
+        "phoneHelp": "Required — we send an SMS invite and verification code."
+      }
+    },
+    "teen": {
+      "subtitle": "Your savings and goals",
+      "noJars": "No savings jars yet. Ask your guardian to set one up!"
+    },
+    "settings": {
+      "phonePlaceholder": "+44 7700 900123",
+      "phoneHelp": "Used for SMS verification via Twilio. International format (E.164): country code, then the number without the leading 0. Example: 07700 900123 → +447700900123.",
+      "phoneFormatHint": "Drop the leading 0 after the country code (e.g. +447700900123, not +4407700900123).",
+      "phoneInvalid": "Enter a valid phone number (e.g. +447700900123 or +33612345678)",
+      "upgradeCta": "Upgrade to Pro — £12/mo"
+    },
+    "budgets": {
+      "limitLabel": "Monthly limit (£)"
+    },
+    "transactions": {
+      "subtitle": "{count} transactions in your active space — search, filter, and export."
+    },
+    "subscriptions": {
+      "shieldDescription": "FlowRate monitors your subscriptions for price changes and unused services. You'll be notified as soon as something changes."
+    },
+    "invite": {
+      "loginHint": "Sign in with {email} and the password you just created."
+    }
+  },
+  "accountTypes": {
+    "CHECKING": "Current account"
+  },
+  "roles": {
+    "CO_GUARDIAN": "Co-guardian"
+  }
+}

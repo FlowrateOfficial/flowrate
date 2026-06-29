@@ -1,3 +1,6 @@
+import { assertSaasShield, userPlanForId } from '../../../../lib/billing/enforcement'
+import { planHasFeature } from '#shared/plan-limits'
+
 export type BusinessAlertSeverity = 'info' | 'warning' | 'critical'
 
 export interface BusinessAlert {
@@ -15,7 +18,7 @@ export interface BusinessOverview {
   monthlySubscriptions: number
   subscriptionWaste: number
   activeSubscriptions: number
-  cloudSpend: number
+  cloudSpend: number | null
   setup: {
     hasAccounts: boolean
     hasTransactions: boolean
@@ -36,6 +39,9 @@ export default defineEventHandler(async (event) => {
   if (!canViewFinancials(membership.role)) {
     throw createError({ statusCode: 403, message: 'Insufficient permissions' })
   }
+
+  const ownerPlan = await userPlanForId(space.ownerId)
+  await assertSaasShield(space.ownerId, ownerPlan)
 
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -70,7 +76,7 @@ export default defineEventHandler(async (event) => {
     return acc
   }, {})
   const wastedSubs = subscriptions
-    .filter(s => duplicateSubs[s.name.toLowerCase()] > 1)
+    .filter(s => (duplicateSubs[s.name.toLowerCase()] ?? 0) > 1)
     .reduce((sum, s) => sum + Number(s.amount), 0)
 
   const cloudSpend = monthlyTx
@@ -120,7 +126,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (cloudSpend > 0 && monthlyBurn > 0 && cloudSpend / monthlyBurn > 0.25) {
+  if (cloudSpend > 0 && monthlyBurn > 0 && cloudSpend / monthlyBurn > 0.25 && planHasFeature(ownerPlan, 'cloudSpendTracking')) {
     alerts.push({
       severity: 'warning',
       code: 'HIGH_CLOUD_SPEND',
@@ -145,7 +151,7 @@ export default defineEventHandler(async (event) => {
     monthlySubscriptions: monthlySubs,
     subscriptionWaste: wastedSubs,
     activeSubscriptions: subscriptions.length,
-    cloudSpend,
+    cloudSpend: planHasFeature(ownerPlan, 'cloudSpendTracking') ? cloudSpend : null,
     setup: {
       hasAccounts,
       hasTransactions,

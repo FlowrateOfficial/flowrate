@@ -1,5 +1,5 @@
 // ANCHOR: Space membership, roles, and active-space resolution
-import type { SpaceRole, SpaceType, MemberStatus } from '~~/generated/prisma'
+import type { SpaceRole, SpaceType, MemberStatus } from '~~/generated/prisma/client'
 
 export const ACTIVE_SPACE_COOKIE = 'flowrate-active-space'
 
@@ -73,7 +73,7 @@ export async function ensureDefaultIndependentSpace(userId: string, userName: st
           userId,
           role: 'OWNER',
           status: 'ACTIVE',
-          displayName: userName,
+          name: userName,
           joinedAt: new Date()
         }
       }
@@ -84,7 +84,7 @@ export async function ensureDefaultIndependentSpace(userId: string, userName: st
 
   await prisma.user.update({
     where: { id: userId },
-    data: { activeSpaceId: space.id }
+    data: { spaceId: space.id }
   })
 
   return space
@@ -139,10 +139,10 @@ export async function resolveActiveSpaceId(event: Parameters<typeof getRequestHe
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { activeSpaceId: true }
+    select: { spaceId: true }
   })
-  if (user?.activeSpaceId && await hasActiveMembership(userId, user.activeSpaceId)) {
-    return user.activeSpaceId
+  if (user?.spaceId && await hasActiveMembership(userId, user.spaceId)) {
+    return user.spaceId
   }
 
   const firstMembership = await prisma.spaceMember.findFirst({

@@ -1,4 +1,4 @@
-import type { BudgetPeriod, TransactionCategory } from '~~/generated/prisma'
+import type { BudgetPeriod, TransactionCategory } from '~~/generated/prisma/client'
 
 interface TxLike {
   merchant: string | null
@@ -13,7 +13,7 @@ export interface DetectedSubCandidate {
   amount: number
   frequency: BudgetPeriod
   category: TransactionCategory
-  lastCharged: Date
+  lastCharge: Date
   nextCharge: Date
 }
 
@@ -58,8 +58,12 @@ export function detectSubscriptionsFromTransactions(txs: TxLike[]): DetectedSubC
 
     const gaps: number[] = []
     for (let i = 0; i < sorted.length - 1; i++) {
-      gaps.push((sorted[i].date.getTime() - sorted[i + 1].date.getTime()) / 86_400_000)
+      const current = sorted[i]
+      const next = sorted[i + 1]
+      if (!current || !next) continue
+      gaps.push((current.date.getTime() - next.date.getTime()) / 86_400_000)
     }
+    if (!gaps.length) continue
     const avgGap = gaps.reduce((s, v) => s + v, 0) / gaps.length
 
     let frequency: BudgetPeriod = 'MONTHLY'
@@ -69,6 +73,7 @@ export function detectSubscriptionsFromTransactions(txs: TxLike[]): DetectedSubC
     else continue
 
     const last = sorted[0]
+    if (!last) continue
     const nextCharge = frequency === 'WEEKLY'
       ? addWeeks(last.date, 1)
       : frequency === 'YEARLY'
@@ -80,7 +85,7 @@ export function detectSubscriptionsFromTransactions(txs: TxLike[]): DetectedSubC
       amount: Math.round(avg * 100) / 100,
       frequency,
       category: last.category === 'OTHER' ? 'SUBSCRIPTIONS' : last.category,
-      lastCharged: last.date,
+      lastCharge: last.date,
       nextCharge
     })
   }

@@ -1,19 +1,9 @@
 <script setup lang="ts">
-import { formatCurrencyForLocale } from '~/utils/format'
+import type { BudgetItem } from '~/types/budget'
 
-interface Budget {
-  id: string
-  name: string
-  category: string
-  amount: number
-  currency: string
-  spent: number
-  period: string
-}
+const props = defineProps<{ budget: BudgetItem }>()
 
-const props = defineProps<{ budget: Budget }>()
-
-const { t, getLocale } = useAppI18n()
+const { t, formatCurrency } = useAppI18n()
 
 const categoryIcons: Record<string, string> = {
   FOOD: 'i-lucide-utensils',
@@ -31,7 +21,7 @@ const categoryIcons: Record<string, string> = {
 }
 
 function fmt(amount: number, currency: string): string {
-  return formatCurrencyForLocale(amount, getLocale(), currency)
+  return formatCurrency(amount, currency)
 }
 
 const percentage = computed(() => {
@@ -48,29 +38,32 @@ const statusColor = computed(() => {
 
 <template>
   <div class="space-y-2">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex min-w-0 flex-1 items-center gap-2">
         <UIcon
           :name="categoryIcons[budget.category] ?? 'i-lucide-circle-dot'"
-          class="w-4 h-4 text-muted"
+          class="size-4 shrink-0 text-muted"
         />
-        <span class="text-sm font-medium">{{ budget.name }}</span>
+        <span class="truncate text-sm font-medium">{{ budget.name }}</span>
       </div>
-      <div class="text-right">
-        <span class="text-sm font-semibold tabular-nums">
-          {{ fmt(budget.spent, budget.currency) }}
-        </span>
-        <span class="text-sm text-muted"> / {{ fmt(budget.amount, budget.currency) }}</span>
+      <div v-if="$slots.actions" class="flex shrink-0 items-center gap-0.5">
+        <slot name="actions" />
       </div>
+    </div>
+    <div class="text-right">
+      <span class="text-sm font-semibold tabular-nums">
+        {{ fmt(budget.spent, budget.currency) }}
+      </span>
+      <span class="text-sm text-muted"> / {{ fmt(budget.amount, budget.currency) }}</span>
     </div>
     <UProgress
       :model-value="percentage"
       :color="statusColor"
       size="sm"
     />
-    <p class="text-xs text-muted text-right">
+    <p class="text-right text-xs text-muted">
       {{ t('dashboard.budgets.percentUsed', { percent: percentage }) }}
-      <span v-if="percentage >= 90" class="text-error ml-1 font-medium">{{ t('dashboard.budgets.overBudget') }}</span>
+      <span v-if="percentage >= 90" class="ml-1 font-medium text-error">{{ t('dashboard.budgets.overBudget') }}</span>
     </p>
   </div>
 </template>

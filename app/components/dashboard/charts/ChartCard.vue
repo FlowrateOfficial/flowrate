@@ -7,13 +7,20 @@ defineProps<{
 </script>
 
 <template>
-  <div class="editorial-card-flat h-full flex flex-col" :class="large ? '!p-8 sm:!p-10' : ''">
-    <div class="mb-8">
-      <h3 class="font-display text-xl sm:text-2xl text-flow-ink dark:text-flow-ink-dark tracking-tight">{{ title }}</h3>
-      <p v-if="subtitle" class="text-sm text-flow-muted dark:text-flow-muted-dark mt-2 leading-relaxed">{{ subtitle }}</p>
+  <UCard class="h-full" :ui="{ body: 'flex h-full flex-col p-4 sm:p-5' }">
+    <div class="mb-3 shrink-0">
+      <h3 class="text-base font-semibold tracking-tight sm:text-lg">
+        {{ title }}
+      </h3>
+      <p v-if="subtitle" class="mt-0.5 text-xs text-muted sm:text-sm">
+        {{ subtitle }}
+      </p>
     </div>
-    <div class="flex-1" :class="large ? 'flow-chart-wrap-lg' : 'flow-chart-wrap'">
+    <div
+      class="relative min-h-0 w-full flex-1"
+      :class="large ? 'min-h-[220px] sm:min-h-[260px]' : 'min-h-[180px] sm:min-h-[220px]'"
+    >
       <slot />
     </div>
-  </div>
+  </UCard>
 </template>

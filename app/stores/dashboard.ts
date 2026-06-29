@@ -1,11 +1,12 @@
 import type { AccountSummary, AnalyticsOverview, SubscriptionItem, TransactionsResponse } from '~/types/financial'
 import type { DashboardStats } from '~/types/dashboard'
-import { formatCurrencyForLocale } from '~/utils/format'
+import { planHasFeature } from '#shared/plan-limits'
+import { activePlan } from '~/state/plan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useDashboardStore = defineStore('dashboard', () => {
-  const { t, getLocale, categoryLabel } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, resolveCurrency, displayCurrency } = useAppI18n()
   const spacesStore = useSpacesStore()
   const { api } = useApi()
 
@@ -18,15 +19,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const analyticsLoading = ref(false)
   const txLoading = ref(false)
 
-  function fmt(amount: number, currency = 'USD') {
-    return formatCurrencyForLocale(amount, getLocale(), currency)
+  function fmt(amount: number, currency?: string) {
+    return formatCurrency(amount, currency ?? resolveCurrency(accounts.value))
   }
 
   const spaceTypeLabel = computed(() =>
-    spacesStore.spaceType(spacesStore.activeSpace?.type ?? 'INDEPENDENT')
+    spacesStore.spaceType(spacesStore.space?.type ?? 'INDEPENDENT')
   )
 
-  const spaceName = computed(() => spacesStore.activeSpace?.name ?? 'Your')
+  const spaceName = computed(() => spacesStore.space?.name ?? 'Your')
 
   const runwayLabel = computed(() => {
     if (stats.value?.runwayMonths == null) return '—'
@@ -47,9 +48,16 @@ export const useDashboardStore = defineStore('dashboard', () => {
   )
   const hasCategoryChart = computed(() => categoryValues.value.length > 0)
 
+  const summaryCurrency = computed(
+    () => analytics.value?.summary.currency ?? resolveCurrency(accounts.value) ?? displayCurrency.value
+  )
+
   const saasShieldCenterValue = computed(() => String(stats.value?.subscriptionAlerts ?? 0))
 
-  const statCards = computed(() => [
+  const showSaasShield = computed(() => planHasFeature(activePlan.value, 'saasShield'))
+
+  const statCards = computed(() => {
+    const cards = [
     {
       key: 'balance',
       title: t('dashboard.overview.stats.totalBalance'),
@@ -82,7 +90,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
       changePositive: true,
       icon: 'i-lucide-hourglass'
     }
-  ])
+    ]
+
+    if (!showSaasShield.value) {
+      return cards.filter(card => card.key !== 'burn' && card.key !== 'runway')
+    }
+
+    return cards
+  })
 
   const previewAccounts = computed(() =>
     accounts.value.slice(0, 5).map(acc => ({
@@ -99,21 +114,25 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const recentTransactions = computed(() => recentTx.value?.items ?? [])
 
   async function fetchOverview() {
-    if (!spacesStore.activeSpace) return
+    if (!spacesStore.space) return
 
     statsLoading.value = true
     analyticsLoading.value = true
     txLoading.value = true
 
     try {
+      const subsRequest = showSaasShield.value
+        ? api<SubscriptionItem[]>(apiRoutes.subscriptions.list, {
+            query: { status: 'PRICE_CHANGED', limit: 5 }
+          })
+        : Promise.resolve([] as SubscriptionItem[])
+
       const [statsResult, analyticsResult, txResult, accountsResult, subsResult] = await Promise.all([
         api<DashboardStats>(apiRoutes.dashboard.stats),
         api<AnalyticsOverview>(apiRoutes.analytics.overview, { query: { range: '30d' } }),
         api<TransactionsResponse>(apiRoutes.transactions.list, { query: { limit: 8 } }),
         api<AccountSummary[]>(apiRoutes.accounts.list),
-        api<SubscriptionItem[]>(apiRoutes.subscriptions.list, {
-          query: { status: 'PRICE_CHANGED', limit: 5 }
-        })
+        subsRequest
       ])
 
       stats.value = statsResult
@@ -128,7 +147,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
-  watch(() => spacesStore.activeSpace?.id, (id) => {
+  watch(() => spacesStore.space?.id, (id) => {
     if (id) fetchOverview()
   })
 
@@ -151,7 +170,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     categoryLabels,
     categoryValues,
     hasCategoryChart,
+    summaryCurrency,
     saasShieldCenterValue,
+    showSaasShield,
     statCards,
     previewAccounts,
     hasAccounts,

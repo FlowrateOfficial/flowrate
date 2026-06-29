@@ -13,33 +13,37 @@ const isAccountActive = computed(() =>
 </script>
 
 <template>
-  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-flow-border/60 dark:border-flow-border-dark/60 bg-flow-card/95 dark:bg-flow-card-dark/95 backdrop-blur-md">
-    <div class="flex items-stretch justify-around px-2 py-2 safe-area-pb">
-      <NuxtLink
+  <nav
+    class="fixed inset-x-0 bottom-0 z-50 border-t border-default bg-default/95 backdrop-blur-md lg:hidden"
+    :aria-label="t('dashboard.layout.mobileNav')"
+  >
+    <div class="grid grid-cols-5 gap-1 px-2 py-2 safe-area-pb">
+      <UButton
         v-for="item in mobileNavItems"
         :key="item.to"
         :to="item.to"
-        class="flex flex-col items-center gap-1 px-3 py-2 rounded-flow text-[10px] min-w-0 flex-1 transition-colors"
-        :class="userStore.isActive(item.to)
-          ? 'text-flow-ink dark:text-flow-ink-dark'
-          : 'text-flow-muted dark:text-flow-muted-dark'"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="min-h-14 flex-col gap-1 px-1"
+        :class="userStore.isActive(item.to) ? 'text-default' : 'text-muted'"
       >
-        <UIcon :name="item.icon" class="w-5 h-5 stroke-[1.25]" />
-        <span class="truncate w-full text-center">{{ item.label }}</span>
-      </NuxtLink>
+        <UIcon :name="item.icon" class="size-6" />
+        <span class="w-full truncate text-center text-[11px] leading-tight">{{ item.label }}</span>
+      </UButton>
 
-      <button
-        type="button"
-        class="flex flex-col items-center gap-1 px-3 py-2 rounded-flow text-[10px] min-w-0 flex-1 transition-colors"
-        :class="isAccountActive
-          ? 'text-flow-ink dark:text-flow-ink-dark'
-          : 'text-flow-muted dark:text-flow-muted-dark'"
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="min-h-14 flex-col gap-1 px-1"
+        :class="isAccountActive ? 'text-default' : 'text-muted'"
         :aria-label="t('common.account')"
         @click="openMenu"
       >
-        <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="xs" class="w-5 h-5" />
-        <span class="truncate w-full text-center">{{ t('common.account') }}</span>
-      </button>
+        <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="xs" class="size-6" />
+        <span class="w-full truncate text-center text-[11px] leading-tight">{{ t('common.account') }}</span>
+      </UButton>
     </div>
   </nav>
 </template>

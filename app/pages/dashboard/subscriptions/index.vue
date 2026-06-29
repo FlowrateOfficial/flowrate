@@ -3,12 +3,12 @@ import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Subscriptions', middleware: 'auth' })
 
-const { t } = useAppI18n()
+const { t, formatCurrency } = useAppI18n()
 const subscriptionsStore = useSubscriptionsStore()
 const spacesStore = useSpacesStore()
 const { subscriptions, loading, monthlyTotal, activeCount } = storeToRefs(subscriptionsStore)
 
-const spaceId = computed(() => spacesStore.activeSpace?.id ?? '')
+const spaceId = computed(() => spacesStore.space?.id ?? '')
 
 await useAsyncData(
   () => `subscriptions-${spaceId.value}`,
@@ -19,44 +19,48 @@ await useAsyncData(
   { watch: [spaceId] }
 )
 
-function formatMoney(amount: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+function formatMoney(amount: number, currency?: string) {
+  return formatCurrency(amount, currency)
 }
+
+const summaryItems = computed(() => [
+  { label: t('dashboard.subscriptions.active'), value: String(activeCount.value), icon: 'i-lucide-repeat' },
+  { label: t('dashboard.subscriptions.monthlyTotal'), value: formatMoney(monthlyTotal.value), icon: 'i-lucide-calendar' }
+])
 </script>
 
 <template>
-  <div class="px-6 sm:px-10 py-10 sm:py-14 space-y-8 max-w-7xl mx-auto">
+  <DashboardPageShell>
     <DashboardPageHeader
       :title="t('dashboard.subscriptions.title')"
       :description="t('dashboard.subscriptions.subtitle', { count: activeCount })"
     />
 
-    <div class="grid sm:grid-cols-3 gap-4">
-      <UCard :ui="{ body: 'p-5' }">
-        <p class="text-xs uppercase tracking-widest text-muted">{{ t('dashboard.subscriptions.active') }}</p>
-        <p class="font-display text-2xl mt-1">{{ activeCount }}</p>
-      </UCard>
-      <UCard :ui="{ body: 'p-5' }">
-        <p class="text-xs uppercase tracking-widest text-muted">{{ t('dashboard.subscriptions.monthlyTotal') }}</p>
-        <p class="font-display text-2xl mt-1">{{ formatMoney(monthlyTotal) }}</p>
-      </UCard>
-    </div>
+    <DashboardSummaryStrip :items="summaryItems" :loading="loading" />
 
-    <div v-if="loading" class="text-center py-16 text-muted text-sm">{{ t('common.loading') }}</div>
-    <div v-else-if="!subscriptions.length" class="text-center py-16">
-      <p class="font-display text-lg">{{ t('dashboard.subscriptions.emptyTitle') }}</p>
-      <p class="text-sm text-muted mt-2 max-w-md mx-auto">{{ t('dashboard.subscriptions.emptyDescription') }}</p>
-    </div>
-    <div v-else class="space-y-3">
-      <UCard v-for="sub in subscriptions" :key="sub.id" :ui="{ body: 'p-4 sm:p-5' }">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-medium">{{ sub.name }}</p>
-            <p class="text-xs text-muted mt-1">{{ sub.frequency ?? 'monthly' }}</p>
+    <UCard v-if="loading" :ui="{ body: 'p-8 text-center' }">
+      <UIcon name="i-lucide-loader-2" class="mx-auto size-6 animate-spin text-muted" />
+    </UCard>
+
+    <UCard v-else-if="!subscriptions.length" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+      <UEmpty
+        icon="i-lucide-credit-card"
+        :title="t('dashboard.subscriptions.emptyTitle')"
+        :description="t('dashboard.subscriptions.emptyDescription')"
+        variant="naked"
+      />
+    </UCard>
+
+    <div v-else class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <UCard v-for="sub in subscriptions" :key="sub.id" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="truncate font-medium">{{ sub.name }}</p>
+            <p class="mt-0.5 text-xs text-muted">{{ sub.frequency ?? 'monthly' }}</p>
           </div>
-          <p class="font-display">{{ formatMoney(sub.amount ?? 0) }}</p>
+          <p class="shrink-0 text-lg font-semibold tabular-nums">{{ formatMoney(sub.amount ?? 0, sub.currency) }}</p>
         </div>
       </UCard>
     </div>
-  </div>
+  </DashboardPageShell>
 </template>

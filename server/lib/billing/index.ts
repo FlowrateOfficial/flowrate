@@ -1,4 +1,11 @@
 export {
+  changeUserSubscription,
+  previewSubscriptionChange,
+  type SubscriptionChangePreview,
+  type SubscriptionChangeRequest
+} from './change-subscription'
+
+export {
   clearBillingSubscription,
   formatPlanPeriod,
   formatPlanPrice,

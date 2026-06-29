@@ -1,4 +1,4 @@
-import type { AccountVisibility } from '~~/generated/prisma'
+import type { AccountVisibility } from '~~/generated/prisma/client'
 
 export interface StripeLinkContext {
   userId: string

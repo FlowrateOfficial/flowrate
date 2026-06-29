@@ -1,4 +1,4 @@
-// ANCHOR: Zod form schemas — auth, spaces
+// NOTE - ANCHOR: Zod form schemas — auth, spaces
 import { z } from 'zod'
 
 export function createLoginSchema() {

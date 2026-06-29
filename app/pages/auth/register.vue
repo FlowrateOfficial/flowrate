@@ -7,7 +7,7 @@ const route = useRoute()
 const { t } = useAppI18n()
 const auth = useAuthStore()
 const billingStore = useBillingStore()
-const { registerForm, loading, error, inviteInfo, registerSchema, selectedPlan } = storeToRefs(auth)
+const { registerForm, loading, inviteInfo, registerSchema, selectedPlan } = storeToRefs(auth)
 
 const plan = computed(() => route.query.plan as string | undefined)
 const billingCadence = computed(() => route.query.billing === 'yearly' ? 'yearly' : 'monthly')
@@ -69,8 +69,8 @@ useSeoMeta({ title: () => t('auth.register.title') })
           type="button"
           class="rounded-flow border p-3 text-left transition-colors"
           :class="selectedPlan === option.id
-            ? 'border-charcoal dark:border-flow-warm bg-flow-secondary/50 dark:bg-flow-secondary-dark/50'
-            : 'border-flow-border/60 dark:border-flow-border-dark/60 hover:border-charcoal/40'"
+            ? 'border-charcoal dark:border-flow-ink-dark/40 bg-flow-secondary/50 dark:bg-flow-elevated-dark/60'
+            : 'border-flow-border/60 dark:border-flow-border-dark/60 hover:border-charcoal/40 dark:hover:border-flow-border-dark'"
           @click="selectedPlan = option.id as 'free' | 'pro' | 'enterprise'"
         >
           <p class="text-sm font-medium text-flow-ink dark:text-flow-ink-dark">{{ option.title }}</p>
@@ -84,7 +84,7 @@ useSeoMeta({ title: () => t('auth.register.title') })
         <button
           type="button"
           class="px-3 py-1.5 text-xs rounded-[0.4rem]"
-          :class="billingStore.pricingCadence === 'monthly' ? 'bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal' : 'text-flow-muted'"
+          :class="billingStore.pricingCadence === 'monthly' ? 'btn-segment-active' : 'text-flow-muted dark:text-flow-muted-dark'"
           @click="billingStore.pricingCadence = 'monthly'"
         >
           {{ t('auth.register.billingMonthly') }}
@@ -92,7 +92,7 @@ useSeoMeta({ title: () => t('auth.register.title') })
         <button
           type="button"
           class="px-3 py-1.5 text-xs rounded-[0.4rem]"
-          :class="billingStore.pricingCadence === 'yearly' ? 'bg-charcoal dark:bg-flow-warm text-flow-warm dark:text-charcoal' : 'text-flow-muted'"
+          :class="billingStore.pricingCadence === 'yearly' ? 'btn-segment-active' : 'text-flow-muted dark:text-flow-muted-dark'"
           @click="billingStore.pricingCadence = 'yearly'"
         >
           {{ t('auth.register.billingYearly') }}
@@ -108,8 +108,6 @@ useSeoMeta({ title: () => t('auth.register.title') })
       variant="subtle"
       icon="i-lucide-mail"
     />
-
-    <UAlert v-if="error" :description="error" color="error" variant="subtle" icon="i-lucide-alert-circle" />
 
     <UForm :schema="registerSchema" :state="registerForm" class="space-y-5" @submit="auth.register">
       <UFormField :label="t('auth.register.name')" name="name" required>
@@ -151,7 +149,7 @@ useSeoMeta({ title: () => t('auth.register.title') })
         block
         :loading="loading"
         color="neutral"
-        class="bg-charcoal! dark:bg-flow-warm! text-flow-warm! dark:text-charcoal! rounded-flow"
+        class="bg-charcoal! dark:bg-flow-ink-dark! text-flow-warm! dark:text-flow-bg-dark! rounded-flow"
       />
     </UForm>
 
