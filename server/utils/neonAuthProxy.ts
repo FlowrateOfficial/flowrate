@@ -453,6 +453,36 @@ export async function tryOAuthSessionExchange(event: H3Event): Promise<string | 
   return url.toString()
 }
 
+export async function deleteNeonAuthUserUpstream(
+  event: H3Event,
+  password?: string
+): Promise<void> {
+  const config = useRuntimeConfig(event)
+  const baseUrl = config.public.neonAuthUrl as string
+  if (!baseUrl) {
+    throw createError({ statusCode: 503, message: 'Authentication is not configured' })
+  }
+
+  const request = toWebRequest(event)
+  const headers = new Headers(request.headers)
+  headers.set('Content-Type', 'application/json')
+
+  const upstream = await fetch(`${baseUrl.replace(/\/$/, '')}/delete-user`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(password ? { password } : {})
+  })
+
+  if (!upstream.ok) {
+    const data = await upstream.json().catch(() => ({})) as { message?: string }
+    const message = data.message ?? 'Failed to delete login account'
+    if (message.toLowerCase().includes('password')) {
+      throw createError({ statusCode: 400, message: 'Password is required or incorrect' })
+    }
+    throw createError({ statusCode: 400, message })
+  }
+}
+
 export async function getSessionFromEvent(event: H3Event): Promise<SessionData | null> {
   const cookieHeader = getRequestHeader(event, 'cookie') ?? ''
   const sessionDataCookie = parseCookies(cookieHeader).get(NEON_AUTH_SESSION_DATA_COOKIE_NAME)
