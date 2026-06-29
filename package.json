@@ -27,6 +27,7 @@
     "@pinia/nuxt": "^0.11.3",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@vercel/speed-insights": "^2.0.0",
     "@vueuse/core": "^14.3.0",
     "better-auth": "^1.6.20",
     "chart.js": "^4.5.1",

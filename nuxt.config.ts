@@ -4,6 +4,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@pinia/nuxt',
+    '@vercel/speed-insights',
     ['nuxt-i18n-micro', {
       locales: [
         { code: 'en', iso: 'en-US', name: 'English (US)', displayName: 'English (US)' },
