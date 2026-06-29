@@ -65,7 +65,7 @@ feature  ──────●──●──●──►     local dev, PRs →
 Clone **only** the branch you need — skips the large feedback-media branch:
 
 ```bash
-git clone --single-branch --branch master git@github.com:Mathieu-ai/flowrate.git
+git clone --single-branch --branch master git@github.com:FlowrateOfficial/flowrate.git
 cd flowrate
 git checkout -b feature   # optional: create local dev branch tracking your workflow
 ```
@@ -73,7 +73,7 @@ git checkout -b feature   # optional: create local dev branch tracking your work
 HTTPS:
 
 ```bash
-git clone --single-branch --branch master https://github.com/Mathieu-ai/flowrate.git
+git clone --single-branch --branch master https://github.com/FlowrateOfficial/flowrate.git
 ```
 
 For daily development, switch to `feature` after clone:
