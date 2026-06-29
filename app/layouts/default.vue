@@ -17,8 +17,8 @@ const navLinks = computed(() => [
 
 <template>
   <div class="min-h-screen flex flex-col surface-page">
-    <header class="fixed inset-x-0 top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-md dark:backdrop-blur-lg">
-      <UContainer class="flex items-center justify-between gap-2 sm:gap-4 h-14 sm:h-[4.5rem] min-w-0">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-sm dark:backdrop-blur-md">
+      <UContainer class="flex items-center justify-between gap-2 sm:gap-4 h-14 sm:h-18 min-w-0">
         <NuxtLink :to="homePath" class="inline-flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
           <BrandFlowRateLogo :mark-size="26" compact-on-mobile class="shrink-0" />
           <AppBetaBadge size="sm" :class="isLegalPage ? 'inline-flex shrink-0' : 'hidden sm:inline-flex shrink-0'" />
@@ -47,7 +47,7 @@ const navLinks = computed(() => [
             </NuxtLink>
             <NuxtLink
               to="/auth/register"
-              class="btn-primary-editorial !px-3 !py-2 sm:!px-5 sm:!py-2.5 text-xs sm:text-sm whitespace-nowrap shrink-0"
+              class="btn-primary-editorial px-3! py-2! sm:px-5! sm:py-2.5! text-xs sm:text-sm whitespace-nowrap shrink-0"
             >
               <span class="sm:hidden">{{ t('common.start') }}</span>
               <span class="hidden sm:inline">{{ t('common.getStarted') }}</span>
@@ -56,7 +56,7 @@ const navLinks = computed(() => [
           <NuxtLink
             v-else
             to="/dashboard"
-            class="btn-primary-editorial !px-3 !py-2 sm:!px-5 sm:!py-2.5 text-xs sm:text-sm whitespace-nowrap shrink-0"
+            class="btn-primary-editorial px-3! py-2! sm:px-5! sm:py-2.5! text-xs sm:text-sm whitespace-nowrap shrink-0"
           >
             {{ t('nav.overview') }}
           </NuxtLink>
@@ -64,7 +64,7 @@ const navLinks = computed(() => [
       </UContainer>
     </header>
 
-    <UMain class="flex-1 overflow-x-clip pt-14 sm:pt-[4.5rem]">
+    <UMain class="flex-1 overflow-x-clip pt-14 sm:pt-18">
       <UContainer v-if="showBreadcrumbs" class="pt-8 pb-0">
         <AppBreadcrumbs />
       </UContainer>

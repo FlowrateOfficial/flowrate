@@ -21,8 +21,8 @@ defineProps<{
       :ui="{ body: 'p-3 sm:p-4' }"
     >
       <div v-if="loading" class="animate-pulse space-y-2">
-        <div class="h-3.5 w-20 rounded bg-elevated" />
-        <div class="h-7 w-28 rounded bg-elevated/70" />
+        <div class="h-3.5 w-20 rounded-sm bg-elevated" />
+        <div class="h-7 w-28 rounded-sm bg-elevated/70" />
       </div>
       <div v-else class="min-w-0 space-y-2">
         <div class="flex min-w-0 items-center gap-2">

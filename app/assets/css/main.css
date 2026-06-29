@@ -1,34 +1,35 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+/* NOTE - ANCHOR: Global styles — tokens, landing, dashboard shell */
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme static {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
 
-  --color-flow-bg: #F8F6F2;
-  --color-flow-card: #FCFBF8;
-  --color-flow-secondary: #F1ECE5;
-  --color-flow-warm: #FFFDF8;
+  --color-flow-bg: #f8f6f2;
+  --color-flow-card: #fcfbf8;
+  --color-flow-secondary: #f1ece5;
+  --color-flow-warm: #fffdf8;
   --color-flow-ink: #191919;
-  --color-flow-muted: #67635E;
-  --color-flow-border: #DDD7CE;
-  --color-sage: #7A8F7A;
-  --color-terracotta: #C46F4A;
-  --color-sand: #D8C7AA;
-  --color-charcoal: #2A2A2A;
-  --color-flow-success: #7FA26A;
-  --color-flow-warning: #C59B4B;
+  --color-flow-muted: #67635e;
+  --color-flow-border: #ddd7ce;
+  --color-sage: #7a8f7a;
+  --color-terracotta: #c46f4a;
+  --color-sand: #d8c7aa;
+  --color-charcoal: #2a2a2a;
+  --color-flow-success: #7fa26a;
+  --color-flow-warning: #c59b4b;
 
-  --color-flow-bg-dark: #0C0B0A;
+  --color-flow-bg-dark: #0c0b0a;
   --color-flow-card-dark: #161514;
-  --color-flow-elevated-dark: #1C1B19;
+  --color-flow-elevated-dark: #1c1b19;
   --color-flow-secondary-dark: #242220;
   --color-flow-warm-dark: #131211;
-  --color-flow-ink-dark: #EDEAE4;
-  --color-flow-muted-dark: #9C968D;
-  --color-flow-dim-dark: #6B6560;
-  --color-flow-border-dark: #2E2B27;
-  --color-flow-border-subtle-dark: #211F1D;
+  --color-flow-ink-dark: #edeae4;
+  --color-flow-muted-dark: #9c968d;
+  --color-flow-dim-dark: #6b6560;
+  --color-flow-border-dark: #2e2b27;
+  --color-flow-border-subtle-dark: #211f1d;
 
   --radius-flow: 0.625rem;
   --radius-flow-lg: 0.875rem;
@@ -50,7 +51,7 @@
 }
 
 .dark {
-  /* Nuxt UI semantic surfaces */
+  /* NOTE - Dark mode Nuxt UI surfaces */
   --ui-bg: var(--color-flow-bg-dark);
   --ui-bg-muted: var(--color-flow-warm-dark);
   --ui-bg-elevated: var(--color-flow-card-dark);
@@ -73,7 +74,7 @@
   --ui-ring-accented: #4A4540;
   --ui-ring-offset: var(--color-flow-bg-dark);
 
-  /* FlowRate editorial tokens */
+  /* NOTE - Dark mode brand color overrides */
   --color-sage: #91A891;
   --color-terracotta: #D4845F;
   --color-sand: #C9B896;
@@ -123,7 +124,7 @@ body::before {
   opacity: 0.028;
 }
 
-/* Editorial typography */
+/* NOTE - Display typography utilities */
 .font-display {
   font-family: var(--font-display);
 }
@@ -143,7 +144,7 @@ body::before {
   @apply text-4xl sm:text-5xl font-normal tracking-tight;
 }
 
-/* Editorial surfaces */
+/* NOTE - Page and card surface classes */
 .surface-page {
   @apply bg-flow-bg dark:bg-flow-bg-dark text-flow-ink dark:text-flow-ink-dark;
 }
@@ -152,7 +153,7 @@ body::before {
   @apply bg-flow-card dark:bg-flow-card-dark border border-flow-border dark:border-flow-border-dark rounded-flow-lg p-6 sm:p-8
     shadow-[0_1px_2px_rgba(25,25,25,0.03)]
     dark:shadow-[0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.35)]
-    transition-[transform,box-shadow] duration-[350ms] ease-[var(--ease-flow)]
+    transition-[transform,box-shadow] duration-350 ease-flow
     hover:-translate-y-1
     hover:shadow-[0_4px_16px_rgba(25,25,25,0.04)]
     dark:hover:shadow-[0_1px_0_rgba(255,255,255,0.06),0_12px_32px_rgba(0,0,0,0.45)]
@@ -186,13 +187,13 @@ body::before {
   @apply py-4 px-2 border-b border-flow-border/40 dark:border-flow-border-dark/40 last:border-0;
 }
 
-/* Luxury buttons */
+/* NOTE - Primary and secondary CTA buttons */
 .btn-primary-editorial {
   @apply inline-flex items-center justify-center gap-2
     bg-charcoal text-flow-warm
     dark:bg-flow-ink-dark dark:text-flow-bg-dark
     px-7 py-3.5 rounded-flow text-[15px] font-medium
-    transition-all duration-300 ease-[var(--ease-flow)]
+    transition-all duration-300 ease-flow
     hover:scale-[1.01] active:scale-[0.99]
     dark:hover:bg-[#F5F2EC];
 }
@@ -202,18 +203,18 @@ body::before {
     bg-transparent border border-flow-border dark:border-flow-border-dark
     text-flow-ink dark:text-flow-ink-dark
     px-7 py-3.5 rounded-flow text-[15px] font-medium
-    transition-all duration-300 ease-[var(--ease-flow)]
+    transition-all duration-300 ease-flow
     hover:bg-flow-secondary/50 dark:hover:bg-flow-elevated-dark/80
     dark:hover:border-[#383430]
     hover:scale-[1.01];
 }
 
-/* Thin outline icons globally in dashboard */
+/* NOTE - Thin stroke icons in dashboard */
 .icon-thin {
   stroke-width: 1.25;
 }
 
-/* Fade-in animation */
+/* NOTE - Fade-up entrance animation */
 @keyframes flow-fade-up {
   from {
     opacity: 0;
@@ -233,7 +234,7 @@ body::before {
 .animate-flow-delay-2 { animation-delay: 0.2s; opacity: 0; }
 .animate-flow-delay-3 { animation-delay: 0.3s; opacity: 0; }
 
-/* Landing page — ambient & motion */
+/* NOTE - Landing ambient backgrounds and motion */
 .landing-hero-glow {
   background:
     radial-gradient(ellipse 80% 60% at 70% 20%, rgba(122, 143, 122, 0.12), transparent 55%),
@@ -372,7 +373,7 @@ body::before {
   @apply min-w-0 max-w-full;
 }
 
-/* Demo viewport — fit narrow phones (e.g. iPhone SE 375px) */
+/* NOTE - Demo frame for narrow viewports */
 .landing-demo-viewport {
   width: min(100%, calc(100% - 0px));
   max-width: min(100%, calc(100dvw - 2rem));
@@ -423,7 +424,7 @@ body::before {
 
 .landing-scene-tab {
   @apply w-full rounded-flow-lg border border-transparent px-4 py-3.5
-    transition-all duration-300 ease-[var(--ease-flow)]
+    transition-all duration-300 ease-flow
     hover:bg-flow-secondary/60 dark:hover:bg-flow-secondary-dark/40;
 }
 
@@ -459,7 +460,7 @@ body::before {
   @apply truncate;
 }
 
-/* Dashboard shell — depth in dark mode */
+/* NOTE - Dashboard sidebar and header depth */
 .dark .dashboard-sidebar {
   background: linear-gradient(180deg, rgba(28, 27, 25, 0.95) 0%, rgba(22, 21, 20, 0.98) 100%);
 }
@@ -508,17 +509,17 @@ body::before {
   opacity: 1;
 }
 
-/* Segmented control — active pill in light & dark */
+/* NOTE - Active segment pill styling */
 .btn-segment-active {
   @apply bg-charcoal text-flow-warm dark:bg-flow-ink-dark dark:text-flow-bg-dark;
 }
 
-/* Touch-friendly defaults for dashboard controls */
+/* NOTE - Minimum touch target size */
 .touch-target {
   @apply min-h-11 min-w-11;
 }
 
-/* Legal — beta disclaimers */
+/* NOTE - Legal beta notice styling */
 .legal-beta-notice {
   @apply flex gap-3 rounded-flow border border-warning/30 bg-warning/8
     dark:bg-warning/10 px-4 py-3.5 text-default;
@@ -533,7 +534,7 @@ body::before {
     border-l-2 border-warning/40 pl-3 py-0.5;
 }
 
-/* Dashboard billing panel */
+/* NOTE - Billing settings panel cards */
 .billing-status-card {
   @apply rounded-flow border border-default/60 bg-elevated/25 dark:bg-flow-elevated-dark/25 p-4;
 }
@@ -561,13 +562,13 @@ body::before {
   display: none;
 }
 
-/* Hero — app window preview */
+/* NOTE - Landing hero app window mock */
 .landing-hero-visual {
   @apply relative mx-auto w-full max-w-lg lg:max-w-none;
 }
 
 .landing-hero-visual-ambient {
-  @apply absolute -inset-6 rounded-[2rem] pointer-events-none;
+  @apply absolute -inset-6 rounded-4xl pointer-events-none;
   background:
     radial-gradient(ellipse 70% 55% at 50% 40%, rgba(145, 168, 145, 0.12), transparent 65%),
     radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212, 132, 95, 0.08), transparent 55%);
@@ -615,7 +616,7 @@ body::before {
 }
 
 .landing-hero-sidebar-item.is-active {
-  @apply bg-elevated text-default shadow-sm;
+  @apply bg-elevated text-default shadow-xs;
 }
 
 .landing-hero-main {
@@ -647,10 +648,10 @@ body::before {
 
 .landing-hero-space-tab.is-active {
   @apply opacity-100 border-flow-border dark:border-flow-border-dark
-    bg-elevated dark:bg-flow-card-dark shadow-sm;
+    bg-elevated dark:bg-flow-card-dark shadow-xs;
 }
 
-/* Demo — sidebar shell + compact dashboard */
+/* NOTE - Landing demo sidebar shell */
 .landing-demo-shell {
   @apply flex min-w-0;
 }
@@ -730,7 +731,7 @@ body::before {
 }
 
 .landing-demo-chart-wrap {
-  @apply relative flex-1 w-full min-w-0 min-h-[5.5rem] max-h-[7rem] sm:min-h-[6.75rem] sm:max-h-[8rem] overflow-hidden;
+  @apply relative flex-1 w-full min-w-0 min-h-22 max-h-28 sm:min-h-27 sm:max-h-32 overflow-hidden;
 }
 
 .landing-demo-chart-wrap :deep(canvas) {

@@ -17,7 +17,7 @@ const { proofItems } = storeToRefs(landing)
             <p class="font-display text-3xl sm:text-4xl text-flow-ink dark:text-flow-ink-dark tabular-nums tracking-tight">
               {{ item.value }}
             </p>
-            <p class="mt-2 text-sm text-flow-muted dark:text-flow-muted-dark leading-relaxed max-w-[14rem] mx-auto sm:mx-0">
+            <p class="mt-2 text-sm text-flow-muted dark:text-flow-muted-dark leading-relaxed max-w-56 mx-auto sm:mx-0">
               {{ item.label }}
             </p>
           </div>

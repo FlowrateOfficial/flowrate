@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Dashboard breadcrumbs — path segments to i18n labels
+// ANCHOR: Dashboard breadcrumbs from path segments
 export interface BreadcrumbItem {
   label: string
   to?: string
@@ -15,9 +15,14 @@ const DASHBOARD_SEGMENT_KEYS: Record<string, string> = {
   teen: 'nav.myMoney',
   settings: 'common.settings',
   spaces: 'nav.spaces',
+  feedback: 'dashboard.feedback.title',
+  admin: 'nav.admin',
   onboarding: 'dashboard.onboarding.welcome',
   invite: 'breadcrumbs.invitation'
 }
+
+// NOTE - Prefix-only routes with no index page
+const DASHBOARD_PREFIX_ONLY = new Set(['admin'])
 
 export function useBreadcrumbs() {
   const route = useRoute()
@@ -73,9 +78,10 @@ export function useBreadcrumbs() {
       const segmentKey = DASHBOARD_SEGMENT_KEYS[part]
 
       if (segmentKey) {
+        const shouldLink = !isLast && !DASHBOARD_PREFIX_ONLY.has(part)
         crumbs.push({
           label: t(segmentKey),
-          to: isLast ? undefined : acc
+          to: shouldLink ? acc : undefined
         })
         continue
       }

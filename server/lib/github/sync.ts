@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: GitHub issue snapshot fetch + DB cache sync for feedback list
+// ANCHOR: GitHub issue snapshot fetch + DB cache sync for feedback list
 
 import type { FeedbackUserLabel } from '#shared/feedback'
 import {

@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Typed nuxt-i18n-micro wrapper
+// ANCHOR: Typed i18n + labels + locale formatters
 import {
   currencyForLocale,
   formatMoney,
@@ -6,6 +6,13 @@ import {
   resolveDisplayCurrency,
   type DisplayCurrency
 } from '#shared/currency'
+import {
+  formatAbsAmount,
+  formatDateTime,
+  formatOptionalDate,
+  formatShortDate,
+  formatShortDateWithYear
+} from '~/utils/format'
 
 type TranslateParams = Record<string, string | number>
 
@@ -22,9 +29,40 @@ export function useAppI18n() {
   }
 
   function categoryLabel(cat: string): string {
-    const key = `categories.${cat}`
+    return labelFromKey(`categories.${cat}`, cat)
+  }
+
+  function labelFromKey(key: string, fallback?: string): string {
     const translated = t(key)
-    return translated !== key ? translated : cat
+    return translated !== key ? translated : (fallback ?? key)
+  }
+
+  function accountTypeLabel(type: string): string {
+    return labelFromKey(
+      `accountTypes.${type}`,
+      type.charAt(0) + type.slice(1).toLowerCase()
+    )
+  }
+
+  function roleLabel(role: string): string {
+    return labelFromKey(`roles.${role}`, role.toLowerCase().replaceAll('_', ' '))
+  }
+
+  function memberStatusLabel(status: string): string {
+    return labelFromKey(`memberStatus.${status}`, status.toLowerCase())
+  }
+
+  function subscriptionStatusLabel(status: string): string {
+    return labelFromKey(`dashboard.subscriptions.status.${status}`, status)
+  }
+
+  function subscriptionFrequencyLabel(freq: string | null | undefined): string {
+    if (!freq) return '—'
+    return labelFromKey(`dashboard.subscriptions.frequency.${freq}`, freq)
+  }
+
+  function feedbackTypeLabel(type: string): string {
+    return labelFromKey(`dashboard.feedback.types.${type}`, type)
   }
 
   const intlLocale = computed(() => intlLocaleFor(getLocale()))
@@ -38,6 +76,29 @@ export function useAppI18n() {
     return resolveDisplayCurrency(getLocale(), items)
   }
 
+  function formatShortDateValue(iso: string) {
+    return formatShortDate(iso, getLocale())
+  }
+
+  function formatShortDateWithYearValue(iso: string) {
+    return formatShortDateWithYear(iso, getLocale())
+  }
+
+  function formatOptionalDateValue(
+    iso: string | null | undefined,
+    style: 'short' | 'medium' = 'medium'
+  ) {
+    return formatOptionalDate(iso, getLocale(), style)
+  }
+
+  function formatDateTimeValue(iso: string) {
+    return formatDateTime(iso, getLocale())
+  }
+
+  function formatAbsAmountValue(amount: number, currency: string) {
+    return formatAbsAmount(amount, getLocale(), currency)
+  }
+
   return {
     t,
     getLocale,
@@ -45,9 +106,21 @@ export function useAppI18n() {
     getLocales,
     spaceType,
     categoryLabel,
+    labelFromKey,
+    accountTypeLabel,
+    roleLabel,
+    memberStatusLabel,
+    subscriptionStatusLabel,
+    subscriptionFrequencyLabel,
+    feedbackTypeLabel,
     intlLocale,
     displayCurrency,
     formatCurrency,
-    resolveCurrency
+    resolveCurrency,
+    formatShortDate: formatShortDateValue,
+    formatShortDateWithYear: formatShortDateWithYearValue,
+    formatOptionalDate: formatOptionalDateValue,
+    formatDateTime: formatDateTimeValue,
+    formatAbsAmount: formatAbsAmountValue
   }
 }

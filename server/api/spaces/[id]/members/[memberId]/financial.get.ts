@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
   const since = new Date()
   since.setDate(since.getDate() - 30)
 
-  const [accounts, transactions, agg] = await Promise.all([
+  const [accounts, transactions, spendingAgg, incomeAgg, txCount30d] = await Promise.all([
     prisma.account.findMany({
       where: { spaceId, userId: member.userId },
       orderBy: { name: 'asc' },
@@ -55,23 +55,24 @@ export default defineEventHandler(async (event) => {
     prisma.transaction.findMany({
       where: { spaceId, userId: member.userId },
       orderBy: { date: 'desc' },
-      take: 50,
+      take: 30,
       include: { account: { select: { id: true, name: true } } }
     }),
     prisma.transaction.aggregate({
-      where: { spaceId, userId: member.userId, date: { gte: since } },
-      _sum: { amount: true },
-      _count: true
+      where: { spaceId, userId: member.userId, date: { gte: since }, amount: { lt: 0 } },
+      _sum: { amount: true }
+    }),
+    prisma.transaction.aggregate({
+      where: { spaceId, userId: member.userId, date: { gte: since }, amount: { gt: 0 } },
+      _sum: { amount: true }
+    }),
+    prisma.transaction.count({
+      where: { spaceId, userId: member.userId, date: { gte: since } }
     })
   ])
 
-  const recentTxs = await prisma.transaction.findMany({
-    where: { spaceId, userId: member.userId, date: { gte: since } },
-    select: { amount: true }
-  })
-
-  const income30d = recentTxs.filter(t => Number(t.amount) > 0).reduce((s, t) => s + Number(t.amount), 0)
-  const spending30d = recentTxs.filter(t => Number(t.amount) < 0).reduce((s, t) => s + Math.abs(Number(t.amount)), 0)
+  const income30d = Number(incomeAgg._sum.amount ?? 0)
+  const spending30d = Math.abs(Number(spendingAgg._sum.amount ?? 0))
   const balance = accounts.reduce((s, a) => s + Number(a.balance), 0)
 
   return {
@@ -123,7 +124,7 @@ export default defineEventHandler(async (event) => {
       balance: Math.round(balance * 100) / 100,
       spending30d: Math.round(spending30d * 100) / 100,
       income30d: Math.round(income30d * 100) / 100,
-      transactionCount: agg._count
+      transactionCount: txCount30d
     }
   }
 })

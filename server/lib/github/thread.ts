@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Fetch GitHub issue thread for in-app feedback history
+// ANCHOR: Fetch GitHub issue thread for in-app feedback history
 
 import type { FeedbackType } from '#shared/feedback'
 import {
@@ -13,6 +13,8 @@ export interface FeedbackThreadComment {
   id: number
   body: string
   createdAt: string
+  authorName: string
+  authorAvatar: string | null
   isTeam: boolean
 }
 
@@ -40,7 +42,7 @@ interface GitHubCommentResponse {
   id: number
   body: string
   created_at: string
-  user: { type: string } | null
+  user: { type: string, login?: string, avatar_url?: string | null } | null
 }
 
 export function isAutomatedFeedbackComment(body: string): boolean {
@@ -71,12 +73,17 @@ export async function fetchIssueThread(
 
   const visibleComments = comments
     .filter(comment => !isAutomatedFeedbackComment(comment.body))
-    .map(comment => ({
-      id: comment.id,
-      body: repairFeedbackMarkdown(comment.body),
-      createdAt: comment.created_at,
-      isTeam: comment.user?.type === 'User'
-    }))
+    .map((comment) => {
+      const isTeam = comment.user?.type === 'User'
+      return {
+        id: comment.id,
+        body: repairFeedbackMarkdown(comment.body),
+        createdAt: comment.created_at,
+        authorName: comment.user?.login ?? (isTeam ? 'FlowRate' : 'You'),
+        authorAvatar: comment.user?.avatar_url ?? null,
+        isTeam
+      }
+    })
 
   const displayLabels = filterFeedbackDisplayLabels(issue.labels)
   const replyCount = visibleComments.length

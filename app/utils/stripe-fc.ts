@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Stripe FC account ID extraction from Stripe.js session object
+// ANCHOR: Extract FC account IDs from Stripe.js session
 export function extractFcAccountIds(session: unknown): string[] {
   if (!session || typeof session !== 'object') return []
 

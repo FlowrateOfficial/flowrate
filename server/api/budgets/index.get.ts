@@ -1,5 +1,6 @@
 import { periodStart } from '../../utils/budgetPeriod'
 import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
+import type { BudgetPeriod } from '~~/generated/prisma/client'
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
@@ -35,26 +36,35 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
-  const earliestFrom = budgets.reduce((min, b) => {
-    const from = periodStart(b.period, now)
-    return from < min ? from : min
-  }, periodStart(budgets[0]!.period, now))
+  const periodStarts = new Map<string, Date>()
+  for (const budget of budgets) {
+    const from = periodStart(budget.period, now)
+    periodStarts.set(from.toISOString(), from)
+  }
 
-  const spendingTxs = await prisma.transaction.findMany({
-    where: {
-      spaceId: space.id,
-      accountId: { in: visibleAccountIds },
-      date: { gte: earliestFrom },
-      amount: { lt: 0 }
-    },
-    select: { amount: true, category: true, date: true }
-  })
+  const spentByPeriod = new Map<string, Map<string, number>>()
+
+  await Promise.all([...periodStarts.entries()].map(async ([key, from]) => {
+    const groups = await prisma.transaction.groupBy({
+      by: ['category'],
+      where: {
+        spaceId: space.id,
+        accountId: { in: visibleAccountIds },
+        date: { gte: from },
+        amount: { lt: 0 }
+      },
+      _sum: { amount: true }
+    })
+
+    spentByPeriod.set(
+      key,
+      new Map(groups.map(g => [g.category, Math.abs(Number(g._sum.amount ?? 0))]))
+    )
+  }))
 
   return budgets.map((b) => {
-    const from = periodStart(b.period, now)
-    const spent = spendingTxs
-      .filter(tx => tx.category === b.category && tx.date >= from)
-      .reduce((sum, tx) => sum + Math.abs(Number(tx.amount)), 0)
+    const fromKey = periodStart(b.period as BudgetPeriod, now).toISOString()
+    const spent = spentByPeriod.get(fromKey)?.get(b.category) ?? 0
 
     return {
       id: b.id,

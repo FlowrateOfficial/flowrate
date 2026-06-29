@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: OAuth client plugin — exchange neon_auth_session_verifier on landing
+// ANCHOR: OAuth verifier exchange on post-login landing
 import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 
 export default defineNuxtPlugin({

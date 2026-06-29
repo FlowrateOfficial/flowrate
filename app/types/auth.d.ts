@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Neon Auth session types (client)
+// ANCHOR: Neon Auth session type augmentations
 export interface NeonAuthUser {
   id: string
   email: string

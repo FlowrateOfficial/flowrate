@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Client Neon Auth — SDK on /api/auth; Google/GitHub via /auth/*
+// ANCHOR: Neon Auth composable for client sign-in
 import { getAuthClient, resetAuthClient } from '~/lib/auth-client'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -31,7 +31,7 @@ export function useNeonAuth() {
         credentials: 'include'
       })
     } catch {
-      // NOTE - Session may already be cleared
+      // NOTE - Sign-out may already have cleared session
     }
   }
 

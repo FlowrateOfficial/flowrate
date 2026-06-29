@@ -70,7 +70,7 @@ export function mapPlaidTransaction(tx: Transaction) {
   const merchant = tx.merchant_name ?? extractMerchant(description)
 
   return {
-    // Plaid: positive = money out; FlowRate: negative = expense
+    // NOTE - Plaid positive = outflow; FlowRate negative = expense
     amount: tx.amount > 0 ? -tx.amount : Math.abs(tx.amount),
     currency: (tx.iso_currency_code ?? tx.unofficial_currency_code ?? 'EUR').toUpperCase(),
     description,

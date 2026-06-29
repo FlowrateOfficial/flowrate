@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Budgets page — summary strip + create/edit modal
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Budgets', middleware: 'auth' })
@@ -25,17 +26,9 @@ const modalTitle = computed(() =>
   isEditing.value ? t('dashboard.budgets.editModalTitle') : t('dashboard.budgets.modalTitle')
 )
 
-const spaceId = computed(() => useSpacesStore().space?.id)
-await useAsyncData(
-  () => `budgets-${spaceId.value}`,
-  async () => {
-    await budgetsStore.fetchBudgets()
-    return null
-  },
-  { watch: [spaceId] }
-)
+await useSpaceStoreFetch('budgets', () => budgetsStore.fetchBudgets())
 
-useSeoMeta({ title: () => `${t('dashboard.budgets.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.budgets.title')
 </script>
 
 <template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// NOTE - ANCHOR: Header logo — mark image + optional FlowRate wordmark
-withDefaults(defineProps<{
+// ANCHOR: Header logo with optional wordmark
+const props = withDefaults(defineProps<{
   markSize?: number | string
   showWordmark?: boolean
-  /** Hide wordmark below sm — single mark on narrow screens */
+  // NOTE - Hide wordmark on narrow screens
   compactOnMobile?: boolean
   class?: string
 }>(), {
@@ -14,7 +14,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <span class="inline-flex items-center gap-2.5 shrink-0" :class="class">
+  <span class="inline-flex items-center gap-2.5 shrink-0" :class="props.class">
     <BrandFlowRateMark :size="markSize" />
     <span
       v-if="showWordmark"

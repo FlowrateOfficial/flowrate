@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: TipTap feedback editor — toolbar, image and video uploads
 import type { EditorCustomHandlers, EditorSuggestionMenuItem, EditorToolbarItem } from '@nuxt/ui'
 import type { Editor } from '@tiptap/vue-3'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
@@ -157,7 +158,7 @@ const suggestionItems = [[{
   icon: 'i-lucide-separator-horizontal'
 }]] satisfies EditorSuggestionMenuItem<typeof customHandlers>[][]
 
-// NOTE - Append menus to body on client to avoid z-index issues in dashboard shell
+// NOTE - Append editor menus to body for z-index
 const appendToBody = import.meta.client ? () => document.body : undefined
 
 function onMediaError(code: string) {
@@ -258,16 +259,16 @@ defineExpose({
       :extensions="[FeedbackImageUpload, FeedbackVideoUpload, FeedbackVideo]"
       :handlers="customHandlers"
       :mention="false"
-      class="min-h-[16rem] w-full"
+      class="min-h-64 w-full"
       :ui="{
-        base: 'px-4 py-3 text-sm leading-relaxed min-h-[14rem]',
-        content: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none'
+        base: 'px-4 py-3 text-sm leading-relaxed min-h-56',
+        content: 'prose prose-sm dark:prose-invert max-w-none focus:outline-hidden'
       }"
     >
       <UEditorToolbar
         :editor="editor"
         :items="fixedToolbarItems"
-        class="sticky top-0 z-10 border-b border-default bg-elevated/80 px-2 py-1.5 backdrop-blur overflow-x-auto"
+        class="sticky top-0 z-10 border-b border-default bg-elevated/80 px-2 py-1.5 backdrop-blur-sm overflow-x-auto"
       />
 
       <UEditorToolbar

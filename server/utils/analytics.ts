@@ -57,12 +57,63 @@ export function buildCashFlowSeries(
     else entry.spending += Math.abs(tx.amount)
   }
 
+  return serializeCashFlowBuckets(buckets)
+}
+
+export function buildCashFlowSeriesFromAggregates(
+  rows: Array<{ period: string, income: number, spending: number }>,
+  from: Date,
+  to: Date,
+  bucket: 'day' | 'month'
+) {
+  const buckets = new Map<string, { income: number, spending: number }>()
+
+  const cursor = new Date(from)
+  while (cursor <= to) {
+    const key = bucket === 'month' ? monthKey(cursor) : dayKey(cursor)
+    if (!buckets.has(key)) buckets.set(key, { income: 0, spending: 0 })
+    if (bucket === 'month') cursor.setMonth(cursor.getMonth() + 1)
+    else cursor.setDate(cursor.getDate() + 1)
+  }
+
+  for (const row of rows) {
+    const entry = buckets.get(row.period)
+    if (!entry) continue
+    entry.income += row.income
+    entry.spending += row.spending
+  }
+
+  return serializeCashFlowBuckets(buckets)
+}
+
+function serializeCashFlowBuckets(buckets: Map<string, { income: number, spending: number }>) {
   return [...buckets.entries()].map(([period, values]) => ({
     period,
     income: Math.round(values.income * 100) / 100,
     spending: Math.round(values.spending * 100) / 100,
     net: Math.round((values.income - values.spending) * 100) / 100
   }))
+}
+
+export function netWorthFromMonthlyTotals(
+  currentBalance: number,
+  monthlyNets: Array<{ period: string, net: number }>,
+  from: Date,
+  to: Date
+) {
+  const netByMonth = new Map(monthlyNets.map(row => [row.period, row.net]))
+  let balance = currentBalance
+  const points: Array<{ period: string, balance: number }> = []
+  const cursor = new Date(to)
+
+  while (cursor >= from) {
+    const key = monthKey(cursor)
+    points.unshift({ period: key, balance: Math.round(balance * 100) / 100 })
+    balance -= netByMonth.get(key) ?? 0
+    cursor.setMonth(cursor.getMonth() - 1)
+  }
+
+  return points
 }
 
 export function spendingByCategory(

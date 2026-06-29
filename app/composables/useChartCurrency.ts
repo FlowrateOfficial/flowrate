@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Chart axis and tooltip currency formatting
+// ANCHOR: Chart axis and tooltip currency formatters
 import { formatCompactMoney } from '#shared/currency'
 
 export function useChartCurrency(currency?: MaybeRef<string | undefined>) {

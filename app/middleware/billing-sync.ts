@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Post-checkout billing sync — webhooks may lag in local dev
+// ANCHOR: Force billing sync after checkout return
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.query.upgraded !== '1') return
 

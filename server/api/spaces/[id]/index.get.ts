@@ -7,8 +7,46 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.method === 'GET') {
+    const view = String(getQuery(event).view ?? '').toLowerCase()
+    if (view === 'team' || view === 'guardians') {
+      const members = await prisma.spaceMember.findMany({
+        where: {
+          spaceId,
+          ...(view === 'guardians' ? { role: { notIn: ['CHILD', 'TEEN'] } } : {})
+        },
+        select: {
+          id: true,
+          userId: true,
+          email: true,
+          name: true,
+          role: true,
+          status: true,
+          user: { select: { email: true, name: true } }
+        },
+        orderBy: { createdAt: 'asc' }
+      })
+
+      return {
+        id: space.id,
+        name: space.name,
+        type: space.type,
+        role: membership.role,
+        members: members.map(m => ({
+          id: m.id,
+          userId: m.userId,
+          email: m.user?.email ?? m.email,
+          name: m.user?.name ?? m.name,
+          role: m.role,
+          status: m.status
+        }))
+      }
+    }
+
     const members = await prisma.spaceMember.findMany({
-      where: { spaceId },
+      where: {
+        spaceId,
+        ...(view === 'children' ? { role: { in: ['CHILD', 'TEEN'] } } : {})
+      },
       include: {
         user: { select: { id: true, name: true, email: true, avatar: true } },
         childProfile: { include: { jars: true } }
@@ -16,10 +54,12 @@ export default defineEventHandler(async (event) => {
       orderBy: { createdAt: 'asc' }
     })
 
-    const accounts = await prisma.account.findMany({
-      where: { spaceId, ...accountVisibilityFilter(user.id, membership.role) },
-      select: { id: true, name: true, balance: true, visibility: true, userId: true, type: true }
-    })
+    const accounts = view === 'children'
+      ? []
+      : await prisma.account.findMany({
+          where: { spaceId, ...accountVisibilityFilter(user.id, membership.role) },
+          select: { id: true, name: true, balance: true, visibility: true, userId: true, type: true }
+        })
 
     const childMembers = members.filter(
       m => (m.role === 'CHILD' || m.role === 'TEEN') && m.userId
@@ -28,7 +68,7 @@ export default defineEventHandler(async (event) => {
 
     const childSummaries = new Map<string, { balance: number, spending30d: number, accountCount: number }>()
 
-    if (childUserIds.length) {
+    if (childUserIds.length && view !== 'guardians') {
       const since = new Date()
       since.setDate(since.getDate() - 30)
 

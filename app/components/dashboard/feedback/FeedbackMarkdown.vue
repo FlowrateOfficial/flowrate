@@ -10,7 +10,7 @@ const html = computed(() => feedbackMarkdownToHtml(repairFeedbackMarkdown(props.
 
 <template>
   <div
-    class="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed break-words [&_img]:my-2 [&_img]:max-h-80 [&_img]:w-auto [&_img]:rounded-lg [&_img]:border [&_img]:border-default"
+    class="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed wrap-break-word [&_img]:my-2 [&_img]:max-h-80 [&_img]:w-auto [&_img]:rounded-lg [&_img]:border [&_img]:border-default"
     v-html="html"
   />
 </template>

@@ -1,5 +1,6 @@
-import type { TableColumn } from '@nuxt/ui'
+// ANCHOR: Family store — members, children, splits, allowance
 import type { TransactionRow } from '~/types/financial'
+import { createTransactionColumns } from '~/utils/table-columns'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
@@ -70,7 +71,7 @@ export interface MemberFinancial {
 }
 
 export const useFamilyStore = defineStore('family', () => {
-  const { t, categoryLabel, intlLocale, formatCurrency } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, formatShortDateWithYear, roleLabel, memberStatusLabel } = useAppI18n()
   const spacesStore = useSpacesStore()
   const appToast = useAppToast()
   const { api } = useApi()
@@ -111,6 +112,7 @@ export const useFamilyStore = defineStore('family', () => {
   })
 
   watch(tabs, (items) => {
+    // NOTE - Hide children tab when plan drops teen feature
     if (tab.value === 'children' && !items.some(item => item.value === 'children')) {
       tab.value = 'members'
     }
@@ -145,41 +147,22 @@ export const useFamilyStore = defineStore('family', () => {
     return formatCurrency(amount, currency)
   }
 
-  function roleLabel(role: string) {
-    const key = `roles.${role}`
-    const translated = t(key)
-    return translated !== key ? translated : role.toLowerCase().replace('_', ' ')
-  }
-
   function statusLabel(status: string) {
-    const key = `memberStatus.${status}`
-    const translated = t(key)
-    return translated !== key ? translated : status
+    return memberStatusLabel(status)
   }
 
   function formatDate(dateStr: string) {
-    return new Intl.DateTimeFormat(intlLocale.value, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    }).format(new Date(dateStr))
+    return formatShortDateWithYear(dateStr)
   }
 
-  function transactionColumns(): TableColumn<TransactionRow>[] {
-    return [
-      { accessorKey: 'date', header: t('dashboard.transactions.columns.date') },
-      { accessorKey: 'description', header: t('dashboard.transactions.columns.description') },
-      { accessorKey: 'category', header: t('dashboard.transactions.columns.category') },
-      {
-        accessorKey: 'amount',
-        header: t('dashboard.transactions.columns.amount'),
-        meta: { class: { th: 'text-right', td: 'text-right' } }
-      }
-    ]
-  }
+  const transactionColumns = computed(() =>
+    createTransactionColumns<TransactionRow>(t)
+  )
 
-  async function fetchSpaceDetail(spaceId: string) {
-    return api<SpaceDetail>(apiRoutes.spaces.detail(spaceId))
+  async function fetchSpaceDetail(spaceId: string, view?: 'guardians' | 'children') {
+    return api<SpaceDetail>(apiRoutes.spaces.detail(spaceId), {
+      query: view ? { view } : undefined
+    })
   }
 
   async function fetchMemberFinancial(spaceId: string, memberId: string) {

@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Shared GitHub REST helpers for feedback issues
+// ANCHOR: Shared GitHub REST helpers for feedback issues
 
 import { FEEDBACK_MEDIA_BRANCH } from '#shared/feedback'
 
@@ -19,7 +19,7 @@ export function githubHeaders(token: string): Record<string, string> {
   }
 }
 
-/** Public GitHub blob URL that renders in issues and in-app img tags */
+// NOTE - Public blob URL for issues and in-app img tags
 export function issueAssetUrl(
   owner: string,
   name: string,
@@ -83,7 +83,7 @@ async function createOrphanMediaBranch(
   })
 }
 
-/** Standalone orphan branch — only feedback uploads, never merged into app code */
+// NOTE - Orphan branch for feedback media only — never merged
 export async function ensureFeedbackMediaBranch(
   token: string,
   owner: string,

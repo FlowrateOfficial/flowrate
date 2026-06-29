@@ -1,15 +1,14 @@
 <script setup lang="ts">
+// ANCHOR: Dashboard overview — stats, charts, recent activity
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Overview', middleware: 'auth' })
 
 const { t } = useAppI18n()
-const spacesStore = useSpacesStore()
 const dashboardStore = useDashboardStore()
 
-useSeoMeta({ title: () => `${t('dashboard.overview.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.overview.title')
 
-const spaceId = computed(() => spacesStore.space?.id)
 const {
   statsLoading,
   txLoading,
@@ -33,14 +32,7 @@ const {
   recentTransactions
 } = storeToRefs(dashboardStore)
 
-await useAsyncData(
-  () => `dashboard-overview-${spaceId.value}`,
-  async () => {
-    await dashboardStore.fetchOverview()
-    return null
-  },
-  { watch: [spaceId] }
-)
+await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOverview())
 </script>
 
 <template>

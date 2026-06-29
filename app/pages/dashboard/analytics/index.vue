@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Analytics page — charts by range; refetch on range change
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Analytics', middleware: 'auth' })
@@ -26,17 +27,9 @@ const {
 
 const hasConnectedAccounts = computed(() => (data.value?.summary.linkedAccountCount ?? 0) > 0)
 
-const spaceId = computed(() => useSpacesStore().space?.id)
-await useAsyncData(
-  () => `analytics-${spaceId.value}-${range.value}`,
-  async () => {
-    await analyticsStore.fetchOverview()
-    return null
-  },
-  { watch: [spaceId, range] }
-)
+await useSpaceStoreFetch('analytics', () => analyticsStore.fetchOverview(), [range])
 
-useSeoMeta({ title: () => `${t('dashboard.analytics.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.analytics.title')
 </script>
 
 <template>

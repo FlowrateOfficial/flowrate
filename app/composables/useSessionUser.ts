@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Layout session check — logo target, guest UI
+// ANCHOR: Session state for layout and nav targets
 export function useSessionUser() {
   const { getSession } = useNeonAuth()
 

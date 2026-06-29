@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Create GitHub feedback issues with anchored follow-up comments
+// ANCHOR: Create GitHub feedback issues with anchored follow-up comments
 
 import { FEEDBACK_ANCHORS, FEEDBACK_ATTACH_PREFIX, feedbackLabelsForType, type FeedbackType } from '#shared/feedback'
 import type { FeedbackUploadFailure } from './assets'

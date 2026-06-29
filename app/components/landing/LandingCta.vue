@@ -8,7 +8,7 @@ const { t } = useAppI18n()
       <div class="relative overflow-hidden py-28 sm:py-36">
         <div class="landing-mesh pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
 
-        <div class="relative editorial-card !p-10 sm:!p-14 text-center max-w-3xl mx-auto landing-section-panel">
+        <div class="relative editorial-card p-10! sm:p-14! text-center max-w-3xl mx-auto landing-section-panel">
           <h2 class="text-display-section text-flow-ink dark:text-flow-ink-dark mb-6">
             {{ t('landing.ctaTitle') }}
           </h2>

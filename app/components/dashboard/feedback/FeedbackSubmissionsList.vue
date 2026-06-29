@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: User feedback submissions list (GitHub issues)
 import type { FeedbackSubmissionSummary } from '~/types/feedback'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -7,7 +8,7 @@ const emit = defineEmits<{
   select: [issueNumber: number]
 }>()
 
-const { t } = useAppI18n()
+const { t, formatOptionalDate, feedbackTypeLabel } = useAppI18n()
 const { api } = useApi()
 
 const { data, pending, refresh } = useAsyncData(
@@ -22,17 +23,6 @@ const { data, pending, refresh } = useAsyncData(
 defineExpose({ refresh })
 
 const submissions = computed(() => data.value?.submissions ?? [])
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value))
-}
-
-function typeLabel(type: string) {
-  if (type === 'review' || type === 'feature' || type === 'bug') {
-    return t(`dashboard.feedback.types.${type}`)
-  }
-  return type
-}
 </script>
 
 <template>
@@ -72,9 +62,9 @@ function typeLabel(type: string) {
               {{ item.title }}
             </p>
             <div class="flex flex-wrap items-center gap-2 text-xs text-muted">
-              <span>{{ typeLabel(item.type) }}</span>
+              <span>{{ feedbackTypeLabel(item.type) }}</span>
               <span>·</span>
-              <span>{{ formatDate(item.submittedAt) }}</span>
+              <span>{{ formatOptionalDate(item.submittedAt) }}</span>
             </div>
             <DashboardFeedbackLabelBadges
               v-if="item.labels.length"
