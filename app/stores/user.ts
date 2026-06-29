@@ -1,8 +1,9 @@
-// NOTE - ANCHOR: User profile store — bootstrap, nav, settings, account menu
+// ANCHOR: User profile store — bootstrap and settings
 import type { AppPlan } from '#shared/billing'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import type { UserProfile } from '~/types/user'
+import { resolveErrorMessage } from '~/utils/errors'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -20,6 +21,23 @@ export const useUserStore = defineStore('user', () => {
   const isAdmin = ref(false)
   const loading = ref(false)
   const bootstrapped = ref(false)
+
+  const profileForm = reactive({
+    name: '',
+    email: '',
+    phone: ''
+  })
+  const verificationCode = ref('')
+  const showVerificationInput = ref(false)
+  const isSavingProfile = ref(false)
+  const isVerifyingPhone = ref(false)
+  const isResendingCode = ref(false)
+
+  const deleteModalOpen = ref(false)
+  const deleteConfirmEmail = ref('')
+  const deleteConfirmPassword = ref('')
+  const deleteAcknowledged = ref(false)
+  const isDeletingAccount = ref(false)
 
   const navItems = computed(() => {
     if (spacesStore.isChildManaged) {
@@ -64,7 +82,7 @@ export const useUserStore = defineStore('user', () => {
     }
 
     if (!spacesStore.isCompany) {
-      // NOTE - Overview link already first for non-business spaces
+      // NOTE - Overview already first for household spaces
     } else if (!items.some(i => i.to === '/dashboard')) {
       items.splice(1, 0, { label: t('nav.overview'), icon: 'i-lucide-layout-dashboard', to: '/dashboard' })
     }
@@ -159,6 +177,80 @@ export const useUserStore = defineStore('user', () => {
     activePlan.value = profile.plan
     billing.value = profile.billing ?? null
     isAdmin.value = profile.isAdmin ?? false
+  }
+
+  function applySettingsForm(profile: UserProfile) {
+    profileForm.name = profile.name ?? ''
+    profileForm.email = profile.email
+    profileForm.phone = profile.phone ?? ''
+    phoneVerified.value = profile.phoneVerified
+    showVerificationInput.value = Boolean(profile.phone && !profile.phoneVerified)
+  }
+
+  function openDeleteModal() {
+    deleteConfirmEmail.value = profileForm.email
+    deleteConfirmPassword.value = ''
+    deleteAcknowledged.value = false
+    deleteModalOpen.value = true
+  }
+
+  async function saveProfileForm() {
+    isSavingProfile.value = true
+    try {
+      const data = await updateProfile({
+        name: profileForm.name,
+        phone: profileForm.phone.trim() || null
+      })
+      applySettingsForm(data)
+      return data
+    } finally {
+      isSavingProfile.value = false
+    }
+  }
+
+  function profileSaveErrorMessage(err: unknown) {
+    const message = resolveErrorMessage(err, t, 'dashboard.settings.tryAgain')
+    if (message.includes('already')) return t('dashboard.settings.phoneTaken')
+    if (message.includes('E.164') || message.includes('valid')) return t('dashboard.settings.phoneInvalid')
+    return message
+  }
+
+  async function verifyPhoneForm() {
+    if (!verificationCode.value.trim()) return false
+    isVerifyingPhone.value = true
+    try {
+      await verifyPhoneCode(verificationCode.value.trim())
+      showVerificationInput.value = false
+      verificationCode.value = ''
+      return true
+    } finally {
+      isVerifyingPhone.value = false
+    }
+  }
+
+  async function resendPhoneForm() {
+    isResendingCode.value = true
+    try {
+      await resendPhoneCode()
+      return true
+    } finally {
+      isResendingCode.value = false
+    }
+  }
+
+  async function confirmDeleteAccountForm() {
+    if (!deleteAcknowledged.value) return false
+    isDeletingAccount.value = true
+    try {
+      await deleteAccount({
+        confirmEmail: deleteConfirmEmail.value.trim(),
+        password: deleteConfirmPassword.value.trim() || undefined
+      })
+      deleteModalOpen.value = false
+      return true
+    } finally {
+      isDeletingAccount.value = false
+    }
   }
 
   async function bootstrap() {
@@ -265,12 +357,31 @@ export const useUserStore = defineStore('user', () => {
     plan,
     isAdmin,
     loading,
+    profileForm,
+    verificationCode,
+    showVerificationInput,
+    isSavingProfile,
+    isVerifyingPhone,
+    isResendingCode,
+    deleteModalOpen,
+    deleteConfirmEmail,
+    deleteConfirmPassword,
+    deleteAcknowledged,
+    isDeletingAccount,
     navItems,
     bottomItems,
     accountMenuLinks,
     getAccountMenuLinks,
     userMenuItems,
     isActive,
+    applyProfile,
+    applySettingsForm,
+    openDeleteModal,
+    saveProfileForm,
+    profileSaveErrorMessage,
+    verifyPhoneForm,
+    resendPhoneForm,
+    confirmDeleteAccountForm,
     bootstrap,
     bootstrapped,
     fetchProfile,

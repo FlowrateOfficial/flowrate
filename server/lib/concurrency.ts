@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Bounded concurrency for GitHub / IO batches
+// ANCHOR: Bounded concurrency for GitHub / IO batches
 
 export async function mapConcurrent<T, R>(
   items: readonly T[],

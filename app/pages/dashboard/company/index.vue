@@ -1,33 +1,38 @@
 <script setup lang="ts">
+// ANCHOR: Company page — burn rate, team, setup steps
 import { storeToRefs } from 'pinia'
-import type { BusinessOverview } from '~/types/dashboard'
 
 definePageMeta({ layout: 'dashboard', title: 'Business', middleware: 'auth' })
 
 const route = useRoute()
-const { t, formatCurrency } = useAppI18n()
+const { t } = useAppI18n()
 const spacesStore = useSpacesStore()
 const businessStore = useBusinessStore()
-const { tab, inviting, overview, overviewPending } = storeToRefs(businessStore)
+const {
+  tab,
+  inviting,
+  overview,
+  overviewPending,
+  teamMembers,
+  teamPending,
+  setupSteps
+} = storeToRefs(businessStore)
 const { isBusinessReadOnly, canManageBusiness } = storeToRefs(spacesStore)
 
-useSeoMeta({ title: () => `${t('dashboard.company.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.company.title')
 
 const spaceId = computed(() => spacesStore.space?.id ?? '')
 
-const { data: spaceDetail, refresh: refreshTeam } = await useAsyncData(
-  () => `business-team-${spaceId.value}`,
-  () => spaceId.value ? businessStore.fetchSpaceDetail(spaceId.value) : Promise.resolve(null),
-  { watch: [spaceId] }
+await useSpaceStoreFetch('business-overview', () =>
+  spaceId.value ? businessStore.fetchOverview(spaceId.value) : Promise.resolve()
 )
 
-await useAsyncData(
-  () => `business-overview-${spaceId.value}`,
-  () => spaceId.value ? businessStore.fetchOverview(spaceId.value) : Promise.resolve(),
-  { watch: [spaceId] }
-)
-
-const pending = overviewPending
+watch(tab, (val) => {
+  // NOTE - Team tab loads members lazily
+  if (val === 'team' && spaceId.value) {
+    businessStore.fetchTeam(spaceId.value)
+  }
+}, { immediate: true })
 
 onMounted(() => {
   if (route.query.tab === 'team') businessStore.tab = 'team'
@@ -38,48 +43,11 @@ watch(() => route.query.tab, (val) => {
   else if (val === 'overview') businessStore.tab = 'overview'
 })
 
-const teamMembers = computed(() => spaceDetail.value?.members ?? [])
-
-function fmt(n: number) {
-  return formatCurrency(n)
+function refreshTeam() {
+  if (spaceId.value) return businessStore.fetchTeam(spaceId.value, true)
 }
 
-function runwayLabel(months: number | null | undefined) {
-  if (months == null || months > 99) return t('dashboard.company.stats.infinite')
-  return t('dashboard.company.stats.months', { count: months })
-}
-
-function alertMessage(alert: BusinessOverview['alerts'][number]) {
-  const key = `dashboard.company.alerts.${alert.code}`
-  const params = alert.params
-    ? Object.fromEntries(Object.entries(alert.params).map(([k, v]) => [k, String(v)]))
-    : undefined
-  return t(key, params)
-}
-
-const setupSteps = computed(() => [
-  {
-    done: overview.value?.setup.hasAccounts,
-    title: t('dashboard.company.setup.step1Title'),
-    description: t('dashboard.company.setup.step1Desc'),
-    to: '/dashboard/accounts',
-    cta: t('dashboard.company.setup.step1Cta')
-  },
-  {
-    done: overview.value?.setup.hasTransactions,
-    title: t('dashboard.company.setup.step2Title'),
-    description: t('dashboard.company.setup.step2Desc'),
-    to: '/dashboard/transactions',
-    cta: t('dashboard.company.setup.step2Cta')
-  },
-  {
-    done: overview.value?.setup.complete,
-    title: t('dashboard.company.setup.step3Title'),
-    description: t('dashboard.company.setup.step3Desc'),
-    to: '/dashboard/subscriptions',
-    cta: t('dashboard.company.setup.step3Cta')
-  }
-])
+const pending = overviewPending
 </script>
 
 <template>
@@ -166,7 +134,10 @@ const setupSteps = computed(() => [
           <div class="border-b border-default px-4 py-3 sm:px-5">
             <h2 class="text-base font-semibold">{{ t('dashboard.company.team.membersTitle') }}</h2>
           </div>
-          <ul class="divide-y divide-default">
+          <div v-if="teamPending" class="p-6 text-center">
+            <UIcon name="i-lucide-loader-2" class="mx-auto size-6 animate-spin text-muted" />
+          </div>
+          <ul v-else class="divide-y divide-default">
             <li
               v-for="member in teamMembers"
               :key="member.id"
@@ -189,14 +160,13 @@ const setupSteps = computed(() => [
         <div v-if="pending" class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
           <UCard v-for="i in 4" :key="i" :ui="{ body: 'p-3 sm:p-4' }">
             <div class="animate-pulse space-y-2">
-              <div class="h-3.5 w-20 rounded bg-elevated" />
-              <div class="h-7 w-28 rounded bg-elevated/70" />
+              <div class="h-3.5 w-20 rounded-sm bg-elevated" />
+              <div class="h-7 w-28 rounded-sm bg-elevated/70" />
             </div>
           </UCard>
         </div>
 
         <template v-else-if="overview">
-      <!-- NOTE - Guided setup when empty -->
           <UCard v-if="!overview.setup.complete" :ui="{ body: 'p-4 sm:p-5' }">
             <h2 class="mb-1 text-base font-semibold sm:text-lg">{{ t('dashboard.company.setup.title') }}</h2>
             <p class="mb-5 max-w-2xl text-sm text-muted">{{ t('dashboard.company.setup.subtitle') }}</p>
@@ -229,39 +199,37 @@ const setupSteps = computed(() => [
             </ol>
           </UCard>
 
-          <!-- NOTE - Alerts -->
           <div v-if="overview.alerts.length" class="space-y-2">
             <h2 class="text-base font-semibold">{{ t('dashboard.company.alertsTitle') }}</h2>
             <UAlert
               v-for="(alert, i) in overview.alerts"
               :key="`${alert.code}-${i}`"
-              :description="alertMessage(alert)"
+              :description="businessStore.alertMessage(alert)"
               :color="alert.severity === 'critical' ? 'error' : alert.severity === 'warning' ? 'warning' : 'neutral'"
               variant="subtle"
               :icon="alert.severity === 'critical' ? 'i-lucide-alert-circle' : alert.severity === 'warning' ? 'i-lucide-triangle-alert' : 'i-lucide-info'"
             />
           </div>
 
-          <!-- NOTE - Metrics -->
           <div class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
             <DashboardStatsCard
               :title="t('dashboard.company.stats.cash')"
-              :value="fmt(overview.cash)"
+              :value="businessStore.fmt(overview.cash)"
               icon="i-lucide-landmark"
             />
             <DashboardStatsCard
               :title="t('dashboard.company.stats.burn')"
-              :value="fmt(overview.netBurn)"
+              :value="businessStore.fmt(overview.netBurn)"
               icon="i-lucide-flame"
             />
             <DashboardStatsCard
               :title="t('dashboard.company.stats.runway')"
-              :value="runwayLabel(overview.runwayMonths)"
+              :value="businessStore.runwayLabel(overview.runwayMonths)"
               icon="i-lucide-timer"
             />
             <DashboardStatsCard
               :title="t('dashboard.company.stats.waste')"
-              :value="fmt(overview.subscriptionWaste)"
+              :value="businessStore.fmt(overview.subscriptionWaste)"
               icon="i-lucide-shield-alert"
             />
           </div>
@@ -272,20 +240,20 @@ const setupSteps = computed(() => [
               <dl class="space-y-3 text-sm">
                 <div class="flex justify-between gap-4">
                   <dt class="text-muted">{{ t('dashboard.company.income') }}</dt>
-                  <dd class="font-medium text-green-600 tabular-nums">{{ fmt(overview.monthlyIncome) }}</dd>
+                  <dd class="font-medium text-green-600 tabular-nums">{{ businessStore.fmt(overview.monthlyIncome) }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                   <dt class="text-muted">{{ t('dashboard.company.expenses') }}</dt>
-                  <dd class="font-medium tabular-nums">{{ fmt(overview.monthlyBurn) }}</dd>
+                  <dd class="font-medium tabular-nums">{{ businessStore.fmt(overview.monthlyBurn) }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                   <dt class="text-muted">{{ t('dashboard.company.subscriptions') }}</dt>
-                  <dd class="font-medium tabular-nums">{{ fmt(overview.monthlySubscriptions) }}</dd>
+                  <dd class="font-medium tabular-nums">{{ businessStore.fmt(overview.monthlySubscriptions) }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                   <dt class="text-muted">{{ t('dashboard.company.cloudDev') }}</dt>
                   <dd class="font-medium tabular-nums">
-                    {{ overview.cloudSpend != null ? fmt(overview.cloudSpend) : '—' }}
+                    {{ overview.cloudSpend != null ? businessStore.fmt(overview.cloudSpend) : '—' }}
                   </dd>
                 </div>
               </dl>
@@ -297,7 +265,7 @@ const setupSteps = computed(() => [
                 {{ t('dashboard.company.activeSubs', { count: overview.activeSubscriptions }) }}
               </p>
               <p v-if="overview.subscriptionWaste > 0" class="text-sm text-amber-600 mb-4">
-                {{ t('dashboard.company.duplicateWaste', { amount: fmt(overview.subscriptionWaste) }) }}
+                {{ t('dashboard.company.duplicateWaste', { amount: businessStore.fmt(overview.subscriptionWaste) }) }}
               </p>
               <UButton
                 to="/dashboard/subscriptions"
@@ -316,7 +284,7 @@ const setupSteps = computed(() => [
                   class="flex justify-between gap-3"
                 >
                   <span class="truncate text-muted">{{ vendor.name }}</span>
-                  <span class="font-medium tabular-nums shrink-0">{{ fmt(vendor.amount) }}</span>
+                  <span class="font-medium tabular-nums shrink-0">{{ businessStore.fmt(vendor.amount) }}</span>
                 </li>
               </ul>
               <p v-else class="text-sm text-muted">{{ t('dashboard.company.noVendors') }}</p>

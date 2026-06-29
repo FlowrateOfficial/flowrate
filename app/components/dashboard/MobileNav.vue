@@ -21,7 +21,7 @@ const isAccountActive = computed(() =>
   <ClientOnly>
     <nav
       :key="spaceNavKey"
-      class="fixed inset-x-0 bottom-0 z-50 border-t border-default bg-default/95 backdrop-blur-md lg:hidden"
+      class="fixed inset-x-0 bottom-0 z-50 border-t border-default bg-default/95 backdrop-blur-sm lg:hidden"
       :aria-label="t('dashboard.layout.mobileNav')"
     >
       <div class="flex gap-0.5 px-1.5 py-1.5 safe-area-pb sm:gap-1 sm:px-2 sm:py-2">
@@ -32,7 +32,7 @@ const isAccountActive = computed(() =>
           color="neutral"
           variant="ghost"
           size="sm"
-          class="mobile-nav-tab min-h-[3.75rem] min-w-0 flex-1 flex-col gap-0.5 px-0.5 sm:min-h-14 sm:gap-1 sm:px-1"
+          class="mobile-nav-tab min-h-15 min-w-0 flex-1 flex-col gap-0.5 px-0.5 sm:min-h-14 sm:gap-1 sm:px-1"
           :class="userStore.isActive(item.to) ? 'text-default' : 'text-muted'"
           :aria-label="item.label"
           :title="item.label"
@@ -47,7 +47,7 @@ const isAccountActive = computed(() =>
           color="neutral"
           variant="ghost"
           size="sm"
-          class="mobile-nav-tab min-h-[3.75rem] min-w-0 flex-1 flex-col gap-0.5 px-0.5 sm:min-h-14 sm:gap-1 sm:px-1"
+          class="mobile-nav-tab min-h-15 min-w-0 flex-1 flex-col gap-0.5 px-0.5 sm:min-h-14 sm:gap-1 sm:px-1"
           :class="isAccountActive ? 'text-default' : 'text-muted'"
           :aria-label="t('common.account')"
           :title="t('common.account')"
@@ -63,7 +63,7 @@ const isAccountActive = computed(() =>
 
     <template #fallback>
       <nav
-        class="fixed inset-x-0 bottom-0 z-50 border-t border-default bg-default/95 backdrop-blur-md lg:hidden"
+        class="fixed inset-x-0 bottom-0 z-50 border-t border-default bg-default/95 backdrop-blur-sm lg:hidden"
         aria-hidden="true"
       >
         <div class="flex gap-1 px-2 py-2 safe-area-pb">

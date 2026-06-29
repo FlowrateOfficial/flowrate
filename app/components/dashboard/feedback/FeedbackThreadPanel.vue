@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Single feedback thread — description + team replies
 import type { FeedbackThread } from '~/types/feedback'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -7,7 +8,7 @@ const props = defineProps<{
   issueNumber: number
 }>()
 
-const { t } = useAppI18n()
+const { t, formatOptionalDate, formatDateTime, feedbackTypeLabel } = useAppI18n()
 const appToast = useAppToast()
 const { api } = useApi()
 
@@ -22,26 +23,13 @@ const { data, pending, error, refresh } = useAsyncData(
 
 const thread = computed(() => data.value?.thread)
 
-const typeLabel = computed(() => {
-  const type = thread.value?.type
-  if (type === 'review' || type === 'feature' || type === 'bug') {
-    return t(`dashboard.feedback.types.${type}`)
-  }
-  return type ?? ''
-})
+const typeLabel = computed(() => feedbackTypeLabel(thread.value?.type ?? ''))
 
 watch(error, (value) => {
   if (value) {
     appToast.error(t('dashboard.feedback.threadLoadFailed'), t('dashboard.feedback.tryAgain'))
   }
 })
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  }).format(new Date(value))
-}
 </script>
 
 <template>
@@ -84,7 +72,7 @@ function formatDate(value: string) {
           :label="typeLabel"
         />
         <span class="text-xs text-muted">
-          {{ t('dashboard.feedback.submittedOn', { date: formatDate(thread.submittedAt) }) }}
+          {{ t('dashboard.feedback.submittedOn', { date: formatOptionalDate(thread.submittedAt) }) }}
         </span>
       </div>
 
@@ -123,7 +111,7 @@ function formatDate(value: string) {
                 {{ reply.authorName }}
               </p>
               <p class="text-xs text-muted">
-                {{ formatDate(reply.createdAt) }}
+                {{ formatDateTime(reply.createdAt) }}
               </p>
             </div>
           </div>

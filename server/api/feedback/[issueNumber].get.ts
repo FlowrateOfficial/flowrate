@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const thread = await fetchIssueThread(
+    const issue = await fetchIssueThread(
       config.githubToken,
       config.githubFeedbackRepo,
       issueNumber,
@@ -34,7 +34,30 @@ export default defineEventHandler(async (event) => {
       { submissionId: submission.id }
     )
 
-    return { thread }
+    const updatedAt = issue.comments.reduce(
+      (latest, comment) => (comment.createdAt > latest ? comment.createdAt : latest),
+      issue.createdAt
+    )
+
+    return {
+      thread: {
+        issueNumber: issue.issueNumber,
+        title: issue.title,
+        state: issue.state,
+        type: submission.type,
+        submittedAt: issue.createdAt,
+        updatedAt,
+        description: issue.body,
+        labels: issue.labels,
+        replies: issue.comments.map(comment => ({
+          id: comment.id,
+          authorName: comment.authorName,
+          authorAvatar: comment.authorAvatar,
+          body: comment.body,
+          createdAt: comment.createdAt
+        }))
+      }
+    }
   } catch {
     throw createError({
       statusCode: 502,

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+// ANCHOR: Accounts page — connect banks, filter visibility
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Accounts', middleware: 'auth' })
 
 const { t } = useAppI18n()
-const spacesStore = useSpacesStore()
 const accountsStore = useAccountsStore()
 const {
   accounts,
@@ -38,17 +38,9 @@ const accountsDescription = computed(() => {
     : t('dashboard.accounts.subtitleSimple')
 })
 
-const spaceId = computed(() => spacesStore.space?.id)
-await useAsyncData(
-  () => `accounts-${spaceId.value}`,
-  async () => {
-    await accountsStore.fetchAccounts()
-    return null
-  },
-  { watch: [spaceId] }
-)
+await useSpaceStoreFetch('accounts', () => accountsStore.fetchAccounts())
 
-useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.accounts.title')
 </script>
 
 <template>
@@ -155,8 +147,8 @@ useSeoMeta({ title: () => `${t('dashboard.accounts.title')} — ${t('common.appN
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         <UCard v-if="pending" v-for="i in 3" :key="`skeleton-${i}`" :ui="{ body: 'p-6' }">
           <div class="animate-pulse space-y-4">
-            <div class="h-5 w-3/4 rounded bg-elevated" />
-            <div class="h-10 w-1/2 rounded bg-elevated/70" />
+            <div class="h-5 w-3/4 rounded-sm bg-elevated" />
+            <div class="h-10 w-1/2 rounded-sm bg-elevated/70" />
           </div>
         </UCard>
 

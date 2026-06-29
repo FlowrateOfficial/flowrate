@@ -1,8 +1,8 @@
 <script setup lang="ts">
-// NOTE - ANCHOR: App mark — served from /public/flowrate_logo.png
+// ANCHOR: FlowRate mark image from public assets
 const LOGO_SRC = '/flowrate_logo.png'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   size?: number | string
   class?: string
 }>(), {
@@ -14,9 +14,9 @@ withDefaults(defineProps<{
   <img
     :src="LOGO_SRC"
     alt=""
-    :width="size"
-    :height="size"
+    :width="props.size"
+    :height="props.size"
     class="shrink-0 object-contain"
-    :class="class"
+    :class="props.class"
   >
 </template>

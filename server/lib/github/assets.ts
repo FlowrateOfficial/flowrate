@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Upload feedback media into the private feedback repo
+// ANCHOR: Upload feedback media into the private feedback repo
 
 import { FEEDBACK_UPLOAD_CONCURRENCY } from '#shared/feedback'
 import { mapConcurrent } from '../concurrency'

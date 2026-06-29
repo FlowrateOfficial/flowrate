@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: OAuth redirect handler — GET /auth/google|github?redirect=
+// ANCHOR: OAuth redirect handler — GET /auth/google|github?redirect=
 import type { H3Event } from 'h3'
 import { getSocialOAuthRedirectUrl } from '../utils/neonAuthProxy'
 

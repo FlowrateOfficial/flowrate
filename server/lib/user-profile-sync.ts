@@ -1,3 +1,4 @@
+// ANCHOR: Sync profile name/email/phone to Neon Auth + Stripe
 import type { H3Event } from 'h3'
 import { getStripeCustomerId } from './billing/repository'
 import { requireStripe } from './stripe'
@@ -57,7 +58,7 @@ async function syncStripeCustomerProfile(
   }
 }
 
-/** Push verified profile phone to Stripe customer (best-effort). */
+// NOTE - Push verified phone to Stripe (best-effort)
 export async function syncVerifiedPhoneToStripe(
   event: H3Event,
   userId: string,
@@ -77,7 +78,7 @@ export async function syncVerifiedPhoneToStripe(
   }
 }
 
-/** Push DB profile fields to Neon Auth session + Stripe customer (best-effort). */
+// NOTE - Push DB profile to Neon Auth + Stripe (best-effort)
 export async function syncUserProfileToIntegrations(
   event: H3Event,
   profile: UserProfileSyncInput

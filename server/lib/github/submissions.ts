@@ -1,8 +1,9 @@
-// NOTE - ANCHOR: Feedback submission persistence + cached GitHub metadata
+// ANCHOR: Feedback submission persistence + cached GitHub metadata
 
 import type { FeedbackType, FeedbackUserLabel } from '#shared/feedback'
+import type { FeedbackLabel } from '#shared/feedback'
+import { feedbackDisplayLabelsFromJson } from '#shared/feedback'
 import {
-  labelsFromJson,
   isFeedbackSyncStale,
   syncStaleSubmissions
 } from './sync'
@@ -11,10 +12,10 @@ export interface FeedbackSubmissionSummary {
   issueNumber: number
   type: FeedbackType
   title: string
-  createdAt: string
+  submittedAt: string
   state: 'open' | 'closed'
   replyCount: number
-  labels: FeedbackUserLabel[]
+  labels: FeedbackLabel[]
 }
 
 export async function saveFeedbackSubmission(input: {
@@ -51,10 +52,10 @@ function rowToSummary(row: {
     issueNumber: row.issueNumber,
     type: row.type as FeedbackType,
     title: row.title,
-    createdAt: row.createdAt.toISOString(),
+    submittedAt: row.createdAt.toISOString(),
     state: row.issueState === 'closed' ? 'closed' : 'open',
     replyCount: row.replyCount,
-    labels: labelsFromJson(row.labelsJson)
+    labels: feedbackDisplayLabelsFromJson(row.labelsJson)
   }
 }
 

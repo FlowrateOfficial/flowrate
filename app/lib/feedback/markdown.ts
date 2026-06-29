@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Repair and render feedback markdown for thread display
+// ANCHOR: Feedback markdown repair and HTML render
 
 import { githubFeedbackAssetUrl, githubFeedbackMediaProxyPath, repairFeedbackMarkdown } from '#shared/feedback'
 

@@ -1,5 +1,7 @@
+// ANCHOR: Budgets store — CRUD + space-scoped list
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
 import type { BudgetItem, BudgetPeriod } from '~/types/budget'
+import { createSpaceScopedLoader, storeMoneyFormatter } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -11,11 +13,9 @@ const CATEGORIES = [
 
 export const useBudgetsStore = defineStore('budgets', () => {
   const { t, categoryLabel, formatCurrency, resolveCurrency } = useAppI18n()
-  const spacesStore = useSpacesStore()
   const { api } = useApi()
 
   const budgets = ref<BudgetItem[]>([])
-  const pending = ref(false)
   const isModalOpen = ref(false)
   const isSaving = ref(false)
   const editingId = ref<string | null>(null)
@@ -52,6 +52,8 @@ export const useBudgetsStore = defineStore('budgets', () => {
     budgets.value.reduce((s, b) => s + b.spent, 0)
   )
 
+  const fmt = storeMoneyFormatter(formatCurrency, resolveCurrency)
+
   const summaryItems = computed<SummaryItem[]>(() => [
     {
       label: t('dashboard.budgets.summary.active'),
@@ -60,12 +62,12 @@ export const useBudgetsStore = defineStore('budgets', () => {
     },
     {
       label: t('dashboard.budgets.summary.budgeted'),
-      value: fmt(totalBudgeted.value),
+      value: fmt(totalBudgeted.value, budgets.value),
       icon: 'i-lucide-wallet'
     },
     {
       label: t('dashboard.budgets.summary.spent'),
-      value: fmt(totalSpent.value),
+      value: fmt(totalSpent.value, budgets.value),
       icon: 'i-lucide-arrow-up-from-line'
     },
     {
@@ -75,9 +77,13 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   ])
 
-  function fmt(amount: number, currency?: string) {
-    return formatCurrency(amount, currency ?? resolveCurrency(budgets.value))
-  }
+  const { pending, load: fetchBudgets, reset } = createSpaceScopedLoader({
+    buildKey: spaceId => `budgets:${spaceId}`,
+    fetch: async () => api<BudgetItem[]>(apiRoutes.budgets.list),
+    apply: data => { budgets.value = data },
+    clear: () => { budgets.value = [] },
+    isCached: () => budgets.value.length > 0
+  })
 
   function resetForm() {
     newBudget.name = ''
@@ -108,16 +114,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     resetForm()
   }
 
-  async function fetchBudgets() {
-    if (!spacesStore.space) return
-    pending.value = true
-    try {
-      budgets.value = await api<BudgetItem[]>(apiRoutes.budgets.list)
-    } finally {
-      pending.value = false
-    }
-  }
-
   async function createBudget() {
     isSaving.value = true
     try {
@@ -132,7 +128,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
         }
       })
       closeModal()
-      await fetchBudgets()
+      await fetchBudgets(true)
     } finally {
       isSaving.value = false
     }
@@ -153,7 +149,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
         }
       })
       closeModal()
-      await fetchBudgets()
+      await fetchBudgets(true)
     } finally {
       isSaving.value = false
     }
@@ -169,12 +165,8 @@ export const useBudgetsStore = defineStore('budgets', () => {
 
   async function deleteBudget(id: string) {
     await api(apiRoutes.budgets.delete(id), { method: 'DELETE' })
-    await fetchBudgets()
+    await fetchBudgets(true)
   }
-
-  watch(() => spacesStore.space?.id, () => {
-    fetchBudgets()
-  })
 
   return {
     budgets,
@@ -197,6 +189,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     createBudget,
     updateBudget,
     saveBudget,
-    deleteBudget
+    deleteBudget,
+    reset
   }
 })

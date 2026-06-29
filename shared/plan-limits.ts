@@ -1,27 +1,27 @@
 import type { AppPlan } from './billing'
 
 export interface PlanLimits {
-  /** Max linked institutions (Plaid items + one Stripe FC bundle). null = unlimited */
+  // NOTE - Max linked banks (Plaid + one Stripe FC); null = unlimited
   bankConnections: number | null
-  /** Max active space memberships. null = unlimited */
+  // NOTE - Max active space memberships; null = unlimited
   spaces: number | null
-  /** Hours between manual syncs. 0 = no throttle */
+  // NOTE - Hours between manual syncs; 0 = no throttle
   manualSyncIntervalHours: number
-  /** Household, Family, and Company spaces (Free = Independent only) */
+  // NOTE - Household/Family/Company spaces (Free = Independent only)
   sharedSpaces: boolean
-  /** SaaS Shield alerts, burn rate, runway, business metrics */
+  // NOTE - SaaS Shield, burn rate, runway, business metrics
   saasShield: boolean
-  /** Create teen / child login accounts */
+  // NOTE - Teen / child login accounts
   teenAccounts: boolean
-  /** Cloud & developer-tool spend breakdowns */
+  // NOTE - Cloud and developer-tool spend breakdowns
   cloudSpendTracking: boolean
-  /** Invite company team members with roles */
+  // NOTE - Company team invites with roles
   companyTeam: boolean
-  /** Max active members in a Company space. null = not applicable */
+  // NOTE - Max Company space members; null = N/A
   companyMemberLimit: number | null
-  /** Basic CSV export */
+  // NOTE - Basic CSV export
   csvExport: boolean
-  /** Audit-ready export with extra fields */
+  // NOTE - Audit-ready export with extra fields
   auditExport: boolean
 }
 

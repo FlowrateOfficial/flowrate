@@ -1,7 +1,7 @@
 <script setup lang="ts">
 type SpaceShape = 'circle' | 'triangle' | 'semicircle' | 'square'
 
-defineProps<{
+const props = defineProps<{
   shape: SpaceShape
   size?: number
   class?: string
@@ -10,12 +10,12 @@ defineProps<{
 
 <template>
   <svg
-    :width="size ?? 32"
-    :height="size ?? 32"
+    :width="props.size ?? 32"
+    :height="props.size ?? 32"
     viewBox="0 0 32 32"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    :class="class"
+    :class="props.class"
     aria-hidden="true"
   >
     <circle

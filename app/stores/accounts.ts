@@ -1,8 +1,9 @@
-// NOTE - ANCHOR: Accounts store — bank connect, sync, list
+// ANCHOR: Accounts store — connect banks, sync, list
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { AccountSummary } from '~/types/financial'
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
 import { resolveErrorMessage } from '~/utils/errors'
+import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { loadStripe } from '~/lib/load-stripe'
 import { isStripeConnectCancelled } from '~/lib/stripe-errors'
 import { extractFcAccountIds } from '~/utils/stripe-fc'
@@ -19,7 +20,6 @@ export const useAccountsStore = defineStore('accounts', () => {
   const { api } = useApi()
 
   const accounts = ref<AccountSummary[]>([])
-  const pending = ref(false)
   const visibilityFilter = ref<'all' | 'shared' | 'personal' | 'mine'>('all')
   const connectVisibility = ref<'PERSONAL' | 'SHARED'>('PERSONAL')
   const isConnecting = ref(false)
@@ -145,19 +145,18 @@ export const useAccountsStore = defineStore('accounts', () => {
     return formatCurrency(balance, currency ?? spaceCurrency.value)
   }
 
-  async function fetchAccounts() {
-    if (!spacesStore.space) return
-    pending.value = true
-    try {
-      accounts.value = await api<AccountSummary[]>(apiRoutes.accounts.list, {
-        query: visibilityFilter.value === 'all'
-          ? {}
-          : { visibility: visibilityFilter.value }
-      })
-    } finally {
-      pending.value = false
-    }
-  }
+  const { pending, load: fetchAccounts, reset: resetLoader, seed } = createSpaceScopedLoader({
+    // NOTE - Filter is part of cache key; watch refetches on change
+    buildKey: spaceId => `accounts:${spaceId}:${visibilityFilter.value}`,
+    fetch: async () => api<AccountSummary[]>(apiRoutes.accounts.list, {
+      query: visibilityFilter.value === 'all'
+        ? {}
+        : { visibility: visibilityFilter.value }
+    }),
+    apply: data => { accounts.value = data },
+    clear: () => { accounts.value = [] },
+    isCached: () => accounts.value.length > 0
+  })
 
   async function syncTransactions() {
     await syncStore.syncTransactions(fetchAccounts)
@@ -321,11 +320,22 @@ export const useAccountsStore = defineStore('accounts', () => {
     await fetchAccounts()
   }
 
-  watch(visibilityFilter, () => fetchAccounts())
-
-  watch(() => spacesStore.space?.id, () => {
+  function reset() {
+    resetLoader()
     visibilityFilter.value = 'all'
-  })
+  }
+
+  function seedAccounts(rows: AccountSummary[]) {
+    const spaceId = spacesStore.space?.id
+    if (spaceId) {
+      // NOTE - Mark cached as "all" filter so visibility changes still refetch
+      seed(rows, `accounts:${spaceId}:all`)
+    } else {
+      accounts.value = rows
+    }
+  }
+
+  watch(visibilityFilter, () => fetchAccounts(true))
 
   return {
     accounts,
@@ -351,6 +361,8 @@ export const useAccountsStore = defineStore('accounts', () => {
     connectBank,
     connectStripeBank,
     connectPlaidBank,
-    disconnectAccount
+    disconnectAccount,
+    reset,
+    seedAccounts
   }
 })

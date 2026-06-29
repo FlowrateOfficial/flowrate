@@ -42,8 +42,3 @@ export function appPlanFromStripeSubscription(
   if (key === 'enterprise') return 'ENTERPRISE'
   return 'PRO'
 }
-
-/** @deprecated Use appPlanFromStripeSubscription with planKey when available */
-export function appPlanFromBillingStatus(status: SubStatus): AppPlan {
-  return appPlanFromStripeSubscription(status, 'pro')
-}

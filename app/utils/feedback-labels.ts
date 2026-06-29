@@ -1,7 +1,7 @@
 import type { FeedbackLabel } from '~/types/feedback'
 
-export function feedbackLabelTextColor(hex: string): string {
-  const normalized = hex.replace('#', '')
+export function feedbackLabelTextColor(hex: string | undefined): string {
+  const normalized = (hex ?? '6b7280').replace('#', '')
   if (normalized.length !== 6) return '#ffffff'
 
   const r = Number.parseInt(normalized.slice(0, 2), 16)
@@ -13,9 +13,10 @@ export function feedbackLabelTextColor(hex: string): string {
 }
 
 export function feedbackLabelStyle(label: FeedbackLabel): Record<string, string> {
+  const color = (label.color ?? '6b7280').replace('#', '')
   return {
-    backgroundColor: `#${label.color}`,
-    color: feedbackLabelTextColor(label.color),
-    borderColor: `#${label.color}`
+    backgroundColor: `#${color}`,
+    color: feedbackLabelTextColor(color),
+    borderColor: `#${color}`
   }
 }

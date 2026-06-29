@@ -90,8 +90,8 @@ function planCardClass(plan: LandingPlan) {
         </div>
 
         <div class="relative landing-section-panel">
-          <div class="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-10 bg-gradient-to-r from-flow-bg dark:from-flow-bg-dark to-transparent sm:block lg:hidden" />
-          <div class="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-10 bg-gradient-to-l from-flow-bg dark:from-flow-bg-dark to-transparent sm:block lg:hidden" />
+          <div class="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-10 bg-linear-to-r from-flow-bg dark:from-flow-bg-dark to-transparent sm:block lg:hidden" />
+          <div class="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-10 bg-linear-to-l from-flow-bg dark:from-flow-bg-dark to-transparent sm:block lg:hidden" />
 
           <UButton
             v-if="activePlan > 0"
@@ -99,7 +99,7 @@ function planCardClass(plan: LandingPlan) {
             color="neutral"
             variant="outline"
             size="sm"
-            class="absolute left-0 top-1/2 z-20 -translate-y-1/2 lg:hidden shadow-sm"
+            class="absolute left-0 top-1/2 z-20 -translate-y-1/2 lg:hidden shadow-xs"
             :aria-label="t('landing.pricing.prevPlan')"
             @click="scrollToIndex(activePlan - 1)"
           />
@@ -109,7 +109,7 @@ function planCardClass(plan: LandingPlan) {
             color="neutral"
             variant="outline"
             size="sm"
-            class="absolute right-0 top-1/2 z-20 -translate-y-1/2 lg:hidden shadow-sm"
+            class="absolute right-0 top-1/2 z-20 -translate-y-1/2 lg:hidden shadow-xs"
             :aria-label="t('landing.pricing.nextPlan')"
             @click="scrollToIndex(activePlan + 1)"
           />
@@ -132,7 +132,7 @@ function planCardClass(plan: LandingPlan) {
                   v-if="plan.highlight"
                   :label="t('landing.pricing.mostPopular')"
                   color="neutral"
-                  class="!bg-terracotta !text-flow-warm font-normal"
+                  class="bg-terracotta! text-flow-warm! font-normal"
                   size="sm"
                 />
 

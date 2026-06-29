@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: TipTap imageUpload node — Nuxt UI Editor image upload pattern
+// ANCHOR: TipTap imageUpload node for feedback editor
 
 import { Node, mergeAttributes } from '@tiptap/core'
 import type { CommandProps, NodeViewRenderer } from '@tiptap/core'

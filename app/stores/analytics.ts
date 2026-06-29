@@ -1,16 +1,33 @@
+// ANCHOR: Analytics store — range-scoped overview + chart series
 import type { AnalyticsOverview, AnalyticsRange } from '~/types/financial'
+import {
+  cashFlowSeries,
+  categorySeries,
+  merchantSeries,
+  netWorthSeries
+} from '~/utils/analytics-series'
+import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useAnalyticsStore = defineStore('analytics', () => {
   const { t, categoryLabel, formatCurrency, displayCurrency } = useAppI18n()
-  const spacesStore = useSpacesStore()
   const syncStore = useSyncStore()
   const { api } = useApi()
 
   const range = ref<AnalyticsRange>('30d')
   const data = ref<AnalyticsOverview | null>(null)
-  const pending = ref(false)
+
+  const { pending, load: fetchOverview, reset } = createSpaceScopedLoader({
+    // NOTE - Key includes range so tab changes trigger refetch
+    buildKey: spaceId => `analytics:${spaceId}:${range.value}`,
+    fetch: async () => api<AnalyticsOverview>(apiRoutes.analytics.overview, {
+      query: { range: range.value }
+    }),
+    apply: payload => { data.value = payload },
+    clear: () => { data.value = null },
+    isCached: () => data.value != null
+  })
 
   const rangeTabs = computed(() => [
     { label: t('dashboard.analytics.ranges.7d'), value: '7d' },
@@ -19,26 +36,22 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     { label: t('dashboard.analytics.ranges.12m'), value: '12m' }
   ])
 
-  const cashFlowLabels = computed(() => data.value?.cashFlow.map(p => p.period) ?? [])
-  const cashFlowIncome = computed(() => data.value?.cashFlow.map(p => p.income) ?? [])
-  const cashFlowSpending = computed(() => data.value?.cashFlow.map(p => p.spending) ?? [])
+  const cashFlow = computed(() => cashFlowSeries(data.value))
+  const cashFlowLabels = computed(() => cashFlow.value.labels)
+  const cashFlowIncome = computed(() => cashFlow.value.income)
+  const cashFlowSpending = computed(() => cashFlow.value.spending)
 
-  const categoryLabels = computed(() =>
-    (data.value?.categories ?? []).map(c => categoryLabel(c.category))
-  )
-  const categoryValues = computed(() =>
-    (data.value?.categories ?? []).map(c => c.amount)
-  )
+  const categories = computed(() => categorySeries(data.value, categoryLabel))
+  const categoryLabels = computed(() => categories.value.labels)
+  const categoryValues = computed(() => categories.value.values)
 
-  const merchantLabels = computed(() =>
-    (data.value?.topMerchants ?? []).map(m => m.name.slice(0, 24))
-  )
-  const merchantValues = computed(() =>
-    (data.value?.topMerchants ?? []).map(m => m.amount)
-  )
+  const merchants = computed(() => merchantSeries(data.value))
+  const merchantLabels = computed(() => merchants.value.labels)
+  const merchantValues = computed(() => merchants.value.values)
 
-  const netWorthLabels = computed(() => data.value?.netWorth.map(p => p.period) ?? [])
-  const netWorthValues = computed(() => data.value?.netWorth.map(p => p.balance) ?? [])
+  const netWorth = computed(() => netWorthSeries(data.value))
+  const netWorthLabels = computed(() => netWorth.value.labels)
+  const netWorthValues = computed(() => netWorth.value.values)
 
   const hasData = computed(() => (data.value?.summary.transactionCount ?? 0) > 0)
 
@@ -48,26 +61,9 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     return formatCurrency(amount, summaryCurrency.value)
   }
 
-  async function fetchOverview() {
-    if (!spacesStore.space) return
-    pending.value = true
-    try {
-      data.value = await api<AnalyticsOverview>(apiRoutes.analytics.overview, {
-        query: { range: range.value }
-      })
-    } finally {
-      pending.value = false
-    }
-  }
-
   async function syncTransactions() {
     await syncStore.syncTransactions(fetchOverview)
   }
-
-  watch(() => spacesStore.space?.id, () => {
-    data.value = null
-    fetchOverview()
-  })
 
   return {
     range,
@@ -89,6 +85,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     fmt,
     categoryLabel,
     fetchOverview,
-    syncTransactions
+    syncTransactions,
+    reset
   }
 })

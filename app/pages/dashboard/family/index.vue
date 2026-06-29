@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Family page — members, children, expense splits
 import type { TableColumn } from '@nuxt/ui'
 import { storeToRefs } from 'pinia'
 import type { SpaceDetailMember } from '~/stores/family'
@@ -10,7 +11,7 @@ const familyStore = useFamilyStore()
 const spacesStore = useSpacesStore()
 const { tab, inviting } = storeToRefs(familyStore)
 
-useSeoMeta({ title: () => `${t('dashboard.family.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.family.title')
 
 const spaceId = computed(() => spacesStore.space?.id ?? '')
 
@@ -36,9 +37,13 @@ async function confirmDeleteChild() {
 }
 
 const { data: spaceDetail, pending, refresh } = await useAsyncData(
-  () => `family-space-${spaceId.value}`,
-  () => spaceId.value ? familyStore.fetchSpaceDetail(spaceId.value) : Promise.resolve(null),
-  { watch: [spaceId] }
+  () => `family-space-${spaceId.value}-${tab.value}`,
+  () => {
+    if (!spaceId.value || tab.value === 'splits') return Promise.resolve(null)
+    const view = tab.value === 'children' ? 'children' as const : 'guardians' as const
+    return familyStore.fetchSpaceDetail(spaceId.value, view)
+  },
+  { watch: [spaceId, tab] }
 )
 
 const children = computed(() =>

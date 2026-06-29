@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Spaces page — list and create financial spaces
 import { storeToRefs } from 'pinia'
 import { SPACE_TYPE_ICONS } from '~/types/space'
 
@@ -14,7 +15,7 @@ const {
   spaceTypes
 } = storeToRefs(spacesStore)
 
-useSeoMeta({ title: () => `${t('dashboard.spaces.title')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.spaces.title')
 
 onMounted(() => spacesStore.fetchSpaces())
 </script>

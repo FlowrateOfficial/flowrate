@@ -8,15 +8,15 @@ withDefaults(defineProps<{
 const { getLocale, getLocales, switchLocale, t } = useAppI18n()
 
 const localeLabels: Record<string, string> = {
-  en: 'common.englishUS',
+  'en': 'common.englishUS',
   'en-GB': 'common.englishUK',
-  fr: 'common.french'
+  'fr': 'common.french'
 }
 
 const localeIcons: Record<string, string> = {
-  en: 'i-lucide-dollar-sign',
+  'en': 'i-lucide-dollar-sign',
   'en-GB': 'i-lucide-pound-sterling',
-  fr: 'i-lucide-euro'
+  'fr': 'i-lucide-euro'
 }
 
 const current = computed(() => getLocale())

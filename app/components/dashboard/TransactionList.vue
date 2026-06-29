@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Compact transaction list for overview panels
 interface Transaction {
   id: string
   description: string
@@ -17,14 +18,10 @@ interface Props {
 
 defineProps<Props>()
 
-const { t, intlLocale, formatCurrency } = useAppI18n()
+const { t, formatShortDate, formatCurrency } = useAppI18n()
 
 function fmt(amount: number, currency: string): string {
   return formatCurrency(Math.abs(amount), currency)
-}
-
-function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat(intlLocale.value, { month: 'short', day: 'numeric' }).format(new Date(dateStr))
 }
 </script>
 
@@ -32,8 +29,8 @@ function formatDate(dateStr: string): string {
   <div>
     <div v-if="loading" class="space-y-1">
       <div v-for="i in 5" :key="i" class="flex animate-pulse items-center justify-between border-b border-default py-3">
-        <div class="h-3.5 w-36 rounded bg-elevated" />
-        <div class="h-3.5 w-14 rounded bg-elevated/70" />
+        <div class="h-3.5 w-36 rounded-sm bg-elevated" />
+        <div class="h-3.5 w-14 rounded-sm bg-elevated/70" />
       </div>
     </div>
 
@@ -57,7 +54,7 @@ function formatDate(dateStr: string): string {
             {{ tx.merchant ?? tx.description }}
           </p>
           <div class="mt-0.5 flex items-center gap-2">
-            <span class="text-xs text-muted">{{ formatDate(tx.date) }}</span>
+            <span class="text-xs text-muted">{{ formatShortDate(tx.date) }}</span>
             <UBadge
               v-if="tx.pending"
               :label="t('dashboard.transactions.pending')"

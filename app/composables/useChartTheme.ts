@@ -1,6 +1,6 @@
-/** Shared Chart.js colors — tuned for FlowRate light & dark palettes. */
+// ANCHOR: Chart.js colors for light and dark themes
 export function useChartTheme() {
-  // NOTE - color-mode v4 state may be undefined before the plugin initializes on SSR
+  // NOTE - color-mode undefined until plugin init on SSR
   const colorModeState = useState<{ value: string } | undefined>('color-mode')
   const isDark = computed(() => (colorModeState.value?.value ?? 'light') === 'dark')
 

@@ -1,59 +1,33 @@
 <script setup lang="ts">
+// ANCHOR: Settings page — profile, phone verify, billing
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: ['auth', 'billing-sync'] })
 
 const route = useRoute()
 const { t } = useAppI18n()
+const appToast = useAppToast()
 const billingStore = useBillingStore()
 const userStore = useUserStore()
 const spacesStore = useSpacesStore()
 const { isMinor } = storeToRefs(spacesStore)
+const {
+  profileForm,
+  verificationCode,
+  showVerificationInput,
+  phoneVerified,
+  isSavingProfile,
+  isVerifyingPhone,
+  isResendingCode,
+  deleteModalOpen,
+  deleteConfirmEmail,
+  deleteConfirmPassword,
+  deleteAcknowledged,
+  isDeletingAccount
+} = storeToRefs(userStore)
+const { settingsPending } = storeToRefs(billingStore)
 
-useSeoMeta({ title: () => `${t('dashboard.settings.title')} — ${t('common.appName')}` })
-
-const appToast = useAppToast()
-
-const profile = reactive({
-  name: '',
-  email: '',
-  phone: ''
-})
-const phoneVerified = ref(false)
-const verificationCode = ref('')
-const isVerifyingPhone = ref(false)
-const isResendingCode = ref(false)
-const showVerificationInput = ref(false)
-const isSavingProfile = ref(false)
-
-function applyProfileForm(data: NonNullable<Awaited<ReturnType<typeof userStore.fetchProfile>>>) {
-  profile.name = data.name ?? ''
-  profile.email = data.email
-  profile.phone = data.phone ?? ''
-  phoneVerified.value = data.phoneVerified
-  showVerificationInput.value = Boolean(data.phone && !data.phoneVerified)
-}
-
-async function loadBillingProfile(checkoutSessionId?: string) {
-  await billingStore.fetchPlans()
-  const data = await userStore.fetchProfile({
-    syncBilling: true,
-    checkoutSessionId
-  })
-  if (!data) return null
-
-  billingStore.applyBillingContext(data.billing, data.plan)
-
-  if (data.plan !== 'FREE' && data.billing?.subscription?.priceId) {
-    try {
-      await billingStore.previewChange()
-    } catch {
-      // NOTE - Preview optional on load
-    }
-  }
-
-  return data
-}
+useDashboardSeo('dashboard.settings.title')
 
 const checkoutSessionId = computed(() =>
   route.query.upgraded === '1' && typeof route.query.session_id === 'string'
@@ -67,18 +41,10 @@ const billingDataKey = computed(() =>
     : 'dashboard-settings-billing'
 )
 
-const { data: billingProfile, pending: billingPending, refresh: refreshBilling } = await useAsyncData(
+await useAsyncData(
   billingDataKey,
-  () => loadBillingProfile(checkoutSessionId.value)
+  () => billingStore.loadSettings({ checkoutSessionId: checkoutSessionId.value })
 )
-
-if (billingProfile.value) {
-  applyProfileForm(billingProfile.value)
-}
-
-watch(billingProfile, (data) => {
-  if (data) applyProfileForm(data)
-})
 
 onMounted(async () => {
   if (route.query.upgraded === '1') {
@@ -92,104 +58,48 @@ onMounted(async () => {
 })
 
 async function refreshProfile() {
-  await refreshBilling()
+  await billingStore.loadSettings({ checkoutSessionId: checkoutSessionId.value })
 }
 
 async function saveProfile() {
-  isSavingProfile.value = true
   try {
-    const data = await userStore.updateProfile({
-      name: profile.name,
-      phone: profile.phone.trim() || null
-    })
-    applyProfileForm(data)
+    const data = await userStore.saveProfileForm()
+    if (!data) return
     if (data.verificationSent) {
       appToast.success(t('dashboard.settings.phoneCodeSent'))
     }
     if (data.verificationError) {
-      appToast.warning(
-        t('dashboard.settings.phoneVerificationFailed'),
-        data.verificationError
-      )
+      appToast.warning(t('dashboard.settings.phoneVerificationFailed'), data.verificationError)
     }
     appToast.success(t('dashboard.settings.profileSaved'))
   } catch (err: unknown) {
-    const message = err && typeof err === 'object' && 'data' in err
-      && typeof (err as { data?: { message?: string } }).data?.message === 'string'
-      ? (err as { data: { message: string } }).data.message
-      : t('dashboard.settings.tryAgain')
-    appToast.errorMessage(
-      message.includes('already')
-        ? t('dashboard.settings.phoneTaken')
-        : message.includes('E.164') || message.includes('valid')
-          ? t('dashboard.settings.phoneInvalid')
-          : message
-    )
-  } finally {
-    isSavingProfile.value = false
+    appToast.errorMessage(userStore.profileSaveErrorMessage(err))
   }
 }
 
 async function verifyPhone() {
-  if (!verificationCode.value.trim()) return
-  isVerifyingPhone.value = true
-  try {
-    await userStore.verifyPhoneCode(verificationCode.value.trim())
-    phoneVerified.value = true
-    showVerificationInput.value = false
-    verificationCode.value = ''
-    appToast.success(t('dashboard.settings.phoneVerified'))
-  } catch {
-    appToast.errorMessage(t('dashboard.settings.phoneCodeInvalid'))
-  } finally {
-    isVerifyingPhone.value = false
-  }
+  const ok = await userStore.verifyPhoneForm()
+  if (ok) appToast.success(t('dashboard.settings.phoneVerified'))
+  else appToast.errorMessage(t('dashboard.settings.phoneCodeInvalid'))
 }
 
 async function resendVerificationCode() {
-  isResendingCode.value = true
   try {
-    await userStore.resendPhoneCode()
+    await userStore.resendPhoneForm()
     appToast.success(t('dashboard.settings.phoneCodeResent'))
   } catch (err: unknown) {
-    const message = err && typeof err === 'object' && 'data' in err
-      && typeof (err as { data?: { message?: string } }).data?.message === 'string'
-      ? (err as { data: { message: string } }).data.message
-      : t('dashboard.settings.tryAgain')
-    appToast.errorMessage(message)
-  } finally {
-    isResendingCode.value = false
+    appToast.errorMessage(userStore.profileSaveErrorMessage(err))
   }
 }
 
-const deleteModalOpen = ref(false)
-const deleteConfirmEmail = ref('')
-const deleteConfirmPassword = ref('')
-const deleteAcknowledged = ref(false)
-const isDeletingAccount = ref(false)
-
-function openDeleteModal() {
-  deleteConfirmEmail.value = profile.email
-  deleteConfirmPassword.value = ''
-  deleteAcknowledged.value = false
-  deleteModalOpen.value = true
-}
-
 async function confirmDeleteAccount() {
-  if (!deleteAcknowledged.value) return
-  isDeletingAccount.value = true
   try {
-    await userStore.deleteAccount({
-      confirmEmail: deleteConfirmEmail.value.trim(),
-      password: deleteConfirmPassword.value.trim() || undefined
-    })
+    const ok = await userStore.confirmDeleteAccountForm()
+    if (!ok) return
     appToast.success(t('dashboard.settings.deleteSuccess'))
-    deleteModalOpen.value = false
     await navigateTo('/', { replace: true })
   } catch (err: unknown) {
     appToast.errorFrom(err, 'dashboard.settings.deleteFailed')
-  } finally {
-    isDeletingAccount.value = false
   }
 }
 </script>
@@ -206,12 +116,12 @@ async function confirmDeleteAccount() {
 
       <div class="space-y-4">
         <UFormField :label="t('dashboard.settings.fullName')">
-          <UInput v-model="profile.name" :placeholder="t('dashboard.settings.namePlaceholder')" class="w-full" />
+          <UInput v-model="profileForm.name" :placeholder="t('dashboard.settings.namePlaceholder')" class="w-full" />
         </UFormField>
 
         <UFormField :label="t('dashboard.settings.email')">
           <UInput
-            v-model="profile.email"
+            v-model="profileForm.email"
             type="email"
             class="w-full"
             disabled
@@ -224,7 +134,7 @@ async function confirmDeleteAccount() {
 
         <UFormField :label="t('dashboard.settings.phone')">
           <UInput
-            v-model="profile.phone"
+            v-model="profileForm.phone"
             type="tel"
             autocomplete="tel"
             :placeholder="t('dashboard.settings.phonePlaceholder')"
@@ -233,7 +143,7 @@ async function confirmDeleteAccount() {
           <template #help>
             <span>{{ t('dashboard.settings.phoneHelp') }}</span>
             <span class="block mt-1 text-xs text-muted">{{ t('dashboard.settings.phoneFormatHint') }}</span>
-            <span v-if="profile.phone" class="block mt-1">
+            <span v-if="profileForm.phone" class="block mt-1">
               <UBadge
                 v-if="phoneVerified"
                 :label="t('dashboard.settings.phoneVerified')"
@@ -254,7 +164,7 @@ async function confirmDeleteAccount() {
         </UFormField>
 
         <div
-          v-if="profile.phone && !phoneVerified && showVerificationInput"
+          v-if="profileForm.phone && !phoneVerified && showVerificationInput"
           class="rounded-lg border border-default p-4 space-y-3 bg-elevated/30"
         >
           <p class="text-sm text-muted">
@@ -313,7 +223,7 @@ async function confirmDeleteAccount() {
       </div>
 
       <DashboardBillingPanel
-        :ready="!billingPending"
+        :ready="!settingsPending"
         @refreshed="refreshProfile"
       />
     </UCard>
@@ -331,7 +241,7 @@ async function confirmDeleteAccount() {
         color="error"
         variant="subtle"
         icon="i-lucide-trash-2"
-        @click="openDeleteModal"
+        @click="userStore.openDeleteModal()"
       />
     </UCard>
 

@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Parse GitHub issue labels for in-app feedback display
+// ANCHOR: Parse GitHub issue labels for in-app feedback display
 
 import {
   filterFeedbackDisplayLabels,

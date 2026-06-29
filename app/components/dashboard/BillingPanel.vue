@@ -208,7 +208,7 @@ function formatBillingDate(iso: string) {
 
     <div
       v-if="hasActiveSubscription"
-      class="rounded-flow border border-default/60 bg-elevated/20 px-3 py-2.5 text-sm text-muted min-h-[2.5rem] flex items-center"
+      class="rounded-flow border border-default/60 bg-elevated/20 px-3 py-2.5 text-sm text-muted min-h-10 flex items-center"
     >
       <span v-if="previewLoading">{{ t('dashboard.settings.previewLoading') }}</span>
       <span v-else-if="previewLabel">{{ previewLabel }}</span>

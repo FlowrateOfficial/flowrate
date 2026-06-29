@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Onboarding — pick space type after signup
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Welcome', middleware: 'auth' })
@@ -9,13 +10,14 @@ const onboarding = useOnboardingStore()
 const { step, selected, spaceName, loading, options } = storeToRefs(onboarding)
 
 onMounted(() => {
+  // NOTE - Deep-link from marketing sets company + skips step 1
   if (route.query.plan === 'enterprise') {
     onboarding.selectType('COMPANY')
     onboarding.continueFromStep1()
   }
 })
 
-useSeoMeta({ title: () => `${t('dashboard.onboarding.welcome')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.onboarding.welcome')
 </script>
 
 <template>

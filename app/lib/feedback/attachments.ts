@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Client-side feedback attachment registry for editor uploads
+// ANCHOR: Feedback editor attachment registry
 
 import {
   FEEDBACK_ATTACH_PREFIX,

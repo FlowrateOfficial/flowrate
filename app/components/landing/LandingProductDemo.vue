@@ -81,7 +81,7 @@ onUnmounted(() => {
                   <UIcon
                     name="i-lucide-chevron-right"
                     class="ml-auto size-4 text-flow-muted opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0"
-                    :class="active === i ? '!opacity-100 !translate-x-0 text-terracotta' : ''"
+                    :class="active === i ? 'opacity-100! translate-x-0! text-terracotta' : ''"
                   />
                 </div>
               </button>

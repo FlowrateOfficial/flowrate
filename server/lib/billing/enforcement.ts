@@ -27,7 +27,7 @@ function planLimitError(
   })
 }
 
-/** Plaid items + one Stripe FC bundle (all Stripe accounts count as one link). */
+// NOTE - Plaid items + one Stripe FC bundle count as one link
 export async function countUserBankConnections(userId: string): Promise<number> {
   const [plaidLinks, stripeAccounts] = await Promise.all([
     prisma.plaidLink.count({ where: { userId } }),
@@ -213,7 +213,7 @@ export async function recordManualSync(userId: string) {
   })
 }
 
-/** Webhook-driven sync is Pro+ only — free users use manual sync. */
+// NOTE - Webhook sync is Pro+ only; free users manual sync
 export function allowsWebhookSync(plan: AppPlan): boolean {
   return plan !== 'FREE'
 }
