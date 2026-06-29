@@ -1243,7 +1243,7 @@
     "privacy": {
       "title": "Privacy Policy",
       "seoTitle": "Privacy Policy — FlowRate",
-      "lastUpdatedAt": "2026-06-29T20:00:00Z",
+      "lastUpdatedAt": "2026-06-30T12:00:00Z",
       "seeAlsoTerms": "See also: Terms of Service",
       "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
       "intro": "FlowRate (“we”, “us”, “our”) is a personal and household finance application currently in beta. This Privacy Policy explains what information we collect, how we use it, who we share it with, where it is stored, and the choices you have. We aim to be transparent so you can make informed decisions about using FlowRate while the product is still in development.",
@@ -1263,11 +1263,11 @@
           "title": "2. Information we collect",
           "p1": "The data we process depends on how you use FlowRate:",
           "items": [
-            "Account information: name, email address, optional phone number, profile settings, and authentication data managed through Neon Auth.",
+            "Account information: name, email address, optional phone number (stored in FlowRate when you add one; verified via SMS through Twilio), profile settings, email-verification status, and authentication data managed through Neon Auth—including six-digit email verification codes when sign-up verification is enabled.",
             "Financial space data: space names, membership roles, invitations, and visibility preferences (personal vs shared accounts).",
             "Connected bank data (when you choose to link): institution name, account display name, account type, masked account identifiers, balances, and transaction history received through Plaid or Stripe Financial Connections, depending on which provider is enabled for your connection flow.",
             "Derived data: transaction categories (including rule-based auto-categorization—no AI today), budget entries, detected subscriptions, analytics summaries, and split rules you configure.",
-            "Billing data: subscription plan, Stripe Billing customer identifiers, and billing profile on your Stripe customer (phone, address, timezone if you provide them)—not stored in the FlowRate database.",
+            "Billing data: subscription plan and Stripe Billing customer identifiers in FlowRate; billing profile fields (verified phone synced from your profile, address, timezone, and invoice history) stored on your Stripe customer record only—not in the FlowRate database.",
             "Feedback and reviews (when you submit them): category (review, feature request, or bug report), subject line, message text, optional star rating, images and short videos you attach, and—if you leave “Include technical context” checked—your user ID, email, name, plan, active space name and type, space role, locale, page URL, and browser user-agent string.",
             "Technical data: server logs, IP addresses, and request metadata generated when you use the app (for example through our hosting provider).",
             "Performance data (production only): anonymized or pseudonymous page-performance metrics sent to Vercel through the Speed Insights module when you visit our public site or app shell—see the notice above."
@@ -1292,9 +1292,9 @@
             "Categorizing transactions using rule-based matching on transaction descriptions (not artificial intelligence today), and letting you review or adjust categories.",
             "Powering budgets, spending analytics, subscription detection, and space-specific views (for example family or company burn-rate summaries).",
             "Enforcing visibility rules you set (personal vs shared accounts within a space).",
-            "Authenticating you, securing sessions, preventing abuse, and responding to support requests.",
+            "Authenticating you, securing sessions, sending email verification codes at registration (via Neon Auth), preventing abuse, and responding to support requests.",
             "Processing optional paid subscriptions through Stripe Billing.",
-            "Collecting and storing billing profile details (phone, address, timezone) on your Stripe customer when you provide them, for invoicing and tax compliance.",
+            "Collecting billing profile details (address, timezone) and syncing your verified profile phone number to your Stripe customer for invoicing, tax compliance, and invoice generation from Settings.",
             "Reviewing in-app feedback you submit and responding through our private issue tracker."
           ],
           "p2": "We may use aggregated or de-identified statistics (that cannot reasonably identify you) to understand product usage and improve the service."
@@ -1335,7 +1335,7 @@
           "title": "8. How we share information",
           "p1": "We share information only in these situations:",
           "items": [
-            "Service providers (subprocessors): companies that host, authenticate, connect banks (Plaid or Stripe), store feedback issues (GitHub), verify phone numbers, or—only if you opt in to AI analysis—generate AI insights on our behalf, solely to provide FlowRate to you. They may not use bank connection data for their own independent purposes.",
+            "Service providers (subprocessors): companies that host, authenticate (including email verification delivery), connect banks (Plaid or Stripe), provide address autofill (Mapbox), send transactional auth email when configured (Resend), verify phone numbers (Twilio), store feedback issues (GitHub), or—only if you opt in to AI analysis—generate AI insights on our behalf, solely to provide FlowRate to you. They may not use bank connection data for their own independent purposes.",
             "Within your spaces: when you mark an account or data as shared, authorized members of that space (for example guardians in a Family space) can see it according to their role.",
             "Legal requirements: if required by law, court order, or to protect rights, safety, and security.",
             "Business transfers: if FlowRate is involved in a merger or acquisition, data may transfer subject to this policy."
@@ -1353,12 +1353,12 @@
             },
             {
               "name": "Stripe",
-              "purpose": "Financial Connections (US bank linking), balance and transaction access, subscription billing",
+              "purpose": "Financial Connections (US bank linking), balance and transaction access, subscription billing, customer billing profile storage (address, timezone, verified phone), and invoice generation",
               "location": "United States (and regions where Stripe operates)"
             },
             {
               "name": "Neon",
-              "purpose": "User authentication (Neon Auth) and PostgreSQL database hosting",
+              "purpose": "User authentication (Neon Auth, including email verification codes at sign-up) and PostgreSQL database hosting",
               "location": "United States and/or European Union"
             },
             {
@@ -1377,8 +1377,13 @@
               "location": "United States"
             },
             {
+              "name": "Resend (when configured)",
+              "purpose": "Transactional email delivery for sign-up verification codes and magic links when Neon Auth webhooks route delivery through FlowRate—not used if you rely on Neon's default shared email only",
+              "location": "United States"
+            },
+            {
               "name": "Twilio",
-              "purpose": "Optional phone number verification (if you add a phone number)",
+              "purpose": "SMS verification when you add a phone number to your FlowRate profile (the verified number may then sync to Stripe for billing)",
               "location": "United States"
             },
             {
@@ -1409,7 +1414,7 @@
           "title": "12. Your choices and rights",
           "p1": "Depending on where you live, you may have rights to access, correct, delete, export, or restrict processing of your personal data. FlowRate supports the following directly in the product or on request:",
           "items": [
-            "Access and update: edit your name and phone number in Settings; add or update your Stripe billing profile (phone, address, timezone) in Settings; view your transactions, accounts, and budgets in the dashboard.",
+            "Access and update: edit your name and phone number in Settings (phone is verified by SMS); complete email verification with the code sent at sign-up if required; add or update your Stripe billing profile (address, timezone) in Settings—your verified phone syncs to Stripe automatically; view your transactions, accounts, and budgets in the dashboard.",
             "Disconnect banks: remove a linked account from the Accounts page (deletes imported transactions for that account in FlowRate).",
             "Shared visibility: choose Personal or Shared when connecting banks in Household, Family, or Company spaces.",
             "Delete account: use Settings → Delete my account for your own profile.",
@@ -1438,8 +1443,8 @@
         },
         "cookies": {
           "title": "16. Cookies and similar technologies",
-          "p1": "We use essential cookies and similar storage for authentication sessions, locale preferences, and security. These are required for the app to function.",
-          "p2": "We do not use advertising cookies or cross-site tracking cookies. You can clear cookies through your browser, but you may need to sign in again.",
+          "p1": "We use essential cookies and similar storage for authentication sessions (Neon Auth), locale preferences, and security. These are required for the app to function.",
+          "p2": "We do not use advertising cookies or cross-site tracking cookies. You can clear cookies through your browser, but you may need to sign in again and complete email verification if required.",
           "p3": "Vercel Speed Insights loads a small performance-measurement script on production. It is not an advertising cookie, but privacy tools or browsers with tracker blocking (such as Brave) may block it—see the Speed Insights notice at the top of this page."
         },
         "international": {
@@ -1457,7 +1462,7 @@
     "terms": {
       "title": "Terms of Service",
       "seoTitle": "Terms of Service — FlowRate",
-      "lastUpdatedAt": "2026-06-29T20:00:00Z",
+      "lastUpdatedAt": "2026-06-30T12:00:00Z",
       "seeAlsoPrivacy": "See also: Privacy Policy",
       "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
       "intro": "These Terms of Service (“Terms”) govern your access to and use of FlowRate while the service is in beta. By creating an account or using the service, you agree to these Terms and our Privacy Policy, including the limitations that apply during active development.",
@@ -1477,12 +1482,14 @@
         "eligibility": {
           "title": "3. Eligibility",
           "p1": "You must be at least 18 years old to create a FlowRate account, unless you are a teen or child profile invited under a parent or guardian’s Family space.",
-          "p2": "You must provide accurate registration information and keep it up to date."
+          "p2": "You must provide accurate registration information and keep it up to date.",
+          "p3": "When email verification is enabled, you must verify your email address with the six-digit code sent after registration before you can fully use the service."
         },
         "account": {
           "title": "4. Your account",
           "p1": "You are responsible for safeguarding your login credentials and for all activity under your account. Notify us immediately at mathieu.lievre.pro@outlook.com if you suspect unauthorized access.",
-          "p2": "You may update profile information in Settings. Account deletion requests can be sent to mathieu.lievre.pro@outlook.com."
+          "p2": "You may update your name and phone number in Settings. Phone numbers are verified by SMS. Email is managed through Neon Auth; if verification is required, complete it on the verify-email page or request a new code.",
+          "p3": "Account deletion is available from Settings → Delete my account, or you may email mathieu.lievre.pro@outlook.com."
         },
         "financialData": {
           "title": "5. Bank connections and financial data",
@@ -1500,7 +1507,7 @@
           "p1": "Some features may require a paid subscription processed by Stripe Billing. Prices and plan details are shown at checkout. Subscriptions renew automatically until canceled through the billing portal or by contacting support.",
           "p2": "Refunds are handled according to the policy displayed at purchase and applicable law.",
           "p3": "Optional AI analysis, when available, requires a Pro or Enterprise subscription and a separate opt-in in Settings. Paying for a plan does not automatically enable AI processing of your financial data.",
-          "p4": "If you provide billing details in Settings (phone, address, timezone), we save them to your Stripe customer profile for invoicing, tax calculation, and payment compliance. Mapbox Address Autofill helps you enter the address; see our Privacy Policy for how Mapbox processes search queries. You can generate invoices from Settings when billable items are available."
+          "p4": "If you provide billing details in Settings (address, timezone), we save them to your Stripe customer profile for invoicing, tax calculation, and payment compliance. Your verified profile phone number syncs to Stripe automatically for billing—we do not store a separate billing phone in FlowRate. Mapbox Address Autofill helps you enter the address; see our Privacy Policy for how Mapbox processes search queries. You can generate invoices from Settings when billable items are available."
         },
         "acceptableUse": {
           "title": "8. Acceptable use",
@@ -1547,7 +1554,7 @@
     "glba": {
       "title": "Financial Privacy Notice (GLBA)",
       "seoTitle": "Financial Privacy Notice (GLBA) — FlowRate",
-      "lastUpdatedAt": "2026-06-29T20:00:00Z",
+      "lastUpdatedAt": "2026-06-30T12:00:00Z",
       "seeAlsoPrivacy": "See also: Privacy Policy",
       "seeAlsoTerms": "Terms of Service",
       "intro": "This Financial Privacy Notice describes how FlowRate collects, uses, and shares nonpublic personal information (“NPI”) about consumers in connection with our personal finance application, which is currently in beta. It is provided to meet transparency expectations under the Gramm-Leach-Bliley Act (“GLBA”) and related U.S. financial privacy rules, including when you connect financial accounts through Plaid or Stripe Financial Connections. This notice supplements our Privacy Policy and Terms of Service and may be updated as the product matures.",
@@ -1572,11 +1579,11 @@
           "title": "4. NPI we collect",
           "p1": "The NPI we collect depends on how you use FlowRate. Categories include:",
           "items": [
-            "Identity and contact information: name, email address, optional phone number, and authentication identifiers managed through our identity provider.",
+            "Identity and contact information: name, email address, optional phone number (stored in FlowRate when you add one; verified via SMS), email-verification status, and authentication identifiers managed through Neon Auth (including verification codes when sign-up verification is enabled).",
             "Connected account information: financial institution name, account display name, account type, masked account numbers, balances, and transaction details received through Plaid or Stripe Financial Connections when you authorize access.",
             "Derived financial information: transaction categories, budgets, subscription estimates, analytics summaries, and split rules you configure inside FlowRate.",
             "Space and sharing data: membership roles, invitations, and visibility settings (personal vs shared) that determine who within a household, family, or company space may see linked financial information.",
-            "Billing information: subscription plan status and Stripe Billing customer identifiers if you purchase a paid plan (we do not store full payment card numbers).",
+            "Billing information: subscription plan status and Stripe Billing customer identifiers in FlowRate; billing profile fields (verified phone synced from your profile, address, timezone, and invoice history) stored on your Stripe customer record only—not in FlowRate's database. We do not store full payment card numbers.",
             "In-app feedback (if you submit it): your message and attachments are generally not NPI, but you must not include bank credentials or full account numbers in feedback. Optional support context may include your plan and space metadata as described in our Privacy Policy."
           ]
         },
@@ -1594,8 +1601,9 @@
             "Categorizing transactions, powering budgets, subscription detection, and spending analytics (using rule-based logic today—not artificial intelligence unless you later opt in to AI analysis).",
             "Generating optional AI spending insights for Pro and Enterprise users who explicitly opt in, when that feature becomes available.",
             "Enforcing visibility and role permissions within financial spaces you create or join.",
-            "Authenticating you, securing the service, preventing fraud and abuse, and providing customer support.",
+            "Authenticating you, securing the service, sending email verification codes when required, preventing fraud and abuse, and providing customer support.",
             "Processing optional paid subscriptions through Stripe Billing.",
+            "Storing billing profile details on your Stripe customer (address, timezone), syncing your verified profile phone to Stripe, and generating invoices from Settings when you request them.",
             "Complying with law, responding to lawful requests, and protecting our rights and users’ safety."
           ],
           "p2": "We do not use NPI to make credit eligibility decisions, sell leads to lenders, or build advertising profiles for unrelated third parties. We do not send NPI to AI providers unless you are on a qualifying paid plan, the AI feature is available, and you have opted in."
@@ -1604,7 +1612,7 @@
           "title": "7. How we share NPI",
           "p1": "We do not sell your NPI. We share NPI only in the limited circumstances below:",
           "items": [
-            "Service providers: trusted companies that process data on our behalf solely to operate FlowRate—for example Plaid and Stripe (bank linking and billing), Neon (authentication and database hosting), Vercel (application hosting), GitHub (private in-app feedback issue tracking), and Twilio (optional phone verification). These providers may use NPI only to perform services for us and must protect it appropriately.",
+            "Service providers: trusted companies that process data on our behalf solely to operate FlowRate—for example Plaid and Stripe (bank linking, billing profile, and invoice generation), Neon (authentication—including email verification codes—and database hosting), Vercel (application hosting), Mapbox (billing address autofill suggestions), Resend (transactional auth email when configured via Neon webhooks), GitHub (private in-app feedback issue tracking), and Twilio (profile phone verification; verified numbers may sync to Stripe). These providers may use NPI only to perform services for us and must protect it appropriately.",
             "AI service providers (opt-in only): if you are a Pro or Enterprise subscriber and explicitly enable AI analysis when that feature is available, we may share selected NPI with third-party AI providers solely to generate insights for you inside FlowRate. This sharing does not occur today and never occurs without your opt-in.",
             "Within your spaces: when you mark an account or data as shared, authorized members of that space (such as guardians in a Family space or finance admins in a Company space) can view it according to their role.",
             "Affiliates: FlowRate does not currently share NPI with corporate affiliates for their own purposes.",
