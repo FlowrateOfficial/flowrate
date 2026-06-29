@@ -3,7 +3,7 @@ import type { H3Event } from 'h3'
 import type Stripe from 'stripe'
 import { getStripeClient } from '../stripe/client'
 import { clearStripeCustomerId } from '../billing/repository'
-import { deleteNeonAuthUserByAdmin, deleteNeonAuthUserSelf } from '../neonAuthAdmin'
+import { deleteNeonAuthUser, deleteNeonAuthUserByAdmin } from '../neonAuthAdmin'
 import { isChildRole, isGuardianRole } from '../../utils/spaceAuth'
 
 export interface PurgeUserDataResult {
@@ -173,19 +173,20 @@ export async function deleteOwnUserAccount(
     throw createError({ statusCode: 400, message: 'Email confirmation does not match' })
   }
 
-  const result = await purgeUserApplicationData(sessionUser.id, event)
-
   try {
-    await deleteNeonAuthUserSelf(event, input.password)
+    await deleteNeonAuthUser(event, sessionUser.id, input.password)
   } catch (error) {
-    console.error('[user-deletion] Neon Auth self-delete failed after app purge:', error)
+    console.error('[user-deletion] Neon Auth delete failed:', error)
+    if (error && typeof error === 'object' && 'statusCode' in error && error.statusCode === 400) {
+      throw error
+    }
     throw createError({
       statusCode: 502,
-      message: 'Your data was removed but login deletion failed. Contact mathieu.lievre.pro@outlook.com.'
+      message: 'Could not delete your login account. Your FlowRate data was not removed. Try again with your password, or contact mathieu.lievre.pro@outlook.com.'
     })
   }
 
-  return result
+  return purgeUserApplicationData(sessionUser.id, event)
 }
 
 export async function deleteOffspringUserAccount(
@@ -225,17 +226,16 @@ export async function deleteOffspringUserAccount(
     throw createError({ statusCode: 400, message: 'Use Settings to delete your own account' })
   }
 
-  const result = await purgeUserApplicationData(target.userId, event)
-
   try {
     await deleteNeonAuthUserByAdmin(target.userId, event)
   } catch (error) {
-    console.error('[user-deletion] Neon Auth admin delete failed after app purge:', error)
+    console.error('[user-deletion] Neon Auth admin delete failed:', error)
     throw createError({
       statusCode: 502,
-      message: 'Account data was removed but login deletion failed. Contact mathieu.lievre.pro@outlook.com.'
+      message: 'Could not delete the login account. Their FlowRate data was not removed. Contact mathieu.lievre.pro@outlook.com.'
     })
   }
 
+  const result = await purgeUserApplicationData(target.userId, event)
   return { ok: true, purged: true, ...result }
 }
