@@ -1,5 +1,4 @@
-// This is your Prisma schema file
-// Learn more: https://pris.ly/d/prisma-schema
+// ANCHOR: Prisma schema — PostgreSQL models for FlowRate
 
 generator client {
   provider = "prisma-client"
@@ -10,7 +9,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// ─── Enums ────────────────────────────────────────────────────────────────────
+// NOTE - Enums
 
 enum Plan {
   FREE
@@ -92,7 +91,7 @@ enum SplitRuleType {
   CUSTOM
 }
 
-/// Stripe Billing subscription lifecycle (mirrors Stripe API statuses).
+// NOTE - Stripe subscription status (mirrors Stripe API)
 enum SubStatus {
   INCOMPLETE
   INCOMPLETE_EXPIRED
@@ -104,15 +103,14 @@ enum SubStatus {
   PAUSED
 }
 
-/// Bank link source: Stripe (US) or Plaid (EU).
+// NOTE - Bank link source: Stripe (US) or Plaid (EU)
 enum LinkProvider {
   STRIPE
   PLAID
 }
 
-// ─── Models ───────────────────────────────────────────────────────────────────
 
-/// User profile — ID is sourced from Neon Auth.
+// NOTE - User profile; id from Neon Auth
 model User {
   id            String    @id
   email         String    @unique
@@ -141,7 +139,7 @@ model User {
   @@map("users")
 }
 
-/// One Plaid bank login (item) — stores access token for EU sync.
+// NOTE - Plaid item — one bank login, stores access token
 model PlaidLink {
   id          String            @id @default(cuid())
   userId      String
@@ -161,7 +159,7 @@ model PlaidLink {
   @@map("plaid_links")
 }
 
-/// Stripe Billing customer profile — one per user (`cus_…`).
+// NOTE - Stripe customer profile — one per user (cus_…)
 model UserBilling {
   userId     String   @id
   customerId String?  @unique
@@ -174,7 +172,7 @@ model UserBilling {
   @@map("user_billing")
 }
 
-/// Stripe subscription record synced from webhooks / checkout (`sub_…`).
+// NOTE - Stripe subscription synced from webhooks / checkout (sub_…)
 model BillingSubscription {
   id          String    @id @default(cuid())
   userId      String    @unique
@@ -196,7 +194,7 @@ model BillingSubscription {
   @@map("billing_subscriptions")
 }
 
-/// Per-user usage counters for plan enforcement and admin reporting.
+// NOTE - Plan enforcement counters + admin usage reporting
 model UserUsage {
   userId         String    @id
   syncCountMonth Int       @default(0)
@@ -209,7 +207,7 @@ model UserUsage {
   @@map("user_usage")
 }
 
-/// A financial space: Independent, Household, Family, or Company.
+// NOTE - Financial space: Independent, Household, Family, or Company
 model FinancialSpace {
   id        String    @id @default(cuid())
   name      String
@@ -234,7 +232,7 @@ model FinancialSpace {
   @@map("financial_spaces")
 }
 
-/// Membership linking a user (or pending invite) to a space with a role.
+// NOTE - User or pending invite membership in a space
 model SpaceMember {
   id        String       @id @default(cuid())
   spaceId   String
@@ -261,6 +259,7 @@ model SpaceMember {
   @@map("space_members")
 }
 
+// NOTE - Space invite token (email or phone)
 model SpaceInvitation {
   id            String    @id @default(cuid())
   spaceId       String
@@ -281,7 +280,7 @@ model SpaceInvitation {
   @@map("space_invitations")
 }
 
-/// Child/teen profile with allowance and supervision settings.
+// NOTE - Child/teen profile — allowance and supervision
 model ChildProfile {
   id        String        @id @default(cuid())
   spaceId   String
@@ -301,6 +300,7 @@ model ChildProfile {
   @@map("child_profiles")
 }
 
+// NOTE - Child savings jar within an allowance
 model AllowanceJar {
   id        String   @id @default(cuid())
   childId   String
@@ -316,7 +316,7 @@ model AllowanceJar {
   @@map("allowance_jars")
 }
 
-/// How expenses are split between space members.
+// NOTE - Expense split rule between space members
 model SplitRule {
   id        String               @id @default(cuid())
   spaceId   String
@@ -333,6 +333,7 @@ model SplitRule {
   @@map("split_rules")
 }
 
+// NOTE - Linked bank account (Stripe FC or Plaid)
 model Account {
   id          String            @id @default(cuid())
   userId      String
@@ -360,6 +361,7 @@ model Account {
   @@map("accounts")
 }
 
+// NOTE - Synced transaction row
 model Transaction {
   id          String              @id @default(cuid())
   userId      String
@@ -388,6 +390,7 @@ model Transaction {
   @@map("transactions")
 }
 
+// NOTE - Category budget for a space
 model Budget {
   id        String              @id @default(cuid())
   userId    String
@@ -409,6 +412,7 @@ model Budget {
   @@map("budgets")
 }
 
+// NOTE - Recurring charge detected from transactions
 model DetectedSubscription {
   id         String              @id @default(cuid())
   userId     String
@@ -434,7 +438,7 @@ model DetectedSubscription {
   @@map("detected_subscriptions")
 }
 
-/// In-app feedback linked to a private GitHub issue.
+// NOTE - In-app feedback linked to private GitHub issue
 model FeedbackSubmission {
   id          String    @id @default(cuid())
   userId      String

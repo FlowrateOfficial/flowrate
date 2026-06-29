@@ -13,12 +13,12 @@ const { isMinor, space } = storeToRefs(spacesStore)
 </script>
 
 <template>
-  <div class="flex h-[100dvh] overflow-hidden bg-default text-default">
+  <div class="flex h-dvh overflow-hidden bg-default text-default">
     <aside
       class="dashboard-sidebar hidden w-72 shrink-0 flex-col border-r border-default bg-elevated/30 lg:flex"
       aria-label="Sidebar"
     >
-      <div class="flex h-[4.5rem] shrink-0 items-center gap-2 border-b border-default px-6">
+      <div class="flex h-18 shrink-0 items-center gap-2 border-b border-default px-6">
         <NuxtLink to="/dashboard" class="inline-flex items-center gap-2">
           <BrandFlowRateLogo :mark-size="32" />
           <AppBetaBadge size="sm" />
@@ -109,7 +109,7 @@ const { isMinor, space } = storeToRefs(spacesStore)
         <AppBreadcrumbs />
       </div>
 
-      <header class="dashboard-header-bar hidden h-[4.5rem] shrink-0 items-center justify-between gap-4 border-b border-default px-6 lg:flex lg:px-8">
+      <header class="dashboard-header-bar hidden h-18 shrink-0 items-center justify-between gap-4 border-b border-default px-6 lg:flex lg:px-8">
         <AppBreadcrumbs v-if="showBreadcrumbs" class="min-w-0 flex-1" />
         <p v-else class="text-sm text-muted">
           {{ t('nav.overview') }}

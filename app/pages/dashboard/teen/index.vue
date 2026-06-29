@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Teen dashboard — guardian-managed money view
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'My Money', middleware: 'auth' })
@@ -7,7 +8,7 @@ const { t, formatCurrency } = useAppI18n()
 const teenStore = useTeenStore()
 const { dashboard: teen, pending } = storeToRefs(teenStore)
 
-useSeoMeta({ title: () => `${t('nav.myMoney')} — ${t('common.appName')}` })
+useDashboardSeo('nav.myMoney')
 
 await useAsyncData('teen-dashboard', () => teenStore.fetchDashboard())
 

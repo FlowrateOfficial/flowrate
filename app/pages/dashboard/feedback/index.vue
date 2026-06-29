@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Feedback page — submit + list GitHub issues
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 import { CSRF_COOKIE, CSRF_HEADER } from '#shared/security'
@@ -138,7 +139,7 @@ async function submit() {
   }
 }
 
-useSeoMeta({ title: () => `${t('dashboard.feedback.pageTitle')} — ${t('common.appName')}` })
+useDashboardSeo('dashboard.feedback.pageTitle')
 </script>
 
 <template>

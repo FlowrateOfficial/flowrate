@@ -2,6 +2,8 @@ import type { H3Event } from 'h3'
 import { normalizePlaidEnv } from '#shared/plaid-config'
 
 const PLAID_LINK_SCRIPT = 'https://cdn.plaid.com/link/v2/stable/link-initialize.js'
+const VERCEL_SPEED_INSIGHTS_SCRIPT = 'https://va.vercel-scripts.com'
+const VERCEL_SPEED_INSIGHTS_CONNECT = 'https://vitals.vercel-insights.com'
 
 function isLocalhostOrigin(origin: string): boolean {
   try {
@@ -12,7 +14,7 @@ function isLocalhostOrigin(origin: string): boolean {
   }
 }
 
-/** Origins allowed in connect-src / form-action (request host + configured deploy URLs). */
+// NOTE - Origins for connect-src / form-action (host + deploy URLs)
 export function collectAppOrigins(event: H3Event): string[] {
   const origins = new Set<string>()
   const requestOrigin = getRequestURL(event).origin
@@ -72,6 +74,7 @@ export function buildContentSecurityPolicy(event: H3Event): string {
     'https://api.github.com',
     'https://api.mapbox.com',
     'https://events.mapbox.com',
+    VERCEL_SPEED_INSIGHTS_CONNECT,
     ...plaidConnectSrc(event)
   ]
 
@@ -92,7 +95,7 @@ export function buildContentSecurityPolicy(event: H3Event): string {
     `form-action 'self'`,
     `frame-ancestors 'none'`,
     `object-src 'none'`,
-    `script-src 'self' 'unsafe-inline' https://js.stripe.com${plaidEnabled ? ` ${PLAID_LINK_SCRIPT}` : ''}`,
+    `script-src 'self' 'unsafe-inline' https://js.stripe.com ${VERCEL_SPEED_INSIGHTS_SCRIPT}${plaidEnabled ? ` ${PLAID_LINK_SCRIPT}` : ''}`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `style-src-attr 'unsafe-inline'`,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Transactions page — filters, infinite scroll, export
 import type { TableRow } from '@nuxt/ui'
 import { storeToRefs } from 'pinia'
 import { useInfiniteScroll } from '@vueuse/core'
@@ -51,21 +52,17 @@ const emptyDescription = computed(() => {
 })
 
 const tableLoading = computed(() => pending.value && !items.value.length)
-
-const spaceId = computed(() => useSpacesStore().space?.id)
 const table = useTemplateRef('table')
 
-await useAsyncData(
-  () => `transactions-${spaceId.value}`,
-  async () => {
-    await Promise.all([
-      transactionsStore.resetAndFetch(),
-      accountsStore.accounts.length ? Promise.resolve() : accountsStore.fetchAccounts()
-    ])
-    return null
-  },
-  { watch: [spaceId] }
-)
+await useSpaceStoreFetch('transactions', async () => {
+  // NOTE - Warm accounts cache only when overview has not loaded them
+  await Promise.all([
+    transactionsStore.resetAndFetch(),
+    accountsStore.accounts.length ? Promise.resolve() : accountsStore.fetchAccounts()
+  ])
+})
+
+useDashboardSeo('dashboard.transactions.title')
 
 onMounted(async () => {
   await nextTick()
@@ -86,8 +83,6 @@ function onSelect(_event: Event, row: TableRow<TransactionRow>) {
 async function syncAndRefresh() {
   await syncStore.syncTransactions(() => transactionsStore.resetAndFetch())
 }
-
-useSeoMeta({ title: () => `${t('dashboard.transactions.title')} — ${t('common.appName')}` })
 </script>
 
 <template>

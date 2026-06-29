@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ANCHOR: Family member detail — accounts, txs, allowance
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Child', middleware: 'auth' })
@@ -8,7 +9,7 @@ const route = useRoute()
 const { setBreadcrumbTail } = useBreadcrumbs()
 const familyStore = useFamilyStore()
 const spacesStore = useSpacesStore()
-const { memberTab, saving } = storeToRefs(familyStore)
+const { memberTab, saving, transactionColumns } = storeToRefs(familyStore)
 
 const memberId = route.params.memberId as string
 const spaceId = computed(() => spacesStore.space?.id ?? '')
@@ -39,7 +40,7 @@ const summaryItems = computed(() => {
   ]
 })
 
-const columns = computed(() => familyStore.transactionColumns())
+const columns = transactionColumns
 
 const isChildMember = computed(() => {
   const role = data.value?.member.role

@@ -66,7 +66,7 @@ onMounted(() => {
         block
         :loading="loading"
         color="neutral"
-        class="!bg-charcoal dark:!bg-flow-warm !text-flow-warm dark:!text-charcoal rounded-flow"
+        class="bg-charcoal! dark:bg-flow-warm! text-flow-warm! dark:text-charcoal! rounded-flow"
       />
     </UForm>
 

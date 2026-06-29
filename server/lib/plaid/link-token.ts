@@ -45,8 +45,8 @@ export async function createPlaidLinkToken(
     products: [Products.Transactions],
     country_codes: countryCodes,
     language,
-    // OAuth redirect must be registered in Plaid Dashboard → Team Settings → API.
-    // Omit on local HTTP dev so sandbox non-OAuth institutions work without registration.
+    // NOTE - OAuth redirect_uri must be registered in Plaid Dashboard
+    // NOTE - Omit on local HTTP so sandbox non-OAuth banks work
     ...(options.redirectUri ? { redirect_uri: options.redirectUri } : {}),
     ...(options.webhook ? { webhook: options.webhook } : {})
   })

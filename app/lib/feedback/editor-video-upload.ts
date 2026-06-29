@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: TipTap videoUpload node — mirrors image upload for feedback videos
+// ANCHOR: TipTap videoUpload node for feedback editor
 
 import { Node, mergeAttributes } from '@tiptap/core'
 import type { CommandProps, NodeViewRenderer } from '@tiptap/core'

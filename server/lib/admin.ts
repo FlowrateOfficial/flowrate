@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Admin access gate via ADMIN_EMAILS env list
+// ANCHOR: Admin access gate via ADMIN_EMAILS env list
 export function parseAdminEmails(raw: string | undefined): string[] {
   return (raw ?? '')
     .split(',')

@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: disablePageLocales — all copy lives in locales/en.json, loaded as the index chunk
+// ANCHOR: Root locale plugin — single locales/en.json chunk
 export default defineNuxtPlugin({
   name: 'flowrate-i18n-root-locale',
   enforce: 'post',

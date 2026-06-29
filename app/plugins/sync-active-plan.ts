@@ -1,4 +1,4 @@
-/** Keep SSR-hydrated active plan aligned with the user profile store. */
+// ANCHOR: Sync active plan from user profile store
 export default defineNuxtPlugin(() => {
   const userStore = useUserStore()
   const activePlan = useActivePlan()

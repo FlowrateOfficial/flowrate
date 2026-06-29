@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Plaid Link client-side error helpers
+// ANCHOR: Plaid Link client error classification
 
 export interface PlaidLinkError {
   error_type?: string
@@ -31,7 +31,7 @@ export function resolvePlaidLinkErrorMessage(error: unknown): string | null {
   if (error instanceof Error) {
     if (error.message === 'Plaid Link failed to initialize') return error.message
     if (error.message === 'Failed to load Plaid Link') {
-      // NOTE - Resolved via i18n in store
+      // NOTE - Store resolves load failure via i18n
       return null
     }
   }

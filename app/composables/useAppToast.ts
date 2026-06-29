@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Unified Nuxt UI toast helpers for success / error feedback
+// ANCHOR: Nuxt UI toast helpers for app feedback
 import { resolveErrorMessage } from '~/utils/errors'
 
 type ToastColor = 'success' | 'error' | 'warning' | 'info' | 'neutral' | 'primary'

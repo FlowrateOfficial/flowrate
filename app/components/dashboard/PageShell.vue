@@ -1,8 +1,9 @@
 <script setup lang="ts">
+// ANCHOR: Dashboard page wrapper — max-width, optional viewport fill
 defineProps<{
   maxWidth?: 'md' | 'lg' | 'xl' | '2xl' | '6xl' | '7xl' | 'full'
   showGuide?: boolean
-  // NOTE - Fill available viewport height — use on data-heavy pages like transactions
+  // NOTE - Fill viewport height for data-heavy pages
   fill?: boolean
 }>()
 
@@ -13,7 +14,7 @@ const maxWidthClass: Record<string, string> = {
   '2xl': 'max-w-6xl',
   '6xl': 'max-w-6xl',
   '7xl': 'max-w-7xl',
-  full: 'max-w-[90rem]'
+  full: 'max-w-360'
 }
 </script>
 

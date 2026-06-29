@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: TipTap video block for feedback editor previews
+// ANCHOR: TipTap video block for feedback previews
 
 import { Node, mergeAttributes } from '@tiptap/core'
 

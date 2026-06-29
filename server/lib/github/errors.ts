@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Parse GitHub API errors for logging and dev responses
+// ANCHOR: Parse GitHub API errors for logging and dev responses
 
 export function formatGithubError(error: unknown): string {
   if (!error || typeof error !== 'object') {

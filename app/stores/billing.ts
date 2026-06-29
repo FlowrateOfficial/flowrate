@@ -1,5 +1,5 @@
 import type { AppPlan } from '#shared/billing'
-import type { UserBillingInfo } from '~/types/user'
+import type { UserBillingInfo, UserProfile } from '~/types/user'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -41,6 +41,7 @@ export const useBillingStore = defineStore('billing', () => {
   const pricingCadence = ref<PricingCadence>('monthly')
   const selectedPlanKey = ref('pro')
   const changePreview = ref<SubscriptionChangePreview | null>(null)
+  const settingsPending = ref(false)
   const { api } = useApi()
 
   const billingInterval = computed<BillingInterval>(() =>
@@ -194,9 +195,34 @@ export const useBillingStore = defineStore('billing', () => {
     }
   }
 
+  async function loadSettings(options?: { checkoutSessionId?: string }) {
+    const userStore = useUserStore()
+    settingsPending.value = true
+    try {
+      await fetchPlans()
+      const profile = await userStore.fetchProfile({
+        syncBilling: true,
+        checkoutSessionId: options?.checkoutSessionId
+      })
+      if (!profile) return null
+
+      userStore.applySettingsForm(profile)
+      applyBillingContext(profile.billing, profile.plan)
+
+      if (profile.plan !== 'FREE' && profile.billing?.subscription?.priceId) {
+        await previewChange().catch(() => null)
+      }
+
+      return profile
+    } finally {
+      settingsPending.value = false
+    }
+  }
+
   return {
     loading,
     previewLoading,
+    settingsPending,
     plans,
     plansLoading,
     pricingCadence,
@@ -213,6 +239,7 @@ export const useBillingStore = defineStore('billing', () => {
     previewChange,
     startCheckout,
     changeSubscription,
-    openPortal
+    openPortal,
+    loadSettings
   }
 })

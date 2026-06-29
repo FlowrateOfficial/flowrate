@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: In-memory cache for proxied GitHub media (per server instance)
+// ANCHOR: In-memory cache for proxied GitHub media (per server instance)
 
 const MAX_ENTRIES = 64
 const MAX_BYTES = 8 * 1024 * 1024

@@ -1,36 +1,16 @@
 <script setup lang="ts">
+// ANCHOR: Subscription row — status badge + next charge
 import type { SubscriptionItem } from '~/types/financial'
 
 defineProps<{ subscription: SubscriptionItem }>()
 
-const { t, intlLocale, formatCurrency } = useAppI18n()
+const { t, formatShortDate, formatCurrency, subscriptionStatusLabel, subscriptionFrequencyLabel } = useAppI18n()
 
 const statusColors: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
   ACTIVE: 'success',
   PAUSED: 'warning',
   CANCELLED: 'neutral',
   PRICE_CHANGED: 'error'
-}
-
-function statusLabel(status: string) {
-  const key = `dashboard.subscriptions.status.${status}`
-  const translated = t(key)
-  return translated !== key ? translated : status
-}
-
-function frequencyLabel(freq: string | null) {
-  if (!freq) return '—'
-  const key = `dashboard.subscriptions.frequency.${freq}`
-  const translated = t(key)
-  return translated !== key ? translated : freq
-}
-
-function fmt(amount: number, currency: string): string {
-  return formatCurrency(amount, currency)
-}
-
-function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat(intlLocale.value, { month: 'short', day: 'numeric' }).format(new Date(dateStr))
 }
 </script>
 
@@ -53,22 +33,22 @@ function formatDate(dateStr: string): string {
       </div>
       <div class="flex items-center gap-2 mt-0.5">
         <UBadge
-          :label="statusLabel(subscription.status)"
+          :label="subscriptionStatusLabel(subscription.status)"
           :color="statusColors[subscription.status] ?? 'neutral'"
           variant="subtle"
           size="xs"
         />
         <span v-if="subscription.nextCharge" class="text-xs text-muted">
-          {{ t('dashboard.subscriptions.nextCharge', { date: formatDate(subscription.nextCharge) }) }}
+          {{ t('dashboard.subscriptions.nextCharge', { date: formatShortDate(subscription.nextCharge) }) }}
         </span>
       </div>
     </div>
 
     <div class="text-right shrink-0">
       <p class="text-sm font-semibold tabular-nums">
-        {{ fmt(subscription.amount, subscription.currency) }}
+        {{ formatCurrency(subscription.amount, subscription.currency) }}
       </p>
-      <p class="text-xs text-muted">{{ frequencyLabel(subscription.frequency) }}</p>
+      <p class="text-xs text-muted">{{ subscriptionFrequencyLabel(subscription.frequency) }}</p>
     </div>
   </div>
 </template>

@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Guest middleware — redirect signed-in users away from marketing/auth pages
+// ANCHOR: Redirect authenticated users off auth pages
 export default defineNuxtRouteMiddleware(async (to) => {
   const { getSession } = useNeonAuth()
   const session = await getSession()

@@ -23,8 +23,8 @@ const metricValue = computed(() => {
 
 <template>
   <div
-    class="editorial-card !p-5 sm:!p-6 w-[220px] sm:w-[240px]"
-    :class="class"
+    class="editorial-card p-5! sm:p-6! w-[220px] sm:w-[240px]"
+    :class="props.class"
   >
     <div class="flex items-start justify-between gap-3 mb-4">
       <BrandSpaceShape :shape="card.shape" :size="28" />

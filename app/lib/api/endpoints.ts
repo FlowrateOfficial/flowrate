@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: API route map — single source of truth for client paths
+// ANCHOR: Client API route path constants
 export const apiRoutes = {
   auth: {
     session: '/api/auth/get-session'
@@ -45,7 +45,8 @@ export const apiRoutes = {
     overview: '/api/analytics/overview'
   },
   dashboard: {
-    stats: '/api/dashboard/stats'
+    stats: '/api/dashboard/stats',
+    overview: '/api/dashboard/overview'
   },
   teen: {
     dashboard: '/api/teen/dashboard'

@@ -1,5 +1,6 @@
-import type { TableColumn } from '@nuxt/ui'
+// ANCHOR: Transactions store — filters, pagination, export
 import type { TransactionRow, TransactionsResponse } from '~/types/financial'
+import { createTransactionColumns } from '~/utils/table-columns'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 import { toIsoDateTime } from '~/utils/date-pickers'
@@ -15,7 +16,7 @@ export type CategoryFilter = (typeof CATEGORY_OPTIONS)[number]
 const PAGE_SIZE = 50
 
 export const useTransactionsStore = defineStore('transactions', () => {
-  const { t, categoryLabel, intlLocale, formatCurrency } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, formatShortDateWithYear } = useAppI18n()
   const spacesStore = useSpacesStore()
   const { api } = useApi()
 
@@ -39,17 +40,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const hasMore = computed(() => items.value.length < total.value)
   const loadedCount = computed(() => items.value.length)
 
-  const columns = computed<TableColumn<TransactionRow>[]>(() => [
-    { accessorKey: 'date', header: t('dashboard.transactions.columns.date') },
-    { accessorKey: 'description', header: t('dashboard.transactions.columns.description') },
-    { accessorKey: 'category', header: t('dashboard.transactions.columns.category') },
-    { accessorKey: 'account', header: t('dashboard.transactions.columns.account') },
-    {
-      accessorKey: 'amount',
-      header: t('dashboard.transactions.columns.amount'),
-      meta: { class: { th: 'text-right', td: 'text-right' } }
-    }
-  ])
+  const columns = computed(() =>
+    createTransactionColumns<TransactionRow>(t, { includeAccount: true })
+  )
 
   const categorySelectItems = computed(() =>
     CATEGORY_OPTIONS.map(cat => ({
@@ -63,11 +56,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   }
 
   function formatDate(dateStr: string): string {
-    return new Intl.DateTimeFormat(intlLocale.value, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    }).format(new Date(dateStr))
+    return formatShortDateWithYear(dateStr)
   }
 
   function clearFilters() {

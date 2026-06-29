@@ -1,4 +1,5 @@
 import { assertSaasShield, userPlanForId } from '../../../../lib/billing/enforcement'
+import { spendingIncomeInRange } from '../../../../lib/repositories/transaction.repository'
 import { planHasFeature } from '#shared/plan-limits'
 
 export type BusinessAlertSeverity = 'info' | 'warning' | 'critical'
@@ -45,27 +46,41 @@ export default defineEventHandler(async (event) => {
 
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const accountFilter = { spaceId: space.id, ...accountVisibilityFilter(user.id, membership.role) }
 
-  const [accounts, monthlyTx, subscriptions, txCount] = await Promise.all([
+  const [accounts, monthly, subscriptions, txCount, cloudAgg, vendorTxs] = await Promise.all([
     prisma.account.findMany({
-      where: { spaceId: space.id, ...accountVisibilityFilter(user.id, membership.role) }
+      where: accountFilter,
+      select: { balance: true }
+    }),
+    spendingIncomeInRange(space.id, startOfMonth),
+    prisma.detectedSubscription.findMany({
+      where: { spaceId: space.id, status: 'ACTIVE' },
+      select: { name: true, amount: true }
+    }),
+    prisma.transaction.count({ where: { spaceId: space.id } }),
+    prisma.transaction.aggregate({
+      where: {
+        spaceId: space.id,
+        date: { gte: startOfMonth },
+        amount: { lt: 0 },
+        category: { in: ['CLOUD_INFRA', 'DEVELOPER_TOOLS'] }
+      },
+      _sum: { amount: true }
     }),
     prisma.transaction.findMany({
-      where: { spaceId: space.id, date: { gte: startOfMonth } }
-    }),
-    prisma.detectedSubscription.findMany({
-      where: { spaceId: space.id, status: 'ACTIVE' }
-    }),
-    prisma.transaction.count({ where: { spaceId: space.id } })
+      where: {
+        spaceId: space.id,
+        date: { gte: startOfMonth },
+        amount: { lt: 0 }
+      },
+      select: { merchant: true, description: true, amount: true }
+    })
   ])
 
   const cash = accounts.reduce((sum, a) => sum + Number(a.balance), 0)
-  const monthlyBurn = monthlyTx
-    .filter(t => Number(t.amount) < 0)
-    .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0)
-  const monthlyIncome = monthlyTx
-    .filter(t => Number(t.amount) > 0)
-    .reduce((sum, t) => sum + Number(t.amount), 0)
+  const monthlyBurn = monthly.spending
+  const monthlyIncome = monthly.income
   const monthlySubs = subscriptions.reduce((sum, s) => sum + Number(s.amount), 0)
   const netBurn = monthlyBurn - monthlyIncome
   const runwayMonths = netBurn > 0 ? cash / netBurn : null
@@ -79,18 +94,14 @@ export default defineEventHandler(async (event) => {
     .filter(s => (duplicateSubs[s.name.toLowerCase()] ?? 0) > 1)
     .reduce((sum, s) => sum + Number(s.amount), 0)
 
-  const cloudSpend = monthlyTx
-    .filter(t => t.category === 'CLOUD_INFRA' || t.category === 'DEVELOPER_TOOLS')
-    .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0)
+  const cloudSpend = Math.abs(Number(cloudAgg._sum.amount ?? 0))
 
-  const vendorTotals = monthlyTx
-    .filter(t => Number(t.amount) < 0)
-    .reduce<Record<string, number>>((acc, t) => {
-      const name = (t.merchant ?? t.description).trim()
-      if (!name) return acc
-      acc[name] = (acc[name] ?? 0) + Math.abs(Number(t.amount))
-      return acc
-    }, {})
+  const vendorTotals = vendorTxs.reduce<Record<string, number>>((acc, t) => {
+    const name = (t.merchant ?? t.description).trim()
+    if (!name) return acc
+    acc[name] = (acc[name] ?? 0) + Math.abs(Number(t.amount))
+    return acc
+  }, {})
 
   const topVendors = Object.entries(vendorTotals)
     .sort((a, b) => b[1] - a[1])

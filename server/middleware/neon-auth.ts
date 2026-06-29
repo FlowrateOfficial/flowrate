@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: OAuth session exchange middleware — completes Google/GitHub redirect
+// ANCHOR: OAuth session exchange middleware — completes Google/GitHub redirect
 import { tryOAuthSessionExchange } from '../utils/neonAuthProxy'
 
 export default defineEventHandler(async (event) => {

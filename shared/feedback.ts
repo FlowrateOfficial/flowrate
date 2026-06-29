@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Feedback submission limits and GitHub issue comment anchors
+// ANCHOR: Feedback submission limits and GitHub issue comment anchors
 
 export const FEEDBACK_ATTACH_PREFIX = 'flowrate-attach:'
 
@@ -36,28 +36,25 @@ export const FEEDBACK_VIDEO_TYPES = new Set([
 // NOTE - Orphan branch for feedback media only — never merged into app code (see docs/feedback-issues-medias-branch.md)
 export const FEEDBACK_MEDIA_BRANCH = 'issues_medias'
 
-/** How long list metadata is served from DB before refreshing from GitHub */
+// NOTE - DB list TTL before refreshing from GitHub
 export const FEEDBACK_SYNC_TTL_MS = 5 * 60 * 1000
 
-/** Max parallel GitHub sync requests when refreshing stale submissions */
+// NOTE - Max parallel GitHub syncs when refreshing stale
 export const FEEDBACK_SYNC_CONCURRENCY = 5
 
-/** Max parallel asset uploads when creating an issue */
+// NOTE - Max parallel uploads per new issue
 export const FEEDBACK_UPLOAD_CONCURRENCY = 4
-
-/** @deprecated Use FEEDBACK_MEDIA_BRANCH */
-export const FEEDBACK_UPLOAD_BRANCH = FEEDBACK_MEDIA_BRANCH
 
 export type FeedbackType = 'review' | 'feature' | 'bug'
 
-/** Applied automatically to every in-app submission */
+// NOTE - Auto-applied label on every submission
 export const FEEDBACK_AUTO_LABEL = 'from-app'
 
-/** Labels users can pick when submitting feedback */
+// NOTE - User-selectable submission labels
 export const FEEDBACK_USER_LABELS = ['USER_BUG', 'USER_FEATURE'] as const
 export type FeedbackUserLabel = typeof FEEDBACK_USER_LABELS[number]
 
-/** Hidden in the app UI — used for internal tracking only */
+// NOTE - Hidden UI labels for internal tracking
 export const FEEDBACK_HIDDEN_LABELS = new Set<string>([FEEDBACK_AUTO_LABEL])
 
 export const FEEDBACK_TYPE_USER_LABEL: Partial<Record<FeedbackType, FeedbackUserLabel>> = {
@@ -76,10 +73,59 @@ export function isFeedbackUserLabel(value: string): value is FeedbackUserLabel {
   return (FEEDBACK_USER_LABELS as readonly string[]).includes(value)
 }
 
+export const FEEDBACK_USER_LABEL_COLORS: Record<FeedbackUserLabel, string> = {
+  USER_BUG: 'd73a4a',
+  USER_FEATURE: '0e8a16'
+}
+
+export function feedbackUserLabelDisplay(name: FeedbackUserLabel): FeedbackLabel {
+  return { name, color: FEEDBACK_USER_LABEL_COLORS[name] }
+}
+
+function defaultFeedbackLabelColor(name: string): string {
+  return isFeedbackUserLabel(name) ? FEEDBACK_USER_LABEL_COLORS[name] : '6b7280'
+}
+
 export interface FeedbackLabel {
   name: string
   color: string
   description?: string | null
+}
+
+// NOTE - Parse labelsJson (legacy string[] or GitHub objects)
+export function feedbackDisplayLabelsFromJson(labelsJson: string): FeedbackLabel[] {
+  try {
+    const parsed = JSON.parse(labelsJson)
+    if (!Array.isArray(parsed)) return []
+
+    const labels: FeedbackLabel[] = []
+    for (const entry of parsed) {
+      if (typeof entry === 'string') {
+        if (isFeedbackUserLabel(entry)) {
+          labels.push(feedbackUserLabelDisplay(entry))
+        }
+        continue
+      }
+
+      if (!entry || typeof entry !== 'object' || typeof entry.name !== 'string') continue
+      const name = entry.name
+      if (FEEDBACK_HIDDEN_LABELS.has(name)) continue
+
+      const color = typeof entry.color === 'string' && entry.color.length > 0
+        ? entry.color.replace('#', '')
+        : defaultFeedbackLabelColor(name)
+
+      labels.push({
+        name,
+        color,
+        description: entry.description ?? null
+      })
+    }
+
+    return labels
+  } catch {
+    return []
+  }
 }
 
 export function filterFeedbackDisplayLabels(labels: FeedbackLabel[]): FeedbackLabel[] {
@@ -121,7 +167,7 @@ export function isFeedbackMimeType(mime: string): boolean {
   return FEEDBACK_IMAGE_TYPES.has(mime) || FEEDBACK_VIDEO_TYPES.has(mime)
 }
 
-/** Fix nested image markdown caused by replacing attach tokens inside title attributes */
+// NOTE - Fix nested img markdown from attach token replacement
 export function repairFeedbackMarkdown(content: string): string {
   let result = content.trim()
   if (!result) return result
@@ -145,7 +191,7 @@ export function repairFeedbackMarkdown(content: string): string {
   return result
 }
 
-/** Normalize legacy media URLs to github.com/blob/{ref}/path?raw=true */
+// NOTE - Normalize legacy media URLs to blob?raw=true
 export function githubFeedbackAssetUrl(url: string): string {
   try {
     const parsed = new URL(url)
@@ -174,7 +220,7 @@ export function githubFeedbackAssetUrl(url: string): string {
   }
 }
 
-/** In-app img src — private repo blobs must be proxied with GITHUB_TOKEN */
+// NOTE - Proxy private blob URLs via /api/feedback/media
 export function githubFeedbackMediaProxyPath(url: string): string | null {
   try {
     const parsed = new URL(url)

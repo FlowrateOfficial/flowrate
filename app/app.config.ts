@@ -8,7 +8,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: 'rounded-flow font-medium transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]'
+        base: 'rounded-flow font-medium transition-all duration-300 ease-flow'
       },
       defaultVariants: {
         size: 'md'
@@ -16,12 +16,12 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: 'rounded-flow-lg border border-default bg-elevated shadow-sm ring-1 ring-default/40 dark:ring-default/25'
+        root: 'rounded-flow-lg border border-default bg-elevated shadow-xs ring-1 ring-default/40 dark:ring-default/25'
       }
     },
     header: {
       slots: {
-        root: 'border-b border-default bg-default/80 backdrop-blur-md'
+        root: 'border-b border-default bg-default/80 backdrop-blur-sm'
       }
     },
     footer: {

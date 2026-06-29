@@ -84,7 +84,7 @@ export async function deleteNeonAuthUserSelf(
   await deleteNeonAuthUserUpstream(event, password)
 }
 
-/** Self-delete via session; falls back to Neon admin API when configured (OAuth, etc.). */
+// NOTE - Self-delete via session; admin API fallback for OAuth
 export async function deleteNeonAuthUser(
   event: H3Event,
   userId: string,

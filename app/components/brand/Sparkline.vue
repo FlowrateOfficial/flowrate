@@ -22,7 +22,7 @@ const points = computed(() => {
 
 <template>
   <svg
-    :class="class"
+    :class="props.class"
     width="80"
     height="24"
     viewBox="0 0 80 24"

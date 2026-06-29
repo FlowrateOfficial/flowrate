@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: Browser Neon Auth client — same-origin /api/auth proxy
+// ANCHOR: Browser Neon Auth client via /api/auth proxy
 import { createAuthClient, type VanillaBetterAuthClient } from '@neondatabase/auth'
 import { BetterAuthVanillaAdapter } from '@neondatabase/auth/vanilla/adapters'
 
@@ -16,7 +16,7 @@ export function getAuthClient(): VanillaBetterAuthClient | null {
   return client
 }
 
-// NOTE - Clear cached client after sign-out
+// NOTE - Reset singleton after sign-out
 export function resetAuthClient() {
   client = null
 }

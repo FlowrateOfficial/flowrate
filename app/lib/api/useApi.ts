@@ -1,4 +1,4 @@
-// NOTE - ANCHOR: App HTTP client — CSRF, active space header, SSR cookies, GET dedupe
+// ANCHOR: Typed HTTP client with CSRF and dedupe
 import type { FetchOptions } from 'ofetch'
 import { CSRF_COOKIE, CSRF_HEADER } from '#shared/security'
 import { readCsrfTokenFromDocument } from '~/utils/csrf'
