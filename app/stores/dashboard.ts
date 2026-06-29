@@ -1,7 +1,7 @@
 import type { AccountSummary, AnalyticsOverview, SubscriptionItem, TransactionsResponse } from '~/types/financial'
 import type { DashboardStats } from '~/types/dashboard'
 import { planHasFeature } from '#shared/plan-limits'
-import { activePlan } from '~/state/plan'
+import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -9,6 +9,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const { t, categoryLabel, formatCurrency, resolveCurrency, displayCurrency } = useAppI18n()
   const spacesStore = useSpacesStore()
   const { api } = useApi()
+  const activePlan = useActivePlan()
 
   const stats = ref<DashboardStats | null>(null)
   const analytics = ref<AnalyticsOverview | null>(null)

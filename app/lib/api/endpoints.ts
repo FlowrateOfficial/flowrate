@@ -71,5 +71,6 @@ export const apiRoutes = {
     exchange: '/api/plaid/exchange',
     syncAccounts: '/api/plaid/sync-accounts',
     syncTransactions: '/api/plaid/sync-transactions'
-  }
+  },
+  feedback: '/api/feedback'
 } as const

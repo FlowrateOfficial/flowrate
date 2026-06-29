@@ -1,0 +1,41 @@
+// NOTE - ANCHOR: TipTap imageUpload node — Nuxt UI Editor image upload pattern
+
+import { Node, mergeAttributes } from '@tiptap/core'
+import type { CommandProps, NodeViewRenderer } from '@tiptap/core'
+import { VueNodeViewRenderer } from '@tiptap/vue-3'
+import EditorImageUploadNode from '~/components/dashboard/feedback/EditorImageUploadNode.vue'
+
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    imageUpload: {
+      insertImageUpload: () => ReturnType
+    }
+  }
+}
+
+export const FeedbackImageUpload = Node.create({
+  name: 'imageUpload',
+  group: 'block',
+  atom: true,
+  draggable: true,
+
+  parseHTML() {
+    return [{ tag: 'div[data-type="image-upload"]' }]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'image-upload' })]
+  },
+
+  addNodeView(): NodeViewRenderer {
+    return VueNodeViewRenderer(EditorImageUploadNode)
+  },
+
+  addCommands() {
+    return {
+      insertImageUpload: () => ({ commands }: CommandProps) => {
+        return commands.insertContent({ type: this.name })
+      }
+    }
+  }
+})

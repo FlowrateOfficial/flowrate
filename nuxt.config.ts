@@ -55,6 +55,8 @@ export default defineNuxtConfig({
     neonBranchId: process.env.NEON_BRANCH_ID ?? '',
     neonAuthCookieSecret: process.env.NUXT_SESSION_PASSWORD ?? process.env.NEON_AUTH_COOKIE_SECRET ?? '',
     adminEmails: process.env.ADMIN_EMAILS ?? '',
+    githubToken: process.env.GITHUB_TOKEN ?? '',
+    githubFeedbackRepo: process.env.GITHUB_FEEDBACK_REPO ?? '',
     public: {
       neonAuthUrl: process.env.NUXT_NEON_AUTH_URL ?? '',
       neonAuthConfigured: Boolean(
@@ -73,6 +75,9 @@ export default defineNuxtConfig({
         process.env.TWILIO_ACCOUNT_SID
         && process.env.TWILIO_AUTH_TOKEN
         && process.env.TWILIO_VERIFY_SERVICE_SID
+      ),
+      feedbackConfigured: Boolean(
+        process.env.GITHUB_TOKEN && process.env.GITHUB_FEEDBACK_REPO
       )
     }
   },
@@ -104,8 +109,15 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-        '@neondatabase/auth',
+    '@neondatabase/auth',
         '@neondatabase/auth/vanilla/adapters',
+        '@nuxt/ui > prosemirror-gapcursor',
+        '@nuxt/ui > prosemirror-model',
+        '@nuxt/ui > prosemirror-state',
+        '@nuxt/ui > prosemirror-transform',
+        '@nuxt/ui > prosemirror-view',
+        '@tiptap/core',
+        '@tiptap/vue-3',
         '@vueuse/core',
         'chart.js',
         'vue-chartjs',

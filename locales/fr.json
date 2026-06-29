@@ -403,7 +403,17 @@
   "dashboard": {
     "layout": {
       "currentSpace": "Votre espace",
-      "mobileNav": "Navigation principale"
+      "mobileNav": "Navigation principale",
+      "switchSpace": "Changer d'espace",
+      "switchSpaceHint": "Choisissez un espace — comptes, budgets et navigation s'adaptent.",
+      "customizeFooter": "Personnaliser le pied de page",
+      "customizeFooterHint": "Choisissez et réorganisez les {count} onglets du pied de page mobile. Le changement d'espace reste dans l'en-tête.",
+      "footerTabs": "Onglets du pied de page",
+      "addFooterTab": "Remplacer l'onglet sélectionné",
+      "moveTabUp": "Monter l'onglet",
+      "moveTabDown": "Descendre l'onglet",
+      "resetFooter": "Réinitialiser",
+      "footerLongPressHint": "Astuce : maintenez le pied de page pour personnaliser les onglets."
     },
     "dateField": {
       "pickDate": "Choisir une date",
@@ -909,6 +919,49 @@
       "portalFailed": "Impossible d'ouvrir le portail de facturation",
       "tryAgain": "Veuillez réessayer."
     },
+    "feedback": {
+      "title": "Avis et retours",
+      "pageTitle": "Retours",
+      "pageDescription": "Partagez un avis, proposez une fonctionnalité ou signalez un bug. Ajoutez photos, vidéos et notes formatées — envoyé en privé à l'équipe FlowRate.",
+      "description": "Partagez un avis, proposez une fonctionnalité ou signalez un bug. Votre message est envoyé en privé à l'équipe FlowRate sous forme d'issue GitHub — rien n'est publié publiquement.",
+      "settingsTeaser": "Ouvrez la page complète pour ajouter images, vidéos et markdown enrichi.",
+      "openPage": "Ouvrir les retours",
+      "editorPlaceholder": "Décrivez votre expérience, idée ou bug. Glissez-déposez images ou vidéos, ou utilisez la barre d'outils.",
+      "editorHelp": "Prise en charge du markdown, des images et de courtes vidéos. Les pièces jointes sont envoyées avec votre rapport.",
+      "uploadImage": "Ajouter une image",
+      "uploadImageHelp": "JPG, PNG, GIF ou WebP (max. 8 Mo)",
+      "uploadVideo": "Ajouter une vidéo",
+      "uploadVideoHelp": "MP4 ou WebM (max. 48 Mo)",
+      "attachmentCount": "{count} en pièce jointe",
+      "mediaErrors": {
+        "unsupported": "Ce type de fichier n'est pas pris en charge. Utilisez JPG, PNG, GIF, WebP, MP4 ou WebM.",
+        "tooLarge": "Fichier trop volumineux. Images jusqu'à 8 Mo, vidéos jusqu'à 48 Mo.",
+        "tooMany": "Vous pouvez joindre jusqu'à 8 fichiers par rapport.",
+        "generic": "Impossible d'ajouter ce fichier."
+      },
+      "types": {
+        "review": "Avis",
+        "feature": "Fonctionnalité",
+        "bug": "Bug"
+      },
+      "rating": "Note globale",
+      "ratingValue": "{value} sur 5 étoiles",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Résumé court",
+      "message": "Détails",
+      "messagePlaceholder": "Qu'est-ce qui fonctionne bien ? Que devrions-nous améliorer ? Pour un bug, indiquez les étapes pour le reproduire.",
+      "includeContext": "Inclure le contexte technique",
+      "includeContextHelp": "Aide au débogage : offre, type d'espace, page et navigateur — pas de données bancaires.",
+      "privacyNote": "N'incluez pas de mots de passe, identifiants bancaires ni numéros de carte complets.",
+      "submit": "Envoyer",
+      "successTitle": "Merci — nous avons bien reçu votre retour",
+      "successDescription": "Notre équipe le traitera dans notre suivi privé. Vous ne recevrez pas de lien public.",
+      "sendAnother": "Envoyer un autre",
+      "failed": "Impossible d'envoyer le retour",
+      "tryAgain": "Veuillez réessayer dans quelques minutes.",
+      "unavailableTitle": "Les retours ne sont pas encore activés",
+      "unavailableDescription": "Le serveur doit avoir GITHUB_TOKEN et GITHUB_FEEDBACK_REPO configurés. Vous pouvez aussi écrire à mathieu.lievre.pro@outlook.com."
+    },
     "transactions": {
       "title": "Transactions",
       "subtitle": "{count} transactions dans votre espace actif — recherchez, filtrez et exportez.",
@@ -1088,10 +1141,21 @@
   "legal": {
     "betaNotice": "FlowRate est en bêta active. Les fonctionnalités, connexions bancaires, facturation, disponibilité et ces documents juridiques peuvent changer sans préavis. Le service peut être incomplet, instable ou temporairement indisponible. Rien ici ne constitue une promesse de livrer une fonctionnalité précise à une date précise. En utilisant FlowRate pendant la bêta, vous acceptez ces limites et comprenez que les politiques et le produit peuvent évoluer.",
     "betaSectionNotice": "Avis bêta : les pratiques décrites dans cette section reflètent le produit actuel et peuvent être mises à jour au fil du développement de FlowRate.",
+    "lastUpdatedLabel": "Dernière mise à jour : {datetime} (UTC)",
+    "speedInsights": {
+      "title": "Vercel Speed Insights (mesure de performance)",
+      "p1": "Sur les déploiements de production hébergés par Vercel, FlowRate charge le module Vercel Speed Insights (@vercel/speed-insights). Il nous aide à mesurer les performances réelles des pages (par ex. les Core Web Vitals : temps de chargement, stabilité visuelle). Il sert uniquement à améliorer la vitesse et la fiabilité du site — pas à la publicité ni au profilage intersites.",
+      "p2Before": "Le module peut envoyer à Vercel des données techniques anonymisées ou pseudonymisées, telles que l'URL de la page, le type de navigateur, la catégorie d'appareil, la qualité de connexion et des métriques de performance. Vercel traite ces données en tant qu'hébergeur. Consultez la ",
+      "vercelLink": "documentation Vercel Speed Insights",
+      "p2After": " pour les détails sur les données collectées et leur conservation.",
+      "p3Before": "Ce script est distinct des analyses de dépenses dans l'application FlowRate. Si vous souhaitez limiter les scripts de mesure tiers, de nombreux navigateurs axés confidentialité intègrent un bloqueur de traqueurs — par exemple ",
+      "braveLink": "Brave Browser",
+      "p3After": " (gratuit). Bloquer le script n'empêche pas d'utiliser les fonctionnalités principales de FlowRate, mais nous recevrons moins de données pour optimiser le site."
+    },
     "privacy": {
       "title": "Politique de confidentialité",
       "seoTitle": "Politique de confidentialité — FlowRate",
-      "lastUpdated": "Dernière mise à jour : 28 juin 2026",
+      "lastUpdatedAt": "2026-06-29T18:00:00Z",
       "seeAlsoTerms": "Voir aussi : Conditions d'utilisation",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "FlowRate (« nous ») est une application de gestion des finances personnelles et familiales, actuellement en bêta. Cette politique explique quelles informations nous collectons, comment nous les utilisons, avec qui nous les partageons, où elles sont stockées et quels choix vous avez. Nous visons une transparence maximale pour que vous puissiez utiliser FlowRate en toute connaissance de cause pendant le développement du produit.",
@@ -1116,7 +1180,8 @@
             "Données bancaires connectées (si vous choisissez de lier un compte) : nom de l'établissement, nom affiché du compte, type de compte, quatre derniers chiffres, soldes et historique des transactions reçus via Stripe Financial Connections.",
             "Données dérivées : catégories de transactions (y compris catégorisation automatique par règles — pas d'IA aujourd'hui), budgets, abonnements détectés, synthèses analytiques et règles de répartition que vous configurez.",
             "Données de facturation : formule d'abonnement et identifiants client Stripe Billing si vous passez à une offre payante.",
-            "Données techniques : journaux serveur, adresses IP et métadonnées de requêtes générées lors de l'utilisation de l'application (notamment via notre hébergeur)."
+            "Données techniques : journaux serveur, adresses IP et métadonnées de requêtes générées lors de l'utilisation de l'application (notamment via notre hébergeur).",
+            "Données de performance (production uniquement) : métriques de performance de page anonymisées ou pseudonymisées envoyées à Vercel via le module Speed Insights lors de votre visite sur le site public ou l'interface de l'app — voir l'encadré en haut de page."
           ]
         },
         "financialConnections": {
@@ -1146,7 +1211,8 @@
         "analytics": {
           "title": "5. Analyses et suivi",
           "p1": "Les fonctionnalités « Analyses » de FlowRate désignent des insights calculés à partir de vos propres données financières dans l'application — pas du suivi publicitaire tiers ou intersites.",
-          "p2": "Nous n'utilisons pas Google Analytics, de pixels publicitaires ni ne vendons de profils comportementaux. Nos hébergeurs peuvent enregistrer des journaux serveur standard (horodatages, URL, codes d'erreur) pour la fiabilité et la sécurité."
+          "p2": "Nous n'utilisons pas Google Analytics, de pixels publicitaires ni ne vendons de profils comportementaux. Nos hébergeurs peuvent enregistrer des journaux serveur standard (horodatages, URL, codes d'erreur) pour la fiabilité et la sécurité.",
+          "p3": "Sur les déploiements de production hébergés par Vercel, nous utilisons aussi Vercel Speed Insights pour mesurer les performances réelles (Core Web Vitals). Ce n'est pas du marketing. Voir l'encadré Speed Insights en haut de cette page et la liste des sous-traitants ci-dessous."
         },
         "ai": {
           "title": "6. Analyses IA optionnelles (Pro et Entreprise)",
@@ -1188,7 +1254,7 @@
             },
             {
               "name": "Vercel",
-              "purpose": "Hébergement de l'application et diffusion de contenu",
+              "purpose": "Hébergement de l'application, diffusion de contenu et Speed Insights (métriques de performance réelles en production)",
               "location": "États-Unis et/ou Union européenne"
             },
             {
@@ -1252,7 +1318,8 @@
         "cookies": {
           "title": "15. Cookies et technologies similaires",
           "p1": "Nous utilisons des cookies essentiels et stockages similaires pour les sessions d'authentification, les préférences de langue et la sécurité. Ils sont nécessaires au fonctionnement de l'application.",
-          "p2": "Nous n'utilisons pas de cookies publicitaires ni de suivi intersites. Vous pouvez effacer les cookies via votre navigateur, mais vous devrez peut-être vous reconnecter."
+          "p2": "Nous n'utilisons pas de cookies publicitaires ni de suivi intersites. Vous pouvez effacer les cookies via votre navigateur, mais vous devrez peut-être vous reconnecter.",
+          "p3": "Vercel Speed Insights charge un petit script de mesure de performance en production. Ce n'est pas un cookie publicitaire, mais les outils de confidentialité ou navigateurs avec bloqueur de traqueurs (comme Brave) peuvent le bloquer — voir l'encadré Speed Insights en haut de cette page."
         },
         "international": {
           "title": "16. Utilisateurs internationaux",
@@ -1269,7 +1336,7 @@
     "terms": {
       "title": "Conditions d'utilisation",
       "seoTitle": "Conditions d'utilisation — FlowRate",
-      "lastUpdated": "Dernière mise à jour : 26 juin 2026",
+      "lastUpdatedAt": "2026-06-29T18:00:00Z",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "Les présentes Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation de FlowRate pendant la phase bêta. En créant un compte ou en utilisant le service, vous acceptez ces Conditions et notre Politique de confidentialité, y compris les limites applicables pendant le développement actif.",
@@ -1283,7 +1350,8 @@
           "title": "2. Le service",
           "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses (par règles aujourd'hui — pas d'intelligence artificielle), définir des budgets, détecter les abonnements et collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise).",
           "p2": "Nous prévoyons d'offrir des analyses de dépenses par IA optionnelles aux abonnés Pro et Entreprise qui s'inscrivent explicitement. Cette fonctionnalité n'est pas encore disponible ; lorsqu'elle sera lancée, elle sera régie par notre Politique de confidentialité et votre choix d'opt-in dans Paramètres.",
-          "p3": "Les fonctionnalités peuvent évoluer. Nous pouvons ajouter, modifier ou retirer des fonctionnalités avec un préavis raisonnable lorsque c'est possible."
+          "p3": "Les fonctionnalités peuvent évoluer. Nous pouvons ajouter, modifier ou retirer des fonctionnalités avec un préavis raisonnable lorsque c'est possible.",
+          "p4": "Notre site de production peut charger Vercel Speed Insights pour mesurer les performances des pages. Il n'accède pas à vos données bancaires. L'utilisation de FlowRate implique que votre navigateur peut transmettre des métriques techniques de performance à Vercel, comme décrit dans notre Politique de confidentialité."
         },
         "eligibility": {
           "title": "3. Éligibilité",
@@ -1348,7 +1416,7 @@
     "glba": {
       "title": "Avis de confidentialité financière (GLBA)",
       "seoTitle": "Avis de confidentialité financière (GLBA) — FlowRate",
-      "lastUpdated": "Dernière mise à jour : 28 juin 2026",
+      "lastUpdatedAt": "2026-06-29T18:00:00Z",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoTerms": "Conditions d'utilisation",
       "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles, actuellement en bêta. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation et peut être mis à jour à mesure que le produit mûrit.",
@@ -1443,7 +1511,8 @@
         "otherNotices": {
           "title": "12. Lien avec les autres politiques",
           "p1": "Notre Politique de confidentialité détaille davantage nos pratiques, les utilisateurs internationaux, les cookies, les enfants et adolescents, et les sous-traitants. Nos Conditions d'utilisation régissent votre utilisation de FlowRate.",
-          "p2": "En cas de conflit entre le présent avis et la Politique de confidentialité concernant les IPNP collectées via des connexions de comptes financiers, le présent avis prévaut pour ces IPNP."
+          "p2": "En cas de conflit entre le présent avis et la Politique de confidentialité concernant les IPNP collectées via des connexions de comptes financiers, le présent avis prévaut pour ces IPNP.",
+          "p3": "Les mesures techniques non financières (comme les données de performance de page Vercel Speed Insights sur notre site public) sont décrites dans notre Politique de confidentialité et n'incluent pas les soldes ni l'historique de transactions de vos comptes connectés."
         },
         "changes": {
           "title": "13. Modifications de cet avis",

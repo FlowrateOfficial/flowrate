@@ -294,6 +294,8 @@ async function confirmDeleteAccount() {
       </div>
     </UCard>
 
+    <DashboardFeedbackPanel />
+
     <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
       <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-base font-semibold">{{ t('dashboard.settings.planBilling') }}</h2>

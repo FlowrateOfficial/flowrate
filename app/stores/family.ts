@@ -1,7 +1,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { TransactionRow } from '~/types/financial'
 import { planHasFeature } from '#shared/plan-limits'
-import { activePlan } from '~/state/plan'
+import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -74,6 +74,7 @@ export const useFamilyStore = defineStore('family', () => {
   const spacesStore = useSpacesStore()
   const appToast = useAppToast()
   const { api } = useApi()
+  const activePlan = useActivePlan()
 
   const inviting = ref(false)
   const saving = ref(false)

@@ -1,9 +1,10 @@
 import type { ActiveSpace, FinancialSpaceSummary } from '~/types/space'
 import { isTeenOrChild } from '~/types/space'
 import { planHasFeature } from '#shared/plan-limits'
-import { activePlan } from '~/state/plan'
+import { useActivePlan } from '~/composables/useActivePlan'
 import { createSpaceSchema } from '~/utils/schemas'
 import { resolveErrorMessage } from '~/utils/errors'
+import { resolvePathAfterSpaceSwitch } from '~/utils/space-routes'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -14,12 +15,14 @@ export const useSpacesStore = defineStore('spaces', () => {
   const space = ref<ActiveSpace | null>(null)
   const spaces = ref<FinancialSpaceSummary[]>([])
   const loading = ref(false)
+  const switching = ref(false)
   const creating = ref(false)
   const showCreate = ref(false)
   const createForm = reactive({ name: '', type: 'HOUSEHOLD' as 'HOUSEHOLD' | 'FAMILY' | 'COMPANY' })
 
   const createSchema = createSpaceSchema()
   const { api } = useApi()
+  const activePlan = useActivePlan()
 
   const isMinor = computed(() => (spaces.value ?? []).some(s => isTeenOrChild(s.role)))
   const minorSpace = computed(() => spaces.value.find(s => isTeenOrChild(s.role)) ?? null)
@@ -94,15 +97,29 @@ export const useSpacesStore = defineStore('spaces', () => {
       return
     }
 
-    const result = await api<ActiveSpace>(apiRoutes.spaces.active, {
-      method: 'POST',
-      body: { spaceId },
-      noSpace: true
-    })
-    space.value = result
-    const idx = spaces.value.findIndex(s => s.id === spaceId)
-    if (idx >= 0) spaces.value[idx] = { ...spaces.value[idx], ...result }
-    await refreshNuxtData()
+    switching.value = true
+    try {
+      const result = await api<ActiveSpace>(apiRoutes.spaces.active, {
+        method: 'POST',
+        body: { spaceId },
+        noSpace: true
+      })
+      space.value = result
+      const idx = spaces.value.findIndex(s => s.id === spaceId)
+      if (idx >= 0) spaces.value[idx] = { ...spaces.value[idx], ...result }
+
+      const router = useRouter()
+      const currentPath = router.currentRoute.value.path
+      const targetPath = resolvePathAfterSpaceSwitch(currentPath, result)
+
+      if (targetPath !== currentPath) {
+        await navigateTo(targetPath, { replace: true })
+      } else {
+        await refreshNuxtData()
+      }
+    } finally {
+      switching.value = false
+    }
   }
 
   async function createSpace() {
@@ -149,6 +166,7 @@ export const useSpacesStore = defineStore('spaces', () => {
     space,
     spaces,
     loading,
+    switching,
     creating,
     showCreate,
     createForm,

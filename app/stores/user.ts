@@ -1,7 +1,7 @@
 // NOTE - ANCHOR: User profile store — bootstrap, nav, settings, account menu
 import type { AppPlan } from '#shared/billing'
 import { planHasFeature } from '#shared/plan-limits'
-import { activePlan } from '~/state/plan'
+import { useActivePlan } from '~/composables/useActivePlan'
 import type { UserProfile } from '~/types/user'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -11,6 +11,7 @@ export const useUserStore = defineStore('user', () => {
   const { getSession, signOut } = useNeonAuth()
   const spacesStore = useSpacesStore()
   const { api } = useApi()
+  const activePlan = useActivePlan()
 
   const user = ref<{ id: string; name: string | null; email: string; phone?: string | null } | null>(null)
   const billing = ref<UserProfile['billing']>(null)
@@ -121,6 +122,7 @@ export const useUserStore = defineStore('user', () => {
       items.push({ label: t('nav.spaces'), icon: 'i-lucide-layers', to: '/dashboard/spaces' })
     }
     items.push(
+      { label: t('dashboard.feedback.title'), icon: 'i-lucide-message-square-heart', to: '/dashboard/feedback' },
       { label: t('common.settings'), icon: 'i-lucide-settings', to: '/dashboard/settings' },
       { label: t('common.privacy'), icon: 'i-lucide-shield', to: '/privacy' },
       { label: t('common.glba'), icon: 'i-lucide-landmark', to: '/glba' },

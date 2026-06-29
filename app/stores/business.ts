@@ -1,6 +1,6 @@
 import type { BusinessOverview } from '~/types/dashboard'
 import { planHasFeature } from '#shared/plan-limits'
-import { activePlan } from '~/state/plan'
+import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -8,6 +8,7 @@ export const useBusinessStore = defineStore('business', () => {
   const { t } = useAppI18n()
   const appToast = useAppToast()
   const { api } = useApi()
+  const activePlan = useActivePlan()
 
   const tab = ref<'overview' | 'team'>('overview')
   const inviting = ref(false)

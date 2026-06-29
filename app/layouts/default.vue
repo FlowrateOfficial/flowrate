@@ -16,8 +16,8 @@ const navLinks = computed(() => [
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col surface-page overflow-x-clip">
-    <header class="sticky top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-md dark:backdrop-blur-lg">
+  <div class="min-h-screen flex flex-col surface-page">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-md dark:backdrop-blur-lg">
       <UContainer class="flex items-center justify-between gap-2 sm:gap-4 h-14 sm:h-[4.5rem] min-w-0">
         <NuxtLink :to="homePath" class="inline-flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
           <BrandFlowRateLogo :mark-size="26" compact-on-mobile class="shrink-0" />
@@ -64,7 +64,7 @@ const navLinks = computed(() => [
       </UContainer>
     </header>
 
-    <UMain class="flex-1 overflow-x-clip">
+    <UMain class="flex-1 overflow-x-clip pt-14 sm:pt-[4.5rem]">
       <UContainer v-if="showBreadcrumbs" class="pt-8 pb-0">
         <AppBreadcrumbs />
       </UContainer>

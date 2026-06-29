@@ -3,6 +3,7 @@ const { t } = useAppI18n()
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const { open, closeMenu } = useMobileAccountMenu()
+const { openCustomizer } = useMobileNavCustomizer()
 
 const menuLinks = computed(() => userStore.getAccountMenuLinks())
 
@@ -39,6 +40,16 @@ async function signOut() {
         </div>
 
         <div class="flex flex-col gap-1">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            block
+            size="lg"
+            class="min-h-12 justify-start gap-3"
+            icon="i-lucide-columns-3"
+            :label="t('dashboard.layout.customizeFooter')"
+            @click="openCustomizer(); closeMenu()"
+          />
           <UButton
             v-for="item in menuLinks"
             :key="item.to"

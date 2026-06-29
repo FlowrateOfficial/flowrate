@@ -26,7 +26,7 @@ useSeoMeta({ title: () => t('legal.glba.seoTitle') })
   <UContainer class="py-16 max-w-3xl">
     <LegalPageIntro
       :title="t('legal.glba.title')"
-      :last-updated="t('legal.glba.lastUpdated')"
+      :last-updated-at="t('legal.glba.lastUpdatedAt')"
       :intro="t('legal.glba.intro')"
     >
       <template #see-also>
@@ -36,6 +36,8 @@ useSeoMeta({ title: () => t('legal.glba.seoTitle') })
         </p>
       </template>
     </LegalPageIntro>
+
+    <LegalSpeedInsights class="mb-10" />
 
     <LegalDocument base-key="legal.glba" :section-ids="sectionIds" />
 

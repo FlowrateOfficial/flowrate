@@ -1,11 +1,22 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title: string
-  lastUpdated: string
+  lastUpdatedAt: string
   intro: string
 }>()
 
-const { t } = useAppI18n()
+const { t, intlLocale } = useAppI18n()
+
+const lastUpdated = computed(() => {
+  const date = new Date(props.lastUpdatedAt)
+  const datetime = new Intl.DateTimeFormat(intlLocale.value, {
+    dateStyle: 'long',
+    timeStyle: 'short',
+    timeZone: 'UTC'
+  }).format(date)
+
+  return t('legal.lastUpdatedLabel', { datetime })
+})
 </script>
 
 <template>
@@ -17,7 +28,7 @@ const { t } = useAppI18n()
     {{ title }}
   </h1>
   <p class="text-sm text-muted mb-4">
-    {{ lastUpdated }}
+    <time :datetime="lastUpdatedAt">{{ lastUpdated }}</time>
   </p>
   <p class="text-muted leading-relaxed mb-6">
     {{ intro }}

@@ -1,13 +1,14 @@
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 import { planHasFeature } from '#shared/plan-limits'
-import { activePlan } from '~/state/plan'
+import { useActivePlan } from '~/composables/useActivePlan'
 
 export const useOnboardingStore = defineStore('onboarding', () => {
   const { t } = useAppI18n()
   const spacesStore = useSpacesStore()
   const router = useRouter()
   const { api } = useApi()
+  const activePlan = useActivePlan()
 
   const step = ref(1)
   const selected = ref<'INDEPENDENT' | 'HOUSEHOLD' | 'FAMILY' | 'COMPANY' | null>(null)

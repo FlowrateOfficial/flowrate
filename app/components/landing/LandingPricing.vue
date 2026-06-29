@@ -127,15 +127,15 @@ function planCardClass(plan: LandingPlan) {
               :class="planCardClass(plan)"
               :style="{ '--stagger': '0.05s' }"
             >
-              <UBadge
-                v-if="plan.highlight"
-                :label="t('landing.pricing.mostPopular')"
-                color="neutral"
-                class="absolute -top-3 left-8 !bg-terracotta !text-flow-warm font-normal"
-                size="sm"
-              />
+              <header class="space-y-6 mb-10">
+                <UBadge
+                  v-if="plan.highlight"
+                  :label="t('landing.pricing.mostPopular')"
+                  color="neutral"
+                  class="!bg-terracotta !text-flow-warm font-normal"
+                  size="sm"
+                />
 
-              <header class="space-y-6 mb-10 pt-2">
                 <p class="text-xs tracking-[0.14em] uppercase text-sage">
                   {{ plan.target }}
                 </p>

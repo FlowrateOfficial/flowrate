@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { SPACE_TYPE_ICONS } from '~/types/space'
 
 const { t } = useAppI18n()
 const { show: showBreadcrumbs } = useBreadcrumbs()
+const { openMenu: openSpaceMenu } = useMobileSpaceMenu()
 
 const spacesStore = useSpacesStore()
 const userStore = useUserStore()
@@ -60,11 +62,32 @@ const { isMinor, space } = storeToRefs(spacesStore)
     </aside>
 
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-      <header class="flex items-center justify-between gap-3 border-b border-default px-4 py-2.5 lg:hidden">
-        <NuxtLink to="/dashboard" class="inline-flex">
-          <BrandFlowRateLogo :mark-size="28" class="[&_span]:text-lg" />
-        </NuxtLink>
-        <div class="flex items-center gap-1">
+      <header class="flex items-center justify-between gap-2 border-b border-default px-3 py-2.5 sm:px-4 lg:hidden">
+        <div class="flex min-w-0 flex-1 items-center gap-2">
+          <NuxtLink to="/dashboard" class="inline-flex shrink-0">
+            <BrandFlowRateLogo :mark-size="28" class="[&_span]:text-lg" />
+          </NuxtLink>
+          <ClientOnly>
+            <UButton
+              v-if="!isMinor && space"
+              color="neutral"
+              variant="outline"
+              size="sm"
+              class="min-h-9 min-w-0 max-w-[52%] justify-start gap-2 px-2.5"
+              :loading="spacesStore.switching"
+              :aria-label="t('dashboard.layout.switchSpace')"
+              @click="openSpaceMenu"
+            >
+              <UIcon :name="SPACE_TYPE_ICONS[space.type]" class="size-4 shrink-0 text-primary" />
+              <span class="truncate text-sm font-medium">{{ space.name }}</span>
+              <UIcon name="i-lucide-chevrons-up-down" class="size-3.5 shrink-0 text-muted" />
+            </UButton>
+            <template #fallback>
+              <span class="h-9 min-w-24 flex-1 rounded-lg bg-elevated/40" aria-hidden="true" />
+            </template>
+          </ClientOnly>
+        </div>
+        <div class="flex shrink-0 items-center gap-1">
           <UButton
             v-if="isAdmin"
             to="/dashboard/admin/usage"
@@ -140,6 +163,8 @@ const { isMinor, space } = storeToRefs(spacesStore)
     <DashboardMobileNav />
     <ClientOnly>
       <DashboardMobileAccountMenu />
+      <DashboardMobileSpaceMenu />
+      <DashboardMobileNavCustomizer />
     </ClientOnly>
   </div>
 </template>
