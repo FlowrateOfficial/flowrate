@@ -1,6 +1,11 @@
 // ANCHOR: Neon Auth admin API — delete users (guardian/self-serve)
 import type { H3Event } from 'h3'
-import { extractNeonAuthCookies } from '../utils/neonAuthProxy'
+import { deleteNeonAuthUserUpstream } from '../utils/neonAuthProxy'
+
+function neonAdminConfigured(event?: H3Event): boolean {
+  const config = useRuntimeConfig(event)
+  return Boolean(config.stackProjectId && config.neonApiKey)
+}
 
 let cachedBranchId: string | null = null
 
@@ -76,32 +81,32 @@ export async function deleteNeonAuthUserSelf(
   event: H3Event,
   password?: string
 ): Promise<void> {
-  const config = useRuntimeConfig(event)
-  const baseUrl = config.public.neonAuthUrl as string
-  if (!baseUrl) {
-    throw createError({ statusCode: 503, message: 'Authentication is not configured' })
+  await deleteNeonAuthUserUpstream(event, password)
+}
+
+/** Self-delete via session; falls back to Neon admin API when configured (OAuth, etc.). */
+export async function deleteNeonAuthUser(
+  event: H3Event,
+  userId: string,
+  password?: string
+): Promise<void> {
+  let selfError: unknown
+  try {
+    await deleteNeonAuthUserSelf(event, password)
+    return
+  } catch (error) {
+    selfError = error
+    console.warn('[neonAuthAdmin] self-delete failed, trying admin fallback:', error)
   }
 
-  const cookieHeader = getRequestHeader(event, 'cookie') ?? ''
-  const origin = getRequestURL(event).origin
+  if (!neonAdminConfigured(event)) {
+    throw selfError
+  }
 
-  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/delete-user`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Origin: origin,
-      Referer: `${origin}/`,
-      Cookie: extractNeonAuthCookies(cookieHeader)
-    },
-    body: JSON.stringify(password ? { password } : {})
-  })
-
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({})) as { message?: string }
-    const message = data.message ?? 'Failed to delete login account'
-    if (message.toLowerCase().includes('password')) {
-      throw createError({ statusCode: 400, message: 'Password is required or incorrect' })
-    }
-    throw createError({ statusCode: 400, message })
+  try {
+    await deleteNeonAuthUserByAdmin(userId, event)
+  } catch (adminError) {
+    console.error('[neonAuthAdmin] admin delete fallback failed:', adminError)
+    throw selfError
   }
 }
