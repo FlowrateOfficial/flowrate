@@ -436,13 +436,17 @@ model DetectedSubscription {
 
 /// In-app feedback linked to a private GitHub issue.
 model FeedbackSubmission {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   issueNumber Int
   type        String
   title       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  issueState  String    @default("open")
+  replyCount  Int       @default(0)
+  labelsJson  String    @default("[]")
+  syncedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

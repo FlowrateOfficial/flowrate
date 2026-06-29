@@ -36,6 +36,15 @@ export const FEEDBACK_VIDEO_TYPES = new Set([
 // NOTE - Orphan branch for feedback media only — never merged into app code (see docs/feedback-issues-medias-branch.md)
 export const FEEDBACK_MEDIA_BRANCH = 'issues_medias'
 
+/** How long list metadata is served from DB before refreshing from GitHub */
+export const FEEDBACK_SYNC_TTL_MS = 5 * 60 * 1000
+
+/** Max parallel GitHub sync requests when refreshing stale submissions */
+export const FEEDBACK_SYNC_CONCURRENCY = 5
+
+/** Max parallel asset uploads when creating an issue */
+export const FEEDBACK_UPLOAD_CONCURRENCY = 4
+
 /** @deprecated Use FEEDBACK_MEDIA_BRANCH */
 export const FEEDBACK_UPLOAD_BRANCH = FEEDBACK_MEDIA_BRANCH
 

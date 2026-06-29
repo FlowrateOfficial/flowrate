@@ -1,21 +1,255 @@
-MIT License
+FlowRate — Proprietary License
+All Rights Reserved
 
-Copyright (c) 2025 Nuxt UI Templates
+Copyright (c) 2025–2026 Mathieu-AI
+Repository: flowrate (https://github.com/Mathieu-ai/flowrate)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+================================================================================
+IMPORTANT — READ CAREFULLY
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This is NOT an open-source license. Unless you have a separate written
+agreement signed by the Rights Holder, you are NOT granted permission to use,
+copy, modify, distribute, or commercially exploit this project, its user
+interface, or its assets.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+If you need a license, contact: mathieu.lievre.pro@outlook.com
+Commercial use requires prior written authorization from Mathieu-AI.
+================================================================================
+
+1. PARTIES AND DEFINITIONS
+
+1.1 "Rights Holder" means Mathieu-AI — sole owner and operator of FlowRate for
+    the purposes of this license, including website and product development,
+    design, and technical operation.
+
+    Contact: mathieu.lievre.pro@outlook.com
+    GitHub:   https://github.com/Mathieu-ai
+
+1.2 "Maintainer" means the Rights Holder (Mathieu-AI) and any individual
+    explicitly granted written authorization by the Rights Holder to administer
+    this repository, review changes, approve merges, or deploy to production.
+    The list of authorized Maintainers may be updated by the Rights Holder at
+    any time. Absence from a public list does NOT grant Maintainer status.
+
+1.3 "Contributor" means any person who submits code, design, documentation,
+    feedback, or other materials to the Project, whether via pull request,
+    issue, or private channel. Contributors other than the Maintainer act only
+    under the terms of this license and any separate written agreement.
+
+1.4 "Software" means all source code, object code, scripts, configuration,
+    database schemas, migrations, seeds, build artifacts, API routes, server
+    logic, documentation, and any other technical materials in this repository
+    or derived from them.
+
+1.5 "User Interface" or "UI" means the visual and interactive design of the
+    FlowRate application, including but not limited to: landing pages, dashboard
+    layouts, financial-space switcher, component structure, typography, colour
+    palettes, spacing systems, motion design, chart presentations, responsive
+    breakpoints, navigation patterns, editor experiences, and the overall
+    look-and-feel.
+
+1.6 "Assets" means all non-code creative materials, including but not limited
+    to: logos and logo variants, favicons, images, videos, icons, fonts, CSS,
+    design tokens, illustrations, and any files in /public or stored in
+    connected media storage (e.g. GitHub issues_medias branch, third-party CDNs).
+
+1.7 "Content" means text, translations, legal documents, copy, metadata, and
+    editorial materials created for FlowRate.
+
+1.8 "Trademarks" means the names, logos, and brand identifiers "FlowRate",
+    "Mathieu-AI", and any related trade dress, whether registered or not.
+
+1.9 "Project" means the Software, User Interface, Assets, Content, and
+    Trademarks collectively, as embodied in this repository and any authorized
+    deployment.
+
+2. OWNERSHIP
+
+2.1 The Rights Holder retains all right, title, and interest in and to the
+    Project. Nothing in this license transfers ownership.
+
+2.2 Third-party open-source components (e.g. Nuxt, Vue, Prisma, Stripe SDKs)
+    remain subject to their respective licenses. This license applies only to
+    original Project materials owned by the Rights Holder.
+
+3. LICENSE GRANT
+
+3.1 No license is granted by default. Mere access to this repository — including
+    viewing, cloning, or forking on GitHub — does NOT grant any right to use the
+    Project.
+
+3.2 The only permitted uses without a separate written agreement are:
+    (a) Viewing the repository on GitHub for informational purposes;
+    (b) Running an authorized production deployment operated by the Rights
+        Holder at the official domain(s);
+    (c) Security research conducted in good faith with findings reported
+        privately to mathieu.lievre.pro@outlook.com before public disclosure.
+
+Any other use requires prior written permission from the Rights Holder.
+
+4. REPOSITORY GOVERNANCE AND PRODUCTION ACCESS
+
+4.1 Production branch. The `master` branch is the production branch. Only the
+    Maintainer may merge into `master`, either directly or by approving and
+    merging pull requests. No other person may merge to `master` unless the
+    Rights Holder has given them explicit written Maintainer authorization.
+
+4.2 Development branch. Day-to-day work may occur on `feature` or other branches
+    named by the Maintainer. Merging into `master` always requires Maintainer
+  review and approval.
+
+4.3 Deployments. Production deployments (e.g. Vercel production environment)
+    must track `master` and may only be triggered or approved by the Maintainer.
+    Credentials, environment variables, and infrastructure access are restricted
+    to the Maintainer unless explicitly delegated in writing.
+
+4.4 Future contributors. The Rights Holder may invite Contributors under terms
+    set out in writing (e.g. Contributor License Agreement). Until such terms
+    are agreed:
+    (a) Contributors may fork or branch only for purposes authorized by the
+        Maintainer;
+    (b) Pull requests do not grant merge rights; the Maintainer decides what
+        is accepted and when it reaches `master`;
+    (c) Accepted contributions become part of the Project owned by the Rights
+        Holder, unless otherwise agreed in writing.
+
+4.5 Revocation. The Rights Holder may revoke Maintainer or Contributor access at
+    any time. Revoked persons must immediately cease merging, deploying, or
+    using non-public materials.
+
+5. PROHIBITED ACTIVITIES
+
+Without prior written authorization from the Rights Holder, you must NOT:
+
+5.1 UI AND DESIGN
+    (a) Copy, imitate, clone, or reproduce the User Interface or any substantial
+        part of its design, layout, or visual identity;
+    (b) Create derivative apps, templates, themes, or products that are
+        confusingly similar to the Project;
+    (c) Extract, scrape, or harvest UI patterns, stylesheets, or design systems
+        for reuse in other projects.
+
+5.2 ASSETS
+    (a) Copy, download, reproduce, redistribute, or publicly display Assets
+        except as rendered by an authorized live deployment during normal use;
+    (b) Use logos, images, or other Assets in any other product, service,
+        portfolio, or marketing material;
+    (c) Remove, alter, or obscure copyright, attribution, or watermark notices.
+
+5.3 SOFTWARE AND CODE
+    (a) Copy, modify, adapt, translate, or create derivative works of the
+        Software;
+    (b) Redistribute, sublicense, sell, rent, lease, or host the Software or
+        any portion thereof;
+    (c) Reverse engineer, decompile, or disassemble the Software, except where
+        such restriction is prohibited by mandatory applicable law;
+    (d) Use the Software to build, operate, or support a competing product or
+        service.
+
+5.4 COMMERCIAL USE
+    (a) Use the Project for any commercial purpose — including but not limited
+        to paid services, client work, SaaS, white-label deployments, resale,
+        advertising revenue, or paid access — without prior written authorization
+        from the Rights Holder;
+    (b) Offer the Project (or any part) as a template, starter kit, boilerplate,
+        or commercial asset.
+
+5.5 TRADEMARKS AND BRAND
+    (a) Use the Trademarks or any confusingly similar name, logo, or branding;
+    (b) Imply endorsement, sponsorship, or affiliation with FlowRate or
+        Mathieu-AI;
+    (c) Register domain names, social handles, or trademarks incorporating
+        "FlowRate" or "Mathieu-AI".
+
+5.6 AUTOMATED USE AND AI
+    (a) Use the Project, Assets, or Content to train, fine-tune, or improve
+        machine-learning or AI models;
+    (b) Scrape, crawl, or systematically download the site, repository, or
+        Assets for dataset creation;
+    (c) Generate synthetic copies or substitutes of Assets or UI using AI tools.
+
+5.7 GENERAL
+    (a) Circumvent technical protections or access controls;
+    (b) Merge to `master`, deploy to production, or modify infrastructure
+        without Maintainer authorization;
+    (c) Remove or alter license notices;
+    (d) Transfer or assign any rights you do not hold.
+
+6. COMMERCIAL LICENSING
+
+Commercial use, redistribution, white-label deployment, template licensing, or
+any use of the UI, Assets, or Software in a revenue-generating context requires
+a separate written license agreement signed by the Rights Holder.
+
+Inquiries: mathieu.lievre.pro@outlook.com
+
+7. CONTRIBUTIONS
+
+7.1 Unless otherwise agreed in writing, any contribution, suggestion, design, or
+    feedback submitted to this repository is deemed assigned to the Rights
+    Holder, who may use it without obligation or compensation.
+
+7.2 Do not submit contributions unless you accept these terms and understand
+    that only the Maintainer may merge accepted work into `master`.
+
+7.3 The Rights Holder may later publish a Contributor License Agreement (CLA)
+    for invited collaborators; until then, Section 7.1 applies.
+
+8. CONFIDENTIALITY
+
+If you receive access to non-public portions of the Project (private repos,
+staging environments, credentials, financial integrations, or unreleased
+materials), you must keep them confidential and use them only for the
+authorized purpose.
+
+9. TERMINATION
+
+This license is revocable. Any breach automatically terminates your limited
+permissions. Upon termination, you must cease all use and destroy copies in
+your possession.
+
+10. DISCLAIMER OF WARRANTY
+
+THE PROJECT IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+11. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE RIGHTS HOLDER SHALL NOT
+BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR
+PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, GOODWILL, OR BUSINESS
+OPPORTUNITY, ARISING FROM OR RELATED TO THE PROJECT, WHETHER IN CONTRACT, TORT,
+OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+12. INDEMNIFICATION
+
+You agree to indemnify and hold harmless the Rights Holder from any claim,
+damage, loss, or expense (including reasonable legal fees) arising from your
+unauthorized use of the Project or breach of this license.
+
+13. GOVERNING LAW AND JURISDICTION
+
+This license is governed by the laws of France, without regard to conflict-of-
+law principles. Exclusive jurisdiction lies with the competent courts of
+France, subject to mandatory consumer protections where applicable.
+
+14. SEVERABILITY
+
+If any provision is held invalid or unenforceable, the remaining provisions
+remain in full force and effect.
+
+15. ENTIRE AGREEMENT
+
+This license constitutes the entire agreement regarding use of the Project and
+supersedes prior understandings. Amendments require written agreement signed by
+the Rights Holder.
+
+16. CONTACT
+
+Licensing & permissions: mathieu.lievre.pro@outlook.com
+Repository governance:  Maintainer (Mathieu-AI) — merge and production access
+
+---
+
+Mathieu-AI — FlowRate product development, design & technical operation

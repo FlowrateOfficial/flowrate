@@ -8,6 +8,7 @@ import { createFeedbackIssue, isGitHubFeedbackConfigured } from '../lib/github/i
 import { saveFeedbackSubmission } from '../lib/github/submissions'
 import { formatGithubError } from '../lib/github/errors'
 import { rateLimit } from '../lib/security/rate-limit'
+import { feedbackLabelsForType } from '#shared/feedback'
 
 const payloadSchema = z.object({
   type: z.enum(['review', 'feature', 'bug']),
@@ -117,22 +118,22 @@ export default defineEventHandler(async (event) => {
     where: { id: user.id },
     select: {
       plan: true,
-      space: { select: { id: true, name: true, type: true } }
+      space: {
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          members: {
+            where: { userId: user.id, status: 'ACTIVE' },
+            select: { role: true },
+            take: 1
+          }
+        }
+      }
     }
   })
 
-  let spaceRole: string | null = null
-  if (profile?.space) {
-    const member = await prisma.spaceMember.findFirst({
-      where: {
-        userId: user.id,
-        spaceId: profile.space.id,
-        status: 'ACTIVE'
-      },
-      select: { role: true }
-    })
-    spaceRole = member?.role ?? null
-  }
+  const spaceRole = profile?.space?.members[0]?.role ?? null
 
   const locale = getCookie(event, 'user-locale')
     ?? getRequestHeader(event, 'accept-language')?.split(',')[0]
@@ -171,7 +172,10 @@ export default defineEventHandler(async (event) => {
       userId: user.id,
       issueNumber,
       type: payload.type,
-      title: payload.title
+      title: payload.title,
+      labels: feedbackLabelsForType(payload.type).filter(
+        (name): name is 'USER_BUG' | 'USER_FEATURE' => name === 'USER_BUG' || name === 'USER_FEATURE'
+      )
     })
   } catch (error) {
     const detail = formatGithubError(error)

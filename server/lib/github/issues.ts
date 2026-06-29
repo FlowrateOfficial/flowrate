@@ -232,12 +232,18 @@ export async function createFeedbackIssue(
   await updateIssueBody(token, owner, name, issueNumber, body)
 
   const extraAttachments = attachmentsComment(attachmentLines, failures)
+  const followUps: Promise<void>[] = []
+
   if (extraAttachments) {
-    await createIssueComment(token, owner, name, issueNumber, extraAttachments)
+    followUps.push(createIssueComment(token, owner, name, issueNumber, extraAttachments))
   }
 
   if (input.context) {
-    await createIssueComment(token, owner, name, issueNumber, contextBody(input.context))
+    followUps.push(createIssueComment(token, owner, name, issueNumber, contextBody(input.context)))
+  }
+
+  if (followUps.length) {
+    await Promise.all(followUps)
   }
 
   return { issueNumber }

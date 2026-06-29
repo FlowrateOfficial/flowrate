@@ -3,7 +3,14 @@ import { requireSessionUser } from '../../lib/auth'
 import { isGitHubFeedbackConfigured } from '../../lib/github/issues'
 import { getFeedbackSubmissionForUser } from '../../lib/github/submissions'
 import { githubHeaders, parseGitHubRepo } from '../../lib/github/client'
+import { getCachedFeedbackMedia, setCachedFeedbackMedia } from '../../lib/github/media-cache'
 import { rateLimit } from '../../lib/security/rate-limit'
+
+interface GitHubContentsResponse {
+  content: string
+  encoding: string
+  sha?: string
+}
 
 function issueNumberFromMediaPath(path: string): number | null {
   const match = path.match(/^(?:feedback\/)?issues\/(\d+)\//)
@@ -44,10 +51,27 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Media not found' })
   }
 
+  const ifNoneMatch = getRequestHeader(event, 'if-none-match')
+  const cached = getCachedFeedbackMedia(ref, path, ifNoneMatch)
+
+  if (cached === 'not-modified') {
+    setHeader(event, 'Cache-Control', 'private, max-age=3600')
+    setResponseStatus(event, 304)
+    return null
+  }
+
+  if (cached) {
+    setHeader(event, 'Content-Type', cached.mimeType)
+    setHeader(event, 'Cache-Control', 'private, max-age=3600')
+    setHeader(event, 'ETag', cached.etag)
+    setHeader(event, 'X-Content-Type-Options', 'nosniff')
+    return cached.body
+  }
+
   const { owner, name } = parseGitHubRepo(config.githubFeedbackRepo)
 
   try {
-    const file = await $fetch<{ content: string, encoding: string }>(
+    const file = await $fetch<GitHubContentsResponse>(
       `https://api.github.com/repos/${owner}/${name}/contents/${path}`,
       {
         headers: githubHeaders(config.githubToken),
@@ -61,9 +85,18 @@ export default defineEventHandler(async (event) => {
 
     const mimeType = inferFeedbackMimeType(path) ?? 'application/octet-stream'
     const data = Buffer.from(file.content, 'base64')
+    const etag = setCachedFeedbackMedia(ref, path, data, mimeType, file.sha)
+
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      setHeader(event, 'Cache-Control', 'private, max-age=3600')
+      setHeader(event, 'ETag', etag)
+      setResponseStatus(event, 304)
+      return null
+    }
 
     setHeader(event, 'Content-Type', mimeType)
     setHeader(event, 'Cache-Control', 'private, max-age=3600')
+    setHeader(event, 'ETag', etag)
     setHeader(event, 'X-Content-Type-Options', 'nosniff')
 
     return data
