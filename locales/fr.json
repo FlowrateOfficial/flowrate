@@ -113,6 +113,7 @@
       "privacyPolicy": "Politique de confidentialité",
       "submit": "Créer un compte",
       "errorGeneric": "Échec de la création du compte. Veuillez réessayer.",
+      "verifyEmailHint": "Nous vous enverrons un code de vérification par e-mail pour confirmer votre adresse.",
       "inviteTitle": "Rejoindre {spaceName}",
       "inviteDescription": "Vous avez été invité·e en tant que {role}."
     },
@@ -123,6 +124,24 @@
       "checkEmailDescription": "Si un compte existe pour cette adresse, nous avons envoyé un lien pour réinitialiser votre mot de passe.",
       "submit": "Envoyer le lien",
       "errorGeneric": "Échec de l'envoi de l'e-mail. Veuillez réessayer."
+    },
+    "verifyEmail": {
+      "title": "Vérifiez votre e-mail",
+      "description": "Saisissez le code à 6 chiffres envoyé à {email}.",
+      "yourEmail": "votre e-mail",
+      "code": "Code de vérification",
+      "codePlaceholder": "123456",
+      "submit": "Vérifier l'e-mail",
+      "resend": "Renvoyer le code",
+      "resendSuccess": "Nouveau code envoyé",
+      "resendFailed": "Impossible de renvoyer le code",
+      "success": "E-mail vérifié — bienvenue sur FlowRate !",
+      "errorInvalid": "Code invalide ou expiré. Réessayez ou renvoyez le code.",
+      "errorGeneric": "Échec de la vérification. Veuillez réessayer.",
+      "missingEmail": "Adresse e-mail manquante — reconnectez-vous ou réinscrivez-vous.",
+      "backToSignIn": "Retour à la connexion",
+      "checkEmailTitle": "Vérifiez vos e-mails",
+      "checkEmailDescription": "Saisissez le code de vérification pour terminer la création de votre compte."
     }
   },
   "landing": {
@@ -842,6 +861,42 @@
       "email": "Adresse e-mail",
       "emailHelp": "L'e-mail est géré par Neon Auth. Modifiez-le dans les paramètres de votre compte.",
       "saveChanges": "Enregistrer les modifications",
+      "taxAddressTitle": "Adresse de facturation et fiscale",
+      "taxAddressDescription": "Utilisée pour le calcul des taxes, les factures et la conformité des paiements. Stockée uniquement sur votre fiche client Stripe — pas dans la base FlowRate.",
+      "taxAddressLine1": "Adresse",
+      "taxAddressLine1Placeholder": "Commencez à saisir votre adresse…",
+      "taxAddressLine2": "Appartement, bâtiment, etc. (optionnel)",
+      "taxAddressLine2Placeholder": "Apt 4B",
+      "taxAddressCity": "Ville",
+      "taxAddressState": "État / région",
+      "taxAddressPostal": "Code postal",
+      "taxAddressCountry": "Pays",
+      "taxAddressCountryPlaceholder": "FR",
+      "taxAddressSave": "Enregistrer l'adresse",
+      "taxAddressSaved": "Adresse enregistrée sur Stripe.",
+      "taxAddressInvalid": "Saisissez une adresse complète (rue, ville, code postal et code pays à 2 lettres).",
+      "taxAddressLoadFailed": "Impossible de charger l'adresse.",
+      "taxAddressSaveFailed": "Impossible d'enregistrer l'adresse.",
+      "taxAddressUnavailable": "La saisie assistée d'adresse n'est pas configurée sur ce déploiement.",
+      "taxAddressMapboxNote": "Les suggestions d'adresse sont fournies par Mapbox pendant la saisie. L'adresse finale est stockée sur Stripe pour la facturation et les taxes. Voir ",
+      "stripeCustomerTitle": "Profil de facturation Stripe",
+      "stripeCustomerDescription": "Adresse et fuseau horaire pour les taxes, factures et conformité des paiements. Votre téléphone vérifié dans Profil est synchronisé automatiquement sur Stripe. Stockés uniquement sur votre fiche client Stripe — pas dans la base FlowRate.",
+      "stripeCustomerPhoneNote": "Ajoutez et vérifiez votre téléphone dans Profil ci-dessus pour le synchroniser sur Stripe.",
+      "stripeCustomerTimezone": "Fuseau horaire",
+      "stripeCustomerTimezoneHelp": "Utilisé pour les dates et heures des factures sur Stripe.",
+      "stripeCustomerSave": "Enregistrer le profil Stripe",
+      "stripeCustomerSaved": "Profil de facturation Stripe enregistré.",
+      "stripeCustomerLoadFailed": "Impossible de charger le profil Stripe.",
+      "stripeCustomerSaveFailed": "Impossible d'enregistrer le profil Stripe.",
+      "stripeCustomerCustomerId": "Client Stripe",
+      "stripeCustomerInvoicesTitle": "Factures",
+      "stripeCustomerInvoicesEmpty": "Aucune facture pour l'instant. Enregistrez votre profil, puis générez une facture lorsque des éléments sont facturables.",
+      "stripeCustomerInvoicesGenerate": "Générer une facture",
+      "stripeCustomerInvoicesGenerated": "Facture générée.",
+      "stripeCustomerInvoicesGenerateFailed": "Impossible de générer la facture.",
+      "stripeCustomerViewInvoice": "Voir",
+      "stripeCustomerDownloadPdf": "PDF",
+      "stripeCustomerInvoiceTemplateNote": "Les factures utilisent votre modèle FlowRate sur Stripe.",
       "planBilling": "Offre et facturation",
       "currentPlan": "Offre actuelle",
       "choosePlan": "Choisir une offre",
@@ -1218,7 +1273,7 @@
             "Données d'espace financier : noms d'espaces, rôles des membres, invitations et préférences de visibilité (comptes personnels ou partagés).",
             "Données bancaires connectées (si vous choisissez de lier un compte) : nom de l'établissement, nom affiché du compte, type de compte, identifiants masqués, soldes et historique des transactions reçus via Plaid ou Stripe Financial Connections, selon le prestataire activé pour votre connexion.",
             "Données dérivées : catégories de transactions (y compris catégorisation automatique par règles — pas d'IA aujourd'hui), budgets, abonnements détectés, synthèses analytiques et règles de répartition que vous configurez.",
-            "Données de facturation : formule d'abonnement et identifiants client Stripe Billing si vous passez à une offre payante.",
+            "Données de facturation : formule d'abonnement, identifiants client Stripe Billing, et profil de facturation sur votre fiche client Stripe (téléphone, adresse, fuseau horaire si vous les fournissez) — pas dans la base FlowRate.",
             "Retours et avis (si vous les envoyez) : catégorie (avis, demande de fonctionnalité ou rapport de bug), objet, texte du message, note par étoiles optionnelle, images et courtes vidéos jointes, et — si « Inclure le contexte technique » reste coché — votre identifiant utilisateur, e-mail, nom, offre, nom et type d'espace actif, rôle dans l'espace, langue, URL de la page et chaîne user-agent du navigateur.",
             "Données techniques : journaux serveur, adresses IP et métadonnées de requêtes générées lors de l'utilisation de l'application (notamment via notre hébergeur).",
             "Données de performance (production uniquement) : métriques de performance de page anonymisées ou pseudonymisées envoyées à Vercel via le module Speed Insights lors de votre visite sur le site public ou l'interface de l'app — voir l'encadré en haut de page."
@@ -1245,6 +1300,7 @@
             "Appliquer les règles de visibilité que vous définissez (comptes personnels ou partagés).",
             "Vous authentifier, sécuriser les sessions, prévenir les abus et répondre au support.",
             "Traiter les abonnements payants optionnels via Stripe Billing.",
+            "Collecter et stocker le profil de facturation (téléphone, adresse, fuseau horaire) sur votre fiche client Stripe lorsque vous le fournissez, pour la facturation et la conformité fiscale.",
             "Examiner les retours envoyés depuis l'application et y répondre via notre outil de suivi privé."
           ],
           "p2": "Nous pouvons utiliser des statistiques agrégées ou anonymisées (ne permettant pas de vous identifier raisonnablement) pour comprendre l'usage du produit et l'améliorer."
@@ -1322,6 +1378,11 @@
               "location": "États-Unis"
             },
             {
+              "name": "Mapbox",
+              "purpose": "Saisie assistée d'adresse lorsque vous renseignez une adresse de facturation/fiscale dans Paramètres (suggestions de recherche uniquement ; l'adresse enregistrée est stockée sur Stripe)",
+              "location": "États-Unis"
+            },
+            {
               "name": "Twilio",
               "purpose": "Vérification optionnelle du numéro de téléphone (si vous en ajoutez un)",
               "location": "États-Unis"
@@ -1354,7 +1415,7 @@
           "title": "12. Vos choix et droits",
           "p1": "Selon votre lieu de résidence, vous pouvez disposer de droits d'accès, de rectification, de suppression, d'exportation ou de limitation du traitement. FlowRate prend en charge ce qui suit directement dans le produit ou sur demande :",
           "items": [
-            "Accès et mise à jour : modifiez votre nom et téléphone dans Paramètres ; consultez transactions, comptes et budgets dans le tableau de bord.",
+            "Accès et mise à jour : modifiez votre nom et téléphone dans Paramètres ; ajoutez ou mettez à jour votre profil de facturation Stripe (téléphone, adresse, fuseau horaire) dans Paramètres ; consultez transactions, comptes et budgets dans le tableau de bord.",
             "Déconnexion bancaire : supprimez un compte lié depuis la page Comptes (supprime les transactions importées pour ce compte dans FlowRate).",
             "Visibilité partagée : choisissez Personnel ou Partagé lors de la connexion dans les espaces Foyer, Famille ou Entreprise.",
             "Suppression de compte : Paramètres → Supprimer mon compte pour votre propre profil.",
@@ -1444,7 +1505,8 @@
           "title": "7. Offres payantes et facturation",
           "p1": "Certaines fonctionnalités peuvent nécessiter un abonnement payant traité par Stripe Billing. Les tarifs sont affichés au moment du paiement. Les abonnements se renouvellent automatiquement jusqu'à annulation via le portail de facturation ou en contactant le support.",
           "p2": "Les remboursements sont traités selon la politique affichée à l'achat et la loi applicable.",
-          "p3": "Les analyses IA optionnelles, lorsqu'elles seront disponibles, nécessitent un abonnement Pro ou Entreprise et un opt-in distinct dans Paramètres. Payer un forfait n'active pas automatiquement le traitement IA de vos données financières."
+          "p3": "Les analyses IA optionnelles, lorsqu'elles seront disponibles, nécessitent un abonnement Pro ou Entreprise et un opt-in distinct dans Paramètres. Payer un forfait n'active pas automatiquement le traitement IA de vos données financières.",
+          "p4": "Si vous fournissez des informations de facturation dans Paramètres (téléphone, adresse, fuseau horaire), nous les enregistrons sur votre fiche client Stripe pour la facturation, le calcul des taxes et la conformité des paiements. La saisie assistée Mapbox vous aide à saisir l'adresse ; voir notre Politique de confidentialité pour le traitement des recherches par Mapbox. Vous pouvez générer des factures depuis Paramètres lorsque des éléments sont facturables."
         },
         "acceptableUse": {
           "title": "8. Usage acceptable",
@@ -1615,6 +1677,7 @@
     "server": "Erreur serveur. Veuillez réessayer plus tard.",
     "unavailable": "Service temporairement indisponible.",
     "codes": {
+      "EMAIL_NOT_VERIFIED": "Vérifiez votre e-mail avant de vous connecter. Consultez votre boîte mail pour le code.",
       "INVALID_ORIGIN": "L'URL de ce site n'est pas autorisée pour l'inscription. Ajoutez l'URL de déploiement (ex. https://votre-app.vercel.app) dans Console Neon → Auth → Configuration → Domaines.",
       "STRIPE_KEY_MISMATCH": "Clés Stripe incohérentes — les clés publique et secrète doivent être toutes en test ou toutes en live sur Vercel.",
       "STRIPE_LIVEMODE_MISMATCH": "Un client Stripe en mode test est lié à ce compte. Déconnectez les anciennes banques ou contactez le support après le passage en live.",

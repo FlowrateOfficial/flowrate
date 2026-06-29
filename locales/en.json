@@ -113,6 +113,7 @@
       "privacyPolicy": "Privacy Policy",
       "submit": "Create account",
       "errorGeneric": "Failed to create account. Please try again.",
+      "verifyEmailHint": "We will email you a verification code to confirm your address.",
       "inviteTitle": "Join {spaceName}",
       "inviteDescription": "You've been invited as {role}."
     },
@@ -123,6 +124,24 @@
       "checkEmailDescription": "If an account exists for that address, we sent a link to reset your password.",
       "submit": "Send reset link",
       "errorGeneric": "Failed to send reset email. Please try again."
+    },
+    "verifyEmail": {
+      "title": "Verify your email",
+      "description": "Enter the 6-digit code we sent to {email}.",
+      "yourEmail": "your email",
+      "code": "Verification code",
+      "codePlaceholder": "123456",
+      "submit": "Verify email",
+      "resend": "Resend code",
+      "resendSuccess": "New verification code sent",
+      "resendFailed": "Could not resend verification code",
+      "success": "Email verified — welcome to FlowRate!",
+      "errorInvalid": "Invalid or expired code. Try again or resend.",
+      "errorGeneric": "Verification failed. Please try again.",
+      "missingEmail": "Missing email address — sign in or register again.",
+      "backToSignIn": "Back to sign in",
+      "checkEmailTitle": "Check your email",
+      "checkEmailDescription": "Enter the verification code we sent to finish creating your account."
     }
   },
   "landing": {
@@ -858,6 +877,42 @@
       "phoneVerificationFailed": "Could not send SMS — check your number format and Twilio settings",
       "phoneTaken": "This phone number is already linked to another account",
       "saveChanges": "Save changes",
+      "taxAddressTitle": "Billing & tax address",
+      "taxAddressDescription": "Used for tax calculation, invoices, and payment compliance. Stored on your Stripe customer record only—not in the FlowRate database.",
+      "taxAddressLine1": "Street address",
+      "taxAddressLine1Placeholder": "Start typing your address…",
+      "taxAddressLine2": "Apartment, suite, etc. (optional)",
+      "taxAddressLine2Placeholder": "Apt 4B",
+      "taxAddressCity": "City",
+      "taxAddressState": "State / region",
+      "taxAddressPostal": "Postal code",
+      "taxAddressCountry": "Country",
+      "taxAddressCountryPlaceholder": "US",
+      "taxAddressSave": "Save billing address",
+      "taxAddressSaved": "Billing address saved to Stripe.",
+      "taxAddressInvalid": "Enter a complete address (street, city, postal code, and 2-letter country code).",
+      "taxAddressLoadFailed": "Could not load billing address.",
+      "taxAddressSaveFailed": "Could not save billing address.",
+      "taxAddressUnavailable": "Address autofill is not configured on this deployment.",
+      "taxAddressMapboxNote": "Address suggestions are powered by Mapbox when you type. We store the final address on Stripe for tax and billing. See ",
+      "stripeCustomerTitle": "Stripe billing profile",
+      "stripeCustomerDescription": "Address and timezone for tax, invoices, and payment compliance. Your verified phone from Profile syncs to Stripe automatically. Stored on your Stripe customer only—not in the FlowRate database.",
+      "stripeCustomerPhoneNote": "Add and verify your phone in Profile above to sync it to Stripe.",
+      "stripeCustomerTimezone": "Timezone",
+      "stripeCustomerTimezoneHelp": "Used for invoice dates and times on Stripe.",
+      "stripeCustomerSave": "Save Stripe profile",
+      "stripeCustomerSaved": "Stripe billing profile saved.",
+      "stripeCustomerLoadFailed": "Could not load Stripe billing profile.",
+      "stripeCustomerSaveFailed": "Could not save Stripe billing profile.",
+      "stripeCustomerCustomerId": "Stripe customer",
+      "stripeCustomerInvoicesTitle": "Invoices",
+      "stripeCustomerInvoicesEmpty": "No invoices yet. Save your profile, then generate an invoice when you have billable items.",
+      "stripeCustomerInvoicesGenerate": "Generate invoice",
+      "stripeCustomerInvoicesGenerated": "Invoice generated.",
+      "stripeCustomerInvoicesGenerateFailed": "Could not generate invoice.",
+      "stripeCustomerViewInvoice": "View",
+      "stripeCustomerDownloadPdf": "PDF",
+      "stripeCustomerInvoiceTemplateNote": "Invoices use your FlowRate template on Stripe.",
       "planBilling": "Plan & Billing",
       "currentPlan": "Current plan",
       "choosePlan": "Choose a plan",
@@ -1212,7 +1267,7 @@
             "Financial space data: space names, membership roles, invitations, and visibility preferences (personal vs shared accounts).",
             "Connected bank data (when you choose to link): institution name, account display name, account type, masked account identifiers, balances, and transaction history received through Plaid or Stripe Financial Connections, depending on which provider is enabled for your connection flow.",
             "Derived data: transaction categories (including rule-based auto-categorization—no AI today), budget entries, detected subscriptions, analytics summaries, and split rules you configure.",
-            "Billing data: subscription plan and Stripe Billing customer identifiers if you upgrade to a paid plan.",
+            "Billing data: subscription plan, Stripe Billing customer identifiers, and billing profile on your Stripe customer (phone, address, timezone if you provide them)—not stored in the FlowRate database.",
             "Feedback and reviews (when you submit them): category (review, feature request, or bug report), subject line, message text, optional star rating, images and short videos you attach, and—if you leave “Include technical context” checked—your user ID, email, name, plan, active space name and type, space role, locale, page URL, and browser user-agent string.",
             "Technical data: server logs, IP addresses, and request metadata generated when you use the app (for example through our hosting provider).",
             "Performance data (production only): anonymized or pseudonymous page-performance metrics sent to Vercel through the Speed Insights module when you visit our public site or app shell—see the notice above."
@@ -1239,6 +1294,7 @@
             "Enforcing visibility rules you set (personal vs shared accounts within a space).",
             "Authenticating you, securing sessions, preventing abuse, and responding to support requests.",
             "Processing optional paid subscriptions through Stripe Billing.",
+            "Collecting and storing billing profile details (phone, address, timezone) on your Stripe customer when you provide them, for invoicing and tax compliance.",
             "Reviewing in-app feedback you submit and responding through our private issue tracker."
           ],
           "p2": "We may use aggregated or de-identified statistics (that cannot reasonably identify you) to understand product usage and improve the service."
@@ -1316,6 +1372,11 @@
               "location": "United States"
             },
             {
+              "name": "Mapbox",
+              "purpose": "Address autofill when you enter a billing/tax address in Settings (search suggestions only; the saved address is stored on Stripe)",
+              "location": "United States"
+            },
+            {
               "name": "Twilio",
               "purpose": "Optional phone number verification (if you add a phone number)",
               "location": "United States"
@@ -1348,7 +1409,7 @@
           "title": "12. Your choices and rights",
           "p1": "Depending on where you live, you may have rights to access, correct, delete, export, or restrict processing of your personal data. FlowRate supports the following directly in the product or on request:",
           "items": [
-            "Access and update: edit your name and phone number in Settings; view your transactions, accounts, and budgets in the dashboard.",
+            "Access and update: edit your name and phone number in Settings; add or update your Stripe billing profile (phone, address, timezone) in Settings; view your transactions, accounts, and budgets in the dashboard.",
             "Disconnect banks: remove a linked account from the Accounts page (deletes imported transactions for that account in FlowRate).",
             "Shared visibility: choose Personal or Shared when connecting banks in Household, Family, or Company spaces.",
             "Delete account: use Settings → Delete my account for your own profile.",
@@ -1438,7 +1499,8 @@
           "title": "7. Paid plans and billing",
           "p1": "Some features may require a paid subscription processed by Stripe Billing. Prices and plan details are shown at checkout. Subscriptions renew automatically until canceled through the billing portal or by contacting support.",
           "p2": "Refunds are handled according to the policy displayed at purchase and applicable law.",
-          "p3": "Optional AI analysis, when available, requires a Pro or Enterprise subscription and a separate opt-in in Settings. Paying for a plan does not automatically enable AI processing of your financial data."
+          "p3": "Optional AI analysis, when available, requires a Pro or Enterprise subscription and a separate opt-in in Settings. Paying for a plan does not automatically enable AI processing of your financial data.",
+          "p4": "If you provide billing details in Settings (phone, address, timezone), we save them to your Stripe customer profile for invoicing, tax calculation, and payment compliance. Mapbox Address Autofill helps you enter the address; see our Privacy Policy for how Mapbox processes search queries. You can generate invoices from Settings when billable items are available."
         },
         "acceptableUse": {
           "title": "8. Acceptable use",
@@ -1609,6 +1671,7 @@
     "server": "Server error. Please try again later.",
     "unavailable": "Service temporarily unavailable.",
     "codes": {
+      "EMAIL_NOT_VERIFIED": "Verify your email before signing in. Check your inbox for the code.",
       "INVALID_ORIGIN": "This site URL is not authorized for sign-up. Add your deployment URL (e.g. https://your-app.vercel.app) under Neon Console → Auth → Configuration → Domains.",
       "STRIPE_KEY_MISMATCH": "Stripe keys are mismatched — publishable and secret keys must both be test or both be live in Vercel.",
       "STRIPE_LIVEMODE_MISMATCH": "A test-mode Stripe customer is linked to this account. Disconnect old banks or contact support after switching to live keys.",

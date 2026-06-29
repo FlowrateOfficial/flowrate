@@ -16,7 +16,7 @@ export default defineEventHandler((event) => {
 
   applySecurityHeaders(event)
 
-  if (path.startsWith('/api/') && !path.startsWith('/api/stripe/webhook') && !path.startsWith('/api/plaid/webhook')) {
+  if (path.startsWith('/api/') && !path.startsWith('/api/stripe/webhook') && !path.startsWith('/api/plaid/webhook') && path !== '/api/webhooks/neon-auth') {
     rateLimit(event, 'api', { max: 240, windowMs: 60_000 })
   }
 

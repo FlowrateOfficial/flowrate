@@ -36,6 +36,14 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const result = await signIn(loginForm.email, loginForm.password)
       if (result.error) {
+        const code = (result.error as { code?: string }).code
+        if (code === 'EMAIL_NOT_VERIFIED') {
+          await navigateTo({
+            path: '/auth/verify-email',
+            query: { email: loginForm.email }
+          })
+          return
+        }
         appToast.errorMessage(resolveErrorMessage(result.error, t, 'auth.login.errorInvalid'))
         return
       }
@@ -47,12 +55,30 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function verificationRedirectQuery() {
+    const plan = (route.query.plan as string) || selectedPlan.value
+    const billingStore = useBillingStore()
+    const query: Record<string, string> = { email: registerForm.email }
+    if (plan === 'pro' || plan === 'enterprise') {
+      query.plan = plan
+      query.billing = billingStore.pricingCadence === 'yearly' ? 'yearly' : 'monthly'
+    }
+    return query
+  }
+
   async function register() {
     loading.value = true
     try {
       const result = await signUp(registerForm.email, registerForm.password, registerForm.name)
       if (result.error) {
         appToast.errorFrom(result.error, 'auth.register.errorGeneric')
+        return
+      }
+
+      const user = result.data?.user as { emailVerified?: boolean } | undefined
+      if (user && user.emailVerified === false) {
+        appToast.success(t('auth.verifyEmail.checkEmailTitle'), t('auth.verifyEmail.checkEmailDescription'))
+        await navigateTo({ path: '/auth/verify-email', query: verificationRedirectQuery() })
         return
       }
 

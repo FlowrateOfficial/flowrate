@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { requireAuthUser } from '../../../lib/auth'
 import { checkPhoneVerification } from '../../../lib/twilio'
+import { syncVerifiedPhoneToStripe } from '../../../lib/user-profile-sync'
 
 const bodySchema = z.object({
   code: z.string().min(4).max(8)
@@ -32,6 +33,8 @@ export default defineEventHandler(async (event) => {
     where: { id: user.id },
     data: { phoneVerified: new Date() }
   })
+
+  await syncVerifiedPhoneToStripe(event, user.id, profile.phone)
 
   return { phoneVerified: true }
 })

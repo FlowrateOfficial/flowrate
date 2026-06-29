@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
 import { getStripeCustomerId } from './billing/repository'
 import { requireStripe } from './stripe'
+import { syncStripeCustomerPhone } from './stripe/customer-profile'
 import { extractNeonAuthCookies } from '../utils/neonAuthProxy'
 
 export interface UserProfileSyncInput {
@@ -53,6 +54,26 @@ async function syncStripeCustomerProfile(
       return
     }
     console.warn('[user-profile-sync] Stripe customer update failed:', error)
+  }
+}
+
+/** Push verified profile phone to Stripe customer (best-effort). */
+export async function syncVerifiedPhoneToStripe(
+  event: H3Event,
+  userId: string,
+  phone: string | null
+): Promise<void> {
+  const customerId = await getStripeCustomerId(userId)
+  if (!customerId) return
+
+  try {
+    const { stripe } = requireStripe(event)
+    await syncStripeCustomerPhone(stripe, userId, phone)
+  } catch (error) {
+    if (error && typeof error === 'object' && 'statusCode' in error && (error as { statusCode: number }).statusCode === 503) {
+      return
+    }
+    console.warn('[user-profile-sync] Stripe customer phone sync failed:', error)
   }
 }
 

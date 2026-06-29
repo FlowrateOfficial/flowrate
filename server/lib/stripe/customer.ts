@@ -6,8 +6,32 @@ import {
   setStripeCustomerId,
   clearStripeCustomerId
 } from '../billing/repository'
-import { isLivemodeMismatch } from './errors'
+import { isLivemodeMismatch, isStaleStripeCustomer } from './errors'
+import { stripeCustomerInvoiceSettings, verifiedPhoneForUser } from './customer-profile'
 import type { StripeUserRef } from './types'
+
+export async function getValidStripeCustomerId(
+  stripe: Stripe,
+  userId: string
+): Promise<string | null> {
+  const customerId = await getStripeCustomerId(userId)
+  if (!customerId) return null
+
+  try {
+    const customer = await stripe.customers.retrieve(customerId)
+    if (customer.deleted) {
+      await clearStripeCustomerId(userId)
+      return null
+    }
+    return customerId
+  } catch (error) {
+    if (isStaleStripeCustomer(error)) {
+      await clearStripeCustomerId(userId)
+      return null
+    }
+    throw error
+  }
+}
 
 export async function linkStripeCustomerToUser(
   stripe: Stripe,
@@ -47,10 +71,10 @@ export async function findAndLinkStripeCustomer(
       await linkStripeCustomerToUser(stripe, user.id, storedId, metadata)
       return storedId
     } catch (error) {
-      if (isLivemodeMismatch(error)) {
+      if (isStaleStripeCustomer(error)) {
         await clearStripeCustomerId(user.id)
       }
-      // NOTE - Stored customer invalid (test vs live) — search by email below
+      // NOTE - Stored customer invalid — search by email below
     }
   }
 
@@ -73,15 +97,27 @@ export async function findAndLinkStripeCustomer(
 export async function ensureStripeCustomer(
   stripe: Stripe,
   user: StripeUserRef,
-  metadata: Record<string, string>
+  metadata: Record<string, string>,
+  invoiceTemplateId?: string
 ): Promise<string> {
   const existing = await findAndLinkStripeCustomer(stripe, user, metadata)
-  if (existing) return existing
+  if (existing) {
+    if (invoiceTemplateId) {
+      await stripe.customers.update(existing, {
+        invoice_settings: stripeCustomerInvoiceSettings(invoiceTemplateId)
+      })
+    }
+    return existing
+  }
+
+  const verifiedPhone = await verifiedPhoneForUser(user.id)
 
   const customer = await stripe.customers.create({
     email: user.email,
     name: user.name ?? undefined,
-    metadata
+    phone: verifiedPhone ?? undefined,
+    metadata,
+    invoice_settings: stripeCustomerInvoiceSettings(invoiceTemplateId)
   })
 
   await linkStripeCustomerToUser(stripe, user.id, customer.id, metadata)
