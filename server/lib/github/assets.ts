@@ -1,5 +1,7 @@
 // NOTE - ANCHOR: Upload feedback media into the private feedback repo
 
+import { FEEDBACK_UPLOAD_CONCURRENCY } from '#shared/feedback'
+import { mapConcurrent } from '../concurrency'
 import { formatGithubError } from './errors'
 import {
   ensureFeedbackMediaBranch,
@@ -35,6 +37,51 @@ function feedbackMediaPath(issueNumber: number, id: string, filename: string): s
   return `issues/${issueNumber}/${id}-${filename}`
 }
 
+async function uploadSingleAsset(
+  token: string,
+  owner: string,
+  name: string,
+  branch: string,
+  issueNumber: number,
+  file: { id: string, filename: string, mimeType: string, data: Buffer }
+): Promise<{ uploaded?: FeedbackUploadedAsset, failure?: FeedbackUploadFailure }> {
+  const filename = safeFilename(file.filename)
+  const path = feedbackMediaPath(issueNumber, file.id, filename)
+
+  try {
+    const response = await $fetch<ContentsUploadResponse>(
+      `https://api.github.com/repos/${owner}/${name}/contents/${path}`,
+      {
+        method: 'PUT',
+        headers: githubHeaders(token),
+        body: {
+          message: `feedback: issue #${issueNumber} attachment ${filename}`,
+          content: file.data.toString('base64'),
+          branch
+        }
+      }
+    )
+
+    return {
+      uploaded: {
+        id: file.id,
+        filename,
+        mimeType: file.mimeType,
+        path,
+        markdownUrl: issueAssetUrl(owner, name, response.commit.sha, path)
+      }
+    }
+  } catch (error) {
+    return {
+      failure: {
+        id: file.id,
+        filename: file.filename,
+        error: formatGithubError(error)
+      }
+    }
+  }
+}
+
 export async function uploadFeedbackAssets(
   token: string,
   repo: string,
@@ -47,41 +94,17 @@ export async function uploadFeedbackAssets(
 
   const { owner, name } = parseGitHubRepo(repo)
   const branch = await ensureFeedbackMediaBranch(token, owner, name)
+
+  const results = await mapConcurrent(files, FEEDBACK_UPLOAD_CONCURRENCY, file =>
+    uploadSingleAsset(token, owner, name, branch, issueNumber, file)
+  )
+
   const uploaded: FeedbackUploadedAsset[] = []
   const failures: FeedbackUploadFailure[] = []
 
-  for (const file of files) {
-    const filename = safeFilename(file.filename)
-    const path = feedbackMediaPath(issueNumber, file.id, filename)
-
-    try {
-      const response = await $fetch<ContentsUploadResponse>(
-        `https://api.github.com/repos/${owner}/${name}/contents/${path}`,
-        {
-          method: 'PUT',
-          headers: githubHeaders(token),
-          body: {
-            message: `feedback: issue #${issueNumber} attachment ${filename}`,
-            content: file.data.toString('base64'),
-            branch
-          }
-        }
-      )
-
-      uploaded.push({
-        id: file.id,
-        filename,
-        mimeType: file.mimeType,
-        path,
-        markdownUrl: issueAssetUrl(owner, name, response.commit.sha, path)
-      })
-    } catch (error) {
-      failures.push({
-        id: file.id,
-        filename,
-        error: formatGithubError(error)
-      })
-    }
+  for (const result of results) {
+    if (result.uploaded) uploaded.push(result.uploaded)
+    if (result.failure) failures.push(result.failure)
   }
 
   return { uploaded, failures }

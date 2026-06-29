@@ -30,7 +30,8 @@ export default defineEventHandler(async (event) => {
       config.githubToken,
       config.githubFeedbackRepo,
       issueNumber,
-      submission.type
+      submission.type as 'review' | 'feature' | 'bug',
+      { submissionId: submission.id }
     )
 
     return { thread }

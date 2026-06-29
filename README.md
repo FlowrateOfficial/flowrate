@@ -1,64 +1,191 @@
-# Nuxt Starter Template
+<p align="center">
+  <img src="./public/flowrate_logo.png" alt="FlowRate" width="88" height="88" />
+</p>
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+<h1 align="center">FlowRate</h1>
 
-Use this template to get started with [Nuxt UI](https://ui.nuxt.com) quickly.
+<p align="center">
+  <strong>Your financial operating system.</strong><br />
+  One login. Independent, Household, Family, and Company money — in separate spaces, same calm dashboard.
+</p>
 
-- [Live demo](https://starter-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+<p align="center">
+  <a href="https://nuxt.com"><img src="https://img.shields.io/badge/Nuxt-4-00DC82?logo=nuxt&labelColor=020420" alt="Nuxt 4" /></a>
+  <a href="https://ui.nuxt.com"><img src="https://img.shields.io/badge/Nuxt%20UI-4-00DC82?logo=nuxt&labelColor=020420" alt="Nuxt UI" /></a>
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Prisma-Neon-2D3748?logo=prisma" alt="Prisma + Neon" />
+</p>
 
-<a href="https://starter-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png">
-    <img alt="Nuxt Starter Template" src="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png" width="830" height="466">
-  </picture>
-</a>
+---
 
-> The starter template for Vue is on https://github.com/nuxt-ui-templates/starter-vue.
+## What FlowRate does today
 
-## Quick Start
+FlowRate is a full-stack personal and business finance app built with **Nuxt 4**. Right now it ships:
 
-```bash [Terminal]
-npm create nuxt@latest -- -t ui
+| Area | What you get |
+|------|----------------|
+| **Financial Spaces** | Independent, Household, Family, and Company — switch context without juggling logins |
+| **Bank linking** | **Plaid** (EU) and **Stripe Financial Connections** (US test/live) |
+| **Money view** | Accounts, transactions, budgets, analytics, burn rate & runway (company) |
+| **Subscriptions** | SaaS Shield — detect recurring spend and duplicates |
+| **Family** | Member invites, allowances, supervised teen dashboard |
+| **Billing** | Stripe Checkout + Customer Portal (Pro plans) |
+| **Feedback** | In-app bug reports & feature requests → private GitHub issues (markdown, images, thread) |
+| **i18n** | English (US/UK) and French |
+
+Auth runs on **Neon Auth** (Better Auth). Data lives in **PostgreSQL** via **Prisma**. Production deploys target **Vercel**.
+
+---
+
+## Branches
+
+| Branch | Role | Deploy |
+|--------|------|--------|
+| **`master`** | Production — stable, deployable | Vercel production |
+| **`feature`** | Development — day-to-day work | Local / preview deploys |
+
+```text
+master   ───●────────●──────►  production (Vercel)
+              \
+feature  ──────●──●──●──►     local dev, PRs → master
 ```
 
-## Deploy your own
+**Workflow**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=starter&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fstarter&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fstarter-dark.png&demo-url=https%3A%2F%2Fstarter-template.nuxt.dev%2F&demo-title=Nuxt%20Starter%20Template&demo-description=A%20minimal%20template%20to%20get%20started%20with%20Nuxt%20UI.)
+1. Clone and work on `feature` (see below).
+2. Open PRs from `feature` → `master` when ready.
+3. Merge to `master` to ship production.
 
-## Setup
+> **Note:** Feedback media lives on a separate orphan Git branch (`issues_medias`). It is never merged into app code. Exclude it from fetch: `sh scripts/git-ignore-feedback-media-branch.sh`.
 
-Make sure to install the dependencies:
+---
+
+## Quick start (clone)
+
+Clone **only** the branch you need — skips the large feedback-media branch:
+
+```bash
+git clone --single-branch --branch master git@github.com:Mathieu-ai/flowrate.git
+cd flowrate
+git checkout -b feature   # optional: create local dev branch tracking your workflow
+```
+
+HTTPS:
+
+```bash
+git clone --single-branch --branch master https://github.com/Mathieu-ai/flowrate.git
+```
+
+For daily development, switch to `feature` after clone:
+
+```bash
+git fetch origin feature
+git checkout feature
+```
+
+---
+
+## Development (`feature` branch)
+
+### Prerequisites
+
+- **Node.js** 20+
+- **pnpm** 9+
+- [Neon](https://neon.tech) project (database + auth)
+- [Stripe](https://stripe.com) account (test mode for local)
+- Optional: [Plaid](https://plaid.com) sandbox, [GitHub PAT](https://github.com/settings/tokens) for in-app feedback
+
+### Setup
 
 ```bash
 pnpm install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
+cp .env.example .env
+# Fill in DATABASE_URL, NUXT_NEON_AUTH_URL, Stripe test keys, etc.
+pnpm prisma generate
 pnpm dev
 ```
 
-## Production
+App runs at **http://localhost:3000**.
 
-Build the application for production:
+### Common dev commands
 
-```bash
-pnpm build
+| Command | Purpose |
+|---------|---------|
+| `pnpm dev` | Nuxt dev server |
+| `pnpm dev:all` | Dev server + Stripe webhook listener |
+| `pnpm stripe:listen` | Forward Stripe webhooks to localhost |
+| `pnpm typecheck` | TypeScript check |
+| `pnpm lint` | ESLint |
+| `pnpm db:studio` | Prisma Studio |
+| `pnpm db:migrate` | Apply migrations |
+| `sh scripts/git-ignore-feedback-media-branch.sh` | Skip `issues_medias` on fetch |
+
+### Dev environment tips
+
+- Use **Stripe test keys** (`sk_test_…` / `pk_test_…`) and run `pnpm stripe:listen` for webhooks.
+- Set `APP_URL=http://localhost:3000`.
+- Plaid sandbox works on localhost; live US bank linking needs HTTPS (production).
+- Feedback (`GITHUB_TOKEN` + `GITHUB_FEEDBACK_REPO`) is optional — without it, the feedback page shows as disabled.
+
+---
+
+## Production (`master` branch)
+
+Production runs on **Vercel** (or any Node host that supports Nuxt SSR).
+
+### Deploy checklist
+
+1. Merge tested work into **`master`**.
+2. Set production env vars in Vercel (see [`.env.example`](./.env.example)):
+   - `APP_URL` → your HTTPS domain
+   - `NUXT_SESSION_PASSWORD` → strong random secret (32+ chars)
+   - `DATABASE_URL`, `NUXT_NEON_AUTH_URL`, Neon auth domains
+   - **Live** Stripe keys + live webhook endpoint → `/api/stripe/webhook`
+   - Plaid / GitHub feedback vars if enabled
+3. Vercel build: `pnpm build` (runs `prisma generate` + `nuxt build`).
+4. Run migrations against production DB: `pnpm exec prisma migrate deploy`.
+
+### Prod vs dev at a glance
+
+| | **Development** (`feature`) | **Production** (`master`) |
+|--|---------------------------|-----------------------------|
+| Branch | `feature` | `master` |
+| URL | `http://localhost:3000` | `https://your-domain.com` |
+| Stripe | Test mode + CLI webhooks | Live keys + dashboard webhook |
+| Database | Neon dev branch | Neon production branch |
+| Auth domains | localhost + preview URLs | Production + custom domain |
+| Builds | Local `pnpm dev` | Vercel on push to `master` |
+
+---
+
+## Project structure
+
+```text
+app/           Nuxt UI, pages, components, stores
+server/        API routes, Prisma services, Stripe/Plaid/GitHub libs
+prisma/        Schema and migrations
+shared/        Types and constants used by app + server
+locales/       en, en-GB, fr copy
+docs/          Operational notes (e.g. feedback media branch)
 ```
 
-Locally preview production build:
+---
 
-```bash
-pnpm preview
-```
+## Environment variables
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+All variables are documented in **[`.env.example`](./.env.example)** — copy to `.env` and fill in values. Never commit `.env`.
 
-## Renovate integration
+Minimum for local dashboard:
 
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+- `DATABASE_URL`, `NUXT_NEON_AUTH_URL`, `NUXT_SESSION_PASSWORD`, `APP_URL`
+- `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` (with `stripe listen`)
+
+---
+
+## License
+
+**Proprietary — all rights reserved.** See [LICENSE](./LICENSE).
+
+Use, copying, modification, and commercial exploitation are not permitted without
+written authorization from Mathieu-AI. Only the Maintainer (or persons explicitly
+authorized in writing) may merge to `master` and approve production deployments.

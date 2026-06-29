@@ -1,140 +1,108 @@
-// NOTE - ANCHOR: Fetch GitHub issue threads for in-app feedback replies
+// NOTE - ANCHOR: Fetch GitHub issue thread for in-app feedback history
 
-import { FEEDBACK_ANCHORS, repairFeedbackMarkdown } from '#shared/feedback'
-import type { FeedbackLabel } from '#shared/feedback'
-import { visibleIssueLabels } from './labels'
+import type { FeedbackType } from '#shared/feedback'
+import {
+  FEEDBACK_ANCHORS,
+  filterFeedbackDisplayLabels,
+  repairFeedbackMarkdown
+} from '#shared/feedback'
+import { applyIssueSnapshot } from './sync'
 import { githubHeaders, parseGitHubRepo } from './client'
 
-export interface FeedbackThreadReply {
+export interface FeedbackThreadComment {
   id: number
-  authorName: string
-  authorAvatar: string | null
   body: string
   createdAt: string
-}
-
-export interface FeedbackIssueMeta {
-  state: 'open' | 'closed'
-  commentCount: number
-  labels: FeedbackLabel[]
+  isTeam: boolean
 }
 
 export interface FeedbackThread {
   issueNumber: number
   title: string
   state: 'open' | 'closed'
-  type: string
-  submittedAt: string
-  updatedAt: string
-  description: string
-  labels: FeedbackLabel[]
-  replies: FeedbackThreadReply[]
+  labels: Array<{ name: string, color: string, description?: string | null }>
+  body: string
+  createdAt: string
+  replyCount: number
+  comments: FeedbackThreadComment[]
 }
 
-interface GitHubIssueLabel {
-  name: string
-  color: string
-  description?: string | null
-}
-
-interface GitHubIssue {
+interface GitHubIssueResponse {
   number: number
   title: string
   state: 'open' | 'closed'
   body: string | null
   created_at: string
-  updated_at: string
-  comments: number
-  labels: GitHubIssueLabel[]
+  labels: Array<{ name: string, color: string, description?: string | null }>
 }
 
-interface GitHubComment {
+interface GitHubCommentResponse {
   id: number
   body: string
   created_at: string
-  user: { login: string, avatar_url: string | null } | null
+  user: { type: string } | null
 }
 
-function isAutomatedComment(body: string): boolean {
-  return body.includes(FEEDBACK_ANCHORS.context)
-    || body.includes(FEEDBACK_ANCHORS.attachments)
-}
-
-function parseIssueDescription(body: string | null): string {
-  if (!body) return ''
-
-  const text = body
-    .replace(FEEDBACK_ANCHORS.description, '')
-    .replace('**Submitted from FlowRate app**', '')
-    .replace('_Loading description and attachments…_', '')
-    .replace(/_Do not paste bank credentials or full account numbers in public feedback\._/g, '')
-    .trim()
-
-  return repairFeedbackMarkdown(text)
-}
-
-function cleanReplyBody(body: string): string {
-  return body
-    .replace(FEEDBACK_ANCHORS.reply, '')
-    .trim()
-}
-
-export async function fetchIssueMeta(
-  token: string,
-  repo: string,
-  issueNumber: number
-): Promise<FeedbackIssueMeta> {
-  const { owner, name } = parseGitHubRepo(repo)
-  const issue = await $fetch<GitHubIssue>(
-    `https://api.github.com/repos/${owner}/${name}/issues/${issueNumber}`,
-    { headers: githubHeaders(token) }
-  )
-
-  return {
-    state: issue.state,
-    commentCount: issue.comments,
-    labels: visibleIssueLabels(issue.labels ?? [])
-  }
+export function isAutomatedFeedbackComment(body: string): boolean {
+  const trimmed = body.trim()
+  return trimmed.startsWith(FEEDBACK_ANCHORS.context)
+    || trimmed.startsWith(FEEDBACK_ANCHORS.attachments)
+    || trimmed.includes(FEEDBACK_ANCHORS.description)
 }
 
 export async function fetchIssueThread(
   token: string,
   repo: string,
   issueNumber: number,
-  type: string
+  type: FeedbackType,
+  options: { submissionId?: string } = {}
 ): Promise<FeedbackThread> {
   const { owner, name } = parseGitHubRepo(repo)
+  const headers = githubHeaders(token)
+  const issueUrl = `https://api.github.com/repos/${owner}/${name}/issues/${issueNumber}`
 
   const [issue, comments] = await Promise.all([
-    $fetch<GitHubIssue>(
-      `https://api.github.com/repos/${owner}/${name}/issues/${issueNumber}`,
-      { headers: githubHeaders(token) }
-    ),
-    $fetch<GitHubComment[]>(
-      `https://api.github.com/repos/${owner}/${name}/issues/${issueNumber}/comments`,
-      { headers: githubHeaders(token) }
-    )
+    $fetch<GitHubIssueResponse>(issueUrl, { headers }),
+    $fetch<GitHubCommentResponse[]>(`${issueUrl}/comments`, {
+      headers,
+      query: { per_page: 100 }
+    })
   ])
 
-  const replies = comments
-    .filter(comment => !isAutomatedComment(comment.body))
+  const visibleComments = comments
+    .filter(comment => !isAutomatedFeedbackComment(comment.body))
     .map(comment => ({
       id: comment.id,
-      authorName: comment.user?.login ?? 'FlowRate team',
-      authorAvatar: comment.user?.avatar_url ?? null,
-      body: cleanReplyBody(comment.body),
-      createdAt: comment.created_at
+      body: repairFeedbackMarkdown(comment.body),
+      createdAt: comment.created_at,
+      isTeam: comment.user?.type === 'User'
     }))
+
+  const displayLabels = filterFeedbackDisplayLabels(issue.labels)
+  const replyCount = visibleComments.length
+
+  if (options.submissionId) {
+    const userLabels = issue.labels
+      .map(label => label.name)
+      .filter((name): name is 'USER_BUG' | 'USER_FEATURE' =>
+        name === 'USER_BUG' || name === 'USER_FEATURE'
+      )
+
+    await applyIssueSnapshot(options.submissionId, {
+      state: issue.state,
+      replyCount,
+      labels: userLabels
+    }).catch(() => {})
+  }
 
   return {
     issueNumber: issue.number,
     title: issue.title,
     state: issue.state,
-    type,
-    submittedAt: issue.created_at,
-    updatedAt: issue.updated_at,
-    description: parseIssueDescription(issue.body),
-    labels: visibleIssueLabels(issue.labels ?? []),
-    replies
+    labels: displayLabels,
+    body: repairFeedbackMarkdown(issue.body ?? ''),
+    createdAt: issue.created_at,
+    replyCount,
+    comments: visibleComments
   }
 }
