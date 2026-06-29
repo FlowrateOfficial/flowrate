@@ -306,7 +306,7 @@ useSeoMeta({ title: () => `${t('dashboard.feedback.pageTitle')} — ${t('common.
                 :label="t('dashboard.feedback.submit')"
                 icon="i-lucide-send"
                 :loading="submitting"
-                :disabled="!title.trim() || !messageReady"
+                :disabled="title.trim().length < 3 || !messageReady"
               />
             </div>
           </UCard>

@@ -14,8 +14,8 @@ const payloadSchema = z.object({
   type: z.enum(['review', 'feature', 'bug']),
   title: z.string().trim().min(3).max(FEEDBACK_LIMITS.maxTitleLength),
   message: z.string().trim().max(FEEDBACK_LIMITS.maxMessageLength),
-  rating: z.number().int().min(1).max(5).optional(),
-  includeContext: z.boolean().optional().default(true),
+  rating: z.coerce.number().int().min(1).max(5).optional(),
+  includeContext: z.coerce.boolean().optional().default(true),
   path: z.string().max(200).optional(),
   attachmentIds: z.array(z.string().min(1).max(80)).max(FEEDBACK_LIMITS.maxAttachments).optional()
 }).superRefine((data, ctx) => {
@@ -74,8 +74,16 @@ export default defineEventHandler(async (event) => {
   let payload: z.infer<typeof payloadSchema>
   try {
     payload = payloadSchema.parse(JSON.parse(payloadPart.data.toString('utf8')))
-  } catch {
-    throw createError({ statusCode: 400, message: 'Invalid feedback payload' })
+  } catch (error) {
+    const detail = error instanceof z.ZodError
+      ? error.issues.map(issue => `${issue.path.join('.') || 'payload'}: ${issue.message}`).join('; ')
+      : null
+    throw createError({
+      statusCode: 400,
+      message: import.meta.dev && detail
+        ? `Invalid feedback payload (${detail})`
+        : 'Invalid feedback payload'
+    })
   }
 
   const allowedIds = new Set(payload.attachmentIds ?? [])
