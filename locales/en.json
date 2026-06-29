@@ -944,6 +944,27 @@
         "feature": "Feature",
         "bug": "Bug"
       },
+      "typeDescriptions": {
+        "review": "Share general feedback or rate your experience.",
+        "feature": "Request a new feature or improvement.",
+        "bug": "Report something that isn't working."
+      },
+      "category": "Category",
+      "categoryHelp": "Bug reports and feature requests are tagged so our team can triage them. Reviews are general feedback without a category tag.",
+      "labels": {
+        "USER_BUG": "Bug report",
+        "USER_FEATURE": "Feature request",
+        "bug": "Bug",
+        "duplicate": "Duplicate",
+        "wontfix": "Won't fix",
+        "invalid": "Invalid",
+        "question": "Question",
+        "help wanted": "Help wanted",
+        "documentation": "Documentation",
+        "enhancement": "Enhancement",
+        "feature-request": "Feature request",
+        "good first issue": "Good first issue"
+      },
       "rating": "Overall rating",
       "ratingValue": "{value} out of 5 stars",
       "subject": "Subject",
@@ -952,13 +973,31 @@
       "messagePlaceholder": "What worked well? What should we improve? For bugs, include steps to reproduce.",
       "includeContext": "Include technical context",
       "includeContextHelp": "Helps us debug: plan, space type, page URL, and browser — no bank data.",
-      "privacyNote": "Do not include passwords, bank login details, or full card numbers.",
+      "privacyNote": "Do not include passwords, bank login details, or full card numbers. See our Privacy Policy for what we collect when you submit feedback.",
       "submit": "Send feedback",
       "successTitle": "Thank you — we received your feedback",
-      "successDescription": "Our team will review it in our private tracker. You will not receive a public link.",
+      "successDescription": "Our team will review it privately. Check the History tab for replies from GitHub.",
       "sendAnother": "Send another",
       "failed": "Could not send feedback",
       "tryAgain": "Please try again in a few minutes.",
+      "retry": "Retry",
+      "tabNew": "New feedback",
+      "tabHistory": "History",
+      "historyTitle": "Your feedback",
+      "historyDescription": "Open a thread to read team replies from GitHub.",
+      "threadTitle": "Feedback thread",
+      "threadLoadFailed": "Could not load replies",
+      "yourMessage": "Your message",
+      "noDescription": "No description provided.",
+      "teamReplies": "Team replies",
+      "noRepliesYet": "No replies yet",
+      "noRepliesDescription": "When the FlowRate team responds on GitHub, their message will appear here.",
+      "noSubmissionsTitle": "No feedback yet",
+      "noSubmissionsDescription": "Submit feedback from the New tab — your threads will show up here.",
+      "statusOpen": "Open",
+      "statusClosed": "Closed",
+      "submittedOn": "Submitted {date}",
+      "replyCount": "{count} replies",
       "unavailableTitle": "Feedback is not enabled yet",
       "unavailableDescription": "The server needs GITHUB_TOKEN and GITHUB_FEEDBACK_REPO configured. You can still email mathieu.lievre.pro@outlook.com."
     },
@@ -1149,7 +1188,7 @@
     "privacy": {
       "title": "Privacy Policy",
       "seoTitle": "Privacy Policy — FlowRate",
-      "lastUpdatedAt": "2026-06-29T18:00:00Z",
+      "lastUpdatedAt": "2026-06-29T20:00:00Z",
       "seeAlsoTerms": "See also: Terms of Service",
       "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
       "intro": "FlowRate (“we”, “us”, “our”) is a personal and household finance application currently in beta. This Privacy Policy explains what information we collect, how we use it, who we share it with, where it is stored, and the choices you have. We aim to be transparent so you can make informed decisions about using FlowRate while the product is still in development.",
@@ -1162,8 +1201,8 @@
       "sections": {
         "overview": {
           "title": "1. Overview",
-          "p1": "FlowRate helps individuals, families, and small teams understand their money. You can connect bank accounts (via Stripe Financial Connections), view transactions, assign categories, track budgets, detect recurring subscriptions, and—when you choose—share selected accounts within a Household, Family, or Company space.",
-          "p2": "We do not sell your personal information. We do not share Financial Connections data with unrelated third parties for their own marketing or product development."
+          "p1": "FlowRate helps individuals, families, and small teams understand their money. You can connect bank accounts through Plaid (supported European markets) or Stripe Financial Connections (US institutions), view transactions, assign categories, track budgets, detect recurring subscriptions, share selected accounts within Household, Family, or Company spaces, and send in-app feedback to the FlowRate team.",
+          "p2": "We do not sell your personal information. We do not share bank connection data with unrelated third parties for their own marketing or product development."
         },
         "dataCollected": {
           "title": "2. Information we collect",
@@ -1171,22 +1210,23 @@
           "items": [
             "Account information: name, email address, optional phone number, profile settings, and authentication data managed through Neon Auth.",
             "Financial space data: space names, membership roles, invitations, and visibility preferences (personal vs shared accounts).",
-            "Connected bank data (when you choose to link): institution name, account display name, account type, last four digits, balances, and transaction history received through Stripe Financial Connections.",
+            "Connected bank data (when you choose to link): institution name, account display name, account type, masked account identifiers, balances, and transaction history received through Plaid or Stripe Financial Connections, depending on which provider is enabled for your connection flow.",
             "Derived data: transaction categories (including rule-based auto-categorization—no AI today), budget entries, detected subscriptions, analytics summaries, and split rules you configure.",
             "Billing data: subscription plan and Stripe Billing customer identifiers if you upgrade to a paid plan.",
+            "Feedback and reviews (when you submit them): category (review, feature request, or bug report), subject line, message text, optional star rating, images and short videos you attach, and—if you leave “Include technical context” checked—your user ID, email, name, plan, active space name and type, space role, locale, page URL, and browser user-agent string.",
             "Technical data: server logs, IP addresses, and request metadata generated when you use the app (for example through our hosting provider).",
             "Performance data (production only): anonymized or pseudonymous page-performance metrics sent to Vercel through the Speed Insights module when you visit our public site or app shell—see the notice above."
           ]
         },
         "financialConnections": {
-          "title": "3. Stripe Financial Connections",
-          "p1": "When you connect a bank, you are redirected through Stripe’s Financial Connections flow. You authenticate directly with your financial institution or through Stripe’s secure interface. FlowRate never receives or stores your bank login credentials.",
-          "p2": "With your explicit consent in the Stripe flow, we request read-only access to balances and transactions for the accounts you select. We use this data only to provide FlowRate features described in this policy.",
-          "p3": "Linked institutions are US financial accounts, as supported by Stripe Financial Connections. You can disconnect a linked account at any time from the Accounts page in FlowRate, which removes the account and its imported transactions from our database and disconnects access through Stripe where applicable.",
+          "title": "3. Bank connections (Plaid and Stripe)",
+          "p1": "When you connect a bank, you are redirected through Plaid Link or Stripe’s Financial Connections flow, depending on which provider is configured for your region and deployment. You authenticate directly with your financial institution or through the provider’s secure interface. FlowRate never receives or stores your bank login credentials.",
+          "p2": "With your explicit consent in the connection flow, we request read-only access to balances and transactions for the accounts you select. We use this data only to provide FlowRate features described in this policy.",
+          "p3": "Plaid supports linked institutions in supported European markets. Stripe Financial Connections supports US financial accounts. You can disconnect a linked account at any time from the Accounts page in FlowRate, which removes the account and its imported transactions from our database and revokes access through the provider where applicable.",
           "items": [
-            "We do not use Financial Connections data for credit underwriting, lending decisions, or selling leads.",
+            "We do not use bank connection data for credit underwriting, lending decisions, or selling leads.",
             "We do not request payment-method or ownership permissions unless we explicitly add those features and update this policy first.",
-            "We do not share raw Financial Connections data with advertisers, data brokers, or unrelated third parties."
+            "We do not share raw bank connection data with advertisers, data brokers, or unrelated third parties."
           ]
         },
         "howWeUse": {
@@ -1198,7 +1238,8 @@
             "Powering budgets, spending analytics, subscription detection, and space-specific views (for example family or company burn-rate summaries).",
             "Enforcing visibility rules you set (personal vs shared accounts within a space).",
             "Authenticating you, securing sessions, preventing abuse, and responding to support requests.",
-            "Processing optional paid subscriptions through Stripe Billing."
+            "Processing optional paid subscriptions through Stripe Billing.",
+            "Reviewing in-app feedback you submit and responding through our private issue tracker."
           ],
           "p2": "We may use aggregated or de-identified statistics (that cannot reasonably identify you) to understand product usage and improve the service."
         },
@@ -1221,24 +1262,42 @@
             "Opting in to AI analysis is separate from connecting a bank account or subscribing to a paid plan—you must enable it explicitly."
           ]
         },
+        "feedback": {
+          "title": "7. In-app feedback and reviews",
+          "p1": "FlowRate includes a Feedback page where signed-in users can send reviews, feature requests, or bug reports to the FlowRate team. Submissions are voluntary. You choose a category, enter a subject and message, optionally attach images or short videos, and— for reviews—an optional star rating.",
+          "p2": "If you enable “Include technical context” (on by default), we attach support metadata to your submission: your FlowRate user ID, email, display name, subscription plan, active space name and type, your role in that space, locale, the page URL where you submitted feedback, and your browser user-agent string. You can turn this off before sending.",
+          "p3": "Feedback is stored in a private GitHub repository operated for FlowRate issue tracking—not on a public community forum. Each submission creates an issue that may receive labels (for example USER_BUG or USER_FEATURE for bug and feature reports, and from-app for all in-app submissions). The FlowRate team may add further labels (such as duplicate or wontfix) when triaging. Team replies posted on the issue can appear in your Feedback history inside the app.",
+          "p4": "Do not include passwords, bank login details, full card numbers, or other highly sensitive financial credentials in feedback messages or attachments. We display a warning in the form, but you are responsible for what you submit.",
+          "items": [
+            "We keep a record in our database linking your user account to the GitHub issue number so you can view submission history and replies in the app.",
+            "Attachments are uploaded to a dedicated branch in the private feedback repository and referenced from the issue.",
+            "Feedback is not used for advertising or sold to third parties. It is used to improve FlowRate and respond to you.",
+            "Rate limits apply to prevent abuse (for example a maximum number of submissions per hour)."
+          ]
+        },
         "sharing": {
-          "title": "7. How we share information",
+          "title": "8. How we share information",
           "p1": "We share information only in these situations:",
           "items": [
-            "Service providers (subprocessors): companies that host, authenticate, connect banks, verify phone numbers, or—only if you opt in to AI analysis—generate AI insights on our behalf, solely to provide FlowRate to you. They may not use Financial Connections data for their own independent purposes.",
+            "Service providers (subprocessors): companies that host, authenticate, connect banks (Plaid or Stripe), store feedback issues (GitHub), verify phone numbers, or—only if you opt in to AI analysis—generate AI insights on our behalf, solely to provide FlowRate to you. They may not use bank connection data for their own independent purposes.",
             "Within your spaces: when you mark an account or data as shared, authorized members of that space (for example guardians in a Family space) can see it according to their role.",
             "Legal requirements: if required by law, court order, or to protect rights, safety, and security.",
             "Business transfers: if FlowRate is involved in a merger or acquisition, data may transfer subject to this policy."
           ],
-          "p2": "We do not share Financial Connections data with affiliates for their independent use, data brokers, or unrelated third parties that would use the data to improve their own products."
+          "p2": "We do not share bank connection data with affiliates for their independent use, data brokers, or unrelated third parties that would use the data to improve their own products. Feedback you submit is stored in a private GitHub repository accessible to the FlowRate team—not posted to a public support forum."
         },
         "subprocessors": {
-          "title": "8. Service providers (subprocessors)",
+          "title": "9. Service providers (subprocessors)",
           "p1": "We rely on the following categories of providers. Each processes data only to deliver services to FlowRate:",
           "table": [
             {
+              "name": "Plaid",
+              "purpose": "Bank linking, balance and transaction access for supported European institutions",
+              "location": "United States and/or European Union (and regions where Plaid operates)"
+            },
+            {
               "name": "Stripe",
-              "purpose": "Financial Connections (bank linking), balance and transaction access, subscription billing",
+              "purpose": "Financial Connections (US bank linking), balance and transaction access, subscription billing",
               "location": "United States (and regions where Stripe operates)"
             },
             {
@@ -1250,6 +1309,11 @@
               "name": "Vercel",
               "purpose": "Application hosting, content delivery, and Speed Insights (real-user performance metrics on production)",
               "location": "United States and/or European Union"
+            },
+            {
+              "name": "GitHub",
+              "purpose": "Private issue tracking for in-app feedback submissions, attachments, and team replies",
+              "location": "United States"
             },
             {
               "name": "Twilio",
@@ -1264,23 +1328,24 @@
           ]
         },
         "storage": {
-          "title": "9. Where we store data",
+          "title": "10. Where we store data",
           "p1": "We store application data only in the United States and/or countries within the European Union, using infrastructure providers that maintain data residency in those regions.",
-          "p2": "We do not intentionally store Financial Connections or personal data in countries outside the US or EU. If you require EU-only storage, contact us and we will work with you on supported configuration options for your account."
+          "p2": "We do not intentionally store bank connection or personal data in countries outside the US or EU. Feedback issues and attachments are stored in a private GitHub repository. If you require EU-only storage, contact us and we will work with you on supported configuration options for your account."
         },
         "retention": {
-          "title": "10. How long we keep data",
+          "title": "11. How long we keep data",
           "p1": "We retain your data while your account is active and as needed to provide the service.",
           "items": [
             "Profile and space data: until you delete your account or ask us to remove it.",
             "Connected bank data: until you disconnect the account in FlowRate or delete your account.",
             "Transactions and derived analytics: tied to the connected account or space; removed when you disconnect or delete.",
+            "Feedback submissions: the link between your account and the GitHub issue is kept while your account is active so you can view history and replies; the GitHub issue itself may be retained for product development and support records unless you request deletion.",
             "Server logs: typically retained for a limited period for security and troubleshooting, then deleted or aggregated.",
             "AI analysis requests (if opted in): retained only as long as needed to deliver insights and comply with law; deleted or anonymized when you opt out or delete your account, subject to provider retention limits."
           ]
         },
         "yourRights": {
-          "title": "11. Your choices and rights",
+          "title": "12. Your choices and rights",
           "p1": "Depending on where you live, you may have rights to access, correct, delete, export, or restrict processing of your personal data. FlowRate supports the following directly in the product or on request:",
           "items": [
             "Access and update: edit your name and phone number in Settings; view your transactions, accounts, and budgets in the dashboard.",
@@ -1289,39 +1354,40 @@
             "Delete account: use Settings → Delete my account for your own profile.",
             "Guardians: delete a child or teen account from Family → child card or member details (permanent erasure of their FlowRate data and login).",
             "Export: email mathieu.lievre.pro@outlook.com to request a copy of your data in a portable format.",
-            "Marketing: we do not send third-party advertising based on Financial Connections data.",
+            "Marketing: we do not send third-party advertising based on bank connection data.",
+            "Feedback: uncheck “Include technical context” before sending if you do not want support metadata attached; view your submission history in Feedback → History; email us to request deletion of a feedback issue.",
             "AI analysis: when available, enable or disable optional AI insights in Settings. Disabling opt-in stops new AI processing of your financial data."
           ],
           "p2": "EU/UK users may also lodge a complaint with their local data protection authority. We will respond to verified requests within applicable legal timeframes."
         },
         "security": {
-          "title": "12. Security",
-          "p1": "We use industry-standard measures including HTTPS encryption in transit, authenticated API access, and role-based permissions within financial spaces. Bank credentials are handled by Stripe and your financial institution—not stored on FlowRate servers.",
+          "title": "13. Security",
+          "p1": "We use industry-standard measures including HTTPS encryption in transit, authenticated API access, and role-based permissions within financial spaces. Bank credentials are handled by Plaid, Stripe, and your financial institution—not stored on FlowRate servers.",
           "p2": "No method of transmission or storage is 100% secure. Please use a strong, unique password and notify us promptly if you suspect unauthorized access."
         },
         "spaces": {
-          "title": "13. Household, Family, and Company spaces",
+          "title": "14. Household, Family, and Company spaces",
           "p1": "When you join or create a shared space, certain information is visible to other members according to their role (owner, guardian, teen, finance admin, etc.). Teens and children may have supervised views with limited permissions.",
           "p2": "You are responsible for inviting only people you trust and for choosing Personal vs Shared visibility when connecting accounts."
         },
         "children": {
-          "title": "14. Children and teens",
+          "title": "15. Children and teens",
           "p1": "Family spaces may include teen or child profiles managed by a parent or guardian. We collect only what is needed for supervised money management within those spaces. Guardians control invitations and visibility.",
           "p2": "FlowRate is not directed at children under 13 to create standalone accounts without parental involvement. If you believe we have collected data from a child improperly, contact mathieu.lievre.pro@outlook.com."
         },
         "cookies": {
-          "title": "15. Cookies and similar technologies",
+          "title": "16. Cookies and similar technologies",
           "p1": "We use essential cookies and similar storage for authentication sessions, locale preferences, and security. These are required for the app to function.",
           "p2": "We do not use advertising cookies or cross-site tracking cookies. You can clear cookies through your browser, but you may need to sign in again.",
           "p3": "Vercel Speed Insights loads a small performance-measurement script on production. It is not an advertising cookie, but privacy tools or browsers with tracker blocking (such as Brave) may block it—see the Speed Insights notice at the top of this page."
         },
         "international": {
-          "title": "16. International users",
+          "title": "17. International users",
           "p1": "FlowRate may be used by people in multiple countries. If you access the service from outside the US or EU, you understand that your data may be processed in the US and/or EU as described above.",
           "p2": "Where local law grants additional rights, we honor those rights to the extent applicable."
         },
         "changes": {
-          "title": "17. Changes to this policy",
+          "title": "18. Changes to this policy",
           "p1": "We may update this Privacy Policy from time to time. We will post the revised version on this page and update the “Last updated” date. Material changes may also be communicated in the app or by email where appropriate.",
           "p2": "Continued use of FlowRate after changes take effect means you accept the updated policy."
         }
@@ -1330,7 +1396,7 @@
     "terms": {
       "title": "Terms of Service",
       "seoTitle": "Terms of Service — FlowRate",
-      "lastUpdatedAt": "2026-06-29T18:00:00Z",
+      "lastUpdatedAt": "2026-06-29T20:00:00Z",
       "seeAlsoPrivacy": "See also: Privacy Policy",
       "seeAlsoGlba": "Financial Privacy Notice (GLBA)",
       "intro": "These Terms of Service (“Terms”) govern your access to and use of FlowRate while the service is in beta. By creating an account or using the service, you agree to these Terms and our Privacy Policy, including the limitations that apply during active development.",
@@ -1342,7 +1408,7 @@
         },
         "service": {
           "title": "2. The service",
-          "p1": "FlowRate provides tools to view connected account balances and transactions, categorize spending (using rule-based logic today—not artificial intelligence), set budgets, detect subscriptions, and collaborate in optional financial spaces (Independent, Household, Family, or Company).",
+          "p1": "FlowRate provides tools to view connected account balances and transactions, categorize spending (using rule-based logic today—not artificial intelligence), set budgets, detect subscriptions, collaborate in optional financial spaces (Independent, Household, Family, or Company), and send feedback to the FlowRate team through an in-app Feedback page.",
           "p2": "We plan to offer optional AI-powered spending analysis for Pro and Enterprise subscribers who explicitly opt in. That feature is not available yet; when it launches, it will be governed by our Privacy Policy and your opt-in choice in Settings.",
           "p3": "Features may change over time. We may add, modify, or discontinue features with reasonable notice where practical.",
           "p4": "Our production site may load Vercel Speed Insights to measure page performance. It does not access your bank data. Use of FlowRate means your browser may transmit technical performance metrics to Vercel as described in our Privacy Policy."
@@ -1359,8 +1425,8 @@
         },
         "financialData": {
           "title": "5. Bank connections and financial data",
-          "p1": "Bank linking is provided through Stripe Financial Connections. By connecting an account, you authorize Stripe and your financial institution to share the balances and transactions you select with FlowRate for the purposes described in our Privacy Policy.",
-          "p2": "You represent that you have the right to connect each account you link. FlowRate does not verify ownership beyond what Stripe and your institution provide.",
+          "p1": "Bank linking is provided through Plaid (supported European markets) and/or Stripe Financial Connections (US institutions), depending on which provider is enabled. By connecting an account, you authorize the provider and your financial institution to share the balances and transactions you select with FlowRate for the purposes described in our Privacy Policy.",
+          "p2": "You represent that you have the right to connect each account you link. FlowRate does not verify ownership beyond what the provider and your institution supply.",
           "p3": "Disconnecting an account in FlowRate stops future syncs and removes that account’s data from our application database, subject to backup retention described in our Privacy Policy."
         },
         "spaces": {
@@ -1382,26 +1448,35 @@
             "Attempt to access another user’s data without authorization.",
             "Reverse engineer, scrape, or overload the service.",
             "Misrepresent your identity or your authority to connect financial accounts.",
-            "Resell or redistribute Financial Connections data obtained through FlowRate."
+            "Resell or redistribute bank connection data obtained through FlowRate.",
+            "Submit feedback containing passwords, bank login credentials, full card numbers, or other information you are not authorized to share."
           ]
         },
+        "feedback": {
+          "title": "9. Feedback and reviews",
+          "p1": "The Feedback page lets you voluntarily send reviews, feature requests, or bug reports to the FlowRate team. By submitting feedback, you grant us a non-exclusive license to use, reproduce, and display your message and attachments for the purpose of operating, improving, and supporting FlowRate.",
+          "p2": "You choose a category (review, feature request, or bug report). Feature and bug reports receive category labels in our private issue tracker (USER_FEATURE and USER_BUG). All in-app submissions are tagged from-app. The team may add further labels when triaging (for example duplicate or wontfix), which you can see in your Feedback history.",
+          "p3": "If you leave “Include technical context” enabled, support metadata (such as your email, plan, space, page URL, and browser user-agent) is attached to help us investigate. You can disable this before sending. Do not include highly sensitive financial credentials in your message or attachments.",
+          "p4": "Feedback is stored in a private GitHub repository for issue tracking—not on a public forum. We may respond through the issue thread; replies can appear in the app under Feedback → History. We may apply rate limits to prevent abuse.",
+          "p5": "Feedback is not a substitute for urgent security reports. If you discover a critical vulnerability, contact mathieu.lievre.pro@outlook.com directly."
+        },
         "disclaimers": {
-          "title": "9. Not financial advice",
+          "title": "10. Not financial advice",
           "p1": "FlowRate is for informational and organizational purposes only. We do not provide financial, investment, tax, or legal advice. Categorizations, subscription detection, analytics, and any future AI-generated insights are automated estimates—you should verify important decisions with qualified professionals and your official bank records.",
           "p2": "AI analysis, when offered, may be inaccurate or incomplete. It does not replace professional judgment or official account records."
         },
         "liability": {
-          "title": "10. Disclaimers and limitation of liability",
+          "title": "11. Disclaimers and limitation of liability",
           "p1": "FlowRate is provided “as is” and “as available” without warranties of any kind, to the fullest extent permitted by law. We do not guarantee uninterrupted or error-free service, or that data synced from banks will always be complete or current.",
           "p2": "To the maximum extent permitted by law, FlowRate and its operators will not be liable for indirect, incidental, special, consequential, or punitive damages, or for loss of profits, data, or goodwill arising from your use of the service."
         },
         "termination": {
-          "title": "11. Suspension and termination",
+          "title": "12. Suspension and termination",
           "p1": "We may suspend or terminate access if you violate these Terms, pose a security risk, or where required by law. You may stop using FlowRate at any time and request account deletion as described in the Privacy Policy.",
           "p2": "Sections that by their nature should survive termination (including disclaimers and limitation of liability) will survive."
         },
         "changes": {
-          "title": "12. Changes to these Terms",
+          "title": "13. Changes to these Terms",
           "p1": "We may update these Terms from time to time. We will post the updated version on this page and update the “Last updated” date. Continued use after changes take effect constitutes acceptance.",
           "p2": "If you do not agree to updated Terms, you must stop using FlowRate and may request account deletion."
         }
@@ -1410,15 +1485,15 @@
     "glba": {
       "title": "Financial Privacy Notice (GLBA)",
       "seoTitle": "Financial Privacy Notice (GLBA) — FlowRate",
-      "lastUpdatedAt": "2026-06-29T18:00:00Z",
+      "lastUpdatedAt": "2026-06-29T20:00:00Z",
       "seeAlsoPrivacy": "See also: Privacy Policy",
       "seeAlsoTerms": "Terms of Service",
-      "intro": "This Financial Privacy Notice describes how FlowRate collects, uses, and shares nonpublic personal information (“NPI”) about consumers in connection with our personal finance application, which is currently in beta. It is provided to meet transparency expectations under the Gramm-Leach-Bliley Act (“GLBA”) and related U.S. financial privacy rules, including when you connect financial accounts through Stripe Financial Connections. This notice supplements our Privacy Policy and Terms of Service and may be updated as the product matures.",
+      "intro": "This Financial Privacy Notice describes how FlowRate collects, uses, and shares nonpublic personal information (“NPI”) about consumers in connection with our personal finance application, which is currently in beta. It is provided to meet transparency expectations under the Gramm-Leach-Bliley Act (“GLBA”) and related U.S. financial privacy rules, including when you connect financial accounts through Plaid or Stripe Financial Connections. This notice supplements our Privacy Policy and Terms of Service and may be updated as the product matures.",
       "contact": "Questions about this Financial Privacy Notice or your NPI? Contact us at",
       "sections": {
         "purpose": {
           "title": "1. Purpose of this notice",
-          "p1": "FlowRate is a personal and household finance application. We are not a bank, credit union, or other depository institution. When you choose to link a U.S. financial account, we receive certain financial information about you with your consent so we can display balances, transactions, budgets, and related features.",
+          "p1": "FlowRate is a personal and household finance application. We are not a bank, credit union, or other depository institution. When you choose to link a financial account, we receive certain financial information about you with your consent so we can display balances, transactions, budgets, and related features. Connections may be provided through Plaid (supported European markets) or Stripe Financial Connections (US institutions).",
           "p2": "This notice explains what NPI we handle, how we use it, who we may share it with, and the choices available to you. We provide this notice at or before the time you connect a financial account and make it available on our website at all times."
         },
         "scope": {
@@ -1436,16 +1511,17 @@
           "p1": "The NPI we collect depends on how you use FlowRate. Categories include:",
           "items": [
             "Identity and contact information: name, email address, optional phone number, and authentication identifiers managed through our identity provider.",
-            "Connected account information: financial institution name, account display name, account type, masked account numbers, balances, and transaction details received through Stripe Financial Connections when you authorize access.",
+            "Connected account information: financial institution name, account display name, account type, masked account numbers, balances, and transaction details received through Plaid or Stripe Financial Connections when you authorize access.",
             "Derived financial information: transaction categories, budgets, subscription estimates, analytics summaries, and split rules you configure inside FlowRate.",
             "Space and sharing data: membership roles, invitations, and visibility settings (personal vs shared) that determine who within a household, family, or company space may see linked financial information.",
-            "Billing information: subscription plan status and Stripe Billing customer identifiers if you purchase a paid plan (we do not store full payment card numbers)."
+            "Billing information: subscription plan status and Stripe Billing customer identifiers if you purchase a paid plan (we do not store full payment card numbers).",
+            "In-app feedback (if you submit it): your message and attachments are generally not NPI, but you must not include bank credentials or full account numbers in feedback. Optional support context may include your plan and space metadata as described in our Privacy Policy."
           ]
         },
         "howWeCollect": {
           "title": "5. How we collect NPI",
           "p1": "We collect NPI directly from you when you register, update your profile, create or join spaces, and configure budgets or categories.",
-          "p2": "When you connect a bank account, you are directed through Stripe’s Financial Connections flow. You authenticate with your financial institution (or through Stripe’s secure interface). FlowRate does not receive or store your online banking username or password.",
+          "p2": "When you connect a bank account, you are directed through Plaid Link or Stripe’s Financial Connections flow, depending on which provider is enabled. You authenticate with your financial institution (or through the provider’s secure interface). FlowRate does not receive or store your online banking username or password.",
           "p3": "We may also receive limited technical data (such as IP address and request logs) generated when you use the application, as described in our Privacy Policy."
         },
         "howWeUse": {
@@ -1466,7 +1542,7 @@
           "title": "7. How we share NPI",
           "p1": "We do not sell your NPI. We share NPI only in the limited circumstances below:",
           "items": [
-            "Service providers: trusted companies that process data on our behalf solely to operate FlowRate—for example Stripe (Financial Connections and billing), Neon (authentication and database hosting), Vercel (application hosting), and Twilio (optional phone verification). These providers may use NPI only to perform services for us and must protect it appropriately.",
+            "Service providers: trusted companies that process data on our behalf solely to operate FlowRate—for example Plaid and Stripe (bank linking and billing), Neon (authentication and database hosting), Vercel (application hosting), GitHub (private in-app feedback issue tracking), and Twilio (optional phone verification). These providers may use NPI only to perform services for us and must protect it appropriately.",
             "AI service providers (opt-in only): if you are a Pro or Enterprise subscriber and explicitly enable AI analysis when that feature is available, we may share selected NPI with third-party AI providers solely to generate insights for you inside FlowRate. This sharing does not occur today and never occurs without your opt-in.",
             "Within your spaces: when you mark an account or data as shared, authorized members of that space (such as guardians in a Family space or finance admins in a Company space) can view it according to their role.",
             "Affiliates: FlowRate does not currently share NPI with corporate affiliates for their own purposes.",
@@ -1506,7 +1582,7 @@
           "title": "12. Relationship to other policies",
           "p1": "Our Privacy Policy provides additional detail about data practices, international users, cookies, children and teens, and subprocessors. Our Terms of Service govern your use of FlowRate.",
           "p2": "If there is a conflict between this Financial Privacy Notice and the Privacy Policy regarding NPI collected through financial account connections, this notice controls for that NPI.",
-          "p3": "Non-financial technical measurements (such as Vercel Speed Insights page-performance data on our public site) are described in our Privacy Policy and do not include your connected account balances or transaction history."
+          "p3": "Non-financial technical measurements (such as Vercel Speed Insights page-performance data on our public site) and voluntary in-app feedback are described in our Privacy Policy. Feedback must not include connected account balances, transaction history, or bank login credentials unless you choose to paste them—and we discourage doing so."
         },
         "changes": {
           "title": "13. Changes to this notice",

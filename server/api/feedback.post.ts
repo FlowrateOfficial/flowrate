@@ -1,18 +1,18 @@
 import { z } from 'zod'
 import {
-  FEEDBACK_IMAGE_TYPES,
   FEEDBACK_LIMITS,
-  FEEDBACK_VIDEO_TYPES
+  inferFeedbackMimeType
 } from '#shared/feedback'
 import { requireSessionUser } from '../lib/auth'
 import { createFeedbackIssue, isGitHubFeedbackConfigured } from '../lib/github/issues'
+import { saveFeedbackSubmission } from '../lib/github/submissions'
 import { formatGithubError } from '../lib/github/errors'
 import { rateLimit } from '../lib/security/rate-limit'
 
 const payloadSchema = z.object({
   type: z.enum(['review', 'feature', 'bug']),
   title: z.string().trim().min(3).max(FEEDBACK_LIMITS.maxTitleLength),
-  message: z.string().trim().min(10).max(FEEDBACK_LIMITS.maxMessageLength),
+  message: z.string().trim().max(FEEDBACK_LIMITS.maxMessageLength),
   rating: z.number().int().min(1).max(5).optional(),
   includeContext: z.boolean().optional().default(true),
   path: z.string().max(200).optional(),
@@ -25,10 +25,19 @@ const payloadSchema = z.object({
       path: ['rating']
     })
   }
+
+  const hasAttachments = (data.attachmentIds?.length ?? 0) > 0
+  if (data.message.trim().length < 10 && !hasAttachments) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Message is too short',
+      path: ['message']
+    })
+  }
 })
 
-function isAllowedMime(mime: string): boolean {
-  return FEEDBACK_IMAGE_TYPES.has(mime) || FEEDBACK_VIDEO_TYPES.has(mime)
+function isAllowedMime(filename: string, mime?: string | null): string | null {
+  return inferFeedbackMimeType(filename, mime)
 }
 
 function maxBytesForMime(mime: string): number {
@@ -73,7 +82,6 @@ export default defineEventHandler(async (event) => {
     part.name?.startsWith('attachment_')
     && part.data
     && part.filename
-    && part.type
   )
 
   if (fileParts.length > FEEDBACK_LIMITS.maxAttachments) {
@@ -87,9 +95,9 @@ export default defineEventHandler(async (event) => {
       continue
     }
 
-    const mimeType = part.type!
-    if (!isAllowedMime(mimeType)) {
-      throw createError({ statusCode: 400, message: `Unsupported file type: ${mimeType}` })
+    const mimeType = isAllowedMime(part.filename!, part.type)
+    if (!mimeType) {
+      throw createError({ statusCode: 400, message: `Unsupported file type: ${part.filename}` })
     }
 
     const data = Buffer.from(part.data!)
@@ -158,6 +166,13 @@ export default defineEventHandler(async (event) => {
       }
     )
     issueNumber = result.issueNumber
+
+    await saveFeedbackSubmission({
+      userId: user.id,
+      issueNumber,
+      type: payload.type,
+      title: payload.title
+    })
   } catch (error) {
     const detail = formatGithubError(error)
     console.error('[feedback] GitHub error:', detail)

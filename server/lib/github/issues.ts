@@ -1,11 +1,11 @@
 // NOTE - ANCHOR: Create GitHub feedback issues with anchored follow-up comments
 
-import { FEEDBACK_ANCHORS, FEEDBACK_ATTACH_PREFIX } from '#shared/feedback'
+import { FEEDBACK_ANCHORS, FEEDBACK_ATTACH_PREFIX, feedbackLabelsForType, type FeedbackType } from '#shared/feedback'
 import type { FeedbackUploadFailure } from './assets'
 import { uploadFeedbackAssets } from './assets'
 import { githubHeaders, parseGitHubRepo } from './client'
 
-export type FeedbackType = 'review' | 'feature' | 'bug'
+export type { FeedbackType }
 
 export interface FeedbackAttachmentInput {
   id: string
@@ -68,6 +68,37 @@ function embedMarkdown(asset: { filename: string, mimeType: string, markdownUrl:
     : `![${asset.filename}](${asset.markdownUrl})`
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function replaceAttachmentToken(
+  message: string,
+  token: string,
+  asset: { filename: string, mimeType: string, markdownUrl: string }
+): string {
+  let resolved = message
+  const { markdownUrl } = asset
+
+  const imagePattern = new RegExp(
+    `!\\[([^\\]]*)]\\(${escapeRegExp(token)}\\)(?:\\s+"[^"]*")?`,
+    'g'
+  )
+  resolved = resolved.replace(imagePattern, `![$1](${markdownUrl})`)
+
+  const linkPattern = new RegExp(
+    `(?<!!)\\[([^\\]]*)]\\(${escapeRegExp(token)}\\)`,
+    'g'
+  )
+  resolved = resolved.replace(linkPattern, `[$1](${markdownUrl})`)
+
+  if (resolved.includes(token)) {
+    resolved = resolved.replaceAll(token, markdownUrl)
+  }
+
+  return resolved
+}
+
 function replaceAttachmentRefs(
   message: string,
   assets: Array<{ id: string, filename: string, mimeType: string, markdownUrl: string }>
@@ -78,10 +109,9 @@ function replaceAttachmentRefs(
 
   for (const asset of assets) {
     const token = `${FEEDBACK_ATTACH_PREFIX}${asset.id}`
-    const embed = embedMarkdown(asset)
 
     if (resolved.includes(token)) {
-      resolved = resolved.replaceAll(token, embed)
+      resolved = replaceAttachmentToken(resolved, token, asset)
       used.add(asset.id)
     }
   }
@@ -182,8 +212,8 @@ export async function createFeedbackIssue(
       headers: githubHeaders(token),
       body: {
         title: issueTitle(input),
-        body: stubBody
-        // NOTE - Labels omitted — GitHub returns 422 if labels are not pre-created on the repo
+        body: stubBody,
+        labels: feedbackLabelsForType(input.type)
       }
     }
   )

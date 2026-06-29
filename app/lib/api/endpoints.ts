@@ -72,5 +72,6 @@ export const apiRoutes = {
     syncAccounts: '/api/plaid/sync-accounts',
     syncTransactions: '/api/plaid/sync-transactions'
   },
-  feedback: '/api/feedback'
+  feedback: '/api/feedback',
+  feedbackDetail: (issueNumber: number) => `/api/feedback/${issueNumber}`
 } as const

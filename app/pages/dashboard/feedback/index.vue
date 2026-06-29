@@ -4,7 +4,8 @@ import { useApi } from '~/lib/api/useApi'
 import { CSRF_COOKIE, CSRF_HEADER } from '#shared/security'
 import { readCsrfTokenFromDocument } from '~/utils/csrf'
 
-type FeedbackType = 'review' | 'feature' | 'bug'
+import type { FeedbackType } from '#shared/feedback'
+import { FEEDBACK_TYPE_USER_LABEL } from '#shared/feedback'
 
 definePageMeta({ layout: 'dashboard', title: 'Feedback', middleware: 'auth' })
 
@@ -21,6 +22,11 @@ const editorRef = useTemplateRef<{
   getRegistry: () => import('~/lib/feedback/attachments').FeedbackAttachmentRegistry
   clearAttachments: () => void
 }>('editorRef')
+const submissionsRef = useTemplateRef<{ refresh: () => Promise<void> }>('submissionsRef')
+
+const activeTab = ref('new')
+const threadOpen = ref(false)
+const selectedIssue = ref<number | null>(null)
 
 const type = ref<FeedbackType>('review')
 const rating = ref(5)
@@ -28,19 +34,42 @@ const title = ref('')
 const message = ref('')
 const includeContext = ref(true)
 const submitting = ref(false)
-const submitted = ref(false)
+
+const tabItems = computed(() => [
+  { label: t('dashboard.feedback.tabNew'), value: 'new', icon: 'i-lucide-plus' },
+  { label: t('dashboard.feedback.tabHistory'), value: 'history', icon: 'i-lucide-inbox' }
+])
 
 const typeOptions = computed(() => [
-  { value: 'review' as const, label: t('dashboard.feedback.types.review'), icon: 'i-lucide-star' },
-  { value: 'feature' as const, label: t('dashboard.feedback.types.feature'), icon: 'i-lucide-lightbulb' },
-  { value: 'bug' as const, label: t('dashboard.feedback.types.bug'), icon: 'i-lucide-bug' }
+  {
+    value: 'review' as const,
+    label: t('dashboard.feedback.types.review'),
+    description: t('dashboard.feedback.typeDescriptions.review'),
+    icon: 'i-lucide-star',
+    githubLabel: null
+  },
+  {
+    value: 'feature' as const,
+    label: t('dashboard.feedback.types.feature'),
+    description: t('dashboard.feedback.typeDescriptions.feature'),
+    icon: 'i-lucide-lightbulb',
+    githubLabel: FEEDBACK_TYPE_USER_LABEL.feature
+  },
+  {
+    value: 'bug' as const,
+    label: t('dashboard.feedback.types.bug'),
+    description: t('dashboard.feedback.typeDescriptions.bug'),
+    icon: 'i-lucide-bug',
+    githubLabel: FEEDBACK_TYPE_USER_LABEL.bug
+  }
 ])
 
 const ratingOptions = [1, 2, 3, 4, 5]
 
 const messageReady = computed((): boolean => {
   const built = editorRef.value?.buildMessage() ?? message.value
-  return built.trim().length >= 10
+  const attachments = editorRef.value?.getRegistry().list().length ?? 0
+  return built.trim().length >= 10 || attachments > 0
 })
 
 const mediaErrorKeys: Record<string, string> = {
@@ -51,6 +80,11 @@ const mediaErrorKeys: Record<string, string> = {
 
 function onMediaError(code: string) {
   appToast.error(t(mediaErrorKeys[code] ?? 'dashboard.feedback.mediaErrors.generic'))
+}
+
+function openThread(issueNumber: number) {
+  selectedIssue.value = issueNumber
+  threadOpen.value = true
 }
 
 async function submit() {
@@ -79,30 +113,29 @@ async function submit() {
     }
 
     const token = csrfCookie.value ?? readCsrfTokenFromDocument()
-    await api(apiRoutes.feedback, {
+    const result = await api<{ issueNumber: number }>(apiRoutes.feedback, {
       method: 'POST',
       body: form,
       noSpace: true,
       headers: token ? { [CSRF_HEADER]: token } : undefined
     })
 
-    submitted.value = true
     title.value = ''
     message.value = ''
     rating.value = 5
     editorRef.value.clearAttachments()
+    await submissionsRef.value?.refresh()
     appToast.success(t('dashboard.feedback.successTitle'), t('dashboard.feedback.successDescription'))
+
+    if (result.issueNumber) {
+      activeTab.value = 'history'
+      openThread(result.issueNumber)
+    }
   } catch (error) {
     appToast.errorFrom(error, 'dashboard.feedback.tryAgain', t('dashboard.feedback.failed'))
   } finally {
     submitting.value = false
   }
-}
-
-function resetForm() {
-  submitted.value = false
-  message.value = ''
-  editorRef.value?.clearAttachments()
 }
 
 useSeoMeta({ title: () => `${t('dashboard.feedback.pageTitle')} — ${t('common.appName')}` })
@@ -115,116 +148,183 @@ useSeoMeta({ title: () => `${t('dashboard.feedback.pageTitle')} — ${t('common.
       :description="t('dashboard.feedback.pageDescription')"
     />
 
-    <UAlert
+    <p
       v-if="!enabled"
-      color="warning"
-      variant="subtle"
-      icon="i-lucide-info"
-      :title="t('dashboard.feedback.unavailableTitle')"
-      :description="t('dashboard.feedback.unavailableDescription')"
-    />
-
-    <div
-      v-else-if="submitted"
-      class="rounded-xl border border-success/30 bg-success/5 p-5 space-y-3"
+      class="text-sm text-muted leading-relaxed"
     >
-      <p class="text-sm font-medium text-default">{{ t('dashboard.feedback.successTitle') }}</p>
-      <p class="text-sm text-muted">{{ t('dashboard.feedback.successDescription') }}</p>
-      <UButton
-        :label="t('dashboard.feedback.sendAnother')"
-        color="neutral"
-        variant="outline"
-        size="sm"
-        @click="resetForm"
+      {{ t('dashboard.feedback.unavailableDescription') }}
+    </p>
+
+    <template v-else>
+      <UTabs
+        v-model="activeTab"
+        :items="tabItems"
+        class="w-full"
       />
-    </div>
 
-    <form v-else class="space-y-5" @submit.prevent="submit">
-      <UCard :ui="{ body: 'p-4 sm:p-5 space-y-4' }">
-        <div class="flex flex-wrap gap-2">
-          <UButton
-            v-for="option in typeOptions"
-            :key="option.value"
-            type="button"
-            color="neutral"
-            :variant="type === option.value ? 'soft' : 'outline'"
-            size="sm"
-            :icon="option.icon"
-            :label="option.label"
-            @click="type = option.value"
-          />
-        </div>
-
-        <div v-if="type === 'review'" class="space-y-2">
-          <p class="text-sm font-medium">{{ t('dashboard.feedback.rating') }}</p>
-          <div class="flex flex-wrap gap-1">
-            <button
-              v-for="value in ratingOptions"
-              :key="value"
-              type="button"
-              class="rounded-md p-1.5 transition-colors"
-              :class="rating >= value ? 'text-warning' : 'text-muted hover:text-default'"
-              :aria-label="t('dashboard.feedback.ratingValue', { value })"
-              @click="rating = value"
-            >
-              <UIcon
-                name="i-lucide-star"
-                class="size-5"
-                :class="rating >= value ? 'fill-current' : ''"
-              />
-            </button>
+      <div
+        v-if="activeTab === 'history'"
+        class="space-y-4"
+      >
+        <UCard :ui="{ body: 'p-4 sm:p-5' }">
+          <div class="mb-4 space-y-1">
+            <h2 class="text-base font-semibold">
+              {{ t('dashboard.feedback.historyTitle') }}
+            </h2>
+            <p class="text-sm text-muted">
+              {{ t('dashboard.feedback.historyDescription') }}
+            </p>
           </div>
-        </div>
-
-        <UFormField :label="t('dashboard.feedback.subject')">
-          <UInput
-            v-model="title"
-            :placeholder="t('dashboard.feedback.subjectPlaceholder')"
-            maxlength="120"
-            class="w-full"
+          <DashboardFeedbackSubmissionsList
+            ref="submissionsRef"
+            @select="openThread"
           />
-        </UFormField>
-      </UCard>
+        </UCard>
+      </div>
 
-      <UCard :ui="{ body: 'p-4 sm:p-5 space-y-3' }">
-        <div class="space-y-1">
-          <p class="text-sm font-medium">{{ t('dashboard.feedback.message') }}</p>
-          <p class="text-xs text-muted">{{ t('dashboard.feedback.editorHelp') }}</p>
-        </div>
+      <div
+        v-else
+        class="space-y-5"
+      >
+        <form
+          class="space-y-5"
+          @submit.prevent="submit"
+        >
+          <UCard :ui="{ body: 'p-4 sm:p-5 space-y-4' }">
+            <div class="space-y-2">
+              <p class="text-sm font-medium">
+                {{ t('dashboard.feedback.category') }}
+              </p>
+              <p class="text-xs text-muted">
+                {{ t('dashboard.feedback.categoryHelp') }}
+              </p>
+            </div>
 
-        <ClientOnly>
-          <DashboardFeedbackEditor
-            ref="editorRef"
-            v-model="message"
-            @media-error="onMediaError"
+            <div class="grid gap-2 sm:grid-cols-3">
+              <button
+                v-for="option in typeOptions"
+                :key="option.value"
+                type="button"
+                class="rounded-xl border p-3 text-left transition-colors"
+                :class="type === option.value
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                  : 'border-default bg-elevated/20 hover:bg-elevated/50'"
+                @click="type = option.value"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    :name="option.icon"
+                    class="size-4 shrink-0"
+                    :class="type === option.value ? 'text-primary' : 'text-muted'"
+                  />
+                  <span class="text-sm font-medium">{{ option.label }}</span>
+                </div>
+                <p class="mt-1 text-xs text-muted leading-relaxed">
+                  {{ option.description }}
+                </p>
+                <p
+                  v-if="option.githubLabel"
+                  class="mt-2 text-[10px] font-mono uppercase tracking-wide text-muted"
+                >
+                  {{ option.githubLabel }}
+                </p>
+              </button>
+            </div>
+
+            <div
+              v-if="type === 'review'"
+              class="space-y-2"
+            >
+              <p class="text-sm font-medium">
+                {{ t('dashboard.feedback.rating') }}
+              </p>
+              <div class="flex flex-wrap gap-1">
+                <button
+                  v-for="value in ratingOptions"
+                  :key="value"
+                  type="button"
+                  class="rounded-md p-1.5 transition-colors"
+                  :class="rating >= value ? 'text-warning' : 'text-muted hover:text-default'"
+                  :aria-label="t('dashboard.feedback.ratingValue', { value })"
+                  @click="rating = value"
+                >
+                  <UIcon
+                    name="i-lucide-star"
+                    class="size-5"
+                    :class="rating >= value ? 'fill-current' : ''"
+                  />
+                </button>
+              </div>
+            </div>
+
+            <UFormField :label="t('dashboard.feedback.subject')">
+              <UInput
+                v-model="title"
+                :placeholder="t('dashboard.feedback.subjectPlaceholder')"
+                maxlength="120"
+                class="w-full"
+              />
+            </UFormField>
+          </UCard>
+
+          <UCard :ui="{ body: 'p-4 sm:p-5 space-y-3' }">
+            <div class="space-y-1">
+              <p class="text-sm font-medium">
+                {{ t('dashboard.feedback.message') }}
+              </p>
+              <p class="text-xs text-muted">
+                {{ t('dashboard.feedback.editorHelp') }}
+              </p>
+            </div>
+
+            <ClientOnly>
+              <DashboardFeedbackEditor
+                ref="editorRef"
+                v-model="message"
+                @media-error="onMediaError"
+              />
+              <template #fallback>
+                <USkeleton class="h-64 w-full rounded-xl" />
+              </template>
+            </ClientOnly>
+          </UCard>
+
+          <UCard :ui="{ body: 'p-4 sm:p-5 space-y-4' }">
+            <UCheckbox
+              v-model="includeContext"
+              :label="t('dashboard.feedback.includeContext')"
+              :description="t('dashboard.feedback.includeContextHelp')"
+            />
+
+            <p class="text-xs text-muted leading-relaxed">
+              {{ t('dashboard.feedback.privacyNote') }}
+            </p>
+
+            <div class="flex justify-end">
+              <UButton
+                type="submit"
+                :label="t('dashboard.feedback.submit')"
+                icon="i-lucide-send"
+                :loading="submitting"
+                :disabled="!title.trim() || !messageReady"
+              />
+            </div>
+          </UCard>
+        </form>
+      </div>
+
+      <USlideover
+        v-model:open="threadOpen"
+        :title="t('dashboard.feedback.threadTitle')"
+        :ui="{ content: 'max-w-lg w-full' }"
+      >
+        <template #body>
+          <DashboardFeedbackThreadPanel
+            v-if="selectedIssue"
+            :issue-number="selectedIssue"
           />
-          <template #fallback>
-            <USkeleton class="h-64 w-full rounded-xl" />
-          </template>
-        </ClientOnly>
-      </UCard>
-
-      <UCard :ui="{ body: 'p-4 sm:p-5 space-y-4' }">
-        <UCheckbox
-          v-model="includeContext"
-          :label="t('dashboard.feedback.includeContext')"
-          :description="t('dashboard.feedback.includeContextHelp')"
-        />
-
-        <p class="text-xs text-muted leading-relaxed">
-          {{ t('dashboard.feedback.privacyNote') }}
-        </p>
-
-        <div class="flex justify-end">
-          <UButton
-            type="submit"
-            :label="t('dashboard.feedback.submit')"
-            icon="i-lucide-send"
-            :loading="submitting"
-            :disabled="!title.trim() || !messageReady"
-          />
-        </div>
-      </UCard>
-    </form>
+        </template>
+      </USlideover>
+    </template>
   </DashboardPageShell>
 </template>

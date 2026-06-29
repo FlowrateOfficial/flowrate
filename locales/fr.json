@@ -944,6 +944,27 @@
         "feature": "Fonctionnalité",
         "bug": "Bug"
       },
+      "typeDescriptions": {
+        "review": "Partagez un retour général ou notez votre expérience.",
+        "feature": "Demandez une nouvelle fonctionnalité ou amélioration.",
+        "bug": "Signalez quelque chose qui ne fonctionne pas."
+      },
+      "category": "Catégorie",
+      "categoryHelp": "Les bugs et demandes de fonctionnalités sont étiquetés pour le tri. Les avis sont des retours généraux sans étiquette de catégorie.",
+      "labels": {
+        "USER_BUG": "Rapport de bug",
+        "USER_FEATURE": "Demande de fonctionnalité",
+        "bug": "Bug",
+        "duplicate": "Doublon",
+        "wontfix": "Ne sera pas corrigé",
+        "invalid": "Invalide",
+        "question": "Question",
+        "help wanted": "Aide souhaitée",
+        "documentation": "Documentation",
+        "enhancement": "Amélioration",
+        "feature-request": "Demande de fonctionnalité",
+        "good first issue": "Bon premier ticket"
+      },
       "rating": "Note globale",
       "ratingValue": "{value} sur 5 étoiles",
       "subject": "Sujet",
@@ -952,13 +973,31 @@
       "messagePlaceholder": "Qu'est-ce qui fonctionne bien ? Que devrions-nous améliorer ? Pour un bug, indiquez les étapes pour le reproduire.",
       "includeContext": "Inclure le contexte technique",
       "includeContextHelp": "Aide au débogage : offre, type d'espace, page et navigateur — pas de données bancaires.",
-      "privacyNote": "N'incluez pas de mots de passe, identifiants bancaires ni numéros de carte complets.",
+      "privacyNote": "N'incluez pas de mots de passe, identifiants bancaires ni numéros de carte complets. Consultez notre Politique de confidentialité pour savoir ce que nous collectons lors d'un retour.",
       "submit": "Envoyer",
       "successTitle": "Merci — nous avons bien reçu votre retour",
-      "successDescription": "Notre équipe le traitera dans notre suivi privé. Vous ne recevrez pas de lien public.",
+      "successDescription": "Notre équipe l'examinera en privé. Consultez l'onglet Historique pour les réponses GitHub.",
       "sendAnother": "Envoyer un autre",
       "failed": "Impossible d'envoyer le retour",
       "tryAgain": "Veuillez réessayer dans quelques minutes.",
+      "retry": "Réessayer",
+      "tabNew": "Nouveau",
+      "tabHistory": "Historique",
+      "historyTitle": "Vos retours",
+      "historyDescription": "Ouvrez un fil pour lire les réponses de l'équipe depuis GitHub.",
+      "threadTitle": "Fil de retour",
+      "threadLoadFailed": "Impossible de charger les réponses",
+      "yourMessage": "Votre message",
+      "noDescription": "Aucune description fournie.",
+      "teamReplies": "Réponses de l'équipe",
+      "noRepliesYet": "Pas encore de réponse",
+      "noRepliesDescription": "Quand l'équipe FlowRate répond sur GitHub, le message apparaîtra ici.",
+      "noSubmissionsTitle": "Aucun retour pour l'instant",
+      "noSubmissionsDescription": "Envoyez un retour depuis l'onglet Nouveau — vos fils apparaîtront ici.",
+      "statusOpen": "Ouvert",
+      "statusClosed": "Fermé",
+      "submittedOn": "Envoyé le {date}",
+      "replyCount": "{count} réponses",
       "unavailableTitle": "Les retours ne sont pas encore activés",
       "unavailableDescription": "Le serveur doit avoir GITHUB_TOKEN et GITHUB_FEEDBACK_REPO configurés. Vous pouvez aussi écrire à mathieu.lievre.pro@outlook.com."
     },
@@ -1155,7 +1194,7 @@
     "privacy": {
       "title": "Politique de confidentialité",
       "seoTitle": "Politique de confidentialité — FlowRate",
-      "lastUpdatedAt": "2026-06-29T18:00:00Z",
+      "lastUpdatedAt": "2026-06-29T20:00:00Z",
       "seeAlsoTerms": "Voir aussi : Conditions d'utilisation",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "FlowRate (« nous ») est une application de gestion des finances personnelles et familiales, actuellement en bêta. Cette politique explique quelles informations nous collectons, comment nous les utilisons, avec qui nous les partageons, où elles sont stockées et quels choix vous avez. Nous visons une transparence maximale pour que vous puissiez utiliser FlowRate en toute connaissance de cause pendant le développement du produit.",
@@ -1168,8 +1207,8 @@
       "sections": {
         "overview": {
           "title": "1. Vue d'ensemble",
-          "p1": "FlowRate aide les particuliers, les familles et les petites équipes à comprendre leur argent. Vous pouvez connecter des comptes bancaires (via Stripe Financial Connections), consulter les transactions, les catégoriser, suivre des budgets, détecter les abonnements récurrents et — si vous le choisissez — partager certains comptes au sein d'un espace Foyer, Famille ou Entreprise.",
-          "p2": "Nous ne vendons pas vos informations personnelles. Nous ne partageons pas les données Financial Connections avec des tiers non liés à nos services pour leur propre marketing ou développement produit."
+          "p1": "FlowRate aide les particuliers, les familles et les petites équipes à comprendre leur argent. Vous pouvez connecter des comptes bancaires via Plaid (marchés européens pris en charge) ou Stripe Financial Connections (établissements américains), consulter les transactions, les catégoriser, suivre des budgets, détecter les abonnements récurrents, partager certains comptes dans un espace Foyer, Famille ou Entreprise, et envoyer des retours à l'équipe FlowRate depuis l'application.",
+          "p2": "Nous ne vendons pas vos informations personnelles. Nous ne partageons pas les données de connexion bancaire avec des tiers non liés à nos services pour leur propre marketing ou développement produit."
         },
         "dataCollected": {
           "title": "2. Informations que nous collectons",
@@ -1177,22 +1216,23 @@
           "items": [
             "Informations de compte : nom, adresse e-mail, numéro de téléphone optionnel, paramètres de profil et données d'authentification gérées via Neon Auth.",
             "Données d'espace financier : noms d'espaces, rôles des membres, invitations et préférences de visibilité (comptes personnels ou partagés).",
-            "Données bancaires connectées (si vous choisissez de lier un compte) : nom de l'établissement, nom affiché du compte, type de compte, quatre derniers chiffres, soldes et historique des transactions reçus via Stripe Financial Connections.",
+            "Données bancaires connectées (si vous choisissez de lier un compte) : nom de l'établissement, nom affiché du compte, type de compte, identifiants masqués, soldes et historique des transactions reçus via Plaid ou Stripe Financial Connections, selon le prestataire activé pour votre connexion.",
             "Données dérivées : catégories de transactions (y compris catégorisation automatique par règles — pas d'IA aujourd'hui), budgets, abonnements détectés, synthèses analytiques et règles de répartition que vous configurez.",
             "Données de facturation : formule d'abonnement et identifiants client Stripe Billing si vous passez à une offre payante.",
+            "Retours et avis (si vous les envoyez) : catégorie (avis, demande de fonctionnalité ou rapport de bug), objet, texte du message, note par étoiles optionnelle, images et courtes vidéos jointes, et — si « Inclure le contexte technique » reste coché — votre identifiant utilisateur, e-mail, nom, offre, nom et type d'espace actif, rôle dans l'espace, langue, URL de la page et chaîne user-agent du navigateur.",
             "Données techniques : journaux serveur, adresses IP et métadonnées de requêtes générées lors de l'utilisation de l'application (notamment via notre hébergeur).",
             "Données de performance (production uniquement) : métriques de performance de page anonymisées ou pseudonymisées envoyées à Vercel via le module Speed Insights lors de votre visite sur le site public ou l'interface de l'app — voir l'encadré en haut de page."
           ]
         },
         "financialConnections": {
-          "title": "3. Stripe Financial Connections",
-          "p1": "Lorsque vous connectez une banque, vous passez par le flux Stripe Financial Connections. Vous vous authentifiez directement auprès de votre établissement ou via l'interface sécurisée de Stripe. FlowRate ne reçoit ni ne stocke vos identifiants bancaires.",
-          "p2": "Avec votre consentement explicite dans le flux Stripe, nous demandons un accès en lecture seule aux soldes et transactions des comptes que vous sélectionnez. Nous utilisons ces données uniquement pour fournir les fonctionnalités FlowRate décrites dans cette politique.",
-          "p3": "Les établissements liés sont des comptes financiers américains, tels que pris en charge par Stripe Financial Connections. Vous pouvez déconnecter un compte à tout moment depuis la page Comptes, ce qui supprime le compte et ses transactions importées de notre base et révoque l'accès via Stripe le cas échéant.",
+          "title": "3. Connexions bancaires (Plaid et Stripe)",
+          "p1": "Lorsque vous connectez une banque, vous passez par Plaid Link ou le flux Stripe Financial Connections, selon le prestataire configuré pour votre région et votre déploiement. Vous vous authentifiez directement auprès de votre établissement ou via l'interface sécurisée du prestataire. FlowRate ne reçoit ni ne stocke vos identifiants bancaires.",
+          "p2": "Avec votre consentement explicite dans le flux de connexion, nous demandons un accès en lecture seule aux soldes et transactions des comptes que vous sélectionnez. Nous utilisons ces données uniquement pour fournir les fonctionnalités FlowRate décrites dans cette politique.",
+          "p3": "Plaid prend en charge les établissements dans les marchés européens pris en charge. Stripe Financial Connections prend en charge les comptes financiers américains. Vous pouvez déconnecter un compte à tout moment depuis la page Comptes, ce qui supprime le compte et ses transactions importées de notre base et révoque l'accès via le prestataire le cas échéant.",
           "items": [
-            "Nous n'utilisons pas les données Financial Connections pour l'octroi de crédit, le scoring ou la vente de leads.",
+            "Nous n'utilisons pas les données de connexion bancaire pour l'octroi de crédit, le scoring ou la vente de leads.",
             "Nous ne demandons pas les permissions payment_method ou ownership sauf si nous ajoutons explicitement ces fonctionnalités et mettons à jour cette politique au préalable.",
-            "Nous ne partageons pas les données Financial Connections brutes avec des annonceurs, courtiers en données ou tiers non liés."
+            "Nous ne partageons pas les données brutes de connexion bancaire avec des annonceurs, courtiers en données ou tiers non liés."
           ]
         },
         "howWeUse": {
@@ -1204,7 +1244,8 @@
             "Alimenter les budgets, analyses de dépenses, détection d'abonnements et vues par espace (par ex. synthèses famille ou burn rate entreprise).",
             "Appliquer les règles de visibilité que vous définissez (comptes personnels ou partagés).",
             "Vous authentifier, sécuriser les sessions, prévenir les abus et répondre au support.",
-            "Traiter les abonnements payants optionnels via Stripe Billing."
+            "Traiter les abonnements payants optionnels via Stripe Billing.",
+            "Examiner les retours envoyés depuis l'application et y répondre via notre outil de suivi privé."
           ],
           "p2": "Nous pouvons utiliser des statistiques agrégées ou anonymisées (ne permettant pas de vous identifier raisonnablement) pour comprendre l'usage du produit et l'améliorer."
         },
@@ -1227,24 +1268,42 @@
             "L'opt-in aux analyses IA est distinct de la connexion bancaire ou de l'abonnement payant — vous devez l'activer explicitement."
           ]
         },
+        "feedback": {
+          "title": "7. Retours et avis dans l'application",
+          "p1": "FlowRate inclut une page Retours où les utilisateurs connectés peuvent envoyer des avis, demandes de fonctionnalités ou rapports de bug à l'équipe FlowRate. Les envois sont volontaires. Vous choisissez une catégorie, saisissez un objet et un message, pouvez joindre des images ou de courtes vidéos, et — pour les avis — une note par étoiles optionnelle.",
+          "p2": "Si vous activez « Inclure le contexte technique » (activé par défaut), nous joignons des métadonnées de support à votre envoi : identifiant utilisateur FlowRate, e-mail, nom affiché, offre d'abonnement, nom et type d'espace actif, votre rôle dans cet espace, langue, URL de la page d'envoi et chaîne user-agent du navigateur. Vous pouvez désactiver cette option avant l'envoi.",
+          "p3": "Les retours sont stockés dans un dépôt GitHub privé utilisé pour le suivi des issues FlowRate — pas sur un forum public. Chaque envoi crée une issue qui peut recevoir des étiquettes (par ex. USER_BUG ou USER_FEATURE pour les bugs et demandes de fonctionnalités, et from-app pour tous les envois depuis l'app). L'équipe FlowRate peut ajouter d'autres étiquettes (comme duplicate ou wontfix) lors du tri. Les réponses publiées sur l'issue peuvent apparaître dans votre historique Retours dans l'application.",
+          "p4": "N'incluez pas de mots de passe, identifiants bancaires, numéros de carte complets ou autres informations financières très sensibles dans vos messages ou pièces jointes. Un avertissement s'affiche dans le formulaire, mais vous êtes responsable de ce que vous envoyez.",
+          "items": [
+            "Nous conservons dans notre base un lien entre votre compte et le numéro d'issue GitHub pour afficher l'historique et les réponses dans l'app.",
+            "Les pièces jointes sont téléversées sur une branche dédiée du dépôt privé et référencées depuis l'issue.",
+            "Les retours ne servent pas à la publicité et ne sont pas vendus à des tiers. Ils servent à améliorer FlowRate et à vous répondre.",
+            "Des limites de débit s'appliquent pour prévenir les abus (par ex. un nombre maximum d'envois par heure)."
+          ]
+        },
         "sharing": {
-          "title": "7. Partage des informations",
+          "title": "8. Partage des informations",
           "p1": "Nous partageons des informations uniquement dans les cas suivants :",
           "items": [
-            "Prestataires (sous-traitants) : entreprises qui hébergent, authentifient, connectent les banques, vérifient les numéros de téléphone ou — uniquement si vous optez pour les analyses IA — génèrent des insights IA pour notre compte, uniquement pour vous fournir FlowRate. Ils ne peuvent pas utiliser les données Financial Connections pour leurs propres finalités.",
+            "Prestataires (sous-traitants) : entreprises qui hébergent, authentifient, connectent les banques (Plaid ou Stripe), stockent les issues de retours (GitHub), vérifient les numéros de téléphone ou — uniquement si vous optez pour les analyses IA — génèrent des insights IA pour notre compte, uniquement pour vous fournir FlowRate. Ils ne peuvent pas utiliser les données de connexion bancaire pour leurs propres finalités.",
             "Au sein de vos espaces : lorsque vous marquez un compte ou des données comme partagés, les membres autorisés de cet espace (par ex. tuteurs dans un espace Famille) peuvent les voir selon leur rôle.",
             "Obligations légales : si la loi, une décision de justice ou la protection de droits, de la sécurité ou de la sûreté l'exige.",
             "Transferts d'activité : en cas de fusion ou acquisition impliquant FlowRate, les données peuvent être transférées sous réserve de cette politique."
           ],
-          "p2": "Nous ne partageons pas les données Financial Connections avec des affiliés pour leur usage indépendant, des courtiers en données ou des tiers non liés qui utiliseraient les données pour améliorer leurs propres produits."
+          "p2": "Nous ne partageons pas les données de connexion bancaire avec des affiliés pour leur usage indépendant, des courtiers en données ou des tiers non liés qui utiliseraient les données pour améliorer leurs propres produits. Les retours que vous envoyez sont stockés dans un dépôt GitHub privé accessible à l'équipe FlowRate — ils ne sont pas publiés sur un forum de support public."
         },
         "subprocessors": {
-          "title": "8. Prestataires (sous-traitants)",
+          "title": "9. Prestataires (sous-traitants)",
           "p1": "Nous nous appuyons sur les catégories de prestataires suivantes. Chacun traite les données uniquement pour fournir des services à FlowRate :",
           "table": [
             {
+              "name": "Plaid",
+              "purpose": "Liaison bancaire, accès aux soldes et transactions pour les établissements européens pris en charge",
+              "location": "États-Unis et/ou Union européenne (et régions où Plaid opère)"
+            },
+            {
               "name": "Stripe",
-              "purpose": "Financial Connections (liaison bancaire), accès aux soldes et transactions, facturation d'abonnement",
+              "purpose": "Financial Connections (liaison bancaire US), accès aux soldes et transactions, facturation d'abonnement",
               "location": "États-Unis (et régions où Stripe opère)"
             },
             {
@@ -1256,6 +1315,11 @@
               "name": "Vercel",
               "purpose": "Hébergement de l'application, diffusion de contenu et Speed Insights (métriques de performance réelles en production)",
               "location": "États-Unis et/ou Union européenne"
+            },
+            {
+              "name": "GitHub",
+              "purpose": "Suivi privé des issues pour les retours in-app, pièces jointes et réponses de l'équipe",
+              "location": "États-Unis"
             },
             {
               "name": "Twilio",
@@ -1270,23 +1334,24 @@
           ]
         },
         "storage": {
-          "title": "9. Où nous stockons les données",
+          "title": "10. Où nous stockons les données",
           "p1": "Nous stockons les données d'application uniquement aux États-Unis et/ou dans des pays de l'Union européenne, via des prestataires d'infrastructure qui maintiennent la résidence des données dans ces régions.",
-          "p2": "Nous ne stockons pas intentionnellement les données Financial Connections ou personnelles en dehors des États-Unis ou de l'UE. Si vous exigez un stockage exclusivement dans l'UE, contactez-nous pour les options de configuration prises en charge."
+          "p2": "Nous ne stockons pas intentionnellement les données de connexion bancaire ou personnelles en dehors des États-Unis ou de l'UE. Les issues et pièces jointes de retours sont stockées dans un dépôt GitHub privé. Si vous exigez un stockage exclusivement dans l'UE, contactez-nous pour les options de configuration prises en charge."
         },
         "retention": {
-          "title": "10. Durée de conservation",
+          "title": "11. Durée de conservation",
           "p1": "Nous conservons vos données tant que votre compte est actif et selon les besoins du service.",
           "items": [
             "Profil et espaces : jusqu'à la suppression de votre compte ou sur demande.",
             "Données bancaires connectées : jusqu'à la déconnexion du compte dans FlowRate ou la suppression du compte.",
             "Transactions et analyses dérivées : liées au compte ou à l'espace ; supprimées lors de la déconnexion ou suppression.",
+            "Retours : le lien entre votre compte et l'issue GitHub est conservé tant que votre compte est actif pour afficher l'historique et les réponses ; l'issue GitHub elle-même peut être conservée pour le développement produit et le support sauf demande de suppression.",
             "Journaux serveur : généralement conservés pour une durée limitée à des fins de sécurité et de dépannage, puis supprimés ou agrégés.",
             "Requêtes d'analyse IA (si opt-in) : conservées uniquement le temps nécessaire pour fournir les insights et respecter la loi ; supprimées ou anonymisées lorsque vous vous désinscrivez ou supprimez votre compte, sous réserve des limites du prestataire."
           ]
         },
         "yourRights": {
-          "title": "11. Vos choix et droits",
+          "title": "12. Vos choix et droits",
           "p1": "Selon votre lieu de résidence, vous pouvez disposer de droits d'accès, de rectification, de suppression, d'exportation ou de limitation du traitement. FlowRate prend en charge ce qui suit directement dans le produit ou sur demande :",
           "items": [
             "Accès et mise à jour : modifiez votre nom et téléphone dans Paramètres ; consultez transactions, comptes et budgets dans le tableau de bord.",
@@ -1295,39 +1360,40 @@
             "Suppression de compte : Paramètres → Supprimer mon compte pour votre propre profil.",
             "Tuteurs : supprimez un compte enfant ou ado depuis Famille → fiche enfant ou détails du membre (effacement définitif des données FlowRate et de la connexion).",
             "Export : écrivez à mathieu.lievre.pro@outlook.com pour demander une copie de vos données dans un format portable.",
-            "Marketing : nous n'envoyons pas de publicité tierce basée sur les données Financial Connections.",
+            "Marketing : nous n'envoyons pas de publicité tierce basée sur les données de connexion bancaire.",
+            "Retours : décochez « Inclure le contexte technique » avant l'envoi si vous ne souhaitez pas joindre les métadonnées de support ; consultez l'historique dans Retours → Historique ; écrivez-nous pour demander la suppression d'une issue.",
             "Analyses IA : lorsque disponible, activez ou désactivez les insights IA optionnels dans Paramètres. La désactivation arrête les nouveaux traitements IA de vos données financières."
           ],
           "p2": "Les utilisateurs UE/RU peuvent également saisir leur autorité de protection des données locale. Nous répondrons aux demandes vérifiées dans les délais légaux applicables."
         },
         "security": {
-          "title": "12. Sécurité",
-          "p1": "Nous utilisons des mesures standard : chiffrement HTTPS, accès API authentifié et permissions par rôle dans les espaces financiers. Les identifiants bancaires sont gérés par Stripe et votre établissement — pas stockés sur les serveurs FlowRate.",
+          "title": "13. Sécurité",
+          "p1": "Nous utilisons des mesures standard : chiffrement HTTPS, accès API authentifié et permissions par rôle dans les espaces financiers. Les identifiants bancaires sont gérés par Plaid, Stripe et votre établissement — pas stockés sur les serveurs FlowRate.",
           "p2": "Aucune méthode de transmission ou de stockage n'est totalement sûre. Utilisez un mot de passe fort et unique et signalez-nous tout accès non autorisé suspecté."
         },
         "spaces": {
-          "title": "13. Espaces Foyer, Famille et Entreprise",
+          "title": "14. Espaces Foyer, Famille et Entreprise",
           "p1": "Lorsque vous rejoignez ou créez un espace partagé, certaines informations sont visibles par les autres membres selon leur rôle (propriétaire, tuteur, ado, admin finance, etc.). Les ados et enfants peuvent avoir des vues supervisées à permissions limitées.",
           "p2": "Vous êtes responsable des personnes que vous invitez et du choix Personnel ou Partagé lors de la connexion des comptes."
         },
         "children": {
-          "title": "14. Enfants et adolescents",
+          "title": "15. Enfants et adolescents",
           "p1": "Les espaces Famille peuvent inclure des profils ado ou enfant gérés par un parent ou tuteur. Nous ne collectons que ce qui est nécessaire à la gestion supervisée de l'argent. Les tuteurs contrôlent les invitations et la visibilité.",
           "p2": "FlowRate ne s'adresse pas aux enfants de moins de 13 ans pour créer un compte autonome sans implication parentale. Si vous pensez que nous avons collecté des données d'un enfant de manière inappropriée, contactez mathieu.lievre.pro@outlook.com."
         },
         "cookies": {
-          "title": "15. Cookies et technologies similaires",
+          "title": "16. Cookies et technologies similaires",
           "p1": "Nous utilisons des cookies essentiels et stockages similaires pour les sessions d'authentification, les préférences de langue et la sécurité. Ils sont nécessaires au fonctionnement de l'application.",
           "p2": "Nous n'utilisons pas de cookies publicitaires ni de suivi intersites. Vous pouvez effacer les cookies via votre navigateur, mais vous devrez peut-être vous reconnecter.",
           "p3": "Vercel Speed Insights charge un petit script de mesure de performance en production. Ce n'est pas un cookie publicitaire, mais les outils de confidentialité ou navigateurs avec bloqueur de traqueurs (comme Brave) peuvent le bloquer — voir l'encadré Speed Insights en haut de cette page."
         },
         "international": {
-          "title": "16. Utilisateurs internationaux",
+          "title": "17. Utilisateurs internationaux",
           "p1": "FlowRate peut être utilisé depuis plusieurs pays. Si vous accédez au service hors États-Unis ou UE, vous comprenez que vos données peuvent être traitées aux États-Unis et/ou dans l'UE comme décrit ci-dessus.",
           "p2": "Lorsque la loi locale accorde des droits supplémentaires, nous les respectons dans la mesure applicable."
         },
         "changes": {
-          "title": "17. Modifications de cette politique",
+          "title": "18. Modifications de cette politique",
           "p1": "Nous pouvons mettre à jour cette politique. La version révisée sera publiée sur cette page avec la date de « Dernière mise à jour ». Les changements importants pourront aussi être communiqués dans l'application ou par e-mail.",
           "p2": "L'utilisation continue de FlowRate après l'entrée en vigueur des modifications vaut acceptation de la politique mise à jour."
         }
@@ -1336,7 +1402,7 @@
     "terms": {
       "title": "Conditions d'utilisation",
       "seoTitle": "Conditions d'utilisation — FlowRate",
-      "lastUpdatedAt": "2026-06-29T18:00:00Z",
+      "lastUpdatedAt": "2026-06-29T20:00:00Z",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "Les présentes Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation de FlowRate pendant la phase bêta. En créant un compte ou en utilisant le service, vous acceptez ces Conditions et notre Politique de confidentialité, y compris les limites applicables pendant le développement actif.",
@@ -1348,7 +1414,7 @@
         },
         "service": {
           "title": "2. Le service",
-          "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses (par règles aujourd'hui — pas d'intelligence artificielle), définir des budgets, détecter les abonnements et collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise).",
+          "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses (par règles aujourd'hui — pas d'intelligence artificielle), définir des budgets, détecter les abonnements, collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise), et envoyer des retours à l'équipe FlowRate via la page Retours dans l'application.",
           "p2": "Nous prévoyons d'offrir des analyses de dépenses par IA optionnelles aux abonnés Pro et Entreprise qui s'inscrivent explicitement. Cette fonctionnalité n'est pas encore disponible ; lorsqu'elle sera lancée, elle sera régie par notre Politique de confidentialité et votre choix d'opt-in dans Paramètres.",
           "p3": "Les fonctionnalités peuvent évoluer. Nous pouvons ajouter, modifier ou retirer des fonctionnalités avec un préavis raisonnable lorsque c'est possible.",
           "p4": "Notre site de production peut charger Vercel Speed Insights pour mesurer les performances des pages. Il n'accède pas à vos données bancaires. L'utilisation de FlowRate implique que votre navigateur peut transmettre des métriques techniques de performance à Vercel, comme décrit dans notre Politique de confidentialité."
@@ -1365,8 +1431,8 @@
         },
         "financialData": {
           "title": "5. Connexions bancaires et données financières",
-          "p1": "La liaison bancaire est fournie par Stripe Financial Connections. En connectant un compte, vous autorisez Stripe et votre établissement à partager avec FlowRate les soldes et transactions que vous sélectionnez, aux fins décrites dans notre Politique de confidentialité.",
-          "p2": "Vous déclarez avoir le droit de connecter chaque compte lié. FlowRate ne vérifie pas la propriété au-delà de ce que Stripe et votre établissement fournissent.",
+          "p1": "La liaison bancaire est fournie par Plaid (marchés européens pris en charge) et/ou Stripe Financial Connections (établissements américains), selon le prestataire activé. En connectant un compte, vous autorisez le prestataire et votre établissement à partager avec FlowRate les soldes et transactions que vous sélectionnez, aux fins décrites dans notre Politique de confidentialité.",
+          "p2": "Vous déclarez avoir le droit de connecter chaque compte lié. FlowRate ne vérifie pas la propriété au-delà de ce que le prestataire et votre établissement fournissent.",
           "p3": "La déconnexion d'un compte dans FlowRate arrête les synchronisations futures et supprime les données de ce compte de notre base applicative, sous réserve de la conservation des sauvegardes décrite dans la Politique de confidentialité."
         },
         "spaces": {
@@ -1388,26 +1454,35 @@
             "Tenter d'accéder aux données d'un autre utilisateur sans autorisation.",
             "Procéder à de l'ingénierie inverse, du scraping ou surcharger le service.",
             "Usurper votre identité ou votre droit de connecter des comptes financiers.",
-            "Revendre ou redistribuer les données Financial Connections obtenues via FlowRate."
+            "Revendre ou redistribuer les données de connexion bancaire obtenues via FlowRate.",
+            "Envoyer des retours contenant des mots de passe, identifiants bancaires, numéros de carte complets ou autres informations que vous n'êtes pas autorisé à partager."
           ]
         },
+        "feedback": {
+          "title": "9. Retours et avis",
+          "p1": "La page Retours vous permet d'envoyer volontairement des avis, demandes de fonctionnalités ou rapports de bug à l'équipe FlowRate. En envoyant un retour, vous nous accordez une licence non exclusive d'utiliser, reproduire et afficher votre message et pièces jointes pour exploiter, améliorer et assister FlowRate.",
+          "p2": "Vous choisissez une catégorie (avis, demande de fonctionnalité ou rapport de bug). Les demandes de fonctionnalités et bugs reçoivent des étiquettes dans notre outil de suivi privé (USER_FEATURE et USER_BUG). Tous les envois depuis l'app sont étiquetés from-app. L'équipe peut ajouter d'autres étiquettes lors du tri (par ex. duplicate ou wontfix), visibles dans votre historique Retours.",
+          "p3": "Si « Inclure le contexte technique » reste activé, des métadonnées de support (e-mail, offre, espace, URL de page, user-agent du navigateur) sont jointes pour faciliter l'investigation. Vous pouvez désactiver cette option avant l'envoi. N'incluez pas d'identifiants financiers très sensibles dans votre message ou vos pièces jointes.",
+          "p4": "Les retours sont stockés dans un dépôt GitHub privé pour le suivi des issues — pas sur un forum public. Nous pouvons répondre via le fil de l'issue ; les réponses peuvent apparaître dans l'app sous Retours → Historique. Des limites de débit peuvent s'appliquer pour prévenir les abus.",
+          "p5": "Les retours ne remplacent pas un signalement de sécurité urgent. Si vous découvrez une vulnérabilité critique, contactez mathieu.lievre.pro@outlook.com directement."
+        },
         "disclaimers": {
-          "title": "9. Pas de conseil financier",
+          "title": "10. Pas de conseil financier",
           "p1": "FlowRate est fourni à titre informatif et organisationnel uniquement. Nous ne fournissons pas de conseil financier, d'investissement, fiscal ou juridique. Les catégorisations, détections d'abonnements, analyses et tout futur insight généré par IA sont des estimations automatisées — vérifiez les décisions importantes avec des professionnels qualifiés et vos relevés bancaires officiels.",
           "p2": "Les analyses IA, lorsqu'elles seront proposées, peuvent être inexactes ou incomplètes. Elles ne remplacent pas le jugement professionnel ni les relevés officiels."
         },
         "liability": {
-          "title": "10. Exclusions et limitation de responsabilité",
+          "title": "11. Exclusions et limitation de responsabilité",
           "p1": "FlowRate est fourni « en l'état » et « selon disponibilité », sans garantie d'aucune sorte, dans la mesure permise par la loi. Nous ne garantissons pas un service ininterrompu ou exempt d'erreurs, ni que les données synchronisées depuis les banques seront toujours complètes ou à jour.",
           "p2": "Dans la mesure maximale permise par la loi, FlowRate et ses opérateurs ne seront pas responsables des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs, ni de la perte de profits, de données ou de clientèle liée à votre utilisation du service."
         },
         "termination": {
-          "title": "11. Suspension et résiliation",
+          "title": "12. Suspension et résiliation",
           "p1": "Nous pouvons suspendre ou résilier l'accès en cas de violation de ces Conditions, de risque pour la sécurité ou si la loi l'exige. Vous pouvez cesser d'utiliser FlowRate à tout moment et demander la suppression du compte comme décrit dans la Politique de confidentialité.",
           "p2": "Les sections qui, par nature, doivent survivre à la résiliation (y compris exclusions et limitation de responsabilité) resteront en vigueur."
         },
         "changes": {
-          "title": "12. Modifications des Conditions",
+          "title": "13. Modifications des Conditions",
           "p1": "Nous pouvons mettre à jour ces Conditions. La version mise à jour sera publiée sur cette page avec la date de « Dernière mise à jour ». L'utilisation continue après l'entrée en vigueur vaut acceptation.",
           "p2": "Si vous n'acceptez pas les Conditions mises à jour, vous devez cesser d'utiliser FlowRate et pouvez demander la suppression de votre compte."
         }
@@ -1416,15 +1491,15 @@
     "glba": {
       "title": "Avis de confidentialité financière (GLBA)",
       "seoTitle": "Avis de confidentialité financière (GLBA) — FlowRate",
-      "lastUpdatedAt": "2026-06-29T18:00:00Z",
+      "lastUpdatedAt": "2026-06-29T20:00:00Z",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoTerms": "Conditions d'utilisation",
-      "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles, actuellement en bêta. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation et peut être mis à jour à mesure que le produit mûrit.",
+      "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles, actuellement en bêta. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Plaid ou Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation et peut être mis à jour à mesure que le produit mûrit.",
       "contact": "Des questions sur cet avis ou vos IPNP ? Contactez-nous à",
       "sections": {
         "purpose": {
           "title": "1. Objet de cet avis",
-          "p1": "FlowRate est une application de finances personnelles et familiales. Nous ne sommes pas une banque, un coopérative de crédit ou un autre établissement de dépôt. Lorsque vous choisissez de lier un compte financier américain, nous recevons certaines informations financières vous concernant avec votre consentement afin d'afficher soldes, transactions, budgets et fonctionnalités associées.",
+          "p1": "FlowRate est une application de finances personnelles et familiales. Nous ne sommes pas une banque, une coopérative de crédit ou un autre établissement de dépôt. Lorsque vous choisissez de lier un compte financier, nous recevons certaines informations financières vous concernant avec votre consentement afin d'afficher soldes, transactions, budgets et fonctionnalités associées. Les connexions peuvent être fournies par Plaid (marchés européens pris en charge) ou Stripe Financial Connections (établissements américains).",
           "p2": "Cet avis explique quelles IPNP nous traitons, comment nous les utilisons, avec qui nous pouvons les partager et les choix dont vous disposez. Nous le fournissons au moment ou avant la connexion d'un compte financier et le rendons disponible en permanence sur notre site."
         },
         "scope": {
@@ -1442,16 +1517,17 @@
           "p1": "Les IPNP collectées dépendent de votre utilisation de FlowRate. Catégories :",
           "items": [
             "Identité et contact : nom, adresse e-mail, numéro de téléphone optionnel et identifiants d'authentification gérés par notre fournisseur d'identité.",
-            "Comptes connectés : nom de l'établissement, libellé du compte, type, numéros masqués, soldes et transactions reçus via Stripe Financial Connections lorsque vous autorisez l'accès.",
+            "Comptes connectés : nom de l'établissement, libellé du compte, type, numéros masqués, soldes et transactions reçus via Plaid ou Stripe Financial Connections lorsque vous autorisez l'accès.",
             "Informations financières dérivées : catégories de transactions, budgets, estimations d'abonnements, synthèses analytiques et règles de répartition que vous configurez dans FlowRate.",
             "Espaces et partage : rôles, invitations et paramètres de visibilité (personnel vs partagé) déterminant qui dans un foyer, une famille ou une entreprise peut voir les informations financières liées.",
-            "Facturation : statut d'abonnement et identifiants client Stripe Billing si vous souscrivez un forfait payant (nous ne stockons pas les numéros complets de carte bancaire)."
+            "Facturation : statut d'abonnement et identifiants client Stripe Billing si vous souscrivez un forfait payant (nous ne stockons pas les numéros complets de carte bancaire).",
+            "Retours in-app (si vous en envoyez) : votre message et pièces jointes ne sont généralement pas des IPNP, mais vous ne devez pas y inclure d'identifiants bancaires ni de numéros de compte complets. Le contexte de support optionnel peut inclure votre offre et les métadonnées d'espace, comme décrit dans notre Politique de confidentialité."
           ]
         },
         "howWeCollect": {
           "title": "5. Comment nous collectons les IPNP",
           "p1": "Nous collectons les IPNP directement auprès de vous lors de l'inscription, de la mise à jour du profil, de la création ou de l'adhésion à des espaces et de la configuration des budgets ou catégories.",
-          "p2": "Lorsque vous connectez un compte bancaire, vous passez par le flux Stripe Financial Connections. Vous vous authentifiez auprès de votre établissement (ou via l'interface sécurisée de Stripe). FlowRate ne reçoit ni ne stocke vos identifiants de connexion bancaire en ligne.",
+          "p2": "Lorsque vous connectez un compte bancaire, vous passez par Plaid Link ou le flux Stripe Financial Connections, selon le prestataire activé. Vous vous authentifiez auprès de votre établissement (ou via l'interface sécurisée du prestataire). FlowRate ne reçoit ni ne stocke vos identifiants de connexion bancaire en ligne.",
           "p3": "Nous pouvons également recevoir des données techniques limitées (adresse IP, journaux de requêtes) générées lors de l'utilisation de l'application, comme décrit dans notre Politique de confidentialité."
         },
         "howWeUse": {
@@ -1472,7 +1548,7 @@
           "title": "7. Comment nous partageons les IPNP",
           "p1": "Nous ne vendons pas vos IPNP. Nous les partageons uniquement dans les cas limités suivants :",
           "items": [
-            "Prestataires de services : entreprises de confiance qui traitent des données pour notre compte afin d'exploiter FlowRate—par exemple Stripe (Financial Connections et facturation), Neon (authentification et base de données), Vercel (hébergement) et Twilio (vérification téléphonique optionnelle). Ces prestataires ne peuvent utiliser les IPNP que pour nous fournir leurs services et doivent les protéger de manière appropriée.",
+            "Prestataires de services : entreprises de confiance qui traitent des données pour notre compte afin d'exploiter FlowRate—par exemple Plaid et Stripe (liaison bancaire et facturation), Neon (authentification et base de données), Vercel (hébergement), GitHub (suivi privé des retours in-app) et Twilio (vérification téléphonique optionnelle). Ces prestataires ne peuvent utiliser les IPNP que pour nous fournir leurs services et doivent les protéger de manière appropriée.",
             "Prestataires d'IA (opt-in uniquement) : si vous êtes abonné Pro ou Entreprise et activez explicitement les analyses IA lorsque la fonctionnalité sera disponible, nous pourrons partager certaines IPNP avec des prestataires d'IA tiers uniquement pour générer des insights dans FlowRate. Ce partage n'a pas lieu aujourd'hui et ne se produit jamais sans votre opt-in.",
             "Au sein de vos espaces : lorsque vous marquez un compte ou des données comme partagés, les membres autorisés de cet espace (tuteurs dans un espace Famille, administrateurs financiers dans un espace Entreprise, etc.) peuvent les consulter selon leur rôle.",
             "Affiliés : FlowRate ne partage actuellement pas les IPNP avec des affiliés pour leurs propres finalités.",
@@ -1512,7 +1588,7 @@
           "title": "12. Lien avec les autres politiques",
           "p1": "Notre Politique de confidentialité détaille davantage nos pratiques, les utilisateurs internationaux, les cookies, les enfants et adolescents, et les sous-traitants. Nos Conditions d'utilisation régissent votre utilisation de FlowRate.",
           "p2": "En cas de conflit entre le présent avis et la Politique de confidentialité concernant les IPNP collectées via des connexions de comptes financiers, le présent avis prévaut pour ces IPNP.",
-          "p3": "Les mesures techniques non financières (comme les données de performance de page Vercel Speed Insights sur notre site public) sont décrites dans notre Politique de confidentialité et n'incluent pas les soldes ni l'historique de transactions de vos comptes connectés."
+          "p3": "Les mesures techniques non financières (comme les données de performance de page Vercel Speed Insights sur notre site public) et les retours volontaires in-app sont décrits dans notre Politique de confidentialité. Les retours ne doivent pas inclure de soldes de comptes connectés, d'historique de transactions ni d'identifiants bancaires sauf si vous choisissez de les coller — ce que nous déconseillons."
         },
         "changes": {
           "title": "13. Modifications de cet avis",

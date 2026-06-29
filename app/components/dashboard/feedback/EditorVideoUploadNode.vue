@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { NodeViewProps } from '@tiptap/vue-3'
 import { NodeViewWrapper } from '@tiptap/vue-3'
-import { FEEDBACK_ATTACH_PREFIX } from '#shared/feedback'
 import {
   FEEDBACK_ATTACHMENT_REGISTRY_KEY,
   FEEDBACK_MEDIA_ERROR_KEY,
@@ -55,7 +54,10 @@ watch(file, (nextFile) => {
       class="min-h-36"
     >
       <template #leading>
-        <UAvatar icon="i-lucide-video" size="lg" />
+        <UAvatar
+          icon="i-lucide-video"
+          size="lg"
+        />
       </template>
     </UFileUpload>
   </NodeViewWrapper>
