@@ -3,10 +3,13 @@
 withDefaults(defineProps<{
   markSize?: number | string
   showWordmark?: boolean
+  /** Hide wordmark below sm — single mark on narrow screens */
+  compactOnMobile?: boolean
   class?: string
 }>(), {
   markSize: 32,
-  showWordmark: true
+  showWordmark: true,
+  compactOnMobile: false
 })
 </script>
 
@@ -16,6 +19,7 @@ withDefaults(defineProps<{
     <span
       v-if="showWordmark"
       class="font-display text-xl sm:text-[1.35rem] tracking-tight text-flow-ink dark:text-flow-ink-dark leading-none"
+      :class="compactOnMobile && 'hidden sm:inline'"
     >
       FlowRate
     </span>

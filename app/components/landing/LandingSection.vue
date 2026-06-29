@@ -20,7 +20,7 @@ const { target, visible } = useScrollReveal(0.08)
     ]"
   >
     <slot name="background" />
-    <UContainer class="relative">
+    <UContainer class="relative min-w-0 max-w-full overflow-x-clip">
       <slot :visible="visible" :index="index" :label-class="labelClass" />
     </UContainer>
   </section>

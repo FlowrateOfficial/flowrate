@@ -18,10 +18,10 @@ const navLinks = computed(() => [
 <template>
   <div class="min-h-screen flex flex-col surface-page overflow-x-clip">
     <header class="sticky top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-md dark:backdrop-blur-lg">
-      <UContainer class="flex items-center justify-between h-16 sm:h-[4.5rem] min-w-0">
-        <NuxtLink :to="homePath" class="inline-flex items-center gap-2.5">
-          <BrandFlowRateLogo :mark-size="28" />
-          <AppBetaBadge size="sm" :class="isLegalPage ? 'inline-flex' : 'hidden sm:inline-flex'" />
+      <UContainer class="flex items-center justify-between gap-2 sm:gap-4 h-14 sm:h-[4.5rem] min-w-0">
+        <NuxtLink :to="homePath" class="inline-flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
+          <BrandFlowRateLogo :mark-size="26" compact-on-mobile class="shrink-0" />
+          <AppBetaBadge size="sm" :class="isLegalPage ? 'inline-flex shrink-0' : 'hidden sm:inline-flex shrink-0'" />
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-10">
@@ -35,9 +35,9 @@ const navLinks = computed(() => [
           </NuxtLink>
         </nav>
 
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <LanguageSwitcher />
-          <UColorModeButton color="neutral" variant="ghost" size="sm" />
+        <div class="flex items-center gap-0.5 sm:gap-2 shrink-0">
+          <LanguageSwitcher compact />
+          <UColorModeButton color="neutral" variant="ghost" size="sm" class="shrink-0" />
           <template v-if="!isLoggedIn">
             <NuxtLink
               to="/auth/login"
@@ -45,14 +45,18 @@ const navLinks = computed(() => [
             >
               {{ t('common.signIn') }}
             </NuxtLink>
-            <NuxtLink to="/auth/register" class="btn-primary-editorial !px-5 !py-2.5 text-sm">
-              {{ t('common.getStarted') }}
+            <NuxtLink
+              to="/auth/register"
+              class="btn-primary-editorial !px-3 !py-2 sm:!px-5 sm:!py-2.5 text-xs sm:text-sm whitespace-nowrap shrink-0"
+            >
+              <span class="sm:hidden">{{ t('common.start') }}</span>
+              <span class="hidden sm:inline">{{ t('common.getStarted') }}</span>
             </NuxtLink>
           </template>
           <NuxtLink
             v-else
             to="/dashboard"
-            class="btn-primary-editorial !px-5 !py-2.5 text-sm"
+            class="btn-primary-editorial !px-3 !py-2 sm:!px-5 sm:!py-2.5 text-xs sm:text-sm whitespace-nowrap shrink-0"
           >
             {{ t('nav.overview') }}
           </NuxtLink>

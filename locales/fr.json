@@ -18,6 +18,7 @@
     "viewAll": "Tout voir",
     "getStarted": "Commencer",
     "getStartedFree": "Commencer gratuitement",
+    "start": "Go",
     "signIn": "Se connecter",
     "signOut": "Se déconnecter",
     "settings": "Paramètres",
@@ -68,6 +69,7 @@
     "COMPANY": "Entreprise"
   },
   "auth": {
+    "backHome": "Retour à l'accueil",
     "social": {
       "google": "Continuer avec Google",
       "github": "Continuer avec GitHub"
@@ -94,6 +96,16 @@
       "confirmPassword": "Confirmer le mot de passe",
       "passwordPlaceholder": "Min. 8 caractères",
       "proBadge": "Démarrage avec l'offre Pro",
+      "enterpriseBadge": "Démarrage avec l'offre Enterprise",
+      "choosePlan": "Choisissez votre forfait",
+      "planFree": "Personnel",
+      "planFreeDescription": "Gratuit — espace indépendant, 1 connexion bancaire",
+      "planPro": "Pro",
+      "planProDescription": "Espaces illimités, SaaS Shield, comptes ados",
+      "planEnterprise": "Enterprise",
+      "planEnterpriseDescription": "Espaces entreprise, rôles d'équipe, support prioritaire",
+      "billingMonthly": "Facturation mensuelle",
+      "billingYearly": "Facturation annuelle (économisez ~17 %)",
       "termsPrefix": "En créant un compte, vous acceptez nos",
       "termsCheckboxPrefix": "J'accepte les",
       "termsOfService": "Conditions d'utilisation",
@@ -102,9 +114,7 @@
       "submit": "Créer un compte",
       "errorGeneric": "Échec de la création du compte. Veuillez réessayer.",
       "inviteTitle": "Rejoindre {spaceName}",
-      "inviteDescription": "Vous avez été invité·e en tant que {role}.",
-      "planFreeDescription": "Gratuit — espace indépendant, 1 connexion bancaire",
-      "planProDescription": "Espaces illimités, SaaS Shield, comptes ados"
+      "inviteDescription": "Vous avez été invité·e en tant que {role}."
     },
     "forgot": {
       "title": "Réinitialiser votre mot de passe",
@@ -306,6 +316,10 @@
     },
     "pricing": {
       "bestForLabel": "Idéal pour",
+      "prevPlan": "Forfait précédent",
+      "nextPlan": "Forfait suivant",
+      "planCarousel": "Forfaits",
+      "swipeHint": "Glissez ou utilisez les flèches pour comparer les forfaits",
       "free": {
         "name": "Gratuit",
         "price": "0 €",
@@ -339,6 +353,8 @@
         "description": "Pour freelances et fondateurs qui passent à la vitesse supérieure.",
         "badge": "Le plus populaire",
         "cta": "Essai Pro",
+        "yearlyPrice": "120 €",
+        "yearlyPeriod": "/an",
         "features": {
           "spaces": "Espaces illimités (Foyer, Famille, Entreprise)",
           "banks": "Connexions bancaires illimitées",
@@ -361,6 +377,8 @@
         },
         "description": "Équipes et entreprises en croissance.",
         "cta": "Démarrer Entreprise",
+        "yearlyPrice": "490 €",
+        "yearlyPeriod": "/an",
         "features": {
           "pro": "Tout ce qui est dans Pro",
           "members": "Jusqu'à 10 membres entreprise",
@@ -371,6 +389,7 @@
       },
       "monthly": "Mensuel",
       "yearly": "Annuel",
+      "billedAnnually": "Facturation annuelle",
       "mostPopular": "Le plus populaire"
     },
     "featureStrip": {

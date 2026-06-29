@@ -18,6 +18,7 @@
     "viewAll": "View all",
     "getStarted": "Get started",
     "getStartedFree": "Get started free",
+    "start": "Start",
     "signIn": "Sign in",
     "signOut": "Sign out",
     "settings": "Settings",
@@ -68,6 +69,7 @@
     "COMPANY": "Company"
   },
   "auth": {
+    "backHome": "Back to home",
     "social": {
       "google": "Continue with Google",
       "github": "Continue with GitHub"
@@ -317,6 +319,10 @@
       "billedAnnually": "Billed annually",
       "mostPopular": "Most popular",
       "bestForLabel": "Best for",
+      "prevPlan": "Previous plan",
+      "nextPlan": "Next plan",
+      "planCarousel": "Pricing plans",
+      "swipeHint": "Swipe or use arrows to compare plans",
       "free": {
         "name": "Free",
         "price": "$0",

@@ -1,4 +1,10 @@
 <script setup lang="ts">
+withDefaults(defineProps<{
+  compact?: boolean
+}>(), {
+  compact: false
+})
+
 const { getLocale, getLocales, switchLocale, t } = useAppI18n()
 
 const localeLabels: Record<string, string> = {
@@ -32,12 +38,13 @@ const currentLabel = computed(() =>
 <template>
   <UDropdownMenu :items="[items]">
     <UButton
-      :label="currentLabel"
+      :label="compact ? undefined : currentLabel"
       icon="i-lucide-languages"
       color="neutral"
       variant="ghost"
       size="sm"
       :aria-label="t('common.language')"
+      :class="compact ? 'px-2' : undefined"
     />
   </UDropdownMenu>
 </template>
