@@ -70,6 +70,8 @@ export function buildContentSecurityPolicy(event: H3Event): string {
     'https://oauth2.googleapis.com',
     'https://github.com',
     'https://api.github.com',
+    'https://api.mapbox.com',
+    'https://events.mapbox.com',
     ...plaidConnectSrc(event)
   ]
 

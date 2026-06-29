@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { isAdminEmail } from '../../lib/admin'
 import { requireSessionUser } from '../../lib/auth'
 import { isTwilioVerifyConfigured, sendPhoneVerification } from '../../lib/twilio'
-import { syncUserProfileToIntegrations } from '../../lib/user-profile-sync'
+import { syncUserProfileToIntegrations, syncVerifiedPhoneToStripe } from '../../lib/user-profile-sync'
 import { normalizePhone } from '../../utils/phone'
 
 const bodySchema = z.object({
@@ -80,6 +80,11 @@ export default defineEventHandler(async (event) => {
       name: updated.name,
       email: updated.email
     })
+  }
+
+  if (body.phone !== undefined) {
+    const phoneToSync = updated.phoneVerified ? updated.phone : null
+    await syncVerifiedPhoneToStripe(event, updated.id, phoneToSync)
   }
 
   let verificationSent = false

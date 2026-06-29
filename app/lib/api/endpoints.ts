@@ -6,6 +6,8 @@ export const apiRoutes = {
   user: {
     bootstrap: '/api/user/bootstrap',
     profile: '/api/user/profile',
+    stripeCustomer: '/api/user/stripe-customer',
+    stripeInvoices: '/api/user/stripe-invoices',
     account: '/api/user/account',
     phoneVerify: '/api/user/phone/verify',
     phoneResend: '/api/user/phone/resend'

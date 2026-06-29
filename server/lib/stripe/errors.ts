@@ -121,3 +121,13 @@ export function isLivemodeMismatch(error: unknown): boolean {
   const text = `${error.code ?? ''} ${error.message ?? ''}`.toLowerCase()
   return error.code === 'livemode_mismatch' || text.includes('livemode')
 }
+
+export function isStaleStripeCustomer(error: unknown): boolean {
+  if (!isStripeError(error)) return false
+  const text = `${error.code ?? ''} ${error.message ?? ''}`.toLowerCase()
+  return (
+    error.code === 'resource_missing'
+    || text.includes('no such customer')
+    || isLivemodeMismatch(error)
+  )
+}

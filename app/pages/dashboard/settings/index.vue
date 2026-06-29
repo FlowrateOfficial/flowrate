@@ -297,6 +297,16 @@ async function confirmDeleteAccount() {
     <DashboardFeedbackPanel />
 
     <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
+      <h2 class="mb-4 text-base font-semibold">{{ t('dashboard.settings.stripeCustomerTitle') }}</h2>
+      <ClientOnly>
+        <DashboardStripeCustomerForm />
+        <template #fallback>
+          <USkeleton class="h-64 w-full rounded-xl" />
+        </template>
+      </ClientOnly>
+    </UCard>
+
+    <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
       <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-base font-semibold">{{ t('dashboard.settings.planBilling') }}</h2>
         <AppBetaBadge size="sm" />

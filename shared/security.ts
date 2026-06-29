@@ -5,6 +5,7 @@ export const CSRF_HEADER = 'x-csrf-token'
 export const SECURITY_EXEMPT_PREFIXES = [
   '/api/stripe/webhook',
   '/api/plaid/webhook',
+  '/api/webhooks/neon-auth',
   '/api/auth/'
 ] as const
 
@@ -27,7 +28,10 @@ export const ALLOWED_AUTH_PATH_PREFIXES = [
   'update-user',
   'revoke-session',
   'revoke-sessions',
-  'list-sessions'
+  'list-sessions',
+  'email-otp',
+  'phone-number',
+  'magic-link'
 ] as const
 
 export function isSecurityExemptPath(path: string): boolean {

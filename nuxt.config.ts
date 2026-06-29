@@ -33,7 +33,8 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: true },
     '/api/stripe/webhook': { cors: false },
-    '/api/plaid/webhook': { cors: false }
+    '/api/plaid/webhook': { cors: false },
+    '/api/webhooks/neon-auth': { cors: false }
   },
 
   runtimeConfig: {
@@ -57,6 +58,9 @@ export default defineNuxtConfig({
     adminEmails: process.env.ADMIN_EMAILS ?? '',
     githubToken: process.env.GITHUB_TOKEN ?? '',
     githubFeedbackRepo: process.env.GITHUB_FEEDBACK_REPO ?? '',
+    stripeInvoiceTemplateId: process.env.STRIPE_INVOICE_TEMPLATE_ID ?? '',
+    resendApiKey: process.env.RESEND_API_KEY ?? '',
+    authFromEmail: process.env.AUTH_FROM_EMAIL ?? '',
     public: {
       neonAuthUrl: process.env.NUXT_NEON_AUTH_URL ?? '',
       neonAuthConfigured: Boolean(
@@ -78,7 +82,8 @@ export default defineNuxtConfig({
       ),
       feedbackConfigured: Boolean(
         process.env.GITHUB_TOKEN && process.env.GITHUB_FEEDBACK_REPO
-      )
+      ),
+      mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN ?? ''
     }
   },
 

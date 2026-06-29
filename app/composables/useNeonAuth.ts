@@ -60,12 +60,29 @@ export function useNeonAuth() {
     return auth.requestPasswordReset({ email, redirectTo })
   }
 
+  async function verifyEmailOtp(email: string, otp: string) {
+    const auth = getAuthClient()
+    if (!auth) throw new Error('Auth is only available in the browser')
+    return auth.emailOtp.verifyEmail({ email, otp })
+  }
+
+  async function sendEmailVerificationOtp(email: string) {
+    const auth = getAuthClient()
+    if (!auth) throw new Error('Auth is only available in the browser')
+    return auth.emailOtp.sendVerificationOtp({
+      email,
+      type: 'email-verification'
+    })
+  }
+
   return {
     isConfigured,
     signIn,
     signUp,
     signOut,
     getSession,
-    requestPasswordReset
+    requestPasswordReset,
+    verifyEmailOtp,
+    sendEmailVerificationOtp
   }
 }

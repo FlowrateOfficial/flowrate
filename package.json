@@ -21,6 +21,7 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.114",
     "@internationalized/date": "^3.12.2",
+    "@mapbox/search-js-web": "^1.5.1",
     "@neondatabase/auth": "0.4.2-beta",
     "@neondatabase/serverless": "^1.1.0",
     "@nuxt/ui": "^4.9.0",

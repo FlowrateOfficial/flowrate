@@ -116,6 +116,9 @@ useSeoMeta({ title: () => t('auth.register.title') })
 
       <UFormField :label="t('auth.login.email')" name="email" required>
         <UInput v-model="registerForm.email" type="email" :placeholder="t('auth.login.emailPlaceholder')" autocomplete="email" class="w-full" variant="outline" />
+        <template #help>
+          <span class="text-xs text-flow-muted dark:text-flow-muted-dark">{{ t('auth.register.verifyEmailHint') }}</span>
+        </template>
       </UFormField>
 
       <UFormField :label="t('auth.login.password')" name="password" required>
