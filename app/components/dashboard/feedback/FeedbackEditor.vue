@@ -12,6 +12,7 @@ import {
 import { FeedbackImageUpload } from '~/lib/feedback/editor-image-upload'
 import { FeedbackVideo } from '~/lib/feedback/editor-video'
 import { FeedbackVideoUpload } from '~/lib/feedback/editor-video-upload'
+import { cleanFeedbackAttachmentMarkdown } from '~/lib/feedback/markdown'
 
 defineProps<{
   placeholder?: string
@@ -23,7 +24,7 @@ const emit = defineEmits<{
 
 const { t } = useAppI18n()
 const model = defineModel<string>({ default: '' })
-const editorRef = useTemplateRef('editorRef')
+const editorRef = useTemplateRef<{ editor?: Editor }>('editorRef')
 const registry = createFeedbackAttachmentRegistry()
 
 const customHandlers = {
@@ -166,6 +167,39 @@ function onMediaError(code: string) {
 provide(FEEDBACK_ATTACHMENT_REGISTRY_KEY, registry)
 provide(FEEDBACK_MEDIA_ERROR_KEY, onMediaError)
 
+function appendImageMarkdown(
+  message: string,
+  editor: Editor | undefined,
+  registry: FeedbackAttachmentRegistry
+): string {
+  if (!editor) return message
+
+  let result = message
+  editor.state.doc.descendants((node: ProseMirrorNode) => {
+    if (node.type.name !== 'image') return
+
+    const src = typeof node.attrs.src === 'string' ? node.attrs.src : ''
+    const alt = typeof node.attrs.alt === 'string' ? node.attrs.alt : 'image'
+
+    for (const entry of registry.list()) {
+      const token = `${FEEDBACK_ATTACH_PREFIX}${entry.id}`
+      if (src !== entry.previewUrl) continue
+
+      if (result.includes(src)) {
+        result = result.replaceAll(src, token)
+        const encoded = encodeURI(src)
+        if (encoded !== src) {
+          result = result.replaceAll(encoded, token)
+        }
+      } else if (!result.includes(token)) {
+        result = `${result}\n\n![${alt}](${token})`.trim()
+      }
+    }
+  })
+
+  return result
+}
+
 function appendVideoMarkdown(message: string, editor: Editor | undefined): string {
   if (!editor) return message
 
@@ -185,8 +219,10 @@ function appendVideoMarkdown(message: string, editor: Editor | undefined): strin
 function buildMessage(): string {
   const editor = editorRef.value?.editor
   const markdown = typeof model.value === 'string' ? model.value : ''
-  const normalized = registry.normalizeMarkdown(markdown)
-  return appendVideoMarkdown(normalized, editor).trim()
+  const withImages = appendImageMarkdown(markdown, editor, registry)
+  const normalized = registry.normalizeMarkdown(withImages)
+  const cleaned = cleanFeedbackAttachmentMarkdown(normalized)
+  return appendVideoMarkdown(cleaned, editor).trim()
 }
 
 function getRegistry(): FeedbackAttachmentRegistry {
@@ -263,7 +299,10 @@ defineExpose({
       v-if="attachmentCount > 0"
       class="flex items-center gap-2 border-t border-default px-4 py-2 text-xs text-muted"
     >
-      <UIcon name="i-lucide-paperclip" class="size-3.5" />
+      <UIcon
+        name="i-lucide-paperclip"
+        class="size-3.5"
+      />
       <span>{{ t('dashboard.feedback.attachmentCount', { count: attachmentCount }) }}</span>
     </div>
   </div>

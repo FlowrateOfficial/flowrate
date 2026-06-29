@@ -1,7 +1,12 @@
 // NOTE - ANCHOR: Upload feedback media into the private feedback repo
 
 import { formatGithubError } from './errors'
-import { getDefaultBranch, githubHeaders, parseGitHubRepo } from './client'
+import {
+  ensureFeedbackMediaBranch,
+  githubHeaders,
+  issueAssetUrl,
+  parseGitHubRepo
+} from './client'
 
 export interface FeedbackUploadedAsset {
   id: string
@@ -17,13 +22,17 @@ export interface FeedbackUploadFailure {
   error: string
 }
 
+interface ContentsUploadResponse {
+  commit: { sha: string }
+}
+
 function safeFilename(name: string): string {
-  const base = name.trim().replace(/[^\w.\-]+/g, '-').replace(/-+/g, '-')
+  const base = name.trim().replace(/[^\w.-]+/g, '-').replace(/-+/g, '-')
   return (base || 'attachment').slice(0, 120)
 }
 
-function rawGitHubUrl(owner: string, name: string, branch: string, path: string): string {
-  return `https://raw.githubusercontent.com/${owner}/${name}/${branch}/${path}`
+function feedbackMediaPath(issueNumber: number, id: string, filename: string): string {
+  return `issues/${issueNumber}/${id}-${filename}`
 }
 
 export async function uploadFeedbackAssets(
@@ -37,16 +46,16 @@ export async function uploadFeedbackAssets(
   }
 
   const { owner, name } = parseGitHubRepo(repo)
-  const branch = await getDefaultBranch(token, owner, name)
+  const branch = await ensureFeedbackMediaBranch(token, owner, name)
   const uploaded: FeedbackUploadedAsset[] = []
   const failures: FeedbackUploadFailure[] = []
 
   for (const file of files) {
     const filename = safeFilename(file.filename)
-    const path = `feedback/issues/${issueNumber}/${file.id}-${filename}`
+    const path = feedbackMediaPath(issueNumber, file.id, filename)
 
     try {
-      await $fetch(
+      const response = await $fetch<ContentsUploadResponse>(
         `https://api.github.com/repos/${owner}/${name}/contents/${path}`,
         {
           method: 'PUT',
@@ -64,7 +73,7 @@ export async function uploadFeedbackAssets(
         filename,
         mimeType: file.mimeType,
         path,
-        markdownUrl: rawGitHubUrl(owner, name, branch, path)
+        markdownUrl: issueAssetUrl(owner, name, response.commit.sha, path)
       })
     } catch (error) {
       failures.push({

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { NodeViewProps } from '@tiptap/vue-3'
 import { NodeViewWrapper } from '@tiptap/vue-3'
-import { FEEDBACK_ATTACH_PREFIX } from '#shared/feedback'
 import {
   FEEDBACK_ATTACHMENT_REGISTRY_KEY,
   FEEDBACK_MEDIA_ERROR_KEY,
@@ -34,8 +33,7 @@ watch(file, (nextFile) => {
     .deleteRange({ from: pos, to: pos + 1 })
     .setImage({
       src: result.previewUrl,
-      alt: nextFile.name,
-      title: `${FEEDBACK_ATTACH_PREFIX}${result.id}`
+      alt: nextFile.name
     })
     .run()
 })
@@ -52,7 +50,10 @@ watch(file, (nextFile) => {
       class="min-h-36"
     >
       <template #leading>
-        <UAvatar icon="i-lucide-image" size="lg" />
+        <UAvatar
+          icon="i-lucide-image"
+          size="lg"
+        />
       </template>
     </UFileUpload>
   </NodeViewWrapper>

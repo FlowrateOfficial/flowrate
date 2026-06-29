@@ -10,6 +10,7 @@ const sectionIds = [
   'howWeUse',
   'analytics',
   'ai',
+  'feedback',
   'sharing',
   'subprocessors',
   'storage',

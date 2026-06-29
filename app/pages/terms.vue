@@ -12,6 +12,7 @@ const sectionIds = [
   'spaces',
   'billing',
   'acceptableUse',
+  'feedback',
   'disclaimers',
   'liability',
   'termination',
