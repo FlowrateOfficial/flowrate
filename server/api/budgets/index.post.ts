@@ -1,58 +1,11 @@
-import { z } from 'zod'
+import { budgetBodySchema } from '../../lib/schemas/api'
 import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
-
-const bodySchema = z.object({
-  name: z.string().min(1),
-  category: z.string(),
-  amount: z.number().positive(),
-  period: z.enum(['WEEKLY', 'MONTHLY', 'YEARLY']),
-  isShared: z.boolean().default(false)
-})
+import { createBudgetForSpace } from '../../lib/services/budgets.service'
+import { requireSpaceContext } from '../../lib/domain/http'
 
 export default defineEventHandler(async (event) => {
-  const { user, space, membership } = await requireSpaceAccess(event)
-
-  if (!canEditFinancials(membership.role, space.type)) {
-    throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
-  }
-
-  const body = await readValidatedBody(event, bodySchema.parse)
-  const currency = await resolveSpaceDisplayCurrency(space.id, localeFromRequest(event))
-
-  const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-
-  const result = await prisma.transaction.aggregate({
-    where: {
-      spaceId: space.id,
-      category: body.category as never,
-      date: { gte: startOfMonth },
-      amount: { lt: 0 }
-    },
-    _sum: { amount: true }
-  })
-
-  const budget = await prisma.budget.create({
-    data: {
-      userId: user.id,
-      spaceId: space.id,
-      name: body.name,
-      category: body.category as never,
-      amount: body.amount,
-      period: body.period,
-      isShared: body.isShared,
-      startDate: startOfMonth
-    }
-  })
-
-  return {
-    id: budget.id,
-    name: budget.name,
-    category: budget.category,
-    amount: Number(budget.amount),
-    currency,
-    spent: Math.abs(Number(result._sum.amount ?? 0)),
-    period: budget.period,
-    isShared: budget.isShared
-  }
+  const ctx = await requireSpaceContext(event)
+  const body = await readValidatedBody(event, budgetBodySchema.parse)
+  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, localeFromRequest(event))
+  return createBudgetForSpace(ctx, body, currency)
 })

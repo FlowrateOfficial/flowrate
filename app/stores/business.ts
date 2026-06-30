@@ -1,23 +1,17 @@
+// ANCHOR: Company store — burn rate overview + team invites
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
+import type { TeamMember } from '~/types/business'
 import type { BusinessOverview } from '~/types/dashboard'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
-import { createStoreFetch } from '~/utils/store-fetch'
+import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
-const fetchOnce = createStoreFetch()
-
-export interface TeamMember {
-  id: string
-  email: string | null
-  name: string | null
-  role: string
-  status: string
-}
+export type { TeamMember }
 
 export const useBusinessStore = defineStore('business', () => {
-  const { t, formatCurrency } = useAppI18n()
+  const { t, formatCurrency, roleLabel, memberStatusLabel } = useAppI18n()
   const appToast = useAppToast()
   const { api } = useApi()
   const activePlan = useActivePlan()
@@ -25,11 +19,7 @@ export const useBusinessStore = defineStore('business', () => {
   const tab = ref<'overview' | 'team'>('overview')
   const inviting = ref(false)
   const overview = ref<BusinessOverview | null>(null)
-  const overviewPending = ref(false)
   const teamMembers = ref<TeamMember[]>([])
-  const teamPending = ref(false)
-  let lastOverviewId = ''
-  let lastTeamId = ''
 
   const inviteForm = reactive({
     email: '',
@@ -64,6 +54,7 @@ export const useBusinessStore = defineStore('business', () => {
   })
 
   watch(tabs, (items) => {
+    // NOTE - Hide team tab when plan drops companyTeam feature
     if (tab.value === 'team' && !items.some(item => item.value === 'team')) {
       tab.value = 'overview'
     }
@@ -110,51 +101,27 @@ export const useBusinessStore = defineStore('business', () => {
     }
   ])
 
-  function roleLabel(role: string) {
-    const key = `roles.${role}`
-    const translated = t(key)
-    return translated !== key ? translated : role.toLowerCase().replaceAll('_', ' ')
-  }
+  const { pending: overviewPending, load: fetchOverview, reset: resetOverview } = createSpaceScopedLoader({
+    buildKey: spaceId => `biz-overview:${spaceId}`,
+    fetch: async (spaceId) => api<BusinessOverview>(apiRoutes.spaces.businessOverview(spaceId)),
+    apply: data => { overview.value = data },
+    clear: () => { overview.value = null },
+    isCached: () => overview.value != null
+  })
 
-  function statusLabel(status: string) {
-    const key = `memberStatus.${status}`
-    const translated = t(key)
-    return translated !== key ? translated : status
-  }
+  const { pending: teamPending, load: fetchTeam, reset: resetTeam } = createSpaceScopedLoader({
+    buildKey: spaceId => `biz-team:${spaceId}`,
+    fetch: async (spaceId) => api<{ members: TeamMember[] }>(apiRoutes.spaces.detail(spaceId), {
+      query: { view: 'team' }
+    }),
+    apply: data => { teamMembers.value = data.members },
+    clear: () => { teamMembers.value = [] },
+    isCached: () => teamMembers.value.length > 0
+  })
 
-  async function fetchOverview(spaceId: string, force = false) {
-    return fetchOnce(`biz-overview:${spaceId}`, async () => {
-      if (!force && lastOverviewId === spaceId && overview.value) return
-
-      overviewPending.value = true
-      try {
-        overview.value = await api<BusinessOverview>(apiRoutes.spaces.businessOverview(spaceId))
-        lastOverviewId = spaceId
-      } finally {
-        overviewPending.value = false
-      }
-    }, force)
-  }
-
-  async function fetchTeam(spaceId: string, force = false) {
-    return fetchOnce(`biz-team:${spaceId}`, async () => {
-      if (!force && lastTeamId === spaceId) return
-
-      teamPending.value = true
-      try {
-        const data = await api<{ members: TeamMember[] }>(apiRoutes.spaces.detail(spaceId), {
-          query: { view: 'team' }
-        })
-        teamMembers.value = data.members
-        lastTeamId = spaceId
-      } finally {
-        teamPending.value = false
-      }
-    }, force)
-  }
-
-  async function inviteMember(spaceId: string, onSuccess?: () => void) {
-    if (!inviteForm.phone.trim()) return false
+  async function inviteMember(onSuccess?: () => void) {
+    const spaceId = useSpacesStore().space?.id
+    if (!spaceId || !inviteForm.phone.trim()) return false
     inviting.value = true
     try {
       await api(apiRoutes.spaces.members(spaceId), {
@@ -170,7 +137,7 @@ export const useBusinessStore = defineStore('business', () => {
       inviteForm.phone = ''
       inviteForm.name = ''
       appToast.success(t('dashboard.company.team.inviteSent'))
-      await fetchTeam(spaceId, true)
+      await fetchTeam(true)
       onSuccess?.()
       return true
     } catch {
@@ -182,10 +149,8 @@ export const useBusinessStore = defineStore('business', () => {
   }
 
   function reset() {
-    overview.value = null
-    teamMembers.value = []
-    lastOverviewId = ''
-    lastTeamId = ''
+    resetOverview()
+    resetTeam()
   }
 
   return {
@@ -203,7 +168,7 @@ export const useBusinessStore = defineStore('business', () => {
     runwayLabel,
     alertMessage,
     roleLabel,
-    statusLabel,
+    statusLabel: memberStatusLabel,
     fetchOverview,
     fetchTeam,
     inviteMember,

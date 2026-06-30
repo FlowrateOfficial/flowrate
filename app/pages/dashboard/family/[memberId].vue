@@ -9,18 +9,17 @@ const route = useRoute()
 const { setBreadcrumbTail } = useBreadcrumbs()
 const familyStore = useFamilyStore()
 const spacesStore = useSpacesStore()
-const { memberTab, saving, transactionColumns } = storeToRefs(familyStore)
+const { memberTab, saving, transactionColumns, memberFinancial, memberPending } = storeToRefs(familyStore)
 
 const memberId = route.params.memberId as string
 const spaceId = computed(() => spacesStore.space?.id ?? '')
 
-const { data, pending, refresh } = await useAsyncData(
-  () => `member-financial-${spaceId.value}-${memberId}`,
-  () => spaceId.value
-    ? familyStore.fetchMemberFinancial(spaceId.value, memberId)
-    : Promise.resolve(null),
-  { watch: [spaceId] }
-)
+useSpaceStoreFetch(`member-financial-${memberId}`, async () => {
+  await familyStore.openMemberFinancial(memberId)
+})
+
+const data = memberFinancial
+const pending = memberPending
 
 watch(data, (val) => familyStore.loadAllowanceFromMember(val ?? null), { immediate: true })
 
@@ -183,7 +182,7 @@ async function confirmDeleteChild() {
           <UButton
             :label="t('common.save')"
             :loading="saving"
-            @click="familyStore.saveChildProfile(spaceId, memberId, refresh)"
+            @click="familyStore.saveChildProfile(spaceId, memberId)"
           />
         </div>
       </UCard>
@@ -198,7 +197,7 @@ async function confirmDeleteChild() {
         </div>
         <div class="flex gap-2">
           <UInput v-model="familyStore.jarName" :placeholder="t('dashboard.family.child.jarPlaceholder')" class="flex-1" />
-          <UButton :label="t('common.add')" @click="familyStore.addJar(spaceId, memberId, refresh)" />
+          <UButton :label="t('common.add')" @click="familyStore.addJar(spaceId, memberId)" />
         </div>
       </UCard>
     </div>

@@ -1,4 +1,5 @@
 // ANCHOR: Pinia fetch helpers — dedupe, space scope, money fmt
+import { clearEtagStore } from '~/lib/api/etag-cache'
 
 // NOTE - Same cache key reuses one in-flight promise
 export function createStoreFetch() {
@@ -41,6 +42,7 @@ export function createSpaceScopedLoader<T>(options: SpaceScopedLoaderOptions<T>)
 
     const key = options.buildKey(spaceId)
     return fetchOnce(key, async () => {
+      if (force) clearEtagStore()
       if (!force && lastKey === key && options.isCached?.(key)) return
 
       pending.value = true

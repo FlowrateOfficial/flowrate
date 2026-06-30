@@ -109,18 +109,27 @@ export async function assertCanCreateSpace(
   }
 }
 
+// NOTE - Pure sync cooldown — returns remaining ms (0 = allowed)
+export function syncCooldownRemainingMs(
+  lastSyncAt: Date | null | undefined,
+  intervalHours: number,
+  now = Date.now()
+): number {
+  if (!intervalHours || !lastSyncAt) return 0
+  const cooldownMs = intervalHours * 60 * 60 * 1000
+  const elapsed = now - lastSyncAt.getTime()
+  return Math.max(0, cooldownMs - elapsed)
+}
+
 export async function assertCanManualSync(userId: string, plan?: AppPlan) {
   const resolved = plan ?? (await getUserPlanLimits(userId)).plan
   const { manualSyncIntervalHours } = limitsForPlan(resolved)
   if (!manualSyncIntervalHours) return
 
   const usage = await prisma.userUsage.findUnique({ where: { userId } })
-  if (!usage?.lastSyncAt) return
-
-  const elapsedMs = Date.now() - usage.lastSyncAt.getTime()
-  const cooldownMs = manualSyncIntervalHours * 60 * 60 * 1000
-  if (elapsedMs < cooldownMs) {
-    const retryAfterSec = Math.ceil((cooldownMs - elapsedMs) / 1000)
+  const remaining = syncCooldownRemainingMs(usage?.lastSyncAt, manualSyncIntervalHours)
+  if (remaining > 0) {
+    const retryAfterSec = Math.ceil(remaining / 1000)
     planLimitError(
       429,
       PLAN_LIMIT_CODES.SYNC_COOLDOWN,

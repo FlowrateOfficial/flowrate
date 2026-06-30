@@ -11,24 +11,16 @@ export interface AccountSummary {
   ownerName: string | null
 }
 
-export interface TransactionRow {
-  id: string
-  description: string
-  merchant: string | null
-  amount: number
-  currency: string
-  category: string
-  date: string
-  pending: boolean
-  account: { id: string, name: string } | null
-}
+export type {
+  TransactionAccountRef,
+  TransactionListItem,
+  TransactionListResponse
+} from '#shared/api/transactions'
 
-export interface TransactionsResponse {
-  items: TransactionRow[]
-  total: number
-  page: number
-  pages: number
-}
+import type { TransactionListItem, TransactionListResponse } from '#shared/api/transactions'
+
+export type TransactionRow = TransactionListItem
+export type TransactionsResponse = TransactionListResponse
 
 export type AnalyticsRange = '7d' | '30d' | '90d' | '12m'
 

@@ -1,14 +1,6 @@
-export interface BudgetItem {
-  id: string
-  name: string
-  category: string
-  amount: number
-  currency: string
-  spent: number
-  period: string
-  isShared: boolean
-  isMine: boolean
-}
+import type { BudgetListItem } from '#shared/api/budgets'
+
+export type BudgetItem = BudgetListItem
 
 export type BudgetPeriod = 'WEEKLY' | 'MONTHLY' | 'YEARLY'
 

@@ -1,35 +1,20 @@
 // ANCHOR: Space membership, roles, and active-space resolution
 import type { SpaceRole, SpaceType, MemberStatus } from '~~/generated/prisma/client'
+import {
+  canManageSpace,
+  isCompanyAdminRole,
+  isGuardianRole,
+  isMinorRole,
+  rolesForSpaceType
+} from '#shared/space-roles'
 
 export const ACTIVE_SPACE_COOKIE = 'flowrate-active-space'
 
-const GUARDIAN_ROLES: SpaceRole[] = ['OWNER', 'CO_GUARDIAN']
-const COMPANY_ADMIN_ROLES: SpaceRole[] = ['OWNER', 'FINANCE_ADMIN']
-const CHILD_ROLES: SpaceRole[] = ['CHILD', 'TEEN']
-
-export const SPACE_TYPE_LABELS: Record<SpaceType, string> = {
-  INDEPENDENT: 'Independent',
-  HOUSEHOLD: 'Household',
-  FAMILY: 'Family',
-  COMPANY: 'Company'
-}
-
-export function isGuardianRole(role: SpaceRole): boolean {
-  return GUARDIAN_ROLES.includes(role)
-}
-
-export function isCompanyAdminRole(role: SpaceRole): boolean {
-  return COMPANY_ADMIN_ROLES.includes(role)
-}
-
-export function isChildRole(role: SpaceRole): boolean {
-  return CHILD_ROLES.includes(role)
-}
+export const isChildRole = isMinorRole
+export { isGuardianRole, isCompanyAdminRole }
 
 export function canManageMembers(role: SpaceRole, spaceType: SpaceType): boolean {
-  if (spaceType === 'COMPANY') return isCompanyAdminRole(role) || role === 'OWNER'
-  if (spaceType === 'INDEPENDENT') return role === 'OWNER'
-  return role === 'OWNER' || role === 'CO_GUARDIAN'
+  return canManageSpace(role, spaceType)
 }
 
 export function canConnectBanks(role: SpaceRole): boolean {
@@ -221,16 +206,7 @@ export function accountVisibilityFilter(userId: string, role: SpaceRole) {
 }
 
 export function getRolesForSpaceType(type: SpaceType) {
-  switch (type) {
-    case 'INDEPENDENT':
-      return ['OWNER']
-    case 'HOUSEHOLD':
-      return ['OWNER', 'CO_GUARDIAN']
-    case 'FAMILY':
-      return ['OWNER', 'CO_GUARDIAN', 'TEEN', 'CHILD']
-    case 'COMPANY':
-      return ['OWNER', 'FINANCE_ADMIN', 'MANAGER', 'MEMBER', 'GUEST']
-  }
+  return rolesForSpaceType(type)
 }
 
 export async function acceptPendingInvitations(userId: string, email: string) {

@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await requireSessionUser(event)
-  rateLimit(event, `feedback:list:${user.id}`, { max: 30, windowMs: 60 * 1000 })
+  await rateLimit(event, `feedback:list:${user.id}`, { max: 30, windowMs: 60 * 1000 })
 
   const query = getQuery(event)
   const refresh = query.refresh === 'true' || query.refresh === '1'

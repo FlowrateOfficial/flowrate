@@ -47,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
         appToast.errorMessage(resolveErrorMessage(result.error, t, 'auth.login.errorInvalid'))
         return
       }
-      await navigateTo('/dashboard')
+      await navigateToDashboard()
     } catch (e) {
       appToast.errorFrom(e, 'auth.login.errorGeneric')
     } finally {
@@ -94,7 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
 
-      await navigateTo('/dashboard/onboarding')
+      await navigateToDashboard('/dashboard/onboarding')
     } catch (e) {
       appToast.errorFrom(e, 'auth.register.errorGeneric')
     } finally {

@@ -1,25 +1,8 @@
-import type Stripe from 'stripe'
 import {
-  getStripeClient,
-  linkContextFromStripeCustomer,
-  upsertFinancialConnectionAccount
-} from '../../lib/stripe'
-import {
-  processCheckoutSessionCompleted,
-  processStripeSubscriptionEvent
-} from '../../lib/billing'
-import { allowsWebhookSync, userPlanForId } from '../../lib/billing/enforcement'
-import { syncAccountTransactions, syncSpaceSubscriptions } from '../../lib/transactionSync'
-
-async function handleFinancialConnectionAccount(stripe: Stripe, fcAccount: Stripe.FinancialConnections.Account) {
-  const customerId = fcAccount.account_holder?.customer
-  if (!customerId || typeof customerId !== 'string') return
-
-  const context = await linkContextFromStripeCustomer(stripe, customerId)
-  if (!context) return
-
-  await upsertFinancialConnectionAccount(stripe, fcAccount, context)
-}
+  constructStripeWebhookEvent,
+  processStripeWebhookEvent
+} from '../../lib/services/stripe-webhook.service'
+import { requireStripe } from '../../lib/stripe'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
@@ -31,7 +14,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 503, message: 'Stripe webhook secret is not configured' })
   }
 
-  const stripe = getStripeClient(config.stripeSecretKey)
+  const { stripe } = requireStripe(event)
   const body = await readRawBody(event)
   const signature = getHeader(event, 'stripe-signature')
 
@@ -39,64 +22,18 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Missing body or signature' })
   }
 
-  let stripeEvent: Stripe.Event
-
+  let stripeEvent
   try {
-    stripeEvent = stripe.webhooks.constructEvent(body, signature, config.stripeWebhookSecret)
+    stripeEvent = constructStripeWebhookEvent(
+      stripe,
+      body,
+      signature,
+      config.stripeWebhookSecret
+    )
   } catch {
     throw createError({ statusCode: 400, message: 'Invalid webhook signature' })
   }
 
-  switch (stripeEvent.type) {
-    case 'financial_connections.account.created':
-    case 'financial_connections.account.refreshed_balance':
-    case 'financial_connections.account.reactivated':
-    case 'financial_connections.account.refreshed_transactions': {
-      const fcAccount = stripeEvent.data.object as Stripe.FinancialConnections.Account
-      await handleFinancialConnectionAccount(stripe, fcAccount)
-
-      const customerId = fcAccount.account_holder?.customer
-      if (customerId && typeof customerId === 'string') {
-        const context = await linkContextFromStripeCustomer(stripe, customerId)
-        if (context) {
-          const plan = await userPlanForId(context.userId)
-          if (!allowsWebhookSync(plan)) break
-
-          const dbAccount = await prisma.account.findUnique({
-            where: { stripeId: fcAccount.id }
-          })
-          if (dbAccount) {
-            await syncAccountTransactions(stripe, dbAccount)
-            await syncSpaceSubscriptions(context.spaceId, context.userId)
-          }
-        }
-      }
-      break
-    }
-
-    case 'financial_connections.account.deactivated':
-    case 'financial_connections.account.disconnected': {
-      const fcAccount = stripeEvent.data.object as Stripe.FinancialConnections.Account
-      await prisma.account.deleteMany({
-        where: { stripeId: fcAccount.id }
-      })
-      break
-    }
-
-    case 'checkout.session.completed': {
-      const session = stripeEvent.data.object as Stripe.Checkout.Session
-      await processCheckoutSessionCompleted(stripe, session)
-      break
-    }
-
-    case 'customer.subscription.created':
-    case 'customer.subscription.updated':
-    case 'customer.subscription.deleted': {
-      const sub = stripeEvent.data.object as Stripe.Subscription
-      await processStripeSubscriptionEvent(stripe, sub)
-      break
-    }
-  }
-
+  await processStripeWebhookEvent(stripe, stripeEvent)
   return { received: true }
 })

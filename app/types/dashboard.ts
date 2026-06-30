@@ -1,4 +1,5 @@
 import type { AccountSummary, AnalyticsOverview, SubscriptionItem, TransactionRow } from '~/types/financial'
+import type { TeenDashboard } from '~/types/teen'
 
 export interface DashboardStats {
   spaceType: string
@@ -19,37 +20,9 @@ export interface DashboardStats {
   subscriptionAlerts: number
 }
 
-export interface BusinessOverview {
-  cash: number
-  monthlyBurn: number
-  monthlyIncome: number
-  netBurn: number
-  runwayMonths: number | null
-  monthlySubscriptions: number
-  subscriptionWaste: number
-  activeSubscriptions: number
-  cloudSpend: number | null
-  setup: { hasAccounts: boolean, hasTransactions: boolean, complete: boolean, step: number }
-  alerts: Array<{ severity: 'info' | 'warning' | 'critical', code: string, params?: Record<string, string | number> }>
-  topVendors: Array<{ name: string, amount: number }>
-}
+export type { BusinessOverviewDto as BusinessOverview } from '#shared/api/business'
 
-export interface TeenDashboard {
-  name: string | null
-  role: string
-  learnMode: boolean
-  allowance: number | null
-  frequency: string | null
-  limits: unknown
-  jars: Array<{
-    id: string
-    name: string
-    balance: number
-    target: number | null
-    progress: number | null
-  }>
-  totalSaved: number
-}
+export type { TeenDashboard }
 
 export interface DashboardOverview {
   stats: DashboardStats | null

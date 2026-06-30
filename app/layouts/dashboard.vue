@@ -13,7 +13,8 @@ const { isMinor, space } = storeToRefs(spacesStore)
 </script>
 
 <template>
-  <div class="flex h-dvh overflow-hidden bg-default text-default">
+  <ClientOnly>
+    <div class="flex h-dvh overflow-hidden bg-default text-default">
     <aside
       class="dashboard-sidebar hidden w-72 shrink-0 flex-col border-r border-default bg-elevated/30 lg:flex"
       aria-label="Sidebar"
@@ -166,5 +167,13 @@ const { isMinor, space } = storeToRefs(spacesStore)
       <DashboardMobileSpaceMenu />
       <DashboardMobileNavCustomizer />
     </ClientOnly>
-  </div>
+    </div>
+    <template #fallback>
+      <div class="flex h-dvh overflow-hidden bg-default text-default" aria-busy="true">
+        <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <div class="flex-1 bg-elevated/10" />
+        </div>
+      </div>
+    </template>
+  </ClientOnly>
 </template>

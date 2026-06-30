@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import {
   createBankLinkSession,
   ensureStripeCustomer,
@@ -10,10 +9,7 @@ import {
   FINANCIAL_CONNECTIONS_BANK_COUNTRIES,
   FINANCIAL_CONNECTIONS_DOCS_URL
 } from '#shared/stripe-financial-connections'
-
-const bodySchema = z.object({
-  visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL')
-})
+import { connectBankBodySchema } from '../../lib/schemas/api'
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
@@ -26,21 +22,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
   }
 
-  let visibility: 'PERSONAL' | 'SHARED' = 'PERSONAL'
-  try {
-    const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
-    visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'VALIDATION_ERROR',
-        message: 'Invalid request body',
-        data: { code: 'VALIDATION_ERROR', message: 'Invalid request body' }
-      })
-    }
-    throw error
-  }
+  const body = await readValidatedBody(event, connectBankBodySchema.parse)
+  const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
 
   try {
     const { config, stripe } = requireStripe(event)
