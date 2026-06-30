@@ -12,7 +12,8 @@ import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useAccountsStore = defineStore('accounts', () => {
-  const { t, formatCurrency, resolveCurrency } = useAppI18n()
+  const { t, formatCurrency, resolveCurrency, displayCurrency } = useAppI18n()
+  const { sum: sumFx } = useFxRates()
   const spacesStore = useSpacesStore()
   const syncStore = useSyncStore()
   const { public: publicConfig } = useRuntimeConfig()
@@ -37,15 +38,21 @@ export const useAccountsStore = defineStore('accounts', () => {
   ])
 
   const totalBalance = computed(() =>
-    accounts.value.reduce((sum, acc) => sum + acc.balance, 0)
+    sumFx(accounts.value.map(acc => ({ amount: acc.balance, currency: acc.currency })), displayCurrency.value)
   )
 
   const personalBalance = computed(() =>
-    accounts.value.filter(a => a.visibility === 'PERSONAL').reduce((s, a) => s + a.balance, 0)
+    sumFx(
+      accounts.value.filter(a => a.visibility === 'PERSONAL').map(a => ({ amount: a.balance, currency: a.currency })),
+      displayCurrency.value
+    )
   )
 
   const sharedBalance = computed(() =>
-    accounts.value.filter(a => a.visibility === 'SHARED').reduce((s, a) => s + a.balance, 0)
+    sumFx(
+      accounts.value.filter(a => a.visibility === 'SHARED').map(a => ({ amount: a.balance, currency: a.currency })),
+      displayCurrency.value
+    )
   )
 
   const spaceCurrency = computed(() => resolveCurrency(accounts.value))

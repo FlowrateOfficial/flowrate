@@ -3,6 +3,7 @@ import type { AppPlan } from '#shared/billing'
 import { requireStripe } from '../stripe'
 import { currentBillingInterval, prorationNetCents } from './proration'
 import { PAID_STRIPE_STATUSES, resolveStripePriceId, upsertBillingSubscription } from './subscription'
+import { billingCurrencyFromRequest } from '../../utils/currency'
 import { getUserBillingSnapshot } from './repository'
 
 export interface SubscriptionChangeRequest {
@@ -52,7 +53,8 @@ async function resolveTargetPriceId(
   return resolveStripePriceId(stripe, {
     planKey: request.planKey,
     interval: request.interval,
-    fallbackPriceId: request.planKey === 'pro' ? config.stripePricePro || undefined : undefined
+    fallbackPriceId: request.planKey === 'pro' ? config.stripePricePro || undefined : undefined,
+    currency: billingCurrencyFromRequest(event)
   })
 }
 

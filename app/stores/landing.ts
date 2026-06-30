@@ -97,9 +97,11 @@ export const useLandingStore = defineStore('landing', () => {
   function stripePlanPrice(key: 'pro' | 'enterprise', fallbackPrice: string, fallbackPeriod: string) {
     const stripe = billingStore.planForKey(key)
     if (stripe) {
+      const period = stripe.formattedPeriod ?? fallbackPeriod
+      const formatted = billingStore.displayPriceForPlan(stripe)
       return {
-        price: stripe.formattedPrice,
-        period: stripe.formattedPeriod ?? fallbackPeriod,
+        price: formatted.endsWith(period) ? formatted.slice(0, -period.length) : formatted,
+        period,
         yearlyNote: pricingCadence.value === 'yearly' && stripe.interval === 'year'
           ? t('landing.pricing.billedAnnually')
           : undefined

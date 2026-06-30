@@ -1,4 +1,6 @@
 import type { AppPlan } from '#shared/billing'
+import { matchStripePlan } from '#shared/billing-plans'
+import { convertWithPresentmentMarkup } from '#shared/fx'
 import type { UserBillingInfo, UserProfile } from '~/types/user'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -18,6 +20,7 @@ export interface StripePlanSummary {
   intervalCount: number
   formattedPrice: string
   formattedPeriod?: string
+  convertedForDisplay?: boolean
 }
 
 export interface SubscriptionChangePreview {
@@ -32,11 +35,14 @@ export interface SubscriptionChangePreview {
 }
 
 export const useBillingStore = defineStore('billing', () => {
-  const { t } = useAppI18n()
+  const { t, displayCurrency, formatCurrency, getLocale, locale } = useAppI18n()
+  const { rates, ensureRates } = useFxRates()
   const appToast = useAppToast()
   const loading = ref(false)
   const previewLoading = ref(false)
   const plans = ref<StripePlanSummary[]>([])
+  const catalog = ref<StripePlanSummary[]>([])
+  const preferredCurrency = ref<string | null>(null)
   const plansLoading = ref(false)
   const pricingCadence = ref<PricingCadence>('monthly')
   const selectedPlanKey = ref('pro')
@@ -48,10 +54,9 @@ export const useBillingStore = defineStore('billing', () => {
     pricingCadence.value === 'yearly' ? 'year' : 'month'
   )
 
-  function planForKey(key: string, interval = billingInterval.value) {
-    return plans.value.find(p => p.key === key && p.interval === interval)
-      ?? plans.value.find(p => p.key === key && p.interval === 'month')
-      ?? plans.value.find(p => p.key === key)
+  function planForKey(key: string, interval = billingInterval.value, currency = preferredCurrency.value ?? displayCurrency.value) {
+    return matchStripePlan(catalog.value, { planKey: key, interval, currency })
+      ?? matchStripePlan(catalog.value, { planKey: key, interval })
   }
 
   function intervalForPriceId(priceId: string | null | undefined): BillingInterval | null {
@@ -83,17 +88,54 @@ export const useBillingStore = defineStore('billing', () => {
   const enterprisePlan = computed(() => planForKey('enterprise'))
   const selectedPlan = computed(() => planForKey(selectedPlanKey.value))
 
+  function displayPriceForPlan(plan: StripePlanSummary | undefined): string {
+    if (!plan) return '—'
+    const target = displayCurrency.value
+    const source = plan.currency.toUpperCase()
+    if (source === target) {
+      return `${formatCurrency(plan.amount, target)}${plan.formattedPeriod ?? ''}`
+    }
+    if (rates.value) {
+      const amount = convertWithPresentmentMarkup(plan.amount, source, target, rates.value)
+      return `${formatCurrency(amount, target)}${plan.formattedPeriod ?? ''}`
+    }
+    const catalogPlan = matchStripePlan(catalog.value, {
+      planKey: plan.key,
+      interval: plan.interval ?? billingInterval.value,
+      currency: target
+    })
+    if (catalogPlan && catalogPlan.currency.toUpperCase() === target) {
+      return `${formatCurrency(catalogPlan.amount, target)}${plan.formattedPeriod ?? ''}`
+    }
+    return `${plan.formattedPrice}${plan.formattedPeriod ?? ''}`
+  }
+
   async function fetchPlans() {
     plansLoading.value = true
     try {
-      const data = await api<{ plans: StripePlanSummary[] }>(apiRoutes.stripe.plans, { noSpace: true })
+      await ensureRates()
+      const data = await api<{
+        plans: StripePlanSummary[]
+        catalog: StripePlanSummary[]
+        preferredCurrency?: string
+      }>(apiRoutes.stripe.plans, {
+        query: { locale: getLocale() },
+        noSpace: true
+      })
       plans.value = data.plans
+      catalog.value = data.catalog?.length ? data.catalog : data.plans
+      preferredCurrency.value = data.preferredCurrency ?? displayCurrency.value
     } catch {
       plans.value = []
+      catalog.value = []
     } finally {
       plansLoading.value = false
     }
   }
+
+  watch([displayCurrency, locale], () => {
+    void fetchPlans()
+  })
 
   async function previewChange(
     planKey = selectedPlanKey.value,
@@ -131,7 +173,8 @@ export const useBillingStore = defineStore('billing', () => {
         body: {
           planKey,
           priceId: selected?.priceId,
-          interval
+          interval,
+          currency: preferredCurrency.value ?? displayCurrency.value
         },
         noSpace: true
       })
@@ -224,6 +267,8 @@ export const useBillingStore = defineStore('billing', () => {
     previewLoading,
     settingsPending,
     plans,
+    catalog,
+    preferredCurrency,
     plansLoading,
     pricingCadence,
     selectedPlanKey,
@@ -232,6 +277,7 @@ export const useBillingStore = defineStore('billing', () => {
     proPlan,
     enterprisePlan,
     selectedPlan,
+    displayPriceForPlan,
     planForKey,
     intervalForPriceId,
     applyBillingContext,

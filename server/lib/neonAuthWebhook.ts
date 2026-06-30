@@ -3,6 +3,7 @@ import type { H3Event } from 'h3'
 import { getStripeClient } from './stripe/client'
 import { syncStripeCustomerPhone } from './stripe/customer-profile'
 import { sendSms } from './twilio'
+import { isDeleteAccountOtp } from './account-delete-otp-context'
 
 const JWKS_CACHE_MS = 10 * 60_000
 let jwksCache: { fetchedAt: number, keys: Array<JsonWebKey & { kid?: string }> } | null = null
@@ -155,17 +156,24 @@ async function handleSendOtp(event: H3Event, payload: NeonWebhookPayload): Promi
   }
 
   const otpType = String(payload.event_data?.otp_type ?? 'sign-in')
-  const subject = otpType === 'email-verification'
-    ? 'Verify your FlowRate email'
-    : otpType === 'forget-password'
-      ? 'Your FlowRate password reset code'
-      : 'Your FlowRate sign-in code'
+  const isDeleteOtp = isDeleteAccountOtp(email)
+  const subject = isDeleteOtp
+    ? 'Your FlowRate account deletion code'
+    : otpType === 'email-verification'
+      ? 'Verify your FlowRate email'
+      : otpType === 'forget-password'
+        ? 'Your FlowRate password reset code'
+        : 'Your FlowRate sign-in code'
+
+  const intro = isDeleteOtp
+    ? 'Use this code to confirm permanent account deletion.'
+    : 'Your FlowRate verification code is'
 
   await sendAuthEmail(
     event,
     email,
     subject,
-    `<p>Your FlowRate verification code is <strong>${otpCode}</strong>.</p>`
+    `<p>${intro} <strong>${otpCode}</strong>.</p>`
   )
 }
 

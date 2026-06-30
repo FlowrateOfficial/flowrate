@@ -1,5 +1,6 @@
 // ANCHOR: User profile store — bootstrap and settings
 import type { AppPlan } from '#shared/billing'
+import type { AccountDeleteRequest } from '#shared/account-delete'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import type { UserProfile } from '~/types/user'
@@ -32,12 +33,6 @@ export const useUserStore = defineStore('user', () => {
   const isSavingProfile = ref(false)
   const isVerifyingPhone = ref(false)
   const isResendingCode = ref(false)
-
-  const deleteModalOpen = ref(false)
-  const deleteConfirmEmail = ref('')
-  const deleteConfirmPassword = ref('')
-  const deleteAcknowledged = ref(false)
-  const isDeletingAccount = ref(false)
 
   const navItems = computed(() => {
     if (spacesStore.isChildManaged) {
@@ -109,12 +104,13 @@ export const useUserStore = defineStore('user', () => {
     return path.startsWith(to)
   }
 
-  async function deleteAccount(input: { confirmEmail: string, password?: string }) {
+  async function deleteAccount(input: AccountDeleteRequest) {
     await api(apiRoutes.user.account, {
       method: 'DELETE',
       body: input,
       noSpace: true
     })
+    await clearNuxtData('neon-auth-session')
     await signOut()
     resetSession()
     spacesStore.clearSession()
@@ -187,13 +183,6 @@ export const useUserStore = defineStore('user', () => {
     showVerificationInput.value = Boolean(profile.phone && !profile.phoneVerified)
   }
 
-  function openDeleteModal() {
-    deleteConfirmEmail.value = profileForm.email
-    deleteConfirmPassword.value = ''
-    deleteAcknowledged.value = false
-    deleteModalOpen.value = true
-  }
-
   async function saveProfileForm() {
     isSavingProfile.value = true
     try {
@@ -235,21 +224,6 @@ export const useUserStore = defineStore('user', () => {
       return true
     } finally {
       isResendingCode.value = false
-    }
-  }
-
-  async function confirmDeleteAccountForm() {
-    if (!deleteAcknowledged.value) return false
-    isDeletingAccount.value = true
-    try {
-      await deleteAccount({
-        confirmEmail: deleteConfirmEmail.value.trim(),
-        password: deleteConfirmPassword.value.trim() || undefined
-      })
-      deleteModalOpen.value = false
-      return true
-    } finally {
-      isDeletingAccount.value = false
     }
   }
 
@@ -363,11 +337,6 @@ export const useUserStore = defineStore('user', () => {
     isSavingProfile,
     isVerifyingPhone,
     isResendingCode,
-    deleteModalOpen,
-    deleteConfirmEmail,
-    deleteConfirmPassword,
-    deleteAcknowledged,
-    isDeletingAccount,
     navItems,
     bottomItems,
     accountMenuLinks,
@@ -376,12 +345,10 @@ export const useUserStore = defineStore('user', () => {
     isActive,
     applyProfile,
     applySettingsForm,
-    openDeleteModal,
     saveProfileForm,
     profileSaveErrorMessage,
     verifyPhoneForm,
     resendPhoneForm,
-    confirmDeleteAccountForm,
     bootstrap,
     bootstrapped,
     fetchProfile,

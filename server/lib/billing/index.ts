@@ -6,21 +6,26 @@ export {
 } from './change-subscription'
 
 export {
-  clearBillingSubscription,
+  buildStripePlanCatalog,
   formatPlanPeriod,
   formatPlanPrice,
+  listStripePlans,
+  resolveStripePriceId,
+  type ResolvedStripePlan,
+  type StripePlan
+} from './plans'
+
+export {
+  clearBillingSubscription,
   getStripeCustomerId,
   getUserBillingSnapshot,
   getUserPlan,
-  listStripePlans,
   processCheckoutSessionCompleted,
   processStripeSubscriptionEvent,
-  resolveStripePriceId,
   syncPlanFromCheckoutSession,
   syncUserPlanFromStripe,
   upsertBillingSubscription,
-  type AppPlan,
-  type StripePlan
+  type AppPlan
 } from './subscription'
 
 export {

@@ -37,6 +37,7 @@ const STATUS_KEYS: Record<number, string> = {
   422: 'errors.validation',
   429: 'errors.rateLimit',
   500: 'errors.server',
+  502: 'errors.server',
   503: 'errors.unavailable'
 }
 
@@ -49,7 +50,7 @@ export function resolveErrorMessage(
 
   const err = error as FetchErrorLike & { code?: string }
   const payload = extractApiErrorPayload(err)
-  const code = payload.code ?? err.data?.code ?? err.code ?? err.statusMessage
+  const code = payload.code ?? err.data?.code ?? err.code
 
   if (code && t(`errors.codes.${code}`) !== `errors.codes.${code}`) {
     return t(`errors.codes.${code}`)

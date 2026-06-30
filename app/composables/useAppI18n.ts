@@ -16,8 +16,16 @@ import {
 
 type TranslateParams = Record<string, string | number>
 
+const LOCALE_COOKIE = 'user-locale'
+
 export function useAppI18n() {
-  const { t: rawT, getLocale, switchLocale, getLocales } = useI18n()
+  const { t: rawT, getLocale: getI18nLocale, switchLocale, getLocales } = useI18n()
+  const localeCookie = useCookie<string | null>(LOCALE_COOKIE)
+  const localeState = useState<string | null>('i18n-locale', () => null)
+
+  // NOTE - nuxt-i18n-micro getLocale() is not reactive in computed contexts; track cookie + state instead
+  const locale = computed(() => localeState.value ?? localeCookie.value ?? getI18nLocale() ?? 'en')
+  const getLocale = () => locale.value
 
   const t = (key: string, params?: TranslateParams): string => {
     const result = rawT(key, params as never)
@@ -65,42 +73,43 @@ export function useAppI18n() {
     return labelFromKey(`dashboard.feedback.types.${type}`, type)
   }
 
-  const intlLocale = computed(() => intlLocaleFor(getLocale()))
-  const displayCurrency = computed<DisplayCurrency>(() => currencyForLocale(getLocale()))
+  const intlLocale = computed(() => intlLocaleFor(locale.value))
+  const displayCurrency = computed<DisplayCurrency>(() => currencyForLocale(locale.value))
 
   function formatCurrency(amount: number, currency?: string) {
-    return formatMoney(amount, getLocale(), currency)
+    return formatMoney(amount, locale.value, currency)
   }
 
   function resolveCurrency(items: Array<{ currency?: string | null }> = []) {
-    return resolveDisplayCurrency(getLocale(), items)
+    return resolveDisplayCurrency(locale.value, items)
   }
 
   function formatShortDateValue(iso: string) {
-    return formatShortDate(iso, getLocale())
+    return formatShortDate(iso, locale.value)
   }
 
   function formatShortDateWithYearValue(iso: string) {
-    return formatShortDateWithYear(iso, getLocale())
+    return formatShortDateWithYear(iso, locale.value)
   }
 
   function formatOptionalDateValue(
     iso: string | null | undefined,
     style: 'short' | 'medium' = 'medium'
   ) {
-    return formatOptionalDate(iso, getLocale(), style)
+    return formatOptionalDate(iso, locale.value, style)
   }
 
   function formatDateTimeValue(iso: string) {
-    return formatDateTime(iso, getLocale())
+    return formatDateTime(iso, locale.value)
   }
 
   function formatAbsAmountValue(amount: number, currency: string) {
-    return formatAbsAmount(amount, getLocale(), currency)
+    return formatAbsAmount(amount, locale.value, currency)
   }
 
   return {
     t,
+    locale,
     getLocale,
     switchLocale,
     getLocales,

@@ -35,22 +35,17 @@ const planLabels = computed(() => ({
 }))
 
 const planOptions = computed(() => {
-  const formatPrice = (key: string, fallback: string) => {
-    const plan = billingStore.planForKey(key)
-    return plan ? `${plan.formattedPrice}${plan.formattedPeriod ?? ''}` : fallback
-  }
-
   return [
     {
       key: 'pro',
       title: t('dashboard.settings.planOptions.pro'),
-      price: formatPrice('pro', '—'),
+      price: billingStore.displayPriceForPlan(billingStore.planForKey('pro')),
       blurb: t('auth.register.planProDescription')
     },
     {
       key: 'enterprise',
       title: t('dashboard.settings.planOptions.enterprise'),
-      price: formatPrice('enterprise', '—'),
+      price: billingStore.displayPriceForPlan(billingStore.planForKey('enterprise')),
       blurb: t('auth.register.planEnterpriseDescription')
     }
   ]
@@ -87,7 +82,7 @@ const primaryLabel = computed(() => {
   if (selectedPlan.value) {
     return t('dashboard.settings.upgradeCtaWithPlan', {
       plan: selectedPlan.value.name,
-      price: `${selectedPlan.value.formattedPrice}${selectedPlan.value.formattedPeriod ?? ''}`
+      price: billingStore.displayPriceForPlan(selectedPlan.value)
     })
   }
   return t('dashboard.settings.upgradeCta')
@@ -220,6 +215,10 @@ function formatBillingDate(iso: string) {
         }}
       </span>
     </div>
+
+    <p v-if="selectedPlan?.convertedForDisplay" class="text-xs text-muted">
+      {{ t('dashboard.settings.billedInStripeCurrency') }}
+    </p>
 
     <div class="flex flex-wrap gap-2 pt-1">
       <UButton
