@@ -1,59 +1,53 @@
-import { DISPLAY_CURRENCIES } from '#shared/currency'
-import { FX_BASE_CURRENCY, type FxCurrency } from '#shared/fx'
+import { normalizeFxCurrency, type FxCurrency } from '#shared/fx'
+import { fetchStripeFxQuotes } from './stripe-quotes'
 
 const CACHE_MS = 6 * 60 * 60 * 1000
-const FRANKFURTER_URL = 'https://api.frankfurter.app/latest'
 
 export interface FxRateSnapshot {
-  base: typeof FX_BASE_CURRENCY
+  base: FxCurrency
   rates: Record<FxCurrency, number>
+  /** Stripe checkout-style rates (exchange_rate, includes FX fee). */
+  presentmentRates?: Record<FxCurrency, number>
+  quoteId?: string
+  lockExpiresAt?: number
   fetchedAt: number
+  source: 'stripe'
 }
 
-let cache: FxRateSnapshot | null = null
+const cache = new Map<string, FxRateSnapshot>()
 
-function buildSnapshot(rates: Record<string, number>): FxRateSnapshot {
-  const normalized = { EUR: 1 } as Record<FxCurrency, number>
-  for (const code of DISPLAY_CURRENCIES) {
-    if (code === FX_BASE_CURRENCY) continue
-    const rate = rates[code]
-    if (typeof rate === 'number' && rate > 0) {
-      normalized[code] = rate
-    }
+function isCacheFresh(snapshot: FxRateSnapshot, now = Date.now()): boolean {
+  if (snapshot.lockExpiresAt) {
+    return now < snapshot.lockExpiresAt - 30_000
   }
-  return {
-    base: FX_BASE_CURRENCY,
-    rates: normalized,
-    fetchedAt: Date.now()
-  }
-}
-
-async function fetchFrankfurterRates(): Promise<FxRateSnapshot> {
-  const symbols = DISPLAY_CURRENCIES.filter(code => code !== FX_BASE_CURRENCY).join(',')
-  const response = await fetch(`${FRANKFURTER_URL}?from=${FX_BASE_CURRENCY}&to=${symbols}`)
-
-  if (!response.ok) {
-    throw createError({ statusCode: 502, message: 'Failed to fetch exchange rates' })
-  }
-
-  const data = await response.json() as { rates?: Record<string, number> }
-  return buildSnapshot(data.rates ?? {})
+  return now - snapshot.fetchedAt < CACHE_MS
 }
 
 export function resetFxRatesCacheForTests(): void {
-  cache = null
+  cache.clear()
 }
 
-export async function getFxRates(force = false): Promise<FxRateSnapshot> {
-  if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) {
-    return cache
+export async function getFxRates(baseCurrency = 'USD', force = false): Promise<FxRateSnapshot> {
+  const base = normalizeFxCurrency(baseCurrency)
+  const cached = cache.get(base)
+
+  if (!force && cached && isCacheFresh(cached)) {
+    return cached
+  }
+
+  const stripeKey = process.env.STRIPE_SECRET_KEY
+  if (!stripeKey) {
+    if (cached) return cached
+    throw createError({ statusCode: 503, message: 'FX rates unavailable' })
   }
 
   try {
-    cache = await fetchFrankfurterRates()
-    return cache
+    const snapshot = await fetchStripeFxQuotes(stripeKey, base)
+    cache.set(base, snapshot)
+    return snapshot
   } catch (error) {
-    if (cache) return cache
-    throw error
+    console.warn(`[fx] Stripe FX Quotes unavailable for ${base}:`, error)
+    if (cached) return cached
+    throw createError({ statusCode: 502, message: 'Failed to fetch exchange rates' })
   }
 }

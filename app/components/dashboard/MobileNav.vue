@@ -9,6 +9,7 @@ const { user } = storeToRefs(userStore)
 const { space } = storeToRefs(spacesStore)
 const { footerItems } = useMobileNavLayout()
 const { openMenu: openAccountMenu } = useMobileAccountMenu()
+const { onNavHover } = useNavPrefetch()
 
 const spaceNavKey = computed(() => space.value?.id ?? 'none')
 
@@ -40,6 +41,8 @@ const isAccountActive = computed(() => {
           :class="userStore.isActive(item.to) ? 'text-default' : 'text-muted'"
           :aria-label="item.label"
           :title="item.label"
+          @pointerenter="onNavHover(item.to)"
+          @focus="onNavHover(item.to)"
         >
           <UIcon :name="item.icon" class="size-5 shrink-0 sm:size-6" />
           <span class="mobile-nav-tab-label w-full text-center leading-tight">

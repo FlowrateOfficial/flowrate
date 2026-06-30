@@ -37,6 +37,25 @@ async function saveCategory() {
   >
     <template v-if="selectedTx" #body>
       <div class="space-y-6 p-4 sm:p-6">
+        <div class="flex items-center gap-3">
+          <DashboardPaymentIcon
+            :name="selectedTx.merchant ?? selectedTx.description"
+            :merchant="selectedTx.merchant"
+            :category="selectedTx.category"
+            size="lg"
+          />
+          <div class="min-w-0">
+            <p class="truncate text-base font-semibold">
+              {{ selectedTx.merchant ?? selectedTx.description }}
+            </p>
+            <p v-if="selectedTx.merchant" class="truncate text-sm text-muted">
+              {{ selectedTx.description }}
+            </p>
+          </div>
+        </div>
+
+        <USeparator />
+
         <div class="grid grid-cols-2 gap-4">
           <UFormField :label="t('dashboard.transactions.columns.amount')">
             <UBadge

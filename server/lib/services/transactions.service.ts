@@ -1,6 +1,6 @@
 // ANCHOR: Transaction list service — query validation + DTO mapping
 import { z } from 'zod'
-import type { TransactionListResponse } from '#shared/api/transactions'
+import type { TransactionListResponse, TransactionListItem } from '#shared/api/transactions'
 import type { transactionPatchBodySchema } from '../schemas/api'
 import type { SpaceContext } from '../domain/context'
 import {
@@ -27,6 +27,36 @@ export const transactionListQuerySchema = z.object({
 
 export type TransactionListQuery = z.infer<typeof transactionListQuerySchema>
 
+function mapTransactionItem(
+  tx: {
+    id: string
+    description: string
+    merchant: string | null
+    amount: { toString(): string } | number
+    currency: string
+    category: string
+    date: Date
+    pending: boolean
+    account: { id: string, name: string, visibility?: string } | null
+    userId?: string
+    user?: { name: string | null } | null
+  },
+  extras: Record<string, unknown> = {}
+): TransactionListItem {
+  return {
+    id: tx.id,
+    description: tx.description,
+    merchant: tx.merchant,
+    amount: Number(tx.amount),
+    currency: tx.currency,
+    category: tx.category,
+    date: tx.date.toISOString(),
+    pending: tx.pending,
+    account: tx.account as TransactionListItem['account'],
+    ...extras
+  } as TransactionListItem
+}
+
 export async function listTransactionsForSpace(
   ctx: SpaceContext,
   query: TransactionListQuery
@@ -52,20 +82,11 @@ export async function listTransactionsForSpace(
   )
 
   return {
-    items: items.map(tx => ({
-      id: tx.id,
-      description: tx.description,
-      merchant: tx.merchant,
-      amount: Number(tx.amount),
-      currency: tx.currency,
-      category: tx.category,
-      date: tx.date.toISOString(),
-      pending: tx.pending,
+    items: items.map(tx => mapTransactionItem(tx, {
       isMine: tx.userId === ctx.userId,
       ownerName: tx.user.name,
       paidBy: tx.user.name,
-      splitHint: splitByCategory.get(tx.category) ?? null,
-      account: tx.account
+      splitHint: splitByCategory.get(tx.category) ?? null
     })),
     total,
     page,
@@ -73,30 +94,24 @@ export async function listTransactionsForSpace(
   }
 }
 
-export async function listRecentTransactionsForSpace(ctx: SpaceContext, limit: number) {
-  const visibleAccountIds = await listVisibleAccountIdsForContext(ctx)
-  if (!visibleAccountIds.length) {
+export async function listRecentTransactionsForSpace(
+  ctx: SpaceContext,
+  limit: number,
+  visibleAccountIds?: string[]
+) {
+  const accountIds = visibleAccountIds ?? await listVisibleAccountIdsForContext(ctx)
+  if (!accountIds.length) {
     return { items: [], total: 0, page: 1, pages: 1 }
   }
 
-  const where = buildTransactionWhere(ctx, visibleAccountIds, { page: 1, limit })
+  const where = buildTransactionWhere(ctx, accountIds, { page: 1, limit })
   const [rows, total] = await Promise.all([
     findRecentTransactions(where, limit),
     countTransactions(where)
   ])
 
   return {
-    items: rows.map(tx => ({
-      id: tx.id,
-      description: tx.description,
-      merchant: tx.merchant,
-      amount: Number(tx.amount),
-      currency: tx.currency,
-      category: tx.category,
-      date: tx.date.toISOString(),
-      pending: tx.pending,
-      account: tx.account
-    })),
+    items: rows.map(tx => mapTransactionItem(tx)),
     total,
     page: 1,
     pages: Math.max(1, Math.ceil(total / limit))
@@ -117,17 +132,7 @@ export async function patchTransactionForSpace(
 
   const updated = await updateTransaction(transactionId, body)
 
-  return {
-    id: updated.id,
-    description: updated.description,
-    merchant: updated.merchant,
-    amount: Number(updated.amount),
-    currency: updated.currency,
-    category: updated.category,
-    date: updated.date.toISOString(),
-    pending: updated.pending,
-    account: updated.account
-  }
+  return mapTransactionItem(updated)
 }
 
 function csvEscape(value: string): string {

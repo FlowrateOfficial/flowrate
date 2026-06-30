@@ -146,7 +146,15 @@ async function confirmDeleteChild() {
           <span class="text-sm text-muted">{{ familyStore.formatDate(row.original.date) }}</span>
         </template>
         <template #description-cell="{ row }">
-          <p class="text-sm font-medium truncate">{{ row.original.merchant ?? row.original.description }}</p>
+          <div class="flex min-w-0 items-center gap-3">
+            <DashboardPaymentIcon
+              :name="row.original.merchant ?? row.original.description"
+              :merchant="row.original.merchant"
+              :category="row.original.category"
+              size="xs"
+            />
+            <p class="truncate text-sm font-medium">{{ row.original.merchant ?? row.original.description }}</p>
+          </div>
         </template>
         <template #category-cell="{ row }">
           <UBadge :label="familyStore.categoryLabel(row.original.category)" variant="subtle" size="xs" />

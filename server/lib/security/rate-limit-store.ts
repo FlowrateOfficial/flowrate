@@ -33,12 +33,23 @@ class MemoryRateLimitStore implements RateLimitStore {
 }
 
 class UpstashRateLimitStore implements RateLimitStore {
+  private readonly memoryFallback = new MemoryRateLimitStore()
+
   constructor(
     private readonly url: string,
     private readonly token: string
   ) {}
 
   async increment(key: string, windowMs: number): Promise<RateLimitIncrementResult> {
+    try {
+      return await this.incrementUpstash(key, windowMs)
+    } catch (error) {
+      console.warn('[rate-limit] Upstash unavailable, using in-memory fallback:', error)
+      return this.memoryFallback.increment(key, windowMs)
+    }
+  }
+
+  private async incrementUpstash(key: string, windowMs: number): Promise<RateLimitIncrementResult> {
     const response = await fetch(`${this.url}/pipeline`, {
       method: 'POST',
       headers: {

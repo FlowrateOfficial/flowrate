@@ -29,7 +29,7 @@ useSeoMeta({
 <template>
   <UApp :ui="{ root: 'surface-page min-h-screen' }">
     <NuxtLayout>
-      <NuxtPage />
+      <NuxtPage keepalive />
     </NuxtLayout>
   </UApp>
 </template>

@@ -8,6 +8,13 @@ import {
   spendingIncomeInRange
 } from '../repositories/transaction.repository'
 
+export type DashboardStatsAccountRow = {
+  balance: { toString(): string } | number
+  visibility: string
+  userId: string
+  currency: string
+}
+
 function sumConverted(
   fx: Awaited<ReturnType<typeof createFxConverter>>,
   rows: Array<{ currency: string, amount: number }>
@@ -15,18 +22,20 @@ function sumConverted(
   return fx.sum(rows.map(row => ({ amount: row.amount, currency: row.currency })))
 }
 
-export async function getDashboardStats(ctx: SpaceContext, displayCurrency: string) {
+export async function getDashboardStats(
+  ctx: SpaceContext,
+  displayCurrency: string,
+  preloadedAccounts?: DashboardStatsAccountRow[]
+) {
   const fx = await createFxConverter(displayCurrency)
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
-  const accountFilter = accountWhereForSpace(ctx, 'all')
-
   const [accounts, current, last, memberCount, subscriptionAlerts] = await Promise.all([
-    prisma.account.findMany({
-      where: accountFilter,
+    preloadedAccounts ?? prisma.account.findMany({
+      where: accountWhereForSpace(ctx, 'all'),
       select: { balance: true, visibility: true, userId: true, currency: true }
     }),
     spendingIncomeInRange(ctx.spaceId, startOfMonth),

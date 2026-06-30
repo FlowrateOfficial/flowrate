@@ -152,7 +152,7 @@ export async function buildStripePlanCatalog(
 ): Promise<ResolvedStripePlan[]> {
   let rates: Awaited<ReturnType<typeof getFxRates>> | null = null
   try {
-    rates = await getFxRates()
+    rates = await getFxRates(options.currency)
   } catch {
     rates = null
   }

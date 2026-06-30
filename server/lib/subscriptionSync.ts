@@ -8,6 +8,7 @@ import { detectSubscriptionsFromTransactions } from '../utils/subscriptions'
 import { merchantDomainForName } from './services/subscriptions.service'
 import { deferTask } from './jobs/defer'
 import { sendSubscriptionPriceAlertEmail } from './email/product-emails'
+import { isResendEmailConfigured } from '../utils/email-delivery'
 import { userPlanForId } from './billing/enforcement'
 
 export async function syncSpaceSubscriptions(spaceId: string, userId: string) {
@@ -141,6 +142,8 @@ function queuePriceAlertEmail(
   prevAmount: number,
   currency: string
 ) {
+  if (!isResendEmailConfigured()) return
+
   deferTask('subscription-price-email', async () => {
     const [user, plan] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true, prefs: true } }),

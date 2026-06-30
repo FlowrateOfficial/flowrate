@@ -2,10 +2,15 @@
 import { planHasFeature } from '#shared/plan-limits'
 import { parseUserPreferences } from '#shared/user-preferences'
 import { sendWeeklyDigestEmail } from '../email/product-emails'
+import { isResendEmailConfigured } from '../../utils/email-delivery'
 import { spendingIncomeInRange } from '../repositories/transaction.repository'
 import { createFxConverter } from '../fx/converter'
 
 export async function sendWeeklyDigests(appUrl: string) {
+  if (!isResendEmailConfigured()) {
+    return { sent: 0, candidates: 0, skipped: true as const }
+  }
+
   const users = await prisma.user.findMany({
     where: { spaceId: { not: null } },
     select: {

@@ -867,7 +867,9 @@
       "subtitle": "Gérez votre compte et vos préférences",
       "profile": "Profil",
       "prefsTitle": "Notifications et alertes",
-      "prefsSubtitle": "Alertes email et suivi des abonnements",
+      "prefsSubtitle": "Suivi des abonnements et alertes",
+      "emailNotificationsComingSoon": "Alertes e-mail bientôt disponibles",
+      "emailNotificationsComingSoonHelp": "Les alertes de hausse de prix et les résumés hebdomadaires ne sont pas encore envoyés par e-mail. Les alertes dans l'application restent actives. Cette page sera mise à jour lorsque l'envoi d'e-mails sera activé.",
       "emailPriceAlerts": "M'envoyer un email en cas de hausse de prix",
       "weeklyDigest": "Résumé hebdomadaire des dépenses",
       "subscriptionCap": "Plafond mensuel d'abonnements ($)",
@@ -1337,7 +1339,7 @@
     "privacy": {
       "title": "Politique de confidentialité",
       "seoTitle": "Politique de confidentialité — FlowRate",
-      "lastUpdatedAt": "2026-06-30T12:00:00Z",
+      "lastUpdatedAt": "2026-06-30T22:00:00Z",
       "seeAlsoTerms": "Voir aussi : Conditions d'utilisation",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "FlowRate (« nous ») est une application de gestion des finances personnelles et familiales, actuellement en bêta. Cette politique explique quelles informations nous collectons, comment nous les utilisons, avec qui nous les partageons, où elles sont stockées et quels choix vous avez. Nous visons une transparence maximale pour que vous puissiez utiliser FlowRate en toute connaissance de cause pendant le développement du produit.",
@@ -1350,7 +1352,7 @@
       "sections": {
         "overview": {
           "title": "1. Vue d'ensemble",
-          "p1": "FlowRate aide les particuliers, les familles et les petites équipes à comprendre leur argent. Vous pouvez connecter des comptes bancaires via Plaid (marchés européens pris en charge) ou Stripe Financial Connections (établissements américains), consulter les transactions, les catégoriser, suivre des budgets, détecter les abonnements récurrents, partager certains comptes dans un espace Foyer, Famille ou Entreprise, et envoyer des retours à l'équipe FlowRate depuis l'application.",
+          "p1": "FlowRate aide les particuliers, les familles et les petites équipes à comprendre leur argent. Vous pouvez connecter des comptes bancaires via Plaid (marchés européens pris en charge) ou Stripe Financial Connections (établissements américains), consulter les transactions, les catégoriser, suivre des budgets, détecter les abonnements récurrents, afficher les montants dans votre devise d'affichage préférée, voir des icônes de marque marchandes optionnelles, partager certains comptes dans un espace Foyer, Famille ou Entreprise, et envoyer des retours à l'équipe FlowRate depuis l'application.",
           "p2": "Nous ne vendons pas vos informations personnelles. Nous ne partageons pas les données de connexion bancaire avec des tiers non liés à nos services pour leur propre marketing ou développement produit."
         },
         "dataCollected": {
@@ -1361,6 +1363,7 @@
             "Données d'espace financier : noms d'espaces, rôles des membres, invitations et préférences de visibilité (comptes personnels ou partagés).",
             "Données bancaires connectées (si vous choisissez de lier un compte) : nom de l'établissement, nom affiché du compte, type de compte, identifiants masqués, soldes et historique des transactions reçus via Plaid ou Stripe Financial Connections, selon le prestataire activé pour votre connexion.",
             "Données dérivées : catégories de transactions (y compris catégorisation automatique par règles — pas d'IA aujourd'hui), budgets, abonnements détectés, synthèses analytiques et règles de répartition que vous configurez.",
+            "Préférences de notification (optionnel) : réglages pour de futures alertes e-mail — hausses de prix d'abonnement et résumés hebdomadaires. L'envoi d'e-mails n'est pas encore actif ; la vérification à l'inscription utilise le service e-mail par défaut de Neon Auth.",
             "Données de facturation : formule d'abonnement et identifiants client Stripe Billing dans FlowRate ; champs du profil de facturation (téléphone vérifié synchronisé depuis votre profil, adresse, fuseau horaire et historique de factures) stockés uniquement sur votre fiche client Stripe — pas dans la base FlowRate.",
             "Retours et avis (si vous les envoyez) : catégorie (avis, demande de fonctionnalité ou rapport de bug), objet, texte du message, note par étoiles optionnelle, images et courtes vidéos jointes, et — si « Inclure le contexte technique » reste coché — votre identifiant utilisateur, e-mail, nom, offre, nom et type d'espace actif, rôle dans l'espace, langue, URL de la page et chaîne user-agent du navigateur.",
             "Données techniques : journaux serveur, adresses IP et métadonnées de requêtes générées lors de l'utilisation de l'application (notamment via notre hébergeur).",
@@ -1385,6 +1388,8 @@
             "Afficher les soldes et listes de transactions dans votre tableau de bord.",
             "Catégoriser les transactions par correspondance de règles sur les libellés (pas d'intelligence artificielle aujourd'hui) et vous permettre de les ajuster.",
             "Alimenter les budgets, analyses de dépenses, détection d'abonnements et vues par espace (par ex. synthèses famille ou burn rate entreprise).",
+            "Convertir et afficher les montants dans votre devise d'affichage via Stripe FX Quotes (codes de devise uniquement — pas vos transactions individuelles).",
+            "Associer les noms de marchands ou d'établissements des libellés de transaction à des icônes de marque optionnelles. Les logos sont servis depuis notre CDN statique Cloudflare ; l'association se fait dans l'application et votre navigateur demande les images par URL sans envoyer soldes ou montants de transaction au CDN.",
             "Appliquer les règles de visibilité que vous définissez (comptes personnels ou partagés).",
             "Vous authentifier, sécuriser les sessions, envoyer les codes de vérification e-mail à l'inscription (via Neon Auth), prévenir les abus et répondre au support.",
             "Traiter les abonnements payants optionnels via Stripe Billing.",
@@ -1397,7 +1402,8 @@
           "title": "5. Analyses et suivi",
           "p1": "Les fonctionnalités « Analyses » de FlowRate désignent des insights calculés à partir de vos propres données financières dans l'application — pas du suivi publicitaire tiers ou intersites.",
           "p2": "Nous n'utilisons pas Google Analytics, de pixels publicitaires ni ne vendons de profils comportementaux. Nos hébergeurs peuvent enregistrer des journaux serveur standard (horodatages, URL, codes d'erreur) pour la fiabilité et la sécurité.",
-          "p3": "Sur les déploiements de production hébergés par Vercel, nous utilisons aussi Vercel Speed Insights pour mesurer les performances réelles (Core Web Vitals). Ce n'est pas du marketing. Voir l'encadré Speed Insights en haut de cette page et la liste des sous-traitants ci-dessous."
+          "p3": "Sur les déploiements de production hébergés par Vercel, nous utilisons aussi Vercel Speed Insights pour mesurer les performances réelles (Core Web Vitals). Ce n'est pas du marketing. Voir l'encadré Speed Insights en haut de cette page et la liste des sous-traitants ci-dessous.",
+          "p4": "Les icônes de marque dans les listes sont associées localement aux noms de marchands ou d'établissements, puis chargées comme images statiques depuis notre CDN Cloudflare (juridiction UE). Ces requêtes n'incluent pas vos soldes bancaires, montants de transaction ou numéros de compte — seulement l'URL de l'image et les métadonnées CDN standard (comme l'adresse IP) que Cloudflare peut journaliser pour la diffusion et la sécurité."
         },
         "ai": {
           "title": "6. Analyses IA optionnelles (Pro et Entreprise)",
@@ -1429,7 +1435,7 @@
           "title": "8. Partage des informations",
           "p1": "Nous partageons des informations uniquement dans les cas suivants :",
           "items": [
-            "Prestataires (sous-traitants) : entreprises qui hébergent, authentifient (y compris l'envoi des codes de vérification e-mail), connectent les banques (Plaid ou Stripe), fournissent la saisie assistée d'adresse (Mapbox), envoient les e-mails d'authentification transactionnels lorsque configuré (Resend), vérifient les numéros de téléphone (Twilio), stockent les issues de retours (GitHub), ou — uniquement si vous optez pour les analyses IA — génèrent des insights IA pour notre compte, uniquement pour vous fournir FlowRate. Ils ne peuvent pas utiliser les données de connexion bancaire pour leurs propres finalités.",
+            "Prestataires (sous-traitants) : entreprises qui hébergent, authentifient (y compris la vérification e-mail via Neon Auth), connectent les banques (Plaid ou Stripe), fournissent la saisie assistée d'adresse (Mapbox), vérifient les numéros de téléphone (Twilio), diffusent les logos de marque statiques (Cloudflare), appliquent la limitation de débit (Upstash si configuré), stockent les issues de retours (GitHub), ou — uniquement si vous optez pour les analyses IA — génèrent des insights IA pour notre compte, uniquement pour vous fournir FlowRate. Ils ne peuvent pas utiliser les données de connexion bancaire pour leurs propres finalités.",
             "Au sein de vos espaces : lorsque vous marquez un compte ou des données comme partagés, les membres autorisés de cet espace (par ex. tuteurs dans un espace Famille) peuvent les voir selon leur rôle.",
             "Obligations légales : si la loi, une décision de justice ou la protection de droits, de la sécurité ou de la sûreté l'exige.",
             "Transferts d'activité : en cas de fusion ou acquisition impliquant FlowRate, les données peuvent être transférées sous réserve de cette politique."
@@ -1447,12 +1453,22 @@
             },
             {
               "name": "Stripe",
-              "purpose": "Financial Connections (liaison bancaire US), accès aux soldes et transactions, facturation d'abonnement, stockage du profil de facturation client (adresse, fuseau horaire, téléphone vérifié) et génération de factures",
+              "purpose": "Financial Connections (liaison bancaire US), accès aux soldes et transactions, facturation d'abonnement, stockage du profil de facturation client (adresse, fuseau horaire, téléphone vérifié), génération de factures et FX Quotes pour la conversion en devise d'affichage",
               "location": "États-Unis (et régions où Stripe opère)"
             },
             {
               "name": "Neon",
               "purpose": "Authentification utilisateur (Neon Auth, y compris les codes de vérification e-mail à l'inscription) et hébergement PostgreSQL",
+              "location": "États-Unis et/ou Union européenne"
+            },
+            {
+              "name": "Cloudflare",
+              "purpose": "CDN de logos de marque statiques (icônes marchandes pré-hébergées servies à votre navigateur ; stockage juridiction UE)",
+              "location": "Union européenne (et régions où Cloudflare opère)"
+            },
+            {
+              "name": "Upstash",
+              "purpose": "Métadonnées de limitation de débit pour prévenir les abus (repli en mémoire si indisponible)",
               "location": "États-Unis et/ou Union européenne"
             },
             {
@@ -1471,8 +1487,8 @@
               "location": "États-Unis"
             },
             {
-              "name": "Resend (si configuré)",
-              "purpose": "Envoi d'e-mails transactionnels pour les codes de vérification à l'inscription et les liens magiques lorsque les webhooks Neon Auth passent par FlowRate — non utilisé si vous vous appuyez uniquement sur l'e-mail partagé par défaut de Neon",
+              "name": "Resend (prévu — pas encore utilisé)",
+              "purpose": "Futurs e-mails transactionnels et de notification produit lorsque nous activerons l'envoi personnalisé. La vérification à l'inscription utilise aujourd'hui le service e-mail par défaut de Neon Auth.",
               "location": "États-Unis"
             },
             {
@@ -1515,6 +1531,7 @@
             "Tuteurs : supprimez un compte enfant ou ado depuis Famille → fiche enfant ou détails du membre (effacement définitif des données FlowRate et de la connexion).",
             "Export : écrivez à mathieu.lievre.pro@outlook.com pour demander une copie de vos données dans un format portable.",
             "Marketing : nous n'envoyons pas de publicité tierce basée sur les données de connexion bancaire.",
+            "Notifications e-mail : des préférences peuvent apparaître dans Paramètres, mais FlowRate n'envoie pas encore d'e-mails de notification produit. Les alertes d'abonnement dans l'application restent actives.",
             "Retours : décochez « Inclure le contexte technique » avant l'envoi si vous ne souhaitez pas joindre les métadonnées de support ; consultez l'historique dans Retours → Historique ; écrivez-nous pour demander la suppression d'une issue.",
             "Analyses IA : lorsque disponible, activez ou désactivez les insights IA optionnels dans Paramètres. La désactivation arrête les nouveaux traitements IA de vos données financières."
           ],
@@ -1556,7 +1573,7 @@
     "terms": {
       "title": "Conditions d'utilisation",
       "seoTitle": "Conditions d'utilisation — FlowRate",
-      "lastUpdatedAt": "2026-06-30T12:00:00Z",
+      "lastUpdatedAt": "2026-06-30T22:00:00Z",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoGlba": "Avis de confidentialité financière (GLBA)",
       "intro": "Les présentes Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation de FlowRate pendant la phase bêta. En créant un compte ou en utilisant le service, vous acceptez ces Conditions et notre Politique de confidentialité, y compris les limites applicables pendant le développement actif.",
@@ -1568,7 +1585,7 @@
         },
         "service": {
           "title": "2. Le service",
-          "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses (par règles aujourd'hui — pas d'intelligence artificielle), définir des budgets, détecter les abonnements, collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise), et envoyer des retours à l'équipe FlowRate via la page Retours dans l'application.",
+          "p1": "FlowRate fournit des outils pour consulter les soldes et transactions des comptes connectés, catégoriser les dépenses (par règles aujourd'hui — pas d'intelligence artificielle), définir des budgets, détecter les abonnements, afficher les montants dans votre devise préférée, montrer des icônes de marque marchandes optionnelles, collaborer dans des espaces financiers optionnels (Indépendant, Foyer, Famille ou Entreprise), et envoyer des retours à l'équipe FlowRate via la page Retours dans l'application.",
           "p2": "Nous prévoyons d'offrir des analyses de dépenses par IA optionnelles aux abonnés Pro et Entreprise qui s'inscrivent explicitement. Cette fonctionnalité n'est pas encore disponible ; lorsqu'elle sera lancée, elle sera régie par notre Politique de confidentialité et votre choix d'opt-in dans Paramètres.",
           "p3": "Les fonctionnalités peuvent évoluer. Nous pouvons ajouter, modifier ou retirer des fonctionnalités avec un préavis raisonnable lorsque c'est possible.",
           "p4": "Notre site de production peut charger Vercel Speed Insights pour mesurer les performances des pages. Il n'accède pas à vos données bancaires. L'utilisation de FlowRate implique que votre navigateur peut transmettre des métriques techniques de performance à Vercel, comme décrit dans notre Politique de confidentialité."
@@ -1601,7 +1618,7 @@
           "p1": "Certaines fonctionnalités peuvent nécessiter un abonnement payant traité par Stripe Billing. Les tarifs sont affichés au moment du paiement. Les abonnements se renouvellent automatiquement jusqu'à annulation via le portail de facturation ou en contactant le support.",
           "p2": "Les remboursements sont traités selon la politique affichée à l'achat et la loi applicable.",
           "p3": "Les analyses IA optionnelles, lorsqu'elles seront disponibles, nécessitent un abonnement Pro ou Entreprise et un opt-in distinct dans Paramètres. Payer un forfait n'active pas automatiquement le traitement IA de vos données financières.",
-          "p4": "Si vous fournissez des informations de facturation dans Paramètres (adresse, fuseau horaire), nous les enregistrons sur votre fiche client Stripe pour la facturation, le calcul des taxes et la conformité des paiements. Votre numéro de téléphone vérifié dans le profil se synchronise automatiquement vers Stripe pour la facturation — nous ne stockons pas de téléphone de facturation distinct dans FlowRate. La saisie assistée Mapbox vous aide à saisir l'adresse ; voir notre Politique de confidentialité pour le traitement des recherches par Mapbox. Vous pouvez générer des factures depuis Paramètres lorsque des éléments sont facturables."
+          "p4": "Si vous fournissez des informations de facturation dans Paramètres (adresse, fuseau horaire), nous les enregistrons sur votre fiche client Stripe pour la facturation, le calcul des taxes et la conformité des paiements. Votre numéro de téléphone vérifié dans le profil se synchronise automatiquement vers Stripe pour la facturation — nous ne stockons pas de téléphone de facturation distinct dans FlowRate. La saisie assistée Mapbox vous aide à saisir l'adresse ; voir notre Politique de confidentialité pour le traitement des recherches par Mapbox. La conversion en devise d'affichage utilise Stripe FX Quotes. Vous pouvez générer des factures depuis Paramètres lorsque des éléments sont facturables."
         },
         "acceptableUse": {
           "title": "8. Usage acceptable",
@@ -1625,7 +1642,7 @@
         },
         "disclaimers": {
           "title": "10. Pas de conseil financier",
-          "p1": "FlowRate est fourni à titre informatif et organisationnel uniquement. Nous ne fournissons pas de conseil financier, d'investissement, fiscal ou juridique. Les catégorisations, détections d'abonnements, analyses et tout futur insight généré par IA sont des estimations automatisées — vérifiez les décisions importantes avec des professionnels qualifiés et vos relevés bancaires officiels.",
+          "p1": "FlowRate est fourni à titre informatif et organisationnel uniquement. Nous ne fournissons pas de conseil financier, d'investissement, fiscal ou juridique. Les catégorisations, détections d'abonnements, analyses, conversions de devise à des fins d'affichage et tout futur insight généré par IA sont des estimations automatisées — vérifiez les décisions importantes avec des professionnels qualifiés et vos relevés bancaires officiels.",
           "p2": "Les analyses IA, lorsqu'elles seront proposées, peuvent être inexactes ou incomplètes. Elles ne remplacent pas le jugement professionnel ni les relevés officiels."
         },
         "liability": {
@@ -1648,7 +1665,7 @@
     "glba": {
       "title": "Avis de confidentialité financière (GLBA)",
       "seoTitle": "Avis de confidentialité financière (GLBA) — FlowRate",
-      "lastUpdatedAt": "2026-06-30T12:00:00Z",
+      "lastUpdatedAt": "2026-06-30T22:00:00Z",
       "seeAlsoPrivacy": "Voir aussi : Politique de confidentialité",
       "seeAlsoTerms": "Conditions d'utilisation",
       "intro": "Le présent Avis de confidentialité financière décrit comment FlowRate collecte, utilise et partage les informations personnelles non publiques (« IPNP ») des consommateurs dans le cadre de notre application de finances personnelles, actuellement en bêta. Il est fourni pour répondre aux exigences de transparence du Gramm-Leach-Bliley Act (« GLBA ») et des règles américaines connexes sur la confidentialité financière, notamment lorsque vous connectez des comptes financiers via Plaid ou Stripe Financial Connections. Cet avis complète notre Politique de confidentialité et nos Conditions d'utilisation et peut être mis à jour à mesure que le produit mûrit.",
@@ -1693,6 +1710,8 @@
           "items": [
             "Afficher soldes et transactions dans votre tableau de bord.",
             "Catégoriser les transactions, alimenter budgets, détection d'abonnements et analyses de dépenses (par règles aujourd'hui — pas d'IA sauf opt-in ultérieur aux analyses IA).",
+            "Convertir les montants pour l'affichage dans votre devise choisie via Stripe FX Quotes.",
+            "Conserver les préférences de notification pour de futures alertes e-mail (non envoyées aujourd'hui).",
             "Générer des insights de dépenses IA optionnels pour les utilisateurs Pro et Entreprise qui s'inscrivent explicitement, lorsque cette fonctionnalité sera disponible.",
             "Appliquer la visibilité et les permissions par rôle dans les espaces que vous créez ou rejoignez.",
             "Vous authentifier, sécuriser le service, envoyer les codes de vérification e-mail lorsque requis, prévenir la fraude et les abus, et fournir le support client.",
@@ -1706,7 +1725,7 @@
           "title": "7. Comment nous partageons les IPNP",
           "p1": "Nous ne vendons pas vos IPNP. Nous les partageons uniquement dans les cas limités suivants :",
           "items": [
-            "Prestataires de services : entreprises de confiance qui traitent des données pour notre compte afin d'exploiter FlowRate — par exemple Plaid et Stripe (liaison bancaire, profil de facturation et génération de factures), Neon (authentification — y compris codes de vérification e-mail — et base de données), Vercel (hébergement), Mapbox (suggestions de saisie d'adresse de facturation), Resend (e-mails d'authentification transactionnels lorsque configuré via webhooks Neon), GitHub (suivi privé des retours in-app) et Twilio (vérification du téléphone du profil ; les numéros vérifiés peuvent être synchronisés vers Stripe). Ces prestataires ne peuvent utiliser les IPNP que pour nous fournir leurs services et doivent les protéger de manière appropriée.",
+            "Prestataires de services : entreprises de confiance qui traitent des données pour notre compte afin d'exploiter FlowRate — par exemple Plaid et Stripe (liaison bancaire, profil de facturation, génération de factures et FX Quotes), Neon (authentification — y compris codes de vérification e-mail — et base de données), Vercel (hébergement), Cloudflare (CDN de logos de marque statiques), Mapbox (suggestions de saisie d'adresse de facturation), Upstash (limitation de débit si configuré), GitHub (suivi privé des retours in-app) et Twilio (vérification du téléphone du profil ; les numéros vérifiés peuvent être synchronisés vers Stripe). Resend est prévu pour l'envoi d'e-mails futur mais n'est pas utilisé aujourd'hui. Ces prestataires ne peuvent utiliser les IPNP que pour nous fournir leurs services et doivent les protéger de manière appropriée.",
             "Prestataires d'IA (opt-in uniquement) : si vous êtes abonné Pro ou Entreprise et activez explicitement les analyses IA lorsque la fonctionnalité sera disponible, nous pourrons partager certaines IPNP avec des prestataires d'IA tiers uniquement pour générer des insights dans FlowRate. Ce partage n'a pas lieu aujourd'hui et ne se produit jamais sans votre opt-in.",
             "Au sein de vos espaces : lorsque vous marquez un compte ou des données comme partagés, les membres autorisés de cet espace (tuteurs dans un espace Famille, administrateurs financiers dans un espace Entreprise, etc.) peuvent les consulter selon leur rôle.",
             "Affiliés : FlowRate ne partage actuellement pas les IPNP avec des affiliés pour leurs propres finalités.",
@@ -1746,7 +1765,7 @@
           "title": "12. Lien avec les autres politiques",
           "p1": "Notre Politique de confidentialité détaille davantage nos pratiques, les utilisateurs internationaux, les cookies, les enfants et adolescents, et les sous-traitants. Nos Conditions d'utilisation régissent votre utilisation de FlowRate.",
           "p2": "En cas de conflit entre le présent avis et la Politique de confidentialité concernant les IPNP collectées via des connexions de comptes financiers, le présent avis prévaut pour ces IPNP.",
-          "p3": "Les mesures techniques non financières (comme les données de performance de page Vercel Speed Insights sur notre site public) et les retours volontaires in-app sont décrits dans notre Politique de confidentialité. Les retours ne doivent pas inclure de soldes de comptes connectés, d'historique de transactions ni d'identifiants bancaires sauf si vous choisissez de les coller — ce que nous déconseillons."
+          "p3": "Les mesures techniques non financières (comme les données de performance de page Vercel Speed Insights sur notre site public), les requêtes de logos de marque statiques vers notre CDN Cloudflare, et les retours volontaires in-app sont décrits dans notre Politique de confidentialité. Les retours ne doivent pas inclure de soldes de comptes connectés, d'historique de transactions ni d'identifiants bancaires sauf si vous choisissez de les coller — ce que nous déconseillons."
         },
         "changes": {
           "title": "13. Modifications de cet avis",

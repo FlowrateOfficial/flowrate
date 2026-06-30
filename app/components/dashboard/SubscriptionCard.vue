@@ -22,7 +22,8 @@ const emit = defineEmits<{
   edit: [id: string]
 }>()
 
-const { t, formatShortDate, formatCurrency, subscriptionStatusLabel, subscriptionFrequencyLabel } = useAppI18n()
+const { t, formatShortDate, subscriptionStatusLabel, subscriptionFrequencyLabel } = useAppI18n()
+const { format: formatMoney } = useDisplayMoney()
 
 const statusColors: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
   [ENUM.subscription.ACTIVE]: 'success',
@@ -52,29 +53,16 @@ const showMissedRenewal = computed(() =>
 const showCancelled = computed(() =>
   props.subscription.status === ENUM.subscription.CANCELLED
 )
-
-const avatarLetter = computed(() => props.subscription.name.charAt(0).toUpperCase())
-const logoFailed = ref(false)
-
-watch(() => props.subscription.id, () => {
-  logoFailed.value = false
-})
 </script>
 
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-        <img
-          v-if="subscription.logoUrl && !logoFailed"
-          :src="subscription.logoUrl"
-          :alt="subscription.name"
-          class="w-full h-full object-contain p-1"
-          loading="lazy"
-          @error="logoFailed = true"
-        >
-        <span v-else class="text-sm font-bold">{{ avatarLetter }}</span>
-      </div>
+      <DashboardPaymentIcon
+        :name="subscription.rawName ?? subscription.name"
+        category="SUBSCRIPTIONS"
+        size="sm"
+      />
 
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
@@ -143,10 +131,10 @@ watch(() => props.subscription.id, () => {
             v-if="subscription.prev != null"
             class="text-xs text-muted line-through tabular-nums"
           >
-            {{ formatCurrency(subscription.prev, subscription.currency) }}
+            {{ formatMoney(subscription.prev, subscription.currency) }}
           </p>
           <p class="text-sm font-semibold tabular-nums">
-            {{ formatCurrency(subscription.amount, subscription.currency) }}
+            {{ formatMoney(subscription.amount, subscription.currency) }}
             <span
               v-if="subscription.priceChangePercent != null && subscription.priceChangePercent > 0"
               class="ml-1 text-xs font-medium text-error"

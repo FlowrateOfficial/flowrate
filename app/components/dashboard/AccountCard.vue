@@ -69,9 +69,11 @@ const syncStale = computed(() => {
   <UCard :ui="{ body: 'p-5 sm:p-6' }">
     <div class="mb-4 flex items-start justify-between gap-3">
       <div class="flex min-w-0 items-center gap-3">
-        <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-elevated">
-          <UIcon :name="typeIcons[account.type] ?? 'i-lucide-landmark'" class="size-6 text-muted" />
-        </div>
+        <DashboardPaymentIcon
+          :name="account.institution ?? account.name"
+          :fallback-icon="typeIcons[account.type] ?? 'i-lucide-landmark'"
+          size="xl"
+        />
         <div class="min-w-0">
           <p class="truncate text-lg font-semibold">{{ account.name }}</p>
           <p v-if="account.institution" class="truncate text-sm text-muted">{{ account.institution }}</p>

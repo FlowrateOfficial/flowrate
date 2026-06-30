@@ -12,7 +12,7 @@ const props = defineProps<{
   loading?: boolean
 }>()
 
-const { t, formatCurrency, formatShortDate } = useAppI18n()
+const { t, formatCurrency, formatShortDate, displayCurrency } = useAppI18n()
 const tz = getLocalTimeZone()
 
 const selected = shallowRef<CalendarDate | undefined>()
@@ -145,7 +145,7 @@ watch(placeholder, (month) => {
             {{ t('dashboard.subscriptions.calendarDayTitle', { date: formatShortDate(selectedKey) }) }}
           </h3>
           <p v-if="selectedEvents.length" class="text-sm font-semibold tabular-nums text-primary">
-            {{ formatCurrency(selectedDayTotal, data.currency) }}
+            {{ formatCurrency(selectedDayTotal, data?.currency ?? displayCurrency) }}
           </p>
         </div>
 
@@ -155,9 +155,16 @@ watch(placeholder, (month) => {
             :key="`${event.subscriptionId}-${event.date}`"
             class="flex items-center justify-between gap-3 px-3 py-2.5"
           >
-            <span class="truncate text-sm font-medium">{{ event.name }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2.5">
+              <DashboardPaymentIcon
+                :name="event.name"
+                category="SUBSCRIPTIONS"
+                size="xs"
+              />
+              <span class="truncate text-sm font-medium">{{ event.name }}</span>
+            </div>
             <span class="shrink-0 text-sm font-semibold tabular-nums">
-              {{ formatCurrency(event.amount, event.currency) }}
+              {{ formatCurrency(event.amount, event.currency || displayCurrency) }}
             </span>
           </li>
         </ul>

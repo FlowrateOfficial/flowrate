@@ -2,7 +2,7 @@
 // ANCHOR: Settings page — profile, phone verify, billing
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: ['auth', 'billing-sync'] })
+definePageMeta({ layout: 'dashboard', title: 'Settings', middleware: ['auth', 'billing-sync'], keepalive: true })
 
 const route = useRoute()
 const { t } = useAppI18n()
@@ -26,9 +26,14 @@ const accountDeleteModalRef = ref<{ openModal: (email: string) => void } | null>
 const userPrefs = useUserPreferences()
 const { prefs, pending: prefsPending, saving: prefsSaving } = userPrefs
 
+const runtimeConfig = useRuntimeConfig()
+const emailNotificationsEnabled = computed(
+  () => Boolean(runtimeConfig.public.emailNotificationsConfigured)
+)
+const subscriptionCapMonthly = ref<number | null>(null)
+
 const emailPriceAlerts = ref(true)
 const weeklyDigest = ref(true)
-const subscriptionCapMonthly = ref<number | null>(null)
 
 useDashboardSeo('dashboard.settings.title')
 
@@ -46,17 +51,18 @@ const billingDataKey = computed(() =>
 
 await useAsyncData(
   billingDataKey,
-  () => billingStore.loadSettings({ checkoutSessionId: checkoutSessionId.value })
+  () => billingStore.loadSettings({ checkoutSessionId: checkoutSessionId.value }),
+  { lazy: import.meta.client, dedupe: 'defer' }
 )
 
-await useAsyncData('user-preferences', async () => {
+useAsyncData('user-preferences', async () => {
   await userPrefs.load()
   if (userPrefs.prefs.value) {
     emailPriceAlerts.value = userPrefs.prefs.value.emailPriceAlerts !== false
     weeklyDigest.value = userPrefs.prefs.value.weeklyDigest !== false
     subscriptionCapMonthly.value = userPrefs.prefs.value.subscriptionCapMonthly ?? null
   }
-})
+}, { lazy: import.meta.client, dedupe: 'defer' })
 
 onMounted(async () => {
   if (route.query.upgraded === '1') {
@@ -105,11 +111,18 @@ async function resendVerificationCode() {
 }
 
 async function savePreferences() {
-  await userPrefs.save({
-    emailPriceAlerts: emailPriceAlerts.value,
-    weeklyDigest: weeklyDigest.value,
-    subscriptionCapMonthly: subscriptionCapMonthly.value
-  })
+  const patch: {
+    subscriptionCapMonthly: number | null
+    emailPriceAlerts?: boolean
+    weeklyDigest?: boolean
+  } = { subscriptionCapMonthly: subscriptionCapMonthly.value }
+
+  if (emailNotificationsEnabled.value) {
+    patch.emailPriceAlerts = emailPriceAlerts.value
+    patch.weeklyDigest = weeklyDigest.value
+  }
+
+  await userPrefs.save(patch)
 }
 </script>
 
@@ -223,14 +236,24 @@ async function savePreferences() {
       </div>
 
       <div v-else class="space-y-4">
-        <UCheckbox
-          v-model="emailPriceAlerts"
-          :label="t('dashboard.settings.emailPriceAlerts')"
+        <UAlert
+          v-if="!emailNotificationsEnabled"
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-mail"
+          :title="t('dashboard.settings.emailNotificationsComingSoon')"
+          :description="t('dashboard.settings.emailNotificationsComingSoonHelp')"
         />
-        <UCheckbox
-          v-model="weeklyDigest"
-          :label="t('dashboard.settings.weeklyDigest')"
-        />
+        <template v-else>
+          <UCheckbox
+            v-model="emailPriceAlerts"
+            :label="t('dashboard.settings.emailPriceAlerts')"
+          />
+          <UCheckbox
+            v-model="weeklyDigest"
+            :label="t('dashboard.settings.weeklyDigest')"
+          />
+        </template>
         <UFormField :label="t('dashboard.settings.subscriptionCap')">
           <UInput
             v-model.number="subscriptionCapMonthly"
