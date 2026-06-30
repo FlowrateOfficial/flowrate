@@ -35,7 +35,8 @@ export const plaidExchangeBodySchema = z.object({
 export const stripeCheckoutBodySchema = z.object({
   planKey: z.string().optional().default('pro'),
   priceId: z.string().optional(),
-  interval: z.enum(['month', 'year']).optional().default('month')
+  interval: z.enum(['month', 'year']).optional().default('month'),
+  currency: z.string().length(3).optional()
 })
 
 export const stripeSyncSubscriptionBodySchema = z.object({
@@ -124,6 +125,8 @@ export const savingsJarBodySchema = z.object({
 
 export const accountDeleteBodySchema = z.object({
   confirmEmail: z.string().email(),
+  emailCode: z.string().min(4).max(12),
+  phoneCode: z.string().min(4).max(12).optional(),
   password: z.string().min(1).optional()
 })
 

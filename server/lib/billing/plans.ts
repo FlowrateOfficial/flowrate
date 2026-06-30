@@ -1,4 +1,8 @@
 import type Stripe from 'stripe'
+import { intlLocaleFor } from '#shared/currency'
+import { findStripePlanInCurrency, matchStripePlan } from '#shared/billing-plans'
+import { convertWithPresentmentMarkup } from '#shared/fx'
+import { getFxRates } from '../fx/rates'
 
 export interface StripePlan {
   key: string
@@ -37,6 +41,31 @@ function mapPrice(product: Stripe.Product, price: Stripe.Price): StripePlan | nu
   }
 }
 
+function expandPriceCurrencies(product: Stripe.Product, price: Stripe.Price): StripePlan[] {
+  const base = mapPrice(product, price)
+  if (!base) return []
+
+  const plans = [base]
+  const options = price.currency_options
+  if (!options || typeof options !== 'object') return plans
+
+  for (const [code, option] of Object.entries(options)) {
+    if (!option || typeof option !== 'object') continue
+    const currency = code.toUpperCase()
+    if (currency === base.currency) continue
+    const unitAmount = 'unit_amount' in option ? option.unit_amount : null
+    if (unitAmount == null) continue
+
+    plans.push({
+      ...base,
+      amount: unitAmount / 100,
+      currency
+    })
+  }
+
+  return plans
+}
+
 export async function listStripePlans(stripe: Stripe, force = false): Promise<StripePlan[]> {
   if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) {
     return cache.plans
@@ -53,12 +82,14 @@ export async function listStripePlans(stripe: Stripe, force = false): Promise<St
     const prices = await stripe.prices.list({
       product: product.id,
       active: true,
-      limit: 20
+      limit: 20,
+      expand: ['data.currency_options']
     })
 
     for (const price of prices.data) {
-      const mapped = mapPrice(product, price)
-      if (mapped) plans.push(mapped)
+      for (const mapped of expandPriceCurrencies(product, price)) {
+        plans.push(mapped)
+      }
     }
   }
 
@@ -75,6 +106,7 @@ export async function resolveStripePriceId(
     priceId?: string
     fallbackPriceId?: string
     interval?: 'month' | 'year'
+    currency?: string
   }
 ): Promise<string> {
   if (options.priceId) return options.priceId
@@ -83,11 +115,8 @@ export async function resolveStripePriceId(
   const interval = options.interval ?? 'month'
   const plans = await listStripePlans(stripe)
 
-  const byKeyInterval = plans.find(p => p.key === key && p.interval === interval)
-  if (byKeyInterval) return byKeyInterval.priceId
-
-  const byKey = plans.find(p => p.key === key)
-  if (byKey) return byKey.priceId
+  const matched = matchStripePlan(plans, { planKey: key, interval, currency: options.currency })
+  if (matched) return matched.priceId
 
   const byName = plans.find(p => p.name.toLowerCase() === key)
   if (byName) return byName.priceId
@@ -96,11 +125,11 @@ export async function resolveStripePriceId(
 
   throw createError({
     statusCode: 404,
-    message: `No Stripe price found for plan "${key}" (${interval}). Add a Product with metadata planKey=${key}.`
+    message: `No Stripe price found for plan "${key}" (${interval}${options.currency ? `, ${options.currency}` : ''}). Add a Product with metadata planKey=${key}.`
   })
 }
 
-export function formatPlanPrice(plan: StripePlan, locale = 'en-US'): string {
+export function formatPlanPrice(plan: Pick<StripePlan, 'amount' | 'currency'>, locale = 'en-US'): string {
   if (plan.amount === 0) return 'Free'
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -108,6 +137,70 @@ export function formatPlanPrice(plan: StripePlan, locale = 'en-US'): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
   }).format(plan.amount)
+}
+
+export interface ResolvedStripePlan extends StripePlan {
+  formattedPrice: string
+  formattedPeriod?: string
+  billingCurrency: string
+  convertedForDisplay: boolean
+}
+
+export async function buildStripePlanCatalog(
+  plans: StripePlan[],
+  options: { currency: string, locale: string }
+): Promise<ResolvedStripePlan[]> {
+  let rates: Awaited<ReturnType<typeof getFxRates>> | null = null
+  try {
+    rates = await getFxRates()
+  } catch {
+    rates = null
+  }
+  const intl = intlLocaleFor(options.locale)
+  const planKeys = [...new Set(plans.map(plan => plan.key))]
+  const intervals: Array<'month' | 'year'> = ['month', 'year']
+  const resolved: ResolvedStripePlan[] = []
+
+  for (const planKey of planKeys) {
+    for (const interval of intervals) {
+      const native = findStripePlanInCurrency(plans, {
+        planKey,
+        interval,
+        currency: options.currency
+      })
+      const fallback = matchStripePlan(plans, { planKey, interval })
+      const source = native ?? fallback
+      if (!source) continue
+
+      const amount = native
+        ? source.amount
+        : rates
+          ? convertWithPresentmentMarkup(
+            source.amount,
+            source.currency,
+            options.currency,
+            rates
+          )
+          : source.amount
+      const currency = (native
+        ? source.currency
+        : rates
+          ? options.currency
+          : source.currency
+      ).toUpperCase()
+      const displayPlan = { ...source, amount, currency }
+
+      resolved.push({
+        ...displayPlan,
+        formattedPrice: formatPlanPrice(displayPlan, intl),
+        formattedPeriod: formatPlanPeriod(source),
+        billingCurrency: options.currency.toUpperCase(),
+        convertedForDisplay: !native && !!rates
+      })
+    }
+  }
+
+  return resolved
 }
 
 export function formatPlanPeriod(plan: StripePlan): string | undefined {

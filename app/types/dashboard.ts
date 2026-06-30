@@ -4,6 +4,7 @@ import type { TeenDashboard } from '~/types/teen'
 export interface DashboardStats {
   spaceType: string
   memberCount: number
+  currency: string
   totalBalance: number
   sharedBalance: number
   personalBalance: number

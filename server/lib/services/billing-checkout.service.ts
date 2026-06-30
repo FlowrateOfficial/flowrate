@@ -4,6 +4,7 @@ import type { z } from 'zod'
 import type { stripeCheckoutBodySchema } from '../schemas/api'
 import { getStripeCustomerId } from '../billing'
 import { resolveStripePriceId } from '../billing'
+import { billingCurrencyFromRequest } from '../../utils/currency'
 import { ensureStripeCustomer, requireStripe, resolveHttpsBaseUrl } from '../stripe'
 import { findDefaultIndependentSpaceId, findUserProfile } from '../repositories/user.repository'
 
@@ -24,7 +25,8 @@ export async function createStripeCheckoutSession(
     planKey: body.planKey ?? 'pro',
     priceId: body.priceId,
     fallbackPriceId: config.stripePricePro || undefined,
-    interval: body.interval
+    interval: body.interval,
+    currency: body.currency ?? billingCurrencyFromRequest(event)
   })
 
   const dbUser = await findUserProfile(authUserId)

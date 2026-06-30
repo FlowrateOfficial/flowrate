@@ -127,7 +127,8 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-    '@neondatabase/auth',
+        '@mapbox/search-js-web',
+        '@neondatabase/auth',
         '@neondatabase/auth/vanilla/adapters',
         '@nuxt/ui > prosemirror-gapcursor',
         '@nuxt/ui > prosemirror-model',

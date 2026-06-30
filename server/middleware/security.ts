@@ -46,6 +46,10 @@ export default defineEventHandler(async (event) => {
     await rateLimit(event, 'account-delete', { max: 3, windowMs: 60 * 60_000 })
   }
 
+  if (path === '/api/user/account/delete-challenge' && event.method === 'POST') {
+    await rateLimit(event, 'account-delete-codes', { max: 5, windowMs: 60 * 60_000 })
+  }
+
   if (path.startsWith('/api/user/phone/')) {
     await rateLimit(event, 'phone-verify', { max: 10, windowMs: 60 * 60_000 })
   }

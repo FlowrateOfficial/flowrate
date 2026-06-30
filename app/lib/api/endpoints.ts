@@ -9,6 +9,7 @@ export const apiRoutes = {
     stripeCustomer: '/api/user/stripe-customer',
     stripeInvoices: '/api/user/stripe-invoices',
     account: '/api/user/account',
+    deleteChallenge: '/api/user/account/delete-challenge',
     phoneVerify: '/api/user/phone/verify',
     phoneResend: '/api/user/phone/resend'
   },
@@ -74,6 +75,9 @@ export const apiRoutes = {
     exchange: '/api/plaid/exchange',
     syncAccounts: '/api/plaid/sync-accounts',
     syncTransactions: '/api/plaid/sync-transactions'
+  },
+  fx: {
+    rates: '/api/fx/rates'
   },
   feedback: '/api/feedback',
   feedbackDetail: (issueNumber: number) => `/api/feedback/${issueNumber}`

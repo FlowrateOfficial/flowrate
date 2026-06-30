@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { resolveDisplayCurrency } from '#shared/currency'
+import { currencyForLocale, type DisplayCurrency } from '#shared/currency'
 
 export function localeFromRequest(event: H3Event): string {
   const cookie = getCookie(event, 'user-locale')
@@ -11,13 +11,17 @@ export function localeFromRequest(event: H3Event): string {
   return 'en'
 }
 
+export function billingCurrencyFromRequest(event: H3Event): string {
+  return currencyForLocale(localeFromRequest(event))
+}
+
+export function displayCurrencyForLocale(localeHint = 'en'): DisplayCurrency {
+  return currencyForLocale(localeHint)
+}
+
 export async function resolveSpaceDisplayCurrency(
-  spaceId: string,
+  _spaceId: string,
   localeHint = 'en'
 ): Promise<string> {
-  const accounts = await prisma.account.findMany({
-    where: { spaceId },
-    select: { currency: true }
-  })
-  return resolveDisplayCurrency(localeHint, accounts)
+  return displayCurrencyForLocale(localeHint)
 }

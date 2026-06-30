@@ -4,10 +4,21 @@ import type { AppPlan } from '#shared/billing'
 import { planHasFeature } from '#shared/plan-limits'
 import type { SpaceContext } from '../domain/context'
 import { assertSaasShield, userPlanForId } from '../billing/enforcement'
+import { createFxConverter } from '../fx/converter'
 import { spendingIncomeInRange } from '../repositories/transaction.repository'
 import { accountVisibilityFilter, canViewFinancials } from '../../utils/spaceAuth'
 
-export async function getBusinessOverview(ctx: SpaceContext): Promise<BusinessOverviewDto> {
+function sumRows(
+  fx: Awaited<ReturnType<typeof createFxConverter>>,
+  rows: Array<{ currency: string, amount: number }>
+) {
+  return fx.sum(rows.map(row => ({ amount: row.amount, currency: row.currency })))
+}
+
+export async function getBusinessOverview(
+  ctx: SpaceContext,
+  displayCurrency: string
+): Promise<BusinessOverviewDto> {
   if (ctx.spaceType !== 'COMPANY') {
     throw createError({ statusCode: 400, message: 'Business metrics are only available for Business spaces' })
   }
@@ -18,23 +29,25 @@ export async function getBusinessOverview(ctx: SpaceContext): Promise<BusinessOv
 
   const ownerPlan = await userPlanForId(ctx.space.ownerId)
   await assertSaasShield(ctx.space.ownerId, ownerPlan)
+  const fx = await createFxConverter(displayCurrency)
 
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
   const accountFilter = { spaceId: ctx.spaceId, ...accountVisibilityFilter(ctx.userId, ctx.role) }
 
-  const [accounts, monthly, subscriptions, txCount, cloudAgg, vendorTxs] = await Promise.all([
+  const [accounts, monthly, subscriptions, txCount, cloudRows, vendorRows] = await Promise.all([
     prisma.account.findMany({
       where: accountFilter,
-      select: { balance: true }
+      select: { balance: true, currency: true }
     }),
     spendingIncomeInRange(ctx.spaceId, startOfMonth),
     prisma.detectedSubscription.findMany({
       where: { spaceId: ctx.spaceId, status: 'ACTIVE' },
-      select: { name: true, amount: true }
+      select: { name: true, amount: true, currency: true }
     }),
     prisma.transaction.count({ where: { spaceId: ctx.spaceId } }),
-    prisma.transaction.aggregate({
+    prisma.transaction.groupBy({
+      by: ['currency'],
       where: {
         spaceId: ctx.spaceId,
         date: { gte: startOfMonth },
@@ -43,20 +56,27 @@ export async function getBusinessOverview(ctx: SpaceContext): Promise<BusinessOv
       },
       _sum: { amount: true }
     }),
-    prisma.transaction.findMany({
+    prisma.transaction.groupBy({
+      by: ['merchant', 'description', 'currency'],
       where: {
         spaceId: ctx.spaceId,
         date: { gte: startOfMonth },
         amount: { lt: 0 }
       },
-      select: { merchant: true, description: true, amount: true }
+      _sum: { amount: true }
     })
   ])
 
-  const cash = accounts.reduce((sum, account) => sum + Number(account.balance), 0)
-  const monthlyBurn = monthly.spending
-  const monthlyIncome = monthly.income
-  const monthlySubs = subscriptions.reduce((sum, sub) => sum + Number(sub.amount), 0)
+  const cash = fx.sum(accounts.map(account => ({
+    amount: Number(account.balance),
+    currency: account.currency
+  })))
+  const monthlyBurn = sumRows(fx, monthly.spendingByCurrency)
+  const monthlyIncome = sumRows(fx, monthly.incomeByCurrency)
+  const monthlySubs = fx.sum(subscriptions.map(sub => ({
+    amount: Number(sub.amount),
+    currency: sub.currency
+  })))
   const netBurn = monthlyBurn - monthlyIncome
   const runwayMonths = netBurn > 0 ? cash / netBurn : null
 
@@ -67,21 +87,28 @@ export async function getBusinessOverview(ctx: SpaceContext): Promise<BusinessOv
   }, {})
   const wastedSubs = subscriptions
     .filter(sub => (duplicateSubs[sub.name.toLowerCase()] ?? 0) > 1)
-    .reduce((sum, sub) => sum + Number(sub.amount), 0)
+    .reduce((sum, sub) => sum + fx.convert(Number(sub.amount), sub.currency), 0)
 
-  const cloudSpend = Math.abs(Number(cloudAgg._sum.amount ?? 0))
+  const cloudSpend = sumRows(
+    fx,
+    cloudRows.map(row => ({
+      currency: row.currency,
+      amount: Math.abs(Number(row._sum.amount ?? 0))
+    }))
+  )
 
-  const vendorTotals = vendorTxs.reduce<Record<string, number>>((acc, tx) => {
-    const name = (tx.merchant ?? tx.description).trim()
-    if (!name) return acc
-    acc[name] = (acc[name] ?? 0) + Math.abs(Number(tx.amount))
-    return acc
-  }, {})
+  const vendorTotals = new Map<string, number>()
+  for (const row of vendorRows) {
+    const name = (row.merchant ?? row.description).trim()
+    if (!name) continue
+    const converted = fx.convert(Math.abs(Number(row._sum.amount ?? 0)), row.currency)
+    vendorTotals.set(name, (vendorTotals.get(name) ?? 0) + converted)
+  }
 
-  const topVendors = Object.entries(vendorTotals)
+  const topVendors = [...vendorTotals.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
-    .map(([name, amount]) => ({ name, amount }))
+    .map(([name, amount]) => ({ name, amount: Math.round(amount * 100) / 100 }))
 
   const hasAccounts = accounts.length > 0
   const hasTransactions = txCount > 0
@@ -134,15 +161,18 @@ export async function getBusinessOverview(ctx: SpaceContext): Promise<BusinessOv
   }
 
   return {
-    cash,
-    monthlyBurn,
-    monthlyIncome,
-    netBurn,
+    currency: displayCurrency,
+    cash: Math.round(cash * 100) / 100,
+    monthlyBurn: Math.round(monthlyBurn * 100) / 100,
+    monthlyIncome: Math.round(monthlyIncome * 100) / 100,
+    netBurn: Math.round(netBurn * 100) / 100,
     runwayMonths: runwayMonths ? Math.round(runwayMonths * 10) / 10 : null,
-    monthlySubscriptions: monthlySubs,
-    subscriptionWaste: wastedSubs,
+    monthlySubscriptions: Math.round(monthlySubs * 100) / 100,
+    subscriptionWaste: Math.round(wastedSubs * 100) / 100,
     activeSubscriptions: subscriptions.length,
-    cloudSpend: planHasFeature(ownerPlan as AppPlan, 'cloudSpendTracking') ? cloudSpend : null,
+    cloudSpend: planHasFeature(ownerPlan as AppPlan, 'cloudSpendTracking')
+      ? Math.round(cloudSpend * 100) / 100
+      : null,
     setup: {
       hasAccounts,
       hasTransactions,

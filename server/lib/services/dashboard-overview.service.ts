@@ -13,13 +13,17 @@ import type { H3Event } from 'h3'
 export async function getDashboardOverview(ctx: SpaceContext, event: H3Event) {
   const plan = await userPlanForId(ctx.userId)
   const includeSaas = planHasFeature(plan, 'saasShield')
-  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, localeFromRequest(event))
+  const queryLocale = getQuery(event).locale
+  const locale = typeof queryLocale === 'string' && queryLocale.trim()
+    ? queryLocale.trim()
+    : localeFromRequest(event)
+  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, locale)
 
   const visibleAccounts = await listVisibleAccountBalances(ctx)
   const accountIds = visibleAccounts.map(account => account.id)
 
   const [stats, analytics, accounts, transactions, alertSubscriptions] = await Promise.all([
-    getDashboardStats(ctx).then((s) => {
+    getDashboardStats(ctx, currency).then((s) => {
       if (!includeSaas) {
         return {
           ...s,
@@ -37,6 +41,7 @@ export async function getDashboardOverview(ctx: SpaceContext, event: H3Event) {
         accountIds,
         accounts: visibleAccounts.map(account => ({
           balance: Number(account.balance),
+          currency: account.currency,
           createdAt: account.createdAt
         })),
         currency

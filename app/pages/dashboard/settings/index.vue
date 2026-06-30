@@ -18,14 +18,11 @@ const {
   phoneVerified,
   isSavingProfile,
   isVerifyingPhone,
-  isResendingCode,
-  deleteModalOpen,
-  deleteConfirmEmail,
-  deleteConfirmPassword,
-  deleteAcknowledged,
-  isDeletingAccount
+  isResendingCode
 } = storeToRefs(userStore)
 const { settingsPending } = storeToRefs(billingStore)
+
+const accountDeleteModalRef = ref<{ openModal: (email: string) => void } | null>(null)
 
 useDashboardSeo('dashboard.settings.title')
 
@@ -89,17 +86,6 @@ async function resendVerificationCode() {
     appToast.success(t('dashboard.settings.phoneCodeResent'))
   } catch (err: unknown) {
     appToast.errorMessage(userStore.profileSaveErrorMessage(err))
-  }
-}
-
-async function confirmDeleteAccount() {
-  try {
-    const ok = await userStore.confirmDeleteAccountForm()
-    if (!ok) return
-    appToast.success(t('dashboard.settings.deleteSuccess'))
-    await navigateTo('/', { replace: true })
-  } catch (err: unknown) {
-    appToast.errorFrom(err, 'dashboard.settings.deleteFailed')
   }
 }
 </script>
@@ -241,59 +227,10 @@ async function confirmDeleteAccount() {
         color="error"
         variant="subtle"
         icon="i-lucide-trash-2"
-        @click="userStore.openDeleteModal()"
+        @click="accountDeleteModalRef?.openModal(profileForm.email)"
       />
     </UCard>
 
-    <UModal v-model:open="deleteModalOpen" :title="t('dashboard.settings.deleteModalTitle')">
-      <template #body>
-        <div class="space-y-4">
-          <p class="text-sm text-muted">{{ t('dashboard.settings.deleteModalDescription') }}</p>
-
-          <UFormField :label="t('dashboard.settings.deleteConfirmEmail')">
-            <UInput
-              v-model="deleteConfirmEmail"
-              type="email"
-              autocomplete="off"
-              :placeholder="t('dashboard.settings.deleteConfirmEmailPlaceholder')"
-              class="w-full"
-            />
-          </UFormField>
-
-          <UFormField :label="t('dashboard.settings.deleteConfirmPassword')">
-            <UInput
-              v-model="deleteConfirmPassword"
-              type="password"
-              autocomplete="current-password"
-              :placeholder="t('dashboard.settings.deleteConfirmPasswordPlaceholder')"
-              class="w-full"
-            />
-            <template #help>{{ t('dashboard.settings.deleteConfirmPasswordHelp') }}</template>
-          </UFormField>
-
-          <UCheckbox
-            v-model="deleteAcknowledged"
-            :label="t('dashboard.settings.deleteConfirmPhrase')"
-          />
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton
-            :label="t('dashboard.settings.deleteCancel')"
-            color="neutral"
-            variant="outline"
-            @click="deleteModalOpen = false"
-          />
-          <UButton
-            :label="t('dashboard.settings.deleteConfirmAction')"
-            color="error"
-            :loading="isDeletingAccount"
-            :disabled="!deleteAcknowledged || !deleteConfirmEmail.trim()"
-            @click="confirmDeleteAccount"
-          />
-        </div>
-      </template>
-    </UModal>
+    <DashboardAccountDeleteModal ref="accountDeleteModalRef" />
   </DashboardPageShell>
 </template>

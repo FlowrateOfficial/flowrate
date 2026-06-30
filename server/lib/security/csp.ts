@@ -88,6 +88,13 @@ export function buildContentSecurityPolicy(event: H3Event): string {
   }
 
   const plaidEnabled = plaidConnectSrc(event).length > 0
+  const isDev = import.meta.dev
+
+  if (isDev) {
+    const { protocol, host } = getRequestURL(event)
+    const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:'
+    connectSrc.push(`${wsProtocol}//${host}`)
+  }
 
   return [
     `default-src 'self'${plaidEnabled ? ' https://cdn.plaid.com' : ''}`,
@@ -102,6 +109,7 @@ export function buildContentSecurityPolicy(event: H3Event): string {
     `font-src 'self' https://fonts.gstatic.com data:`,
     `img-src 'self' data: blob: https:`,
     `connect-src ${connectSrc.join(' ')}`,
-    `frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://accounts.google.com${plaidEnabled ? ' https://cdn.plaid.com' : ''}`
+    `frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://accounts.google.com${plaidEnabled ? ' https://cdn.plaid.com' : ''}`,
+    `worker-src 'self'${isDev ? ' blob:' : ''}`
   ].join('; ')
 }

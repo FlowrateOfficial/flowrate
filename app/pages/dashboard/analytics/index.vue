@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Analytics', middleware: 'auth' })
 
-const { t } = useAppI18n()
+const { t, displayCurrency } = useAppI18n()
 const analyticsStore = useAnalyticsStore()
 const {
   range,
@@ -27,7 +27,11 @@ const {
 
 const hasConnectedAccounts = computed(() => (data.value?.summary.linkedAccountCount ?? 0) > 0)
 
-await useSpaceStoreFetch('analytics', () => analyticsStore.fetchOverview(), [range])
+await useSpaceStoreFetch(
+  'analytics',
+  () => analyticsStore.fetchOverview(),
+  [range, displayCurrency]
+)
 
 useDashboardSeo('dashboard.analytics.title')
 </script>

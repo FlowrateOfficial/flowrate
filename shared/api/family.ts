@@ -59,5 +59,6 @@ export interface MemberFinancialDto {
     spending30d: number
     income30d: number
     transactionCount: number
+    currency: string
   }
 }

@@ -29,6 +29,7 @@ export const ALLOWED_AUTH_PATH_PREFIXES = [
   'revoke-session',
   'revoke-sessions',
   'list-sessions',
+  'list-accounts',
   'email-otp',
   'phone-number',
   'magic-link'
