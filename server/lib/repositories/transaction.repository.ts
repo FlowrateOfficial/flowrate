@@ -21,27 +21,50 @@ export async function listVisibleAccountIdsForContext(ctx: SpaceContext): Promis
 export async function spendingIncomeInRange(
   spaceId: string,
   from: Date,
-  to?: Date
+  to?: Date,
+  accountIds?: string[]
 ) {
   const dateFilter: Prisma.DateTimeFilter = { gte: from }
   if (to) dateFilter.lte = to
 
-  const baseWhere = { spaceId, date: dateFilter }
+  const accountFilter = accountIds?.length ? { accountId: { in: accountIds } } : {}
+  const baseWhere = { spaceId, date: dateFilter, ...accountFilter }
 
-  const [spendingAgg, incomeAgg] = await Promise.all([
-    prisma.transaction.aggregate({
+  const [spendingRows, incomeRows] = await Promise.all([
+    prisma.transaction.groupBy({
+      by: ['currency'],
       where: { ...baseWhere, amount: { lt: 0 } },
       _sum: { amount: true }
     }),
-    prisma.transaction.aggregate({
+    prisma.transaction.groupBy({
+      by: ['currency'],
       where: { ...baseWhere, amount: { gt: 0 } },
       _sum: { amount: true }
     })
   ])
 
-  const spending = Math.abs(Number(spendingAgg._sum.amount ?? 0))
-  const income = Number(incomeAgg._sum.amount ?? 0)
-  return { spending, income, net: income - spending }
+  return {
+    spendingByCurrency: spendingRows.map(row => ({
+      currency: row.currency,
+      amount: Math.abs(Number(row._sum.amount ?? 0))
+    })),
+    incomeByCurrency: incomeRows.map(row => ({
+      currency: row.currency,
+      amount: Number(row._sum.amount ?? 0)
+    }))
+  }
+}
+
+export async function spendingIncomeInRangeTotals(
+  spaceId: string,
+  from: Date,
+  to?: Date,
+  accountIds?: string[]
+) {
+  const split = await spendingIncomeInRange(spaceId, from, to, accountIds)
+  const spending = split.spendingByCurrency.reduce((sum, row) => sum + row.amount, 0)
+  const income = split.incomeByCurrency.reduce((sum, row) => sum + row.amount, 0)
+  return { spending, income, net: income - spending, ...split }
 }
 
 export async function transactionsInRange(
@@ -194,15 +217,17 @@ export async function findTransactionsForExport(
   })
 }
 
+export type CategorySpendByCurrency = Map<string, Array<{ currency: string, amount: number }>>
+
 export async function spentByCategorySince(
   spaceId: string,
   accountIds: string[],
   from: Date
-) {
-  if (!accountIds.length) return new Map<string, number>()
+): Promise<CategorySpendByCurrency> {
+  if (!accountIds.length) return new Map()
 
   const groups = await prisma.transaction.groupBy({
-    by: ['category'],
+    by: ['category', 'currency'],
     where: {
       spaceId,
       accountId: { in: accountIds },
@@ -212,7 +237,15 @@ export async function spentByCategorySince(
     _sum: { amount: true }
   })
 
-  return new Map(
-    groups.map(group => [group.category, Math.abs(Number(group._sum.amount ?? 0))])
-  )
+  const byCategory = new Map<string, Array<{ currency: string, amount: number }>>()
+  for (const group of groups) {
+    const rows = byCategory.get(group.category) ?? []
+    rows.push({
+      currency: group.currency,
+      amount: Math.abs(Number(group._sum.amount ?? 0))
+    })
+    byCategory.set(group.category, rows)
+  }
+
+  return byCategory
 }

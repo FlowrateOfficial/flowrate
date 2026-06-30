@@ -466,6 +466,8 @@ export async function deleteNeonAuthUserUpstream(
   const request = toWebRequest(event)
   const headers = new Headers(request.headers)
   headers.set('Content-Type', 'application/json')
+  headers.set('Origin', getRequestURL(event).origin)
+  headers.set('x-neon-auth-middleware', 'true')
 
   const upstream = await fetch(`${baseUrl.replace(/\/$/, '')}/delete-user`, {
     method: 'POST',
@@ -480,6 +482,113 @@ export async function deleteNeonAuthUserUpstream(
       throw createError({ statusCode: 400, message: 'Password is required or incorrect' })
     }
     throw createError({ statusCode: 400, message })
+  }
+}
+
+async function neonAuthAuthedFetch(
+  event: H3Event,
+  path: string,
+  init: RequestInit = {}
+): Promise<Response> {
+  const config = useRuntimeConfig(event)
+  const baseUrl = config.public.neonAuthUrl as string
+  if (!baseUrl) {
+    throw createError({ statusCode: 503, message: 'Authentication is not configured' })
+  }
+
+  const headers = new Headers(init.headers)
+  headers.set('Cookie', extractNeonAuthCookies(getRequestHeader(event, 'cookie') ?? ''))
+  headers.set('Origin', getRequestURL(event).origin)
+  headers.set('x-neon-auth-middleware', 'true')
+  const userAgent = getRequestHeader(event, 'user-agent')
+  if (userAgent) headers.set('User-Agent', userAgent)
+  if (init.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  return fetch(`${baseUrl.replace(/\/$/, '')}/${path}`, {
+    ...init,
+    headers
+  })
+}
+
+export async function listNeonAuthAccountProviders(event: H3Event): Promise<string[]> {
+  const upstream = await neonAuthAuthedFetch(event, 'list-accounts', { method: 'GET' })
+  if (!upstream.ok) return []
+
+  const data = await upstream.json().catch(() => null) as
+    | Array<{ providerId?: string }>
+    | { accounts?: Array<{ providerId?: string }> }
+    | null
+
+  const accounts = Array.isArray(data) ? data : data?.accounts ?? []
+  return accounts
+    .map(account => account.providerId)
+    .filter((providerId): providerId is string => Boolean(providerId))
+}
+
+export type NeonAuthEmailOtpType = 'forget-password' | 'email-verification' | 'sign-in'
+
+export async function sendNeonAuthEmailOtp(
+  event: H3Event,
+  email: string,
+  type: NeonAuthEmailOtpType = 'forget-password'
+): Promise<void> {
+  const upstream = await neonAuthAuthedFetch(event, 'email-otp/send-verification-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email, type })
+  })
+
+  if (!upstream.ok) {
+    const body = await upstream.text().catch(() => '')
+    let message = 'Failed to send email verification code'
+    try {
+      const data = JSON.parse(body) as { message?: string }
+      if (data.message) message = data.message
+    } catch {
+      if (body) message = body.slice(0, 200)
+    }
+    if (import.meta.dev) {
+      console.warn('[neon-auth] send email OTP failed:', upstream.status, body)
+    }
+    throw createError({
+      statusCode: upstream.status === 429 ? 429 : 502,
+      message
+    })
+  }
+}
+
+export async function checkNeonAuthEmailOtp(
+  event: H3Event,
+  email: string,
+  otp: string,
+  type: NeonAuthEmailOtpType = 'forget-password'
+): Promise<void> {
+  const upstream = await neonAuthAuthedFetch(event, 'email-otp/check-verification-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email, otp, type })
+  })
+
+  if (!upstream.ok) {
+    throw createError({ statusCode: 400, message: 'Invalid or expired email verification code' })
+  }
+}
+
+export async function getUpstreamSessionFromEvent(event: H3Event): Promise<SessionData | null> {
+  const cookieHeader = getRequestHeader(event, 'cookie') ?? ''
+  const sessionToken = parseCookies(cookieHeader).get(NEON_AUTH_SESSION_COOKIE_NAME)
+  if (!sessionToken) return null
+
+  const baseUrl = useRuntimeConfig(event).public.neonAuthUrl as string
+  if (!baseUrl) return null
+
+  try {
+    return await fetchSessionWithCookie(
+      `${NEON_AUTH_SESSION_COOKIE_NAME}=${sessionToken}`,
+      baseUrl
+    )
+  } catch {
+    return null
   }
 }
 
@@ -516,5 +625,20 @@ export async function getSessionFromEvent(event: H3Event): Promise<SessionData |
     )
   } catch {
     return null
+  }
+}
+
+export function clearNeonAuthCookies(event: H3Event): void {
+  const cookieHeader = getRequestHeader(event, 'cookie') ?? ''
+  const parsed = parseCookies(cookieHeader)
+  const isHttps = getRequestURL(event).protocol === 'https:'
+
+  for (const name of parsed.keys()) {
+    if (!name.startsWith(NEON_AUTH_COOKIE_PREFIX)) continue
+    deleteCookie(event, name, {
+      path: '/',
+      secure: isHttps || name.startsWith('__Secure-'),
+      sameSite: 'lax'
+    })
   }
 }

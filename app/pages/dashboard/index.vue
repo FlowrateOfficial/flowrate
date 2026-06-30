@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'dashboard', title: 'Overview', middleware: 'auth' })
 
-const { t } = useAppI18n()
+const { t, displayCurrency } = useAppI18n()
 const dashboardStore = useDashboardStore()
 
 useDashboardSeo('dashboard.overview.title')
@@ -32,7 +32,7 @@ const {
   recentTransactions
 } = storeToRefs(dashboardStore)
 
-await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOverview())
+await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOverview(), [displayCurrency])
 </script>
 
 <template>

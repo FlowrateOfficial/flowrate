@@ -98,6 +98,6 @@ export async function sumBalances(spaceId: string, where?: Prisma.AccountWhereIn
 export async function listVisibleAccountBalances(ctx: SpaceContext) {
   return prisma.account.findMany({
     where: accountWhereForSpace(ctx, 'all'),
-    select: { id: true, balance: true, createdAt: true }
+    select: { id: true, balance: true, currency: true, createdAt: true }
   })
 }

@@ -4,7 +4,7 @@ import type { DashboardOverview, DashboardStats } from '~/types/dashboard'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import { cashFlowSeries, categorySeries } from '~/utils/analytics-series'
-import { createSpaceScopedLoader, storeMoneyFormatter } from '~/utils/store-fetch'
+import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
@@ -17,7 +17,7 @@ type OverviewPayload = {
 }
 
 export const useDashboardStore = defineStore('dashboard', () => {
-  const { t, categoryLabel, formatCurrency, resolveCurrency, displayCurrency } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, displayCurrency, getLocale } = useAppI18n()
   const spacesStore = useSpacesStore()
   const accountsStore = useAccountsStore()
   const analyticsStore = useAnalyticsStore()
@@ -29,7 +29,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const recentTx = ref<TransactionsResponse | null>(null)
   const alertSubs = ref<SubscriptionItem[]>([])
 
-  const fmt = storeMoneyFormatter(formatCurrency, resolveCurrency)
+  const fmt = (amount: number, _items: Array<{ currency?: string | null }> = [], currency?: string) =>
+    formatCurrency(amount, currency ?? displayCurrency.value)
 
   const spaceTypeLabel = computed(() =>
     spacesStore.spaceType(spacesStore.space?.type ?? 'INDEPENDENT')
@@ -54,9 +55,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const categoryValues = computed(() => categories.value.values)
   const hasCategoryChart = computed(() => categoryValues.value.length > 0)
 
-  const summaryCurrency = computed(
-    () => analytics.value?.summary.currency ?? resolveCurrency(accountsStore.accounts) ?? displayCurrency.value
-  )
+  const summaryCurrency = computed(() => displayCurrency.value)
 
   const saasShieldCenterValue = computed(() => String(stats.value?.subscriptionAlerts ?? 0))
 
@@ -120,8 +119,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const recentTransactions = computed(() => recentTx.value?.items ?? [])
 
   const { pending: overviewLoading, load: fetchOverview, reset } = createSpaceScopedLoader<OverviewPayload>({
-    buildKey: spaceId => `overview:${spaceId}`,
-    fetch: async () => api<OverviewPayload>(apiRoutes.dashboard.overview),
+    buildKey: spaceId => `overview:${spaceId}:${getLocale()}`,
+    fetch: async () => api<OverviewPayload>(apiRoutes.dashboard.overview, {
+      query: { locale: getLocale() }
+    }),
     apply: (payload) => {
       stats.value = payload.stats
       analytics.value = payload.analytics

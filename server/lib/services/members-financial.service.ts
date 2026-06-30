@@ -2,14 +2,18 @@
 import type { MemberFinancialDto } from '#shared/api/family'
 import type { SpaceContext } from '../domain/context'
 import { assertGuardianCanViewMember } from '../domain/space-guard'
+import { createFxConverter } from '../fx/converter'
+import { spendingIncomeInRange } from '../repositories/transaction.repository'
 import { canManageMembers } from '../../utils/spaceAuth'
 
 export async function getMemberFinancial(
   ctx: SpaceContext,
   routeSpaceId: string,
-  memberId: string
+  memberId: string,
+  displayCurrency: string
 ): Promise<MemberFinancialDto> {
   assertGuardianCanViewMember(ctx.role, ctx.spaceType, canManageMembers)
+  const fx = await createFxConverter(displayCurrency)
 
   const member = await prisma.spaceMember.findFirst({
     where: { id: memberId, spaceId: routeSpaceId },
@@ -36,14 +40,14 @@ export async function getMemberFinancial(
       },
       accounts: [],
       transactions: [],
-      stats: { balance: 0, spending30d: 0, income30d: 0, transactionCount: 0 }
+      stats: { balance: 0, spending30d: 0, income30d: 0, transactionCount: 0, currency: displayCurrency }
     }
   }
 
   const since = new Date()
   since.setDate(since.getDate() - 30)
 
-  const [accounts, transactions, spendingAgg, incomeAgg, txCount30d] = await Promise.all([
+  const [accounts, transactions, txCount30d] = await Promise.all([
     prisma.account.findMany({
       where: { spaceId: routeSpaceId, userId: member.userId },
       orderBy: { name: 'asc' },
@@ -64,22 +68,28 @@ export async function getMemberFinancial(
       take: 30,
       include: { account: { select: { id: true, name: true } } }
     }),
-    prisma.transaction.aggregate({
-      where: { spaceId: routeSpaceId, userId: member.userId, date: { gte: since }, amount: { lt: 0 } },
-      _sum: { amount: true }
-    }),
-    prisma.transaction.aggregate({
-      where: { spaceId: routeSpaceId, userId: member.userId, date: { gte: since }, amount: { gt: 0 } },
-      _sum: { amount: true }
-    }),
     prisma.transaction.count({
       where: { spaceId: routeSpaceId, userId: member.userId, date: { gte: since } }
     })
   ])
 
-  const income30d = Number(incomeAgg._sum.amount ?? 0)
-  const spending30d = Math.abs(Number(spendingAgg._sum.amount ?? 0))
-  const balance = accounts.reduce((sum, account) => sum + Number(account.balance), 0)
+  const accountIds = accounts.map(account => account.id)
+  const monthlySplit = accountIds.length
+    ? await spendingIncomeInRange(routeSpaceId, since, undefined, accountIds)
+    : { spendingByCurrency: [], incomeByCurrency: [] }
+
+  const income30d = fx.sum(monthlySplit.incomeByCurrency.map(row => ({
+    amount: row.amount,
+    currency: row.currency
+  })))
+  const spending30d = fx.sum(monthlySplit.spendingByCurrency.map(row => ({
+    amount: row.amount,
+    currency: row.currency
+  })))
+  const balance = fx.sum(accounts.map(account => ({
+    amount: Number(account.balance),
+    currency: account.currency
+  })))
 
   return {
     member: {
@@ -131,7 +141,8 @@ export async function getMemberFinancial(
       balance: Math.round(balance * 100) / 100,
       spending30d: Math.round(spending30d * 100) / 100,
       income30d: Math.round(income30d * 100) / 100,
-      transactionCount: txCount30d
+      transactionCount: txCount30d,
+      currency: displayCurrency
     }
   }
 }

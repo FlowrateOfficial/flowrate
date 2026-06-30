@@ -17,6 +17,7 @@ export interface BusinessAlertDto {
 }
 
 export interface BusinessOverviewDto {
+  currency: string
   cash: number
   monthlyBurn: number
   monthlyIncome: number

@@ -11,7 +11,7 @@ import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
 export const useAnalyticsStore = defineStore('analytics', () => {
-  const { t, categoryLabel, formatCurrency, displayCurrency } = useAppI18n()
+  const { t, categoryLabel, formatCurrency, displayCurrency, getLocale } = useAppI18n()
   const syncStore = useSyncStore()
   const { api } = useApi()
 
@@ -19,10 +19,9 @@ export const useAnalyticsStore = defineStore('analytics', () => {
   const data = ref<AnalyticsOverview | null>(null)
 
   const { pending, load: fetchOverview, reset } = createSpaceScopedLoader({
-    // NOTE - Key includes range so tab changes trigger refetch
-    buildKey: spaceId => `analytics:${spaceId}:${range.value}`,
+    buildKey: spaceId => `analytics:${spaceId}:${range.value}:${getLocale()}`,
     fetch: async () => api<AnalyticsOverview>(apiRoutes.analytics.overview, {
-      query: { range: range.value }
+      query: { range: range.value, locale: getLocale() }
     }),
     apply: payload => { data.value = payload },
     clear: () => { data.value = null },
@@ -55,7 +54,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
 
   const hasData = computed(() => (data.value?.summary.transactionCount ?? 0) > 0)
 
-  const summaryCurrency = computed(() => data.value?.summary.currency ?? displayCurrency.value)
+  const summaryCurrency = computed(() => displayCurrency.value)
 
   function fmt(amount: number) {
     return formatCurrency(amount, summaryCurrency.value)
