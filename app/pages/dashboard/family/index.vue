@@ -2,14 +2,14 @@
 // ANCHOR: Family page — members, children, expense splits
 import type { TableColumn } from '@nuxt/ui'
 import { storeToRefs } from 'pinia'
-import type { SpaceDetailMember } from '~/stores/family'
+import type { SpaceDetailMember } from '~/types/family'
 
 definePageMeta({ layout: 'dashboard', title: 'Family', middleware: 'auth' })
 
 const { t } = useAppI18n()
 const familyStore = useFamilyStore()
 const spacesStore = useSpacesStore()
-const { tab, inviting } = storeToRefs(familyStore)
+const { tab, inviting, spaceDetail, pending } = storeToRefs(familyStore)
 
 useDashboardSeo('dashboard.family.title')
 
@@ -28,7 +28,7 @@ async function confirmDeleteChild() {
   if (!childToDelete.value || !spaceId.value) return
   isDeletingChild.value = true
   try {
-    await familyStore.deleteChildAccount(spaceId.value, childToDelete.value.id, refresh)
+    await familyStore.deleteChildAccount(spaceId.value, childToDelete.value.id)
     deleteChildModalOpen.value = false
     childToDelete.value = null
   } finally {
@@ -36,15 +36,11 @@ async function confirmDeleteChild() {
   }
 }
 
-const { data: spaceDetail, pending, refresh } = await useAsyncData(
-  () => `family-space-${spaceId.value}-${tab.value}`,
-  () => {
-    if (!spaceId.value || tab.value === 'splits') return Promise.resolve(null)
-    const view = tab.value === 'children' ? 'children' as const : 'guardians' as const
-    return familyStore.fetchSpaceDetail(spaceId.value, view)
-  },
-  { watch: [spaceId, tab] }
-)
+useSpaceStoreFetch('family-space', async () => {
+  if (tab.value === 'splits') return
+  familyStore.setDetailView(tab.value === 'children' ? 'children' : 'guardians')
+  await familyStore.loadSpaceDetail()
+}, [tab])
 
 const children = computed(() =>
   (spaceDetail.value?.members ?? []).filter(m => m.role === 'CHILD' || m.role === 'TEEN')
@@ -125,7 +121,7 @@ const spaceTypeHint = computed(() => {
           :label="t('dashboard.family.sendInvite')"
           icon="i-lucide-mail"
           :loading="inviting"
-          @click="familyStore.inviteMember(spaceId, refresh)"
+          @click="familyStore.inviteMember(spaceId)"
         />
       </UCard>
 
@@ -155,7 +151,7 @@ const spaceTypeHint = computed(() => {
               variant="ghost"
               size="xs"
               :aria-label="t('dashboard.family.removeMember')"
-              @click="familyStore.removeMember(spaceId, row.original.id, refresh)"
+              @click="familyStore.removeMember(spaceId, row.original.id)"
             />
           </template>
         </UTable>
@@ -187,7 +183,7 @@ const spaceTypeHint = computed(() => {
             <USelect v-model="familyStore.childForm.role" :items="familyStore.childRoleItems" class="w-full" />
           </UFormField>
         </div>
-        <UButton class="mt-4" :label="t('dashboard.family.createAccount')" icon="i-lucide-user-plus" :loading="inviting" @click="familyStore.addChild(spaceId, refresh)" />
+        <UButton class="mt-4" :label="t('dashboard.family.createAccount')" icon="i-lucide-user-plus" :loading="inviting" @click="familyStore.addChild(spaceId)" />
       </UCard>
 
       <UEmpty

@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await requireSessionUser(event)
-  rateLimit(event, `feedback:media:${user.id}`, { max: 120, windowMs: 60 * 1000 })
+  await rateLimit(event, `feedback:media:${user.id}`, { max: 120, windowMs: 60 * 1000 })
 
   const query = getQuery(event)
   const path = String(query.path ?? '').trim()

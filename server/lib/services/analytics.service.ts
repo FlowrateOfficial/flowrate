@@ -1,6 +1,7 @@
 // ANCHOR: Analytics overview — SQL aggregates for cash flow, merchants, net worth
 import type { TransactionCategory } from '~~/generated/prisma/client'
 import { Prisma } from '~~/generated/prisma/client'
+import type { SpaceContext } from '../domain/context'
 import {
   buildCashFlowSeriesFromAggregates,
   monthKey,
@@ -8,6 +9,8 @@ import {
   rangeToDates,
   type AnalyticsRange
 } from '../../utils/analytics'
+import { resolveSpaceDisplayCurrency } from '../../utils/currency'
+import { accountVisibilityFilter } from '../../utils/spaceAuth'
 
 export interface AnalyticsQueryContext {
   spaceId: string
@@ -176,4 +179,32 @@ export async function getAnalyticsOverview(
     netWorth,
     topMerchants
   }
+}
+
+export async function getAnalyticsForSpace(
+  ctx: SpaceContext,
+  range: AnalyticsRange,
+  locale: string,
+  options: AnalyticsOverviewOptions = {}
+) {
+  const accounts = await prisma.account.findMany({
+    where: { spaceId: ctx.spaceId, ...accountVisibilityFilter(ctx.userId, ctx.role) },
+    select: { id: true, balance: true, createdAt: true }
+  })
+
+  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, locale)
+
+  return getAnalyticsOverview(
+    {
+      spaceId: ctx.spaceId,
+      accountIds: accounts.map(account => account.id),
+      accounts: accounts.map(account => ({
+        balance: Number(account.balance),
+        createdAt: account.createdAt
+      })),
+      currency
+    },
+    range,
+    options
+  )
 }

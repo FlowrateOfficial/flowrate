@@ -7,6 +7,7 @@ import {
 import { requirePlaid, syncPlaidSpaceTransactions } from '../plaid'
 import { requireStripe } from '../stripe'
 import { syncSpaceTransactions } from '../transactionSync'
+import { EMPTY_SYNC_RESULT, mergeSyncResults } from './results'
 
 export async function runManualSpaceSync(event: H3Event) {
   const { user, space } = await requireSpaceAccess(event)
@@ -14,7 +15,7 @@ export async function runManualSpaceSync(event: H3Event) {
   await assertCanManualSync(user.id)
   await recordManualSync(user.id)
 
-  let stripeResult = { imported: 0, accounts: 0 }
+  let stripeResult = { ...EMPTY_SYNC_RESULT }
   try {
     const { stripe } = requireStripe(event)
     stripeResult = await syncSpaceTransactions(stripe, space.id, user.id)
@@ -24,7 +25,7 @@ export async function runManualSpaceSync(event: H3Event) {
     }
   }
 
-  let plaidResult = { imported: 0, accounts: 0 }
+  let plaidResult = { ...EMPTY_SYNC_RESULT }
   try {
     const { client } = requirePlaid(event)
     plaidResult = await syncPlaidSpaceTransactions(client, space.id, user.id)
@@ -36,8 +37,5 @@ export async function runManualSpaceSync(event: H3Event) {
 
   await processAllowancePayouts(space.id)
 
-  return {
-    imported: stripeResult.imported + plaidResult.imported,
-    accounts: stripeResult.accounts + plaidResult.accounts
-  }
+  return mergeSyncResults(stripeResult, plaidResult)
 }

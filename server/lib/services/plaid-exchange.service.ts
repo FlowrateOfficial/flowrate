@@ -1,0 +1,72 @@
+// ANCHOR: Plaid public token exchange service
+import type { H3Event } from 'h3'
+import type { z } from 'zod'
+import type { plaidExchangeBodySchema } from '../schemas/api'
+import {
+  requirePlaid,
+  syncPlaidAccountsForLink,
+  syncPlaidLinkTransactions,
+  throwPlaidError,
+  upsertPlaidLink
+} from '../plaid'
+import { assertCanConnectBank } from '../billing/enforcement'
+import { findPlaidLinkByRef } from '../repositories/space.repository'
+import { canConnectBanks, canEditFinancials } from '../../utils/spaceAuth'
+
+type ExchangeBody = z.infer<typeof plaidExchangeBodySchema>
+
+export async function exchangePlaidPublicToken(
+  event: H3Event,
+  user: { id: string },
+  space: { id: string },
+  membership: { role: string },
+  spaceType: string,
+  body: ExchangeBody
+) {
+  if (!canConnectBanks(membership.role as import('~~/generated/prisma/client').SpaceRole)) {
+    throw createError({ statusCode: 403, message: 'You cannot connect bank accounts in this space' })
+  }
+
+  if (!canEditFinancials(
+    membership.role as import('~~/generated/prisma/client').SpaceRole,
+    spaceType as import('~~/generated/prisma/client').SpaceType
+  )) {
+    throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
+  }
+
+  const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
+  const { client } = requirePlaid(event)
+
+  const context = {
+    userId: user.id,
+    spaceId: space.id,
+    visibility: visibility as 'PERSONAL' | 'SHARED'
+  }
+
+  try {
+    const exchange = await client.itemPublicTokenExchange({ public_token: body.publicToken })
+    const token = exchange.data.access_token
+    const ref = exchange.data.item_id
+
+    const existingLink = await findPlaidLinkByRef(ref)
+    if (!existingLink) {
+      await assertCanConnectBank(user.id)
+    }
+
+    const institutionName = typeof body.metadata?.institution === 'object'
+      && body.metadata?.institution !== null
+      && 'name' in body.metadata.institution
+      ? String((body.metadata.institution as { name?: string }).name ?? '')
+      : body.institution
+
+    const link = await upsertPlaidLink(context, ref, token, institutionName || null)
+    const synced = await syncPlaidAccountsForLink(client, link, context)
+    await syncPlaidLinkTransactions(client, link.id)
+
+    return { synced, ref }
+  } catch (error) {
+    if (error && typeof error === 'object' && 'statusCode' in error) throw error
+    console.error('[plaid/exchange]', error)
+    throwPlaidError(error, 'Could not link bank account with Plaid')
+  }
+}

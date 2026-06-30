@@ -19,6 +19,13 @@ function isAllowedPath(path: string, prefixes: string[]) {
 
 // NOTE - Guards /dashboard/*; OAuth verifier handled server-side
 export default defineNuxtRouteMiddleware(async (to) => {
+  const isDashboard = to.path === '/dashboard' || to.path.startsWith('/dashboard/')
+
+  // NOTE - Dashboard routes are client-rendered; skip SSR to avoid layout/session races
+  if (isDashboard && import.meta.server) {
+    return
+  }
+
   const verifier = to.query[NEON_AUTH_SESSION_VERIFIER_PARAM]
 
   if (verifier && import.meta.server) {

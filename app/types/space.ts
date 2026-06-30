@@ -1,5 +1,13 @@
-export type SpaceType = 'INDEPENDENT' | 'HOUSEHOLD' | 'FAMILY' | 'COMPANY'
-export type SpaceRole = 'OWNER' | 'CO_GUARDIAN' | 'TEEN' | 'CHILD' | 'FINANCE_ADMIN' | 'MANAGER' | 'MEMBER' | 'GUEST'
+// ANCHOR: Space types — UI icons; role helpers from shared
+import {
+  canManageSpace,
+  isGuardianRole,
+  isMinorRole,
+  type SpaceRole,
+  type SpaceType
+} from '#shared/space-roles'
+
+export type { SpaceRole, SpaceType } from '#shared/space-roles'
 
 export interface FinancialSpaceSummary {
   id: string
@@ -15,6 +23,7 @@ export interface ActiveSpace extends FinancialSpaceSummary {
   name: string
 }
 
+/** @deprecated Prefer useAppI18n().spaceType() for display labels */
 export const SPACE_TYPE_LABELS: Record<SpaceType, string> = {
   INDEPENDENT: 'Independent',
   HOUSEHOLD: 'Household',
@@ -29,16 +38,6 @@ export const SPACE_TYPE_ICONS: Record<SpaceType, string> = {
   COMPANY: 'i-lucide-building-2'
 }
 
-export function isTeenOrChild(role: SpaceRole): boolean {
-  return role === 'TEEN' || role === 'CHILD'
-}
-
-export function isGuardian(role: SpaceRole): boolean {
-  return role === 'OWNER' || role === 'CO_GUARDIAN'
-}
-
-export function canManageSpace(role: SpaceRole, type: SpaceType): boolean {
-  if (type === 'COMPANY') return role === 'OWNER' || role === 'FINANCE_ADMIN'
-  if (type === 'INDEPENDENT') return role === 'OWNER'
-  return role === 'OWNER' || role === 'CO_GUARDIAN'
-}
+export const isTeenOrChild = isMinorRole
+export const isGuardian = isGuardianRole
+export { canManageSpace }

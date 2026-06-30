@@ -1,17 +1,14 @@
 // ANCHOR: Transactions store — filters, pagination, export
 import type { TransactionRow, TransactionsResponse } from '~/types/financial'
+import { TRANSACTION_FILTER_CATEGORIES, type TransactionCategoryFilter } from '#shared/categories'
 import { createTransactionColumns } from '~/utils/table-columns'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 import { toIsoDateTime } from '~/utils/date-pickers'
 
-const CATEGORY_OPTIONS = [
-  'ALL', 'FOOD', 'TRANSPORT', 'SUBSCRIPTIONS', 'HOUSING', 'UTILITIES',
-  'HEALTHCARE', 'ENTERTAINMENT', 'SHOPPING', 'SAVINGS', 'INCOME',
-  'CLOUD_INFRA', 'DEVELOPER_TOOLS', 'OTHER'
-] as const
+export type CategoryFilter = TransactionCategoryFilter
 
-export type CategoryFilter = (typeof CATEGORY_OPTIONS)[number]
+const CATEGORY_OPTIONS = TRANSACTION_FILTER_CATEGORIES
 
 const PAGE_SIZE = 50
 

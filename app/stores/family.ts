@@ -1,74 +1,14 @@
 // ANCHOR: Family store — members, children, splits, allowance
+import type { MemberFinancial, SpaceDetail } from '~/types/family'
 import type { TransactionRow } from '~/types/financial'
+
+export type { MemberFinancial, SpaceDetail, SpaceDetailMember } from '~/types/family'
+import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { createTransactionColumns } from '~/utils/table-columns'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
-
-export interface SpaceDetailMember {
-  id: string
-  userId: string | null
-  email: string | null
-  name: string | null
-  role: string
-  status: string
-  birthday: string | null
-  childProfile: {
-    id: string
-    allowance: number | null
-    frequency: string | null
-    learnMode: boolean
-    jars: Array<{ id: string, name: string, balance: number, target: number | null }>
-  } | null
-  financialSummary: { balance: number, spending30d: number, accountCount: number } | null
-}
-
-export interface SpaceDetail {
-  id: string
-  name: string
-  type: string
-  role: string
-  settings: unknown
-  members: SpaceDetailMember[]
-  accounts: unknown[]
-}
-
-export interface MemberFinancial {
-  member: {
-    id: string
-    userId?: string | null
-    name: string | null
-    email: string | null
-    role: string
-    status: string
-    birthday: string | null
-    hasAccount: boolean
-    childProfile?: {
-      allowance: number | null
-      frequency: string | null
-      learnMode: boolean
-      jars: Array<{ id: string, name: string, balance: number, target: number | null }>
-    } | null
-  }
-  accounts: Array<{
-    id: string
-    name: string
-    institution: string | null
-    type: string
-    visibility: string
-    balance: number
-    currency: string
-    syncedAt: string | null
-  }>
-  transactions: TransactionRow[]
-  stats: {
-    balance: number
-    spending30d: number
-    income30d: number
-    transactionCount: number
-  }
-}
 
 export const useFamilyStore = defineStore('family', () => {
   const { t, categoryLabel, formatCurrency, formatShortDateWithYear, roleLabel, memberStatusLabel } = useAppI18n()
@@ -159,17 +99,54 @@ export const useFamilyStore = defineStore('family', () => {
     createTransactionColumns<TransactionRow>(t)
   )
 
-  async function fetchSpaceDetail(spaceId: string, view?: 'guardians' | 'children') {
-    return api<SpaceDetail>(apiRoutes.spaces.detail(spaceId), {
-      query: view ? { view } : undefined
-    })
+  const spaceDetail = ref<SpaceDetail | null>(null)
+  const detailView = ref<'guardians' | 'children'>('guardians')
+  const activeMemberId = ref('')
+
+  const {
+    pending,
+    load: loadSpaceDetail,
+    reset: resetSpaceDetail
+  } = createSpaceScopedLoader({
+    buildKey: spaceId => `family:${spaceId}:${detailView.value}`,
+    fetch: async (spaceId) => {
+      return api<SpaceDetail>(apiRoutes.spaces.detail(spaceId), {
+        query: { view: detailView.value }
+      })
+    },
+    apply: data => { spaceDetail.value = data },
+    clear: () => { spaceDetail.value = null },
+    isCached: () => spaceDetail.value != null
+  })
+
+  const memberFinancial = ref<MemberFinancial | null>(null)
+  const {
+    pending: memberPending,
+    load: loadMemberFinancial,
+    reset: resetMemberFinancial
+  } = createSpaceScopedLoader({
+    buildKey: spaceId => `member-financial:${spaceId}:${activeMemberId.value}`,
+    fetch: spaceId =>
+      api<MemberFinancial>(apiRoutes.spaces.memberFinancial(spaceId, activeMemberId.value)),
+    apply: data => { memberFinancial.value = data },
+    clear: () => { memberFinancial.value = null },
+    isCached: () => memberFinancial.value != null
+  })
+
+  function setDetailView(view: 'guardians' | 'children') {
+    detailView.value = view
   }
 
-  async function fetchMemberFinancial(spaceId: string, memberId: string) {
-    return api<MemberFinancial>(apiRoutes.spaces.memberFinancial(spaceId, memberId))
+  async function refreshSpaceDetail() {
+    await loadSpaceDetail(true)
   }
 
-  async function inviteMember(spaceId: string, refresh: () => Promise<void>) {
+  async function openMemberFinancial(memberId: string, force = false) {
+    activeMemberId.value = memberId
+    await loadMemberFinancial(force)
+  }
+
+  async function inviteMember(spaceId: string) {
     inviting.value = true
     try {
       await api(apiRoutes.spaces.members(spaceId), {
@@ -182,13 +159,13 @@ export const useFamilyStore = defineStore('family', () => {
       })
       inviteForm.email = ''
       inviteForm.name = ''
-      await refresh()
+      await refreshSpaceDetail()
     } finally {
       inviting.value = false
     }
   }
 
-  async function addChild(spaceId: string, refresh: () => Promise<void>) {
+  async function addChild(spaceId: string) {
     if (!childForm.username.trim() || !childForm.email.trim() || !childForm.password) {
       appToast.errorMessage(t('dashboard.family.childErrors.missingFields'))
       return false
@@ -226,7 +203,7 @@ export const useFamilyStore = defineStore('family', () => {
         t('dashboard.family.accountCreated'),
         t('dashboard.family.accountCreatedDescription', { name: createdName })
       )
-      await refresh()
+      await refreshSpaceDetail()
       return true
     } catch (e: unknown) {
       const message = e && typeof e === 'object' && 'data' in e
@@ -244,27 +221,27 @@ export const useFamilyStore = defineStore('family', () => {
     }
   }
 
-  async function saveChildProfile(spaceId: string, memberId: string, refresh: () => Promise<void>) {
+  async function saveChildProfile(spaceId: string, memberId: string) {
     saving.value = true
     try {
       await api(apiRoutes.spaces.memberChild(spaceId, memberId), {
         method: 'PATCH',
         body: allowanceForm
       })
-      await refresh()
+      await openMemberFinancial(memberId, true)
     } finally {
       saving.value = false
     }
   }
 
-  async function addJar(spaceId: string, memberId: string, refresh: () => Promise<void>) {
+  async function addJar(spaceId: string, memberId: string) {
     if (!jarName.value) return
     await api(apiRoutes.spaces.memberChild(spaceId, memberId), {
       method: 'POST',
       body: { name: jarName.value }
     })
     jarName.value = ''
-    await refresh()
+    await openMemberFinancial(memberId, true)
   }
 
   const splitForm = reactive({ name: '', category: 'FOOD', mode: 'EQUAL' as 'EQUAL' | 'PROPORTIONAL' | 'CUSTOM' })
@@ -283,17 +260,22 @@ export const useFamilyStore = defineStore('family', () => {
     await fetchSplits(spaceId)
   }
 
-  async function removeMember(spaceId: string, memberId: string, refresh: () => Promise<void>) {
+  async function removeMember(spaceId: string, memberId: string) {
     await api(apiRoutes.spaces.member(spaceId, memberId), { method: 'DELETE' })
-    await refresh()
+    await refreshSpaceDetail()
   }
 
-  async function deleteChildAccount(spaceId: string, memberId: string, refresh: () => Promise<void>) {
+  async function deleteChildAccount(
+    spaceId: string,
+    memberId: string,
+    onSuccess?: () => void | Promise<void>
+  ) {
     await api(apiRoutes.spaces.member(spaceId, memberId), {
       method: 'DELETE',
       body: { purge: true }
     })
-    await refresh()
+    await onSuccess?.()
+    await refreshSpaceDetail()
   }
 
   function loadAllowanceFromMember(data: MemberFinancial | null) {
@@ -324,8 +306,16 @@ export const useFamilyStore = defineStore('family', () => {
     formatDate,
     categoryLabel,
     transactionColumns,
-    fetchSpaceDetail,
-    fetchMemberFinancial,
+    spaceDetail,
+    pending,
+    memberFinancial,
+    memberPending,
+    setDetailView,
+    loadSpaceDetail,
+    refreshSpaceDetail,
+    openMemberFinancial,
+    resetSpaceDetail,
+    resetMemberFinancial,
     inviteMember,
     addChild,
     saveChildProfile,

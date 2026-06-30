@@ -1,15 +1,12 @@
 // ANCHOR: Budgets store — CRUD + space-scoped list
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
 import type { BudgetItem, BudgetPeriod } from '~/types/budget'
+import { BUDGET_CATEGORIES } from '#shared/categories'
 import { createSpaceScopedLoader, storeMoneyFormatter } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
-const CATEGORIES = [
-  'FOOD', 'TRANSPORT', 'SUBSCRIPTIONS', 'HOUSING', 'UTILITIES',
-  'HEALTHCARE', 'ENTERTAINMENT', 'SHOPPING', 'SAVINGS', 'CLOUD_INFRA',
-  'DEVELOPER_TOOLS', 'OTHER'
-] as const
+const CATEGORIES = BUDGET_CATEGORIES
 
 export const useBudgetsStore = defineStore('budgets', () => {
   const { t, categoryLabel, formatCurrency, resolveCurrency } = useAppI18n()

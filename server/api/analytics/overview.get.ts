@@ -1,35 +1,12 @@
-import { z } from 'zod'
-import type { AnalyticsRange } from '../../utils/analytics'
-import { getAnalyticsOverview } from '../../lib/services/analytics.service'
-import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
-
-const querySchema = z.object({
-  range: z.enum(['7d', '30d', '90d', '12m']).default('30d')
-})
+import { getAnalyticsForSpace } from '../../lib/services/analytics.service'
+import { analyticsRangeQuerySchema } from '../../lib/schemas/api'
+import { localeFromRequest } from '../../utils/currency'
+import { requireSpaceContext } from '../../lib/domain/http'
+import { respondWithPrivateCache } from '../../lib/http/cache'
 
 export default defineEventHandler(async (event) => {
-  const { user, space, membership } = await requireSpaceAccess(event)
-  const { range } = await getValidatedQuery(event, querySchema.parse)
-
-  const accountFilter = accountVisibilityFilter(user.id, membership.role)
-
-  const accounts = await prisma.account.findMany({
-    where: { spaceId: space.id, ...accountFilter },
-    select: { id: true, balance: true, createdAt: true }
-  })
-
-  const currency = await resolveSpaceDisplayCurrency(space.id, localeFromRequest(event))
-
-  return getAnalyticsOverview(
-    {
-      spaceId: space.id,
-      accountIds: accounts.map(a => a.id),
-      accounts: accounts.map(a => ({
-        balance: Number(a.balance),
-        createdAt: a.createdAt
-      })),
-      currency
-    },
-    range as AnalyticsRange
-  )
+  const ctx = await requireSpaceContext(event)
+  const { range } = await getValidatedQuery(event, analyticsRangeQuerySchema.parse)
+  const payload = await getAnalyticsForSpace(ctx, range, localeFromRequest(event))
+  return respondWithPrivateCache(event, payload) ?? undefined
 })

@@ -21,16 +21,12 @@ const { isBusinessReadOnly, canManageBusiness } = storeToRefs(spacesStore)
 
 useDashboardSeo('dashboard.company.title')
 
-const spaceId = computed(() => spacesStore.space?.id ?? '')
-
-await useSpaceStoreFetch('business-overview', () =>
-  spaceId.value ? businessStore.fetchOverview(spaceId.value) : Promise.resolve()
-)
+await useSpaceStoreFetch('business-overview', () => businessStore.fetchOverview())
 
 watch(tab, (val) => {
   // NOTE - Team tab loads members lazily
-  if (val === 'team' && spaceId.value) {
-    businessStore.fetchTeam(spaceId.value)
+  if (val === 'team') {
+    businessStore.fetchTeam()
   }
 }, { immediate: true })
 
@@ -44,7 +40,7 @@ watch(() => route.query.tab, (val) => {
 })
 
 function refreshTeam() {
-  if (spaceId.value) return businessStore.fetchTeam(spaceId.value, true)
+  return businessStore.fetchTeam(true)
 }
 
 const pending = overviewPending
@@ -126,7 +122,7 @@ const pending = overviewPending
             :label="t('dashboard.company.team.sendInvite')"
             icon="i-lucide-mail"
             :loading="inviting"
-            @click="businessStore.inviteMember(spaceId, () => refreshTeam())"
+            @click="businessStore.inviteMember(() => refreshTeam())"
           />
         </UCard>
 

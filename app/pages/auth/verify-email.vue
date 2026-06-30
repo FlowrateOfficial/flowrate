@@ -23,7 +23,7 @@ onMounted(async () => {
   const session = await getSession()
   const verified = (session?.user as { emailVerified?: boolean } | undefined)?.emailVerified
   if (verified) {
-    await navigateTo('/dashboard')
+    await navigateToDashboard()
   }
 })
 
@@ -51,7 +51,7 @@ async function verifyEmail() {
       return
     }
 
-    await navigateTo('/dashboard/onboarding')
+    await navigateToDashboard('/dashboard/onboarding')
   } catch (err) {
     appToast.errorFrom(err, 'auth.verifyEmail.errorGeneric')
   } finally {

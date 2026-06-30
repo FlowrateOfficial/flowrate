@@ -1,10 +1,6 @@
 import { getValidStripeCustomerId } from '../../../lib/stripe/customer'
 import { requireStripe } from '../../../lib/stripe'
-import {
-  assertBillingAddressComplete,
-  generateStripeCustomerInvoice,
-  getStripeCustomerProfile
-} from '../../../lib/stripe/customer-profile'
+import { createStripeCustomerInvoice } from '../../../lib/services/billing-invoices.service'
 import {
   loadStripeUserContext,
   stripeInvoiceTemplateId
@@ -23,28 +19,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const profile = await getStripeCustomerProfile(stripe, user.id, Boolean(templateId))
-  assertBillingAddressComplete(profile.address)
-
-  const billing = await prisma.userBilling.findUnique({
-    where: { userId: user.id },
-    select: {
-      subscription: {
-        select: { subId: true, status: true }
-      }
-    }
-  })
-
-  const status = billing?.subscription?.status
-  const subscriptionId = status === 'ACTIVE' || status === 'TRIALING'
-    ? billing?.subscription?.subId ?? null
-    : null
-
-  const invoice = await generateStripeCustomerInvoice(
+  const invoice = await createStripeCustomerInvoice(
     stripe,
+    user.id,
     customerId,
-    subscriptionId,
-    templateId
+    templateId ?? null
   )
 
   return { invoice }
