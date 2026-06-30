@@ -63,6 +63,7 @@ export default defineNuxtConfig({
     stripeInvoiceTemplateId: process.env.STRIPE_INVOICE_TEMPLATE_ID ?? '',
     resendApiKey: process.env.RESEND_API_KEY ?? '',
     authFromEmail: process.env.AUTH_FROM_EMAIL ?? '',
+    cronSecret: process.env.CRON_SECRET ?? '',
     public: {
       neonAuthUrl: process.env.NUXT_NEON_AUTH_URL ?? '',
       neonAuthConfigured: Boolean(
@@ -127,6 +128,7 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
+        '@internationalized/date',
         '@mapbox/search-js-web',
         '@neondatabase/auth',
         '@neondatabase/auth/vanilla/adapters',

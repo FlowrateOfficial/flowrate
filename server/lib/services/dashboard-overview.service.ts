@@ -51,14 +51,20 @@ export async function getDashboardOverview(ctx: SpaceContext, event: H3Event) {
     ),
     getAccountsForSpace(ctx, 'all'),
     listRecentTransactionsForSpace(ctx, 8),
-    includeSaas ? listAlertSubscriptionsForSpace(ctx.spaceId, 5) : Promise.resolve([])
+    includeSaas ? listAlertSubscriptionsForSpace(ctx.spaceId, 5, false) : listAlertSubscriptionsForSpace(ctx.spaceId, 5, true)
   ])
+
+  const alertPayload = alertSubscriptions
 
   return {
     stats,
     analytics,
     transactions,
     accounts,
-    alertSubscriptions
+    alertSubscriptions: alertPayload.items,
+    saasAlertPreview: {
+      count: alertPayload.count,
+      locked: alertPayload.locked
+    }
   }
 }

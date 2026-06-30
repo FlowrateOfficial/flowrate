@@ -1,6 +1,6 @@
 // ANCHOR: Dashboard store — composite overview payload
 import type { AnalyticsOverview, SubscriptionItem, TransactionsResponse } from '~/types/financial'
-import type { DashboardOverview, DashboardStats } from '~/types/dashboard'
+import type { DashboardOverview, DashboardStats, SaasAlertPreview } from '~/types/dashboard'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import { cashFlowSeries, categorySeries } from '~/utils/analytics-series'
@@ -14,6 +14,7 @@ type OverviewPayload = {
   transactions: TransactionsResponse
   accounts: DashboardOverview['accounts']
   alertSubscriptions: SubscriptionItem[]
+  saasAlertPreview?: SaasAlertPreview
 }
 
 export const useDashboardStore = defineStore('dashboard', () => {
@@ -28,6 +29,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const analytics = ref<AnalyticsOverview | null>(null)
   const recentTx = ref<TransactionsResponse | null>(null)
   const alertSubs = ref<SubscriptionItem[]>([])
+  const saasAlertPreview = ref<SaasAlertPreview | null>(null)
 
   const fmt = (amount: number, _items: Array<{ currency?: string | null }> = [], currency?: string) =>
     formatCurrency(amount, currency ?? displayCurrency.value)
@@ -116,6 +118,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const hasAccounts = computed(() => accountsStore.accounts.length > 0)
   const hasAlertSubs = computed(() => alertSubs.value.length > 0)
   const previewAlertSubs = computed(() => alertSubs.value.slice(0, 3))
+  const showSaasUpgradeGate = computed(() =>
+    saasAlertPreview.value?.locked === true && (saasAlertPreview.value?.count ?? 0) > 0
+  )
+  const saasUpgradeAlertCount = computed(() => saasAlertPreview.value?.count ?? 0)
   const recentTransactions = computed(() => recentTx.value?.items ?? [])
 
   const { pending: overviewLoading, load: fetchOverview, reset } = createSpaceScopedLoader<OverviewPayload>({
@@ -128,6 +134,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       analytics.value = payload.analytics
       recentTx.value = payload.transactions
       alertSubs.value = payload.alertSubscriptions
+      saasAlertPreview.value = payload.saasAlertPreview ?? null
       accountsStore.seedAccounts(payload.accounts)
 
       // NOTE - Share 30d analytics cache when overview already fetched it
@@ -140,6 +147,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       analytics.value = null
       recentTx.value = null
       alertSubs.value = []
+      saasAlertPreview.value = null
     },
     isCached: () => stats.value != null
   })
@@ -149,6 +157,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     analytics,
     recentTx,
     alertSubs,
+    saasAlertPreview,
     statsLoading: overviewLoading,
     analyticsLoading: overviewLoading,
     txLoading: overviewLoading,
@@ -170,6 +179,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     hasAccounts,
     hasAlertSubs,
     previewAlertSubs,
+    showSaasUpgradeGate,
+    saasUpgradeAlertCount,
     recentTransactions,
     fetchOverview,
     reset

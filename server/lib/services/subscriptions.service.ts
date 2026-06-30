@@ -1,11 +1,106 @@
-// ANCHOR: Detected subscriptions list service
+// ANCHOR: Detected subscriptions — list, alerts, calendar, overrides
 import type { SubscriptionListItemDto } from '#shared/api/subscriptions'
-import type { SubscriptionStatus } from '~~/generated/prisma/client'
+import type { RenewalCalendarEvent } from '#shared/subscription-calendar'
+import { buildRenewalCalendarEvents } from '#shared/subscription-calendar'
+import { merchantLogoUrl, guessMerchantDomain } from '#shared/merchant-logo'
+import { ENUM, type SubscriptionStatus } from '#shared/prisma-enums'
+import {
+  annualPriceImpact,
+  compareSubscriptionPrice,
+  periodPriceImpact,
+  subscriptionMonthlyEquivalent
+} from '#shared/subscription-alerts'
+import { effectiveSubscriptionCap, parseSpaceSettings } from '#shared/space-settings'
+import { parseUserPreferences } from '#shared/user-preferences'
 import type { SpaceContext } from '../domain/context'
+import { createFxConverter } from '../fx/converter'
 
 export interface SubscriptionListQuery {
-  status?: string
+  status?: SubscriptionStatus
   limit: number
+  includeHidden?: boolean
+}
+
+export interface SubscriptionPatchInput {
+  displayName?: string | null
+  hidden?: boolean
+  excluded?: boolean
+}
+
+function visibleWhere(includeHidden?: boolean) {
+  return {
+    excluded: false,
+    ...(includeHidden ? {} : { hidden: false })
+  }
+}
+
+function duplicateMeta(
+  sub: { id: string, name: string },
+  subs: Array<{ id: string, name: string }>
+) {
+  const key = sub.name.toLowerCase()
+  const group = subs.filter(s => s.name.toLowerCase() === key)
+  return {
+    isDuplicate: group.length > 1,
+    duplicateCount: group.length,
+    duplicateIds: group.filter(s => s.id !== sub.id).map(s => s.id)
+  }
+}
+
+function mapSubscription(
+  sub: {
+    id: string
+    name: string
+    displayName: string | null
+    merchantDomain: string | null
+    amount: { toString(): string }
+    prev: { toString(): string } | null
+    currency: string
+    frequency: string
+    status: string
+    icon: string | null
+    lastCharge: Date | null
+    nextCharge: Date | null
+    alert: boolean
+    hidden: boolean
+    excluded: boolean
+  },
+  meta: ReturnType<typeof duplicateMeta>
+): SubscriptionListItemDto {
+  const amount = Number(sub.amount)
+  const prev = sub.prev != null ? Number(sub.prev) : null
+  const label = sub.displayName?.trim() || sub.name
+
+  return {
+    id: sub.id,
+    name: label,
+    rawName: sub.name,
+    amount,
+    prev,
+    priceChangePercent: prev != null ? compareSubscriptionPrice(prev, amount).percent : null,
+    periodPriceImpact: periodPriceImpact(amount, prev),
+    annualPriceImpact: annualPriceImpact(amount, prev, sub.frequency),
+    currency: sub.currency,
+    frequency: sub.frequency,
+    status: sub.status,
+    icon: sub.icon,
+    logoUrl: merchantLogoUrl(label, sub.merchantDomain),
+    lastCharge: sub.lastCharge?.toISOString() ?? null,
+    nextCharge: sub.nextCharge?.toISOString() ?? null,
+    alert: sub.alert,
+    hidden: sub.hidden,
+    excluded: sub.excluded,
+    isDuplicate: meta.isDuplicate,
+    duplicateCount: meta.duplicateCount,
+    duplicateIds: meta.duplicateIds
+  }
+}
+
+async function loadVisibleSubs(spaceId: string, includeHidden?: boolean) {
+  return prisma.detectedSubscription.findMany({
+    where: { spaceId, ...visibleWhere(includeHidden) },
+    orderBy: { amount: 'desc' }
+  })
 }
 
 export async function listSubscriptionsForSpace(
@@ -15,60 +110,172 @@ export async function listSubscriptionsForSpace(
   const subs = await prisma.detectedSubscription.findMany({
     where: {
       spaceId: ctx.spaceId,
-      ...(query.status ? { status: query.status as SubscriptionStatus } : {})
+      ...visibleWhere(query.includeHidden),
+      ...(query.status ? { status: query.status } : {})
     },
     orderBy: { amount: 'desc' },
     take: query.limit
   })
 
-  const nameCounts = subs.reduce<Record<string, number>>((acc, sub) => {
-    const key = sub.name.toLowerCase()
-    acc[key] = (acc[key] ?? 0) + 1
-    return acc
-  }, {})
-
-  return subs.map(sub => ({
-    id: sub.id,
-    name: sub.name,
-    amount: Number(sub.amount),
-    currency: sub.currency,
-    frequency: sub.frequency,
-    status: sub.status,
-    icon: sub.icon,
-    lastCharge: sub.lastCharge?.toISOString() ?? null,
-    nextCharge: sub.nextCharge?.toISOString() ?? null,
-    alert: sub.alert,
-    isDuplicate: (nameCounts[sub.name.toLowerCase()] ?? 0) > 1
-  }))
+  return subs.map(sub => mapSubscription(sub, duplicateMeta(sub, subs)))
 }
 
 export async function listAlertSubscriptionsForSpace(
   spaceId: string,
-  limit: number
-): Promise<SubscriptionListItemDto[]> {
+  limit: number,
+  locked = false
+): Promise<{ items: SubscriptionListItemDto[], locked: boolean, count: number }> {
+  const count = await prisma.detectedSubscription.count({
+    where: { spaceId, alert: true, ...visibleWhere() }
+  })
+
+  if (locked) {
+    return { items: [], locked: true, count }
+  }
+
   const subs = await prisma.detectedSubscription.findMany({
-    where: { spaceId, status: 'PRICE_CHANGED' },
+    where: { spaceId, alert: true, ...visibleWhere() },
     orderBy: { amount: 'desc' },
     take: limit
   })
 
-  const nameCounts = subs.reduce<Record<string, number>>((acc, sub) => {
-    const key = sub.name.toLowerCase()
-    acc[key] = (acc[key] ?? 0) + 1
-    return acc
-  }, {})
+  return {
+    items: subs.map(sub => mapSubscription(sub, duplicateMeta(sub, subs))),
+    locked: false,
+    count
+  }
+}
 
-  return subs.map(sub => ({
-    id: sub.id,
-    name: sub.name,
-    amount: Number(sub.amount),
-    currency: sub.currency,
-    frequency: sub.frequency,
-    status: sub.status,
-    icon: sub.icon,
-    lastCharge: sub.lastCharge?.toISOString() ?? null,
-    nextCharge: sub.nextCharge?.toISOString() ?? null,
-    alert: sub.alert,
-    isDuplicate: (nameCounts[sub.name.toLowerCase()] ?? 0) > 1
+export async function getRenewalCalendarForSpace(
+  ctx: SpaceContext,
+  displayCurrency: string
+): Promise<{ events: RenewalCalendarEvent[], currency: string }> {
+  const subs = await loadVisibleSubs(ctx.spaceId)
+  const fx = await createFxConverter(displayCurrency)
+  const events = buildRenewalCalendarEvents(
+    subs.map(sub => ({
+      id: sub.id,
+      name: sub.name,
+      displayName: sub.displayName,
+      amount: Number(sub.amount),
+      currency: sub.currency,
+      frequency: sub.frequency,
+      nextCharge: sub.nextCharge,
+      status: sub.status
+    }))
+  ).map(event => ({
+    ...event,
+    amount: fx.convert(event.amount, event.currency),
+    currency: displayCurrency,
+    monthlyEquivalent: fx.convert(event.monthlyEquivalent, event.currency)
   }))
+
+  return { events, currency: displayCurrency }
+}
+
+export async function checkSubscriptionCapForSpace(spaceId: string, userId: string) {
+  const [space, user, subs] = await Promise.all([
+    prisma.financialSpace.findUnique({ where: { id: spaceId }, select: { settings: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { prefs: true } }),
+    prisma.detectedSubscription.findMany({
+      where: { spaceId, excluded: false, hidden: false, status: { not: ENUM.subscription.CANCELLED } },
+      select: { amount: true, currency: true, frequency: true }
+    })
+  ])
+
+  const cap = effectiveSubscriptionCap(
+    parseUserPreferences(user?.prefs),
+    parseSpaceSettings(space?.settings)
+  )
+  if (cap == null) return null
+
+  const fx = await createFxConverter('USD')
+  const monthlyTotal = subs.reduce((sum, sub) => {
+    const monthly = subscriptionMonthlyEquivalent(Number(sub.amount), sub.frequency)
+    return sum + fx.convert(monthly, sub.currency)
+  }, 0)
+
+  if (monthlyTotal <= cap) return null
+
+  return { cap, monthlyTotal: Math.round(monthlyTotal * 100) / 100, currency: 'USD' }
+}
+
+export async function dismissSubscriptionAlert(
+  ctx: SpaceContext,
+  subscriptionId: string
+): Promise<SubscriptionListItemDto> {
+  const sub = await prisma.detectedSubscription.findFirst({
+    where: { id: subscriptionId, spaceId: ctx.spaceId }
+  })
+  if (!sub) throw createError({ statusCode: 404, message: 'Subscription not found' })
+
+  const updated = await prisma.detectedSubscription.update({
+    where: { id: sub.id },
+    data: {
+      alert: false,
+      alertDismissedAt: new Date(),
+      status: sub.status === ENUM.subscription.PRICE_CHANGED ? ENUM.subscription.ACTIVE : sub.status
+    }
+  })
+
+  const all = await loadVisibleSubs(ctx.spaceId, true)
+  return mapSubscription(updated, duplicateMeta(updated, all))
+}
+
+export async function patchSubscriptionForSpace(
+  ctx: SpaceContext,
+  subscriptionId: string,
+  patch: SubscriptionPatchInput
+): Promise<SubscriptionListItemDto> {
+  const sub = await prisma.detectedSubscription.findFirst({
+    where: { id: subscriptionId, spaceId: ctx.spaceId }
+  })
+  if (!sub) throw createError({ statusCode: 404, message: 'Subscription not found' })
+
+  const updated = await prisma.detectedSubscription.update({
+    where: { id: sub.id },
+    data: {
+      ...(patch.displayName !== undefined ? { displayName: patch.displayName } : {}),
+      ...(patch.hidden !== undefined ? { hidden: patch.hidden } : {}),
+      ...(patch.excluded !== undefined ? {
+        excluded: patch.excluded,
+        hidden: patch.excluded ? true : patch.hidden ?? sub.hidden
+      } : {})
+    }
+  })
+
+  const all = await loadVisibleSubs(ctx.spaceId, true)
+  return mapSubscription(updated, duplicateMeta(updated, all))
+}
+
+export async function mergeDuplicateSubscriptions(
+  ctx: SpaceContext,
+  keepId: string
+): Promise<SubscriptionListItemDto> {
+  const keep = await prisma.detectedSubscription.findFirst({
+    where: { id: keepId, spaceId: ctx.spaceId }
+  })
+  if (!keep) throw createError({ statusCode: 404, message: 'Subscription not found' })
+
+  const dupes = await prisma.detectedSubscription.findMany({
+    where: {
+      spaceId: ctx.spaceId,
+      id: { not: keep.id },
+      name: { equals: keep.name, mode: 'insensitive' }
+    }
+  })
+  if (!dupes.length) {
+    throw createError({ statusCode: 400, message: 'No duplicate subscriptions to merge' })
+  }
+
+  await prisma.detectedSubscription.deleteMany({
+    where: { id: { in: dupes.map(d => d.id) } }
+  })
+
+  const all = await loadVisibleSubs(ctx.spaceId, true)
+  return mapSubscription(keep, duplicateMeta(keep, all))
+}
+
+export function merchantDomainForName(name: string) {
+  return guessMerchantDomain(name)
 }

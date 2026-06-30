@@ -35,4 +35,8 @@ export interface BusinessOverviewDto {
   }
   alerts: BusinessAlertDto[]
   topVendors: Array<{ name: string, amount: number }>
+  vendorTrends: Array<{
+    name: string
+    points: Array<{ month: string, amount: number }>
+  }>
 }

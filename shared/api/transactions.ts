@@ -17,6 +17,8 @@ export interface TransactionListItem {
   pending: boolean
   isMine?: boolean
   ownerName?: string | null
+  paidBy?: string | null
+  splitHint?: string | null
   account: TransactionAccountRef | null
 }
 

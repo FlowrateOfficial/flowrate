@@ -1,22 +1,28 @@
 // ANCHOR: Space role/type helpers — shared by client and server
+import { ENUM, SpaceRole, SpaceType } from './prisma-enums'
 
-export type SpaceType = 'INDEPENDENT' | 'HOUSEHOLD' | 'FAMILY' | 'COMPANY'
+export type { SpaceType, SpaceRole }
 
-export type SpaceRole =
-  | 'OWNER'
-  | 'CO_GUARDIAN'
-  | 'TEEN'
-  | 'CHILD'
-  | 'FINANCE_ADMIN'
-  | 'MANAGER'
-  | 'MEMBER'
-  | 'GUEST'
+export const MINOR_SPACE_ROLES = [
+  ENUM.role.TEEN,
+  ENUM.role.CHILD
+] as const satisfies readonly SpaceRole[]
 
-export const MINOR_SPACE_ROLES = ['TEEN', 'CHILD'] as const satisfies readonly SpaceRole[]
+export const GUARDIAN_SPACE_ROLES = [
+  ENUM.role.OWNER,
+  ENUM.role.CO_GUARDIAN
+] as const satisfies readonly SpaceRole[]
 
-export const GUARDIAN_SPACE_ROLES = ['OWNER', 'CO_GUARDIAN'] as const satisfies readonly SpaceRole[]
+export const COMPANY_ADMIN_ROLES = [
+  ENUM.role.OWNER,
+  ENUM.role.FINANCE_ADMIN
+] as const satisfies readonly SpaceRole[]
 
-export const COMPANY_ADMIN_ROLES = ['OWNER', 'FINANCE_ADMIN'] as const satisfies readonly SpaceRole[]
+export const SHARED_SPACE_TYPES = [
+  ENUM.space.HOUSEHOLD,
+  ENUM.space.FAMILY,
+  ENUM.space.COMPANY
+] as const satisfies readonly SpaceType[]
 
 export function isMinorRole(role: string): boolean {
   return (MINOR_SPACE_ROLES as readonly string[]).includes(role)
@@ -31,20 +37,31 @@ export function isCompanyAdminRole(role: string): boolean {
 }
 
 export function canManageSpace(role: string, spaceType: string): boolean {
-  if (spaceType === 'COMPANY') return isCompanyAdminRole(role)
-  if (spaceType === 'INDEPENDENT') return role === 'OWNER'
+  if (spaceType === ENUM.space.COMPANY) return isCompanyAdminRole(role)
+  if (spaceType === ENUM.space.INDEPENDENT) return role === ENUM.role.OWNER
   return isGuardianRole(role)
 }
 
 export function rolesForSpaceType(type: SpaceType): SpaceRole[] {
   switch (type) {
-    case 'INDEPENDENT':
-      return ['OWNER']
-    case 'HOUSEHOLD':
-      return ['OWNER', 'CO_GUARDIAN']
-    case 'FAMILY':
-      return ['OWNER', 'CO_GUARDIAN', 'TEEN', 'CHILD']
-    case 'COMPANY':
-      return ['OWNER', 'FINANCE_ADMIN', 'MANAGER', 'MEMBER', 'GUEST']
+    case ENUM.space.INDEPENDENT:
+      return [ENUM.role.OWNER]
+    case ENUM.space.HOUSEHOLD:
+      return [ENUM.role.OWNER, ENUM.role.CO_GUARDIAN]
+    case ENUM.space.FAMILY:
+      return [
+        ENUM.role.OWNER,
+        ENUM.role.CO_GUARDIAN,
+        ENUM.role.TEEN,
+        ENUM.role.CHILD
+      ]
+    case ENUM.space.COMPANY:
+      return [
+        ENUM.role.OWNER,
+        ENUM.role.FINANCE_ADMIN,
+        ENUM.role.MANAGER,
+        ENUM.role.MEMBER,
+        ENUM.role.GUEST
+      ]
   }
 }

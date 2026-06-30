@@ -78,6 +78,20 @@ async function saveCategory() {
             icon="i-lucide-landmark"
           />
         </UFormField>
+
+        <UFormField
+          v-if="selectedTx.paidBy || selectedTx.splitHint"
+          :label="t('dashboard.transactions.columns.split')"
+        >
+          <div class="text-sm text-muted">
+            <p v-if="selectedTx.paidBy">
+              {{ t('dashboard.transactions.paidBy', { name: selectedTx.paidBy }) }}
+            </p>
+            <p v-if="selectedTx.splitHint">
+              {{ t('dashboard.transactions.splitRule', { rule: selectedTx.splitHint }) }}
+            </p>
+          </div>
+        </UFormField>
       </div>
     </template>
     <template #footer>

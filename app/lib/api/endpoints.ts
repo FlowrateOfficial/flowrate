@@ -10,6 +10,7 @@ export const apiRoutes = {
     stripeInvoices: '/api/user/stripe-invoices',
     account: '/api/user/account',
     deleteChallenge: '/api/user/account/delete-challenge',
+    preferences: '/api/user/preferences',
     phoneVerify: '/api/user/phone/verify',
     phoneResend: '/api/user/phone/resend'
   },
@@ -40,7 +41,16 @@ export const apiRoutes = {
     delete: (id: string) => `/api/budgets/${id}`
   },
   subscriptions: {
-    list: '/api/subscriptions'
+    list: '/api/subscriptions',
+    calendar: '/api/subscriptions/calendar',
+    capStatus: '/api/subscriptions/cap-status',
+    dismiss: (id: string) => `/api/subscriptions/${id}/dismiss`,
+    merge: (id: string) => `/api/subscriptions/${id}/merge`,
+    patch: (id: string) => `/api/subscriptions/${id}/patch`
+  },
+  savingsGoals: {
+    list: '/api/savings-goals',
+    contribute: (id: string) => `/api/savings-goals/${id}/contribute`
   },
   analytics: {
     overview: '/api/analytics/overview'

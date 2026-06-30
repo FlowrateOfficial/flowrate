@@ -16,4 +16,12 @@ export interface TeenDashboardDto {
   limits: unknown
   jars: TeenJarDto[]
   totalSaved: number
+  nudges: TeenSpendingNudgeDto[]
+}
+
+export interface TeenSpendingNudgeDto {
+  category: string
+  spent: number
+  limit: number
+  percent: number
 }

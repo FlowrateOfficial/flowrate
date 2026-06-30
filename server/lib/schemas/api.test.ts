@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ENUM } from '#shared/prisma-enums'
 import {
   budgetBodySchema,
   connectBankBodySchema,
@@ -11,13 +12,13 @@ describe('api body schemas', () => {
   it('parses budget payloads', () => {
     const parsed = budgetBodySchema.parse({
       name: 'Food',
-      category: 'FOOD',
+      category: ENUM.category.FOOD,
       amount: 200,
-      period: 'MONTHLY',
+      period: ENUM.period.MONTHLY,
       isShared: true
     })
 
-    expect(parsed.category).toBe('FOOD')
+    expect(parsed.category).toBe(ENUM.category.FOOD)
     expect(parsed.isShared).toBe(true)
   })
 
@@ -27,7 +28,7 @@ describe('api body schemas', () => {
 
   it('accepts plaid exchange tokens', () => {
     const parsed = plaidExchangeBodySchema.parse({ publicToken: 'public-sandbox-token' })
-    expect(parsed.visibility).toBe('PERSONAL')
+    expect(parsed.visibility).toBe(ENUM.visibility.PERSONAL)
   })
 
   it('defaults connect bank visibility', () => {
