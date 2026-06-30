@@ -1,5 +1,13 @@
 export const MOBILE_NAV_SLOT_COUNT = 4
 
+/** Sensible mobile defaults when the user has not customized footer tabs */
+export const DEFAULT_MOBILE_NAV_ORDER = [
+  '/dashboard',
+  '/dashboard/transactions',
+  '/dashboard/subscriptions',
+  '/dashboard/budgets'
+] as const
+
 export interface MobileNavLink {
   to: string
   icon: string
@@ -35,8 +43,9 @@ export function resolveMobileNavOrder(
 ): string[] {
   const pool = new Map(available.map(item => [item.to, item]))
   const result: string[] = []
+  const seed = saved ?? [...DEFAULT_MOBILE_NAV_ORDER]
 
-  for (const to of saved ?? []) {
+  for (const to of seed) {
     if (pool.has(to) && !result.includes(to)) result.push(to)
     if (result.length >= slotCount) break
   }
@@ -59,7 +68,11 @@ export function useMobileNavLayout() {
     const seen = new Set<string>()
     const items: MobileNavLink[] = []
 
-    for (const item of [...navItems.value, ...bottomItems.value]) {
+    const dashboardExtras = userStore.getAccountMenuLinks().filter(
+      item => item.to.startsWith('/dashboard') && item.to !== '/dashboard/settings'
+    )
+
+    for (const item of [...navItems.value, ...bottomItems.value, ...dashboardExtras]) {
       if (seen.has(item.to)) continue
       seen.add(item.to)
       items.push(item)
@@ -71,6 +84,8 @@ export function useMobileNavLayout() {
   const order = computed(() =>
     resolveMobileNavOrder(savedOrder.value, availableItems.value)
   )
+
+  const footerPaths = computed(() => new Set(order.value))
 
   const footerItems = computed(() =>
     order.value
@@ -133,6 +148,7 @@ export function useMobileNavLayout() {
   return {
     order,
     footerItems,
+    footerPaths,
     availableItems,
     setOrder,
     resetOrder,

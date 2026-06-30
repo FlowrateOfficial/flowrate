@@ -1,19 +1,19 @@
-import type { TransactionCategory } from '~~/generated/prisma/client'
+import { ENUM, type TransactionCategory } from '#shared/prisma-enums'
 import type Stripe from 'stripe'
 
 const MERCHANT_RULES: Array<{ pattern: RegExp, category: TransactionCategory }> = [
-  { pattern: /netflix|spotify|hulu|disney|apple music|youtube premium|adobe|github|notion|slack|zoom/i, category: 'SUBSCRIPTIONS' },
-  { pattern: /aws|azure|google cloud|digitalocean|vercel|heroku|cloudflare/i, category: 'CLOUD_INFRA' },
-  { pattern: /uber|lyft|metro|transit|shell|chevron|bp |gas station|parking/i, category: 'TRANSPORT' },
-  { pattern: /whole foods|trader joe|safeway|kroger|walmart grocery|instacart|doordash|ubereats|grubhub|starbucks|mcdonald|chipotle/i, category: 'FOOD' },
-  { pattern: /amazon|target|best buy|etsy|shopify/i, category: 'SHOPPING' },
-  { pattern: /rent|mortgage|zillow|apartment/i, category: 'HOUSING' },
-  { pattern: /electric|water|gas company|utility|comcast|verizon|at&t|t-mobile/i, category: 'UTILITIES' },
-  { pattern: /cvs|walgreens|pharmacy|hospital|clinic|dental/i, category: 'HEALTHCARE' },
-  { pattern: /cinema|theater|steam|playstation|xbox|ticketmaster/i, category: 'ENTERTAINMENT' },
-  { pattern: /coursera|udemy|university|tuition|school/i, category: 'EDUCATION' },
-  { pattern: /payroll|salary|direct dep|employer|dividend|interest paid/i, category: 'INCOME' },
-  { pattern: /figma|jetbrains|linear|cursor|copilot|sentry|datadog/i, category: 'DEVELOPER_TOOLS' }
+  { pattern: /netflix|spotify|hulu|disney|apple music|youtube premium|adobe|github|notion|slack|zoom/i, category: ENUM.category.SUBSCRIPTIONS },
+  { pattern: /aws|azure|google cloud|digitalocean|vercel|heroku|cloudflare/i, category: ENUM.category.CLOUD_INFRA },
+  { pattern: /uber|lyft|metro|transit|shell|chevron|bp |gas station|parking/i, category: ENUM.category.TRANSPORT },
+  { pattern: /whole foods|trader joe|safeway|kroger|walmart grocery|instacart|doordash|ubereats|grubhub|starbucks|mcdonald|chipotle/i, category: ENUM.category.FOOD },
+  { pattern: /amazon|target|best buy|etsy|shopify/i, category: ENUM.category.SHOPPING },
+  { pattern: /rent|mortgage|zillow|apartment/i, category: ENUM.category.HOUSING },
+  { pattern: /electric|water|gas company|utility|comcast|verizon|at&t|t-mobile/i, category: ENUM.category.UTILITIES },
+  { pattern: /cvs|walgreens|pharmacy|hospital|clinic|dental/i, category: ENUM.category.HEALTHCARE },
+  { pattern: /cinema|theater|steam|playstation|xbox|ticketmaster/i, category: ENUM.category.ENTERTAINMENT },
+  { pattern: /coursera|udemy|university|tuition|school/i, category: ENUM.category.EDUCATION },
+  { pattern: /payroll|salary|direct dep|employer|dividend|interest paid/i, category: ENUM.category.INCOME },
+  { pattern: /figma|jetbrains|linear|cursor|copilot|sentry|datadog/i, category: ENUM.category.DEVELOPER_TOOLS }
 ]
 
 export function categorizeTransaction(description: string, merchant?: string | null): TransactionCategory {
@@ -21,7 +21,7 @@ export function categorizeTransaction(description: string, merchant?: string | n
   for (const rule of MERCHANT_RULES) {
     if (rule.pattern.test(text)) return rule.category
   }
-  return 'OTHER'
+  return ENUM.category.OTHER
 }
 
 export function extractMerchant(description: string): string | null {

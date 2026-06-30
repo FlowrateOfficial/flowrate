@@ -21,6 +21,20 @@ export interface DashboardStats {
   subscriptionAlerts: number
 }
 
+export interface SaasAlertPreview {
+  count: number
+  locked: boolean
+}
+
+export interface DashboardOverviewPayload {
+  stats: DashboardStats
+  analytics: import('~/types/financial').AnalyticsOverview
+  transactions: import('~/types/financial').TransactionsResponse
+  accounts: AccountSummary[]
+  alertSubscriptions: SubscriptionItem[]
+  saasAlertPreview?: SaasAlertPreview
+}
+
 export type { BusinessOverviewDto as BusinessOverview } from '#shared/api/business'
 
 export type { TeenDashboard }

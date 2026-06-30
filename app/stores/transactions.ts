@@ -38,7 +38,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const loadedCount = computed(() => items.value.length)
 
   const columns = computed(() =>
-    createTransactionColumns<TransactionRow>(t, { includeAccount: true })
+    createTransactionColumns<TransactionRow>(t, {
+      includeAccount: true,
+      includeSplit: spacesStore.isSharedSpace
+    })
   )
 
   const categorySelectItems = computed(() =>

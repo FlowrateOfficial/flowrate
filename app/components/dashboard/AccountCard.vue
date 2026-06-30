@@ -57,6 +57,12 @@ function formatSynced(dateStr: string): string {
   if (hrs < 24) return t('dashboard.accounts.syncedHours', { count: hrs })
   return t('dashboard.accounts.syncedDays', { count: Math.floor(hrs / 24) })
 }
+
+const syncStale = computed(() => {
+  if (!props.account.syncedAt) return false
+  const days = (Date.now() - new Date(props.account.syncedAt).getTime()) / 86_400_000
+  return days >= 3
+})
 </script>
 
 <template>
@@ -105,9 +111,12 @@ function formatSynced(dateStr: string): string {
       {{ fmt(account.balance, account.currency) }}
     </p>
 
-    <p v-if="account.syncedAt" class="mt-3 flex items-center gap-2 text-sm text-muted">
-      <UIcon name="i-lucide-refresh-cw" class="size-4" />
-      {{ t('dashboard.accounts.synced', { time: formatSynced(account.syncedAt) }) }}
+    <p v-if="account.syncedAt" class="mt-3 flex items-center gap-2 text-sm" :class="syncStale ? 'text-warning' : 'text-muted'">
+      <UIcon :name="syncStale ? 'i-lucide-alert-triangle' : 'i-lucide-refresh-cw'" class="size-4" />
+      {{ syncStale
+        ? t('dashboard.accounts.syncStale', { time: formatSynced(account.syncedAt) })
+        : t('dashboard.accounts.synced', { time: formatSynced(account.syncedAt) })
+      }}
     </p>
     <p v-else class="mt-3 text-sm text-muted">
       {{ t('dashboard.accounts.notSynced') }}

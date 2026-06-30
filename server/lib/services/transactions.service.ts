@@ -36,10 +36,20 @@ export async function listTransactionsForSpace(
   const visibleAccountIds = await listVisibleAccountIdsForContext(ctx)
   const where = buildTransactionWhere(ctx, visibleAccountIds, query)
 
-  const [items, total] = await Promise.all([
+  const [items, total, splitRules] = await Promise.all([
     findTransactionsPage(where, skip, limit),
-    countTransactions(where)
+    countTransactions(where),
+    prisma.splitRule.findMany({
+      where: { spaceId: ctx.spaceId },
+      select: { name: true, category: true }
+    })
   ])
+
+  const splitByCategory = new Map(
+    splitRules
+      .filter(rule => rule.category)
+      .map(rule => [rule.category as string, rule.name])
+  )
 
   return {
     items: items.map(tx => ({
@@ -53,6 +63,8 @@ export async function listTransactionsForSpace(
       pending: tx.pending,
       isMine: tx.userId === ctx.userId,
       ownerName: tx.user.name,
+      paidBy: tx.user.name,
+      splitHint: splitByCategory.get(tx.category) ?? null,
       account: tx.account
     })),
     total,

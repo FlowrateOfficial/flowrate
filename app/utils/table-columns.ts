@@ -11,13 +11,17 @@ export interface TransactionTableRow {
 
 export function createTransactionColumns<T extends TransactionTableRow = TransactionTableRow>(
   t: (key: string) => string,
-  options: { includeAccount?: boolean } = {}
+  options: { includeAccount?: boolean, includeSplit?: boolean } = {}
 ): TableColumn<T>[] {
   const columns: TableColumn<T>[] = [
     { accessorKey: 'date', header: t('dashboard.transactions.columns.date') },
     { accessorKey: 'description', header: t('dashboard.transactions.columns.description') },
     { accessorKey: 'category', header: t('dashboard.transactions.columns.category') }
   ]
+
+  if (options.includeSplit) {
+    columns.push({ accessorKey: 'splitHint', header: t('dashboard.transactions.columns.split') })
+  }
 
   if (options.includeAccount) {
     columns.push({ accessorKey: 'account', header: t('dashboard.transactions.columns.account') })

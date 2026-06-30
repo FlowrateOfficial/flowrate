@@ -1,4 +1,4 @@
-import type { BudgetPeriod, TransactionCategory } from '~~/generated/prisma/client'
+import { ENUM, type BudgetPeriod, type TransactionCategory } from '#shared/prisma-enums'
 
 interface TxLike {
   merchant: string | null
@@ -66,17 +66,17 @@ export function detectSubscriptionsFromTransactions(txs: TxLike[]): DetectedSubC
     if (!gaps.length) continue
     const avgGap = gaps.reduce((s, v) => s + v, 0) / gaps.length
 
-    let frequency: BudgetPeriod = 'MONTHLY'
-    if (avgGap >= 25 && avgGap <= 35) frequency = 'MONTHLY'
-    else if (avgGap >= 6 && avgGap <= 8) frequency = 'WEEKLY'
-    else if (avgGap >= 350 && avgGap <= 380) frequency = 'YEARLY'
+    let frequency: BudgetPeriod = ENUM.period.MONTHLY
+    if (avgGap >= 25 && avgGap <= 35) frequency = ENUM.period.MONTHLY
+    else if (avgGap >= 6 && avgGap <= 8) frequency = ENUM.period.WEEKLY
+    else if (avgGap >= 350 && avgGap <= 380) frequency = ENUM.period.YEARLY
     else continue
 
     const last = sorted[0]
     if (!last) continue
-    const nextCharge = frequency === 'WEEKLY'
+    const nextCharge = frequency === ENUM.period.WEEKLY
       ? addWeeks(last.date, 1)
-      : frequency === 'YEARLY'
+      : frequency === ENUM.period.YEARLY
         ? addMonths(last.date, 12)
         : addMonths(last.date, 1)
 
@@ -84,7 +84,9 @@ export function detectSubscriptionsFromTransactions(txs: TxLike[]): DetectedSubC
       name: last.merchant ?? last.description,
       amount: Math.round(avg * 100) / 100,
       frequency,
-      category: last.category === 'OTHER' ? 'SUBSCRIPTIONS' : last.category,
+      category: last.category === ENUM.category.OTHER
+        ? ENUM.category.SUBSCRIPTIONS
+        : last.category,
       lastCharge: last.date,
       nextCharge
     })

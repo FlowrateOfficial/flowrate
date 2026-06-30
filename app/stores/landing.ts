@@ -1,3 +1,5 @@
+import { ENUM } from '#shared/prisma-enums'
+
 export interface LandingFeature {
   icon: string
   title: string
@@ -492,14 +494,20 @@ export const useLandingStore = defineStore('landing', () => {
           id: 's1',
           name: 'Figma',
           amount: 240,
+          prev: 180,
+          priceChangePercent: 33.3,
+          periodPriceImpact: 60,
+          annualPriceImpact: 720,
           currency: cur,
-          frequency: 'MONTHLY',
-          status: 'PRICE_CHANGED',
+          frequency: ENUM.period.MONTHLY,
+          status: ENUM.subscription.PRICE_CHANGED,
           icon: null,
           lastCharge: txDate(30),
           nextCharge: txDate(-15),
           alert: true,
-          isDuplicate: false
+          isDuplicate: false,
+          duplicateCount: 1,
+          duplicateIds: []
         },
         saasChart: {
           labels: [

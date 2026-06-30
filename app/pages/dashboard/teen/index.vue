@@ -6,6 +6,7 @@ definePageMeta({ layout: 'dashboard', title: 'My Money', middleware: 'auth' })
 
 const { t, formatCurrency } = useAppI18n()
 const teenStore = useTeenStore()
+const transactionsStore = useTransactionsStore()
 const { dashboard: teen, pending } = storeToRefs(teenStore)
 
 useDashboardSeo('nav.myMoney')
@@ -94,5 +95,24 @@ function frequencyLabel(freq?: string | null) {
       icon="i-lucide-graduation-cap"
       variant="subtle"
     />
+
+    <div v-if="teen?.nudges?.length" class="space-y-2">
+      <h2 class="text-base font-semibold">{{ t('dashboard.teen.nudgesTitle') }}</h2>
+      <UAlert
+        v-for="nudge in teen.nudges"
+        :key="nudge.category"
+        color="warning"
+        variant="subtle"
+        icon="i-lucide-bell"
+        :title="t('dashboard.teen.nudgeTitle', {
+          category: transactionsStore.categoryLabel(nudge.category),
+          percent: nudge.percent
+        })"
+        :description="t('dashboard.teen.nudgeDescription', {
+          spent: fmt(nudge.spent),
+          limit: fmt(nudge.limit)
+        })"
+      />
+    </div>
   </DashboardPageShell>
 </template>

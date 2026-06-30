@@ -6,6 +6,7 @@ export type { MemberFinancial, SpaceDetail, SpaceDetailMember } from '~/types/fa
 import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { createTransactionColumns } from '~/utils/table-columns'
 import { planHasFeature } from '#shared/plan-limits'
+import { ENUM } from '#shared/prisma-enums'
 import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -22,18 +23,18 @@ export const useFamilyStore = defineStore('family', () => {
   const tab = ref('members')
   const memberTab = ref('overview')
 
-  const inviteForm = reactive({ email: '', role: 'CO_GUARDIAN', name: '' })
+  const inviteForm = reactive({ email: '', role: ENUM.role.CO_GUARDIAN, name: '' })
   const childForm = reactive({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'CHILD' as 'CHILD' | 'TEEN',
+    role: ENUM.role.CHILD as typeof ENUM.role.CHILD | typeof ENUM.role.TEEN,
     birthday: ''
   })
   const allowanceForm = reactive({
     allowance: 0,
-    frequency: 'WEEKLY' as 'WEEKLY' | 'MONTHLY' | 'YEARLY',
+    frequency: ENUM.period.WEEKLY as typeof ENUM.period.WEEKLY | typeof ENUM.period.MONTHLY | typeof ENUM.period.YEARLY,
     learnMode: true
   })
   const jarName = ref('')
@@ -59,18 +60,24 @@ export const useFamilyStore = defineStore('family', () => {
   })
 
   const childRoleItems = computed(() => [
-    { label: t('dashboard.family.roleChild'), value: 'CHILD' },
-    { label: t('dashboard.family.roleTeen'), value: 'TEEN' }
+    { label: t('dashboard.family.roleChild'), value: ENUM.role.CHILD },
+    { label: t('dashboard.family.roleTeen'), value: ENUM.role.TEEN }
   ])
 
   const frequencyItems = computed(() => [
-    { label: t('frequencies.WEEKLY'), value: 'WEEKLY' },
-    { label: t('frequencies.MONTHLY'), value: 'MONTHLY' },
-    { label: t('frequencies.YEARLY'), value: 'YEARLY' }
+    { label: t('frequencies.WEEKLY'), value: ENUM.period.WEEKLY },
+    { label: t('frequencies.MONTHLY'), value: ENUM.period.MONTHLY },
+    { label: t('frequencies.YEARLY'), value: ENUM.period.YEARLY }
   ])
 
   const categoryItems = computed(() =>
-    ['FOOD', 'HOUSING', 'UTILITIES', 'ENTERTAINMENT', 'OTHER'].map(c => ({
+    [
+      ENUM.category.FOOD,
+      ENUM.category.HOUSING,
+      ENUM.category.UTILITIES,
+      ENUM.category.ENTERTAINMENT,
+      ENUM.category.OTHER
+    ].map(c => ({
       label: categoryLabel(c),
       value: c
     }))
@@ -244,7 +251,11 @@ export const useFamilyStore = defineStore('family', () => {
     await openMemberFinancial(memberId, true)
   }
 
-  const splitForm = reactive({ name: '', category: 'FOOD', mode: 'EQUAL' as 'EQUAL' | 'PROPORTIONAL' | 'CUSTOM' })
+  const splitForm = reactive({
+    name: '',
+    category: ENUM.category.FOOD,
+    mode: ENUM.split.EQUAL
+  })
   const splits = ref<Array<{ id: string, name: string, category: string | null, mode: string }>>([])
 
   async function fetchSplits(spaceId: string) {
