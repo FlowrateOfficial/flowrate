@@ -76,8 +76,7 @@ export default defineNuxtConfig({
       plaidConfigured: Boolean(process.env.PLAID_CLIENT_ID && process.env.PLAID_SECRET),
       plaidEnv: process.env.PLAID_ENV ?? 'sandbox',
       plaidSandboxMode: (process.env.PLAID_ENV ?? 'sandbox') !== 'production',
-      appUrl: process.env.APP_URL
-        ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
+      appUrl: process.env.APP_URL,
       twilioConfigured: Boolean(
         process.env.TWILIO_ACCOUNT_SID
         && process.env.TWILIO_AUTH_TOKEN
@@ -86,7 +85,11 @@ export default defineNuxtConfig({
       feedbackConfigured: Boolean(
         process.env.GITHUB_TOKEN && process.env.GITHUB_FEEDBACK_REPO
       ),
-      mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN ?? ''
+      mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN ?? '',
+      assetCdnBaseUrl: process.env.NUXT_PUBLIC_ASSET_CDN_BASE_URL ?? '',
+      emailNotificationsConfigured: Boolean(
+        process.env.RESEND_API_KEY?.trim() && process.env.AUTH_FROM_EMAIL?.trim()
+      )
     }
   },
 

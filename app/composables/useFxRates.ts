@@ -3,25 +3,45 @@ import { sumWithRates } from '#shared/fx'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
-let loadPromise: Promise<FxRateTable> | null = null
-
 export function useFxRates() {
   const { displayCurrency } = useAppI18n()
   const { api } = useApi()
   const rates = useState<FxRateTable | null>('fx-rates', () => null)
+  const loadedBase = useState<string | null>('fx-rates-base', () => null)
 
-  async function ensureRates(): Promise<FxRateTable> {
-    if (rates.value) return rates.value
-    if (!loadPromise) {
-      loadPromise = api<{ base: 'EUR', rates: FxRateTable['rates'], fetchedAt: number }>(
-        apiRoutes.fx.rates,
-        { noSpace: true }
-      ).then((payload) => ({
-        base: payload.base,
-        rates: payload.rates
-      }))
+  let loadPromise: Promise<FxRateTable> | null = null
+  let loadPromiseBase: string | null = null
+
+  async function ensureRates(base = displayCurrency.value): Promise<FxRateTable> {
+    const normalized = base.toUpperCase()
+
+    if (rates.value && loadedBase.value === normalized) {
+      return rates.value
     }
+
+    if (loadPromise && loadPromiseBase === normalized) {
+      rates.value = await loadPromise
+      loadedBase.value = normalized
+      return rates.value
+    }
+
+    loadPromiseBase = normalized
+    loadPromise = api<{
+      base: FxRateTable['base']
+      rates: FxRateTable['rates']
+      presentmentRates?: FxRateTable['presentmentRates']
+      fetchedAt: number
+    }>(apiRoutes.fx.rates, {
+      query: { base: normalized },
+      noSpace: true
+    }).then(payload => ({
+      base: payload.base,
+      rates: payload.rates,
+      presentmentRates: payload.presentmentRates
+    }))
+
     rates.value = await loadPromise
+    loadedBase.value = normalized
     return rates.value
   }
 
@@ -34,6 +54,15 @@ export function useFxRates() {
     }
     return sumWithRates(items, targetCurrency, rates.value)
   }
+
+  watch(displayCurrency, (next, prev) => {
+    if (next === prev) return
+    rates.value = null
+    loadedBase.value = null
+    loadPromise = null
+    loadPromiseBase = null
+    void ensureRates(next)
+  })
 
   if (import.meta.client && !rates.value && !loadPromise) {
     void ensureRates()

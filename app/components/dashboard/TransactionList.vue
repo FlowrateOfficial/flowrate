@@ -47,21 +47,29 @@ function fmt(amount: number, currency: string): string {
       <li
         v-for="tx in transactions"
         :key="tx.id"
-        class="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+        class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
       >
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-medium">
-            {{ tx.merchant ?? tx.description }}
-          </p>
-          <div class="mt-0.5 flex items-center gap-2">
-            <span class="text-xs text-muted">{{ formatShortDate(tx.date) }}</span>
-            <UBadge
-              v-if="tx.pending"
-              :label="t('dashboard.transactions.pending')"
-              color="warning"
-              variant="subtle"
-              size="xs"
-            />
+        <div class="flex min-w-0 flex-1 items-center gap-3">
+          <DashboardPaymentIcon
+            :name="tx.merchant ?? tx.description"
+            :merchant="tx.merchant"
+            :category="tx.category"
+            size="xs"
+          />
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium">
+              {{ tx.merchant ?? tx.description }}
+            </p>
+            <div class="mt-0.5 flex items-center gap-2">
+              <span class="text-xs text-muted">{{ formatShortDate(tx.date) }}</span>
+              <UBadge
+                v-if="tx.pending"
+                :label="t('dashboard.transactions.pending')"
+                color="warning"
+                variant="subtle"
+                size="xs"
+              />
+            </div>
           </div>
         </div>
 

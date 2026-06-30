@@ -5,6 +5,7 @@ import type { RenewalCalendarResponse, SubscriptionCapStatusDto } from '#shared/
 import type { SubscriptionStatus } from '#shared/prisma-enums'
 import { ENUM } from '#shared/prisma-enums'
 import { subscriptionMonthlyEquivalent } from '#shared/subscription-alerts'
+import { convertWithRates } from '#shared/fx'
 import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -18,10 +19,11 @@ export type SubscriptionPatchInput = {
 }
 
 export const useSubscriptionsStore = defineStore('subscriptions', () => {
-  const { t, formatCurrency, resolveCurrency, subscriptionFrequencyLabel, displayCurrency } = useAppI18n()
+  const { t, formatCurrency, subscriptionFrequencyLabel, displayCurrency, getLocale } = useAppI18n()
   const { api } = useApi()
   const appToast = useAppToast()
   const fx = useFxRates()
+  const spacesStore = useSpacesStore()
 
   const subscriptions = ref<SubscriptionItem[]>([])
   const statusFilter = ref<SubscriptionFilter>('all')
@@ -29,15 +31,32 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
   const calendar = ref<RenewalCalendarResponse | null>(null)
   const capStatus = ref<SubscriptionCapStatusDto | null>(null)
   const calendarPending = ref(false)
+  const calendarCurrency = ref<string | null>(null)
+
+  function formatInDisplayCurrency(amount: number, fromCurrency: string) {
+    if (!fx.rates.value) {
+      return formatCurrency(amount, fromCurrency)
+    }
+    const converted = convertWithRates(
+      amount,
+      fromCurrency,
+      displayCurrency.value,
+      fx.rates.value
+    )
+    return formatCurrency(converted, displayCurrency.value)
+  }
 
   const { pending: loading, load: fetchSubscriptions, reset } = createSpaceScopedLoader({
     buildKey: spaceId => `subs:${spaceId}:${statusFilter.value}`,
     fetch: async () => {
+      const locale = getLocale()
       const [items, cap] = await Promise.all([
         api<SubscriptionItem[]>(apiRoutes.subscriptions.list, {
           query: statusFilter.value === 'all' ? {} : { status: statusFilter.value }
         }),
-        api<SubscriptionCapStatusDto | null>(apiRoutes.subscriptions.capStatus)
+        api<SubscriptionCapStatusDto | null>(apiRoutes.subscriptions.capStatus, {
+          query: { locale }
+        })
       ])
       capStatus.value = cap
       return items
@@ -46,9 +65,16 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
     clear: () => {
       subscriptions.value = []
       capStatus.value = null
+      calendar.value = null
+      calendarCurrency.value = null
     },
-    isCached: () => subscriptions.value.length > 0
+    isCached: () => true
   })
+
+  watch(() => spacesStore.space?.id, (id, prev) => {
+    if (!id || !prev || id === prev) return
+    void Promise.all([fetchSubscriptions(), fetchCalendar(true)])
+  }, { flush: 'post' })
 
   const filterItems = computed(() => [
     { label: t('dashboard.subscriptions.filters.all'), value: 'all' as const },
@@ -82,7 +108,12 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
   )
 
   const totalAnnualImpact = computed(() =>
-    alertSubs.value.reduce((sum, s) => sum + (s.annualPriceImpact ?? 0), 0)
+    alertSubs.value.reduce((sum, sub) => {
+      const impact = sub.annualPriceImpact ?? 0
+      if (!impact) return sum
+      if (!fx.rates.value) return sum + impact
+      return sum + convertWithRates(impact, sub.currency, displayCurrency.value, fx.rates.value)
+    }, 0)
   )
 
   const summaryItems = computed<SummaryItem[]>(() => [
@@ -102,7 +133,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
     if (sub.periodPriceImpact == null) return null
     const freq = subscriptionFrequencyLabel(sub.frequency)
     return t('dashboard.subscriptions.periodImpact', {
-      amount: formatCurrency(sub.periodPriceImpact, sub.currency),
+      amount: formatInDisplayCurrency(sub.periodPriceImpact, sub.currency),
       period: freq
     })
   }
@@ -110,16 +141,22 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
   function formatAnnualImpact(sub: SubscriptionItem) {
     if (sub.annualPriceImpact == null) return null
     return t('dashboard.subscriptions.annualImpact', {
-      amount: formatCurrency(sub.annualPriceImpact, sub.currency)
+      amount: formatInDisplayCurrency(sub.annualPriceImpact, sub.currency)
     })
   }
 
   async function fetchCalendar(force = false) {
-    if (calendar.value && !force) return calendar.value
+    const currency = displayCurrency.value
+    if (calendar.value && calendarCurrency.value === currency && !force) {
+      return calendar.value
+    }
+
     calendarPending.value = true
     try {
-      await fx.ensureRates()
-      calendar.value = await api<RenewalCalendarResponse>(apiRoutes.subscriptions.calendar)
+      calendar.value = await api<RenewalCalendarResponse>(apiRoutes.subscriptions.calendar, {
+        query: { locale: getLocale() }
+      })
+      calendarCurrency.value = currency
       return calendar.value
     } finally {
       calendarPending.value = false
@@ -195,6 +232,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
     patchSubscription,
     formatPeriodImpact,
     formatAnnualImpact,
+    formatInDisplayCurrency,
     reset
   }
 })

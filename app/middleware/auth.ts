@@ -21,45 +21,39 @@ function isAllowedPath(path: string, prefixes: string[]) {
 export default defineNuxtRouteMiddleware(async (to) => {
   const isDashboard = to.path === '/dashboard' || to.path.startsWith('/dashboard/')
 
-  // NOTE - Dashboard routes are client-rendered; skip SSR to avoid layout/session races
   if (isDashboard && import.meta.server) {
     return
   }
 
   const verifier = to.query[NEON_AUTH_SESSION_VERIFIER_PARAM]
-
   if (verifier && import.meta.server) {
     return
   }
 
-  const { getSession } = useNeonAuth()
-  const session = await getSession()
-
-  if (!session?.user?.id) {
-    return navigateTo('/auth/login')
-  }
-
   const userStore = useUserStore()
-
-  try {
-    if (!userStore.bootstrapped) {
-      await userStore.bootstrap()
-    }
-  } catch {
-    return navigateTo('/auth/login')
-  }
-
   const spacesStore = useSpacesStore()
 
-  if (import.meta.server || !spacesStore.spaces.length) {
+  // NOTE - After first bootstrap, skip session round-trip on every navigation
+  const sessionReady = userStore.bootstrapped && spacesStore.spaces.length > 0
+
+  if (!sessionReady) {
+    const { getSession } = useNeonAuth()
+    const session = await getSession()
+
+    if (!session?.user?.id) {
+      return navigateTo('/auth/login')
+    }
+
     try {
-      await spacesStore.fetchSpaces()
+      await Promise.all([
+        !userStore.bootstrapped ? userStore.bootstrap() : Promise.resolve(),
+        !spacesStore.spaces.length ? spacesStore.fetchSpaces() : Promise.resolve(),
+        !userStore.user ? userStore.fetchUser() : Promise.resolve()
+      ])
     } catch {
       return navigateTo('/auth/login')
     }
-  }
-
-  if (!userStore.user) {
+  } else if (!userStore.user) {
     try {
       await userStore.fetchUser()
     } catch {

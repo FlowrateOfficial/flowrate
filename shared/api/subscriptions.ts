@@ -13,7 +13,6 @@ export interface SubscriptionListItemDto {
   frequency: string | null
   status: string
   icon: string | null
-  logoUrl: string | null
   lastCharge: string | null
   nextCharge: string | null
   alert: boolean

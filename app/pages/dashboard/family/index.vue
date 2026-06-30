@@ -4,7 +4,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { storeToRefs } from 'pinia'
 import type { SpaceDetailMember } from '~/types/family'
 
-definePageMeta({ layout: 'dashboard', title: 'Family', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Family', middleware: 'auth', keepalive: true })
 
 const { t } = useAppI18n()
 const familyStore = useFamilyStore()

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const userStore = useUserStore()
 const { navItems, bottomItems } = storeToRefs(userStore)
+const { onNavHover } = useNavPrefetch()
 
 function linkClass(active: boolean) {
   return active
@@ -23,6 +24,8 @@ function linkClass(active: boolean) {
       :class="linkClass(userStore.isActive(item.to))"
       :icon="item.icon"
       :label="item.label"
+      @mouseenter="onNavHover(item.to)"
+      @focus="onNavHover(item.to)"
     />
   </nav>
 
@@ -39,6 +42,8 @@ function linkClass(active: boolean) {
       :class="linkClass(userStore.isActive(item.to))"
       :icon="item.icon"
       :label="item.label"
+      @mouseenter="onNavHover(item.to)"
+      @focus="onNavHover(item.to)"
     />
   </div>
 </template>

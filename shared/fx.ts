@@ -1,7 +1,5 @@
 import { DISPLAY_CURRENCIES, type DisplayCurrency } from './currency'
 
-export const FX_BASE_CURRENCY = 'EUR' as const
-
 export type FxCurrency = DisplayCurrency
 
 export function roundMoney(amount: number): number {
@@ -18,8 +16,10 @@ export function normalizeFxCurrency(value: string, fallback: FxCurrency = 'USD')
 }
 
 export interface FxRateTable {
-  base: typeof FX_BASE_CURRENCY
+  base: FxCurrency
   rates: Record<FxCurrency, number>
+  /** Stripe FX Quotes exchange_rate table (includes FX fee). */
+  presentmentRates?: Partial<Record<FxCurrency, number>>
 }
 
 export function convertWithRates(
@@ -28,16 +28,27 @@ export function convertWithRates(
   toCurrency: string,
   table: FxRateTable
 ): number {
+  const base = table.base
   const from = normalizeFxCurrency(fromCurrency, normalizeFxCurrency(toCurrency))
   const to = normalizeFxCurrency(toCurrency, from)
   if (from === to) return roundMoney(amount)
 
-  const toEur = from === 'EUR' ? amount : amount / table.rates[from]
-  const converted = to === 'EUR' ? toEur : toEur * table.rates[to]
+  const toBase = from === base ? amount : amount / table.rates[from]
+  const converted = to === base ? toBase : toBase * table.rates[to]
   return roundMoney(converted)
 }
 
-// Stripe Checkout adaptive pricing quotes ~3.9% above ECB mid-market (incl. conversion fee).
+function tableWithPresentmentRates(table: FxRateTable): FxRateTable {
+  const presentment = table.presentmentRates ?? {}
+  const rates = { [table.base]: 1 } as Record<FxCurrency, number>
+  for (const code of DISPLAY_CURRENCIES) {
+    if (code === table.base) continue
+    rates[code] = presentment[code] ?? table.rates[code]
+  }
+  return { base: table.base, rates }
+}
+
+// Fallback when Stripe FX Quotes presentment rates are unavailable.
 export const BILLING_PRESENTMENT_MARKUP = 0.039
 
 export function convertWithPresentmentMarkup(
@@ -46,10 +57,15 @@ export function convertWithPresentmentMarkup(
   toCurrency: string,
   table: FxRateTable
 ): number {
-  const converted = convertWithRates(amount, fromCurrency, toCurrency, table)
   if (normalizeFxCurrency(fromCurrency) === normalizeFxCurrency(toCurrency)) {
-    return converted
+    return convertWithRates(amount, fromCurrency, toCurrency, table)
   }
+
+  if (table.presentmentRates && Object.keys(table.presentmentRates).length > 1) {
+    return convertWithRates(amount, fromCurrency, toCurrency, tableWithPresentmentRates(table))
+  }
+
+  const converted = convertWithRates(amount, fromCurrency, toCurrency, table)
   return roundMoney(converted * (1 + BILLING_PRESENTMENT_MARKUP))
 }
 

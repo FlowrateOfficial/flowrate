@@ -4,9 +4,9 @@ import { storeToRefs } from 'pinia'
 import { ENUM } from '#shared/prisma-enums'
 import type { SubscriptionFilter } from '~/stores/subscriptions'
 
-definePageMeta({ layout: 'dashboard', title: 'Subscriptions', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Subscriptions', middleware: 'auth', keepalive: true })
 
-const { t, formatCurrency } = useAppI18n()
+const { t, formatCurrency, displayCurrency } = useAppI18n()
 const subscriptionsStore = useSubscriptionsStore()
 const {
   subscriptions,
@@ -23,10 +23,13 @@ const {
   calendarPending
 } = storeToRefs(subscriptionsStore)
 
-await useSpaceStoreFetch('subscriptions', async () => {
-  await subscriptionsStore.fetchSubscriptions()
-  await subscriptionsStore.fetchCalendar()
-})
+await useSpaceStoreFetch('subscriptions', () =>
+  Promise.all([
+    subscriptionsStore.fetchSubscriptions(),
+    subscriptionsStore.fetchCalendar()
+  ]),
+  [displayCurrency]
+)
 
 useDashboardSeo('dashboard.subscriptions.title')
 
@@ -61,10 +64,7 @@ const priceChangeDescription = computed(() => {
   if (totalAnnualImpact.value > 0) {
     parts.push(
       t('dashboard.subscriptions.priceChangeAnnualTotal', {
-        amount: formatCurrency(
-          totalAnnualImpact.value,
-          alertSubs.value[0]?.currency ?? 'USD'
-        )
+        amount: formatCurrency(totalAnnualImpact.value, displayCurrency.value)
       })
     )
   }

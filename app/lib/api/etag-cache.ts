@@ -1,5 +1,5 @@
 // ANCHOR: Client-side ETag cache for conditional GET requests
-const MAX_ENTRIES = 64
+const MAX_ENTRIES = 128
 
 interface EtagEntry {
   etag: string
@@ -9,7 +9,12 @@ interface EtagEntry {
 const store = new Map<string, EtagEntry>()
 
 export function getEtagEntry(key: string): EtagEntry | undefined {
-  return store.get(key)
+  const entry = store.get(key)
+  if (!entry) return undefined
+  // NOTE - LRU touch
+  store.delete(key)
+  store.set(key, entry)
+  return entry
 }
 
 export function setEtagEntry(key: string, etag: string, data: unknown) {
@@ -26,4 +31,15 @@ export function clearEtagEntry(key: string) {
 
 export function clearEtagStore() {
   store.clear()
+}
+
+/** Drop cached GETs whose key contains a fragment (e.g. space id or route path). */
+export function clearEtagEntriesMatching(matcher: string | ((key: string) => boolean)) {
+  const test = typeof matcher === 'string'
+    ? (key: string) => key.includes(matcher)
+    : matcher
+
+  for (const key of [...store.keys()]) {
+    if (test(key)) store.delete(key)
+  }
 }

@@ -1,9 +1,15 @@
 import { checkSubscriptionCapForSpace } from '../../lib/services/subscriptions.service'
 import { requireSpaceContext } from '../../lib/domain/http'
+import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/currency'
 
 export default defineEventHandler(async (event) => {
   const ctx = await requireSpaceContext(event)
-  const breach = await checkSubscriptionCapForSpace(ctx.spaceId, ctx.userId)
+  const queryLocale = getQuery(event).locale
+  const locale = typeof queryLocale === 'string' && queryLocale.trim()
+    ? queryLocale.trim()
+    : localeFromRequest(event)
+  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, locale)
+  const breach = await checkSubscriptionCapForSpace(ctx.spaceId, ctx.userId, currency)
   if (!breach) return null
   return { ...breach, exceeded: true }
 })

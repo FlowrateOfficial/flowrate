@@ -33,9 +33,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
   let fetchSeq = 0
   let abortController: AbortController | null = null
   let skipWatch = false
+  const loadedForSpaceId = ref<string | null>(null)
 
   const hasMore = computed(() => items.value.length < total.value)
   const loadedCount = computed(() => items.value.length)
+  const hasDefaultFilters = computed(() =>
+    selectedCategory.value === 'ALL'
+    && !search.value.trim()
+    && !dateFrom.value
+    && !dateTo.value
+    && !timeFrom.value
+    && !timeTo.value
+  )
 
   const columns = computed(() =>
     createTransactionColumns<TransactionRow>(t, {
@@ -128,6 +137,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         items.value = [...items.value, ...fresh]
       } else {
         items.value = result.items
+        loadedForSpaceId.value = spacesStore.space?.id ?? null
       }
     } catch (error) {
       if (seq !== fetchSeq) return
@@ -144,7 +154,15 @@ export const useTransactionsStore = defineStore('transactions', () => {
   async function resetAndFetch() {
     items.value = []
     total.value = 0
+    loadedForSpaceId.value = null
     await fetchTransactions()
+  }
+
+  function seedFromOverview(payload: TransactionsResponse) {
+    if (!hasDefaultFilters.value || items.value.length) return
+    items.value = payload.items
+    total.value = payload.total
+    loadedForSpaceId.value = spacesStore.space?.id ?? null
   }
 
   async function loadMore() {
@@ -196,6 +214,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
       skipWatch = false
       items.value = []
       total.value = 0
+      loadedForSpaceId.value = null
       resetAndFetch()
     }
   })
@@ -226,8 +245,11 @@ export const useTransactionsStore = defineStore('transactions', () => {
     updateCategory,
     fetchTransactions,
     resetAndFetch,
+    seedFromOverview,
+    hasDefaultFilters,
     loadMore,
     exportCsv,
-    exportAuditCsv
+    exportAuditCsv,
+    loadedForSpaceId
   }
 })

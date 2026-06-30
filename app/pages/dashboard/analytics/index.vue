@@ -2,7 +2,7 @@
 // ANCHOR: Analytics page — charts by range; refetch on range change
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Analytics', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Analytics', middleware: 'auth', keepalive: true })
 
 const { t, displayCurrency } = useAppI18n()
 const analyticsStore = useAnalyticsStore()

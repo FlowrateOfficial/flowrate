@@ -22,6 +22,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const spacesStore = useSpacesStore()
   const accountsStore = useAccountsStore()
   const analyticsStore = useAnalyticsStore()
+  const transactionsStore = useTransactionsStore()
   const { api } = useApi()
   const activePlan = useActivePlan()
 
@@ -136,10 +137,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
       alertSubs.value = payload.alertSubscriptions
       saasAlertPreview.value = payload.saasAlertPreview ?? null
       accountsStore.seedAccounts(payload.accounts)
+      transactionsStore.seedFromOverview(payload.transactions)
 
-      // NOTE - Share 30d analytics cache when overview already fetched it
+      // NOTE - Lite 30d snapshot; analytics page upgrades to full payload when opened
       if (analyticsStore.range === '30d') {
-        analyticsStore.data = payload.analytics
+        analyticsStore.seedLite(payload.analytics)
       }
     },
     clear: () => {

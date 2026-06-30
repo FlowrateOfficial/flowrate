@@ -10,6 +10,14 @@ const spacesStore = useSpacesStore()
 const userStore = useUserStore()
 const { user, plan, isAdmin } = storeToRefs(userStore)
 const { isMinor, space } = storeToRefs(spacesStore)
+const { prefetchRoute } = useNavPrefetch()
+
+onMounted(() => {
+  prefetchRoute('/dashboard')
+  for (const item of userStore.navItems) {
+    prefetchRoute(item.to)
+  }
+})
 </script>
 
 <template>

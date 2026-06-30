@@ -5,6 +5,7 @@ const { user, navItems } = storeToRefs(userStore)
 const { open, closeMenu } = useMobileAccountMenu()
 const { openCustomizer } = useMobileNavCustomizer()
 const { footerPaths } = useMobileNavLayout()
+const { prefetchRoute } = useNavPrefetch()
 
 const accountLinks = computed(() =>
   userStore.getAccountMenuLinks().filter(item => !footerPaths.value.has(item.to))
@@ -15,6 +16,7 @@ const menuNavItems = computed(() =>
 )
 
 async function goTo(to: string) {
+  prefetchRoute(to)
   closeMenu()
   await navigateTo(to)
 }
@@ -56,6 +58,7 @@ async function signOut() {
               :key="item.to"
               type="button"
               class="flex min-h-12 items-center gap-2 rounded-xl border border-default bg-elevated/20 px-3 py-2 text-left transition-colors hover:bg-elevated/50"
+              @pointerenter="prefetchRoute(item.to)"
               @click="goTo(item.to)"
             >
               <UIcon :name="item.icon" class="size-4 shrink-0 text-primary" />
