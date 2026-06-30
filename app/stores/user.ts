@@ -68,6 +68,10 @@ export const useUserStore = defineStore('user', () => {
       { label: t('nav.budgets'), icon: 'i-lucide-pie-chart', to: '/dashboard/budgets' }
     )
 
+    if (!spacesStore.isCompany) {
+      items.push({ label: t('nav.goals'), icon: 'i-lucide-target', to: '/dashboard/goals' })
+    }
+
     if (spacesStore.isSharedSpace && (spacesStore.space?.type === 'HOUSEHOLD' || spacesStore.space?.type === 'FAMILY')) {
       items.push({ label: t('nav.family'), icon: 'i-lucide-users', to: '/dashboard/family' })
     }
@@ -100,8 +104,9 @@ export const useUserStore = defineStore('user', () => {
 
   function isActive(to: string) {
     const path = useRouter().currentRoute.value.path
-    if (to === '/dashboard') return path === '/dashboard'
-    return path.startsWith(to)
+    const base = to.split('?')[0]!
+    if (base === '/dashboard') return path === '/dashboard'
+    return path === base || path.startsWith(`${base}/`)
   }
 
   async function deleteAccount(input: AccountDeleteRequest) {

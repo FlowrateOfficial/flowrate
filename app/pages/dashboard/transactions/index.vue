@@ -105,9 +105,10 @@ async function syncAndRefresh() {
           v-if="has('auditExport')"
           :label="t('dashboard.transactions.exportAuditCsv')"
           icon="i-lucide-file-badge"
-          color="neutral"
-          variant="outline"
+          color="primary"
+          variant="soft"
           size="sm"
+          :title="t('dashboard.transactions.exportAuditHelp')"
           @click="transactionsStore.exportAuditCsv()"
         />
         <UButton
@@ -207,6 +208,15 @@ async function syncAndRefresh() {
             variant="subtle"
             size="xs"
           />
+        </template>
+        <template #splitHint-cell="{ row }">
+          <span v-if="row.original.splitHint || row.original.paidBy" class="text-xs text-muted">
+            <span v-if="row.original.paidBy">{{ row.original.paidBy }}</span>
+            <span v-if="row.original.splitHint">
+              <span v-if="row.original.paidBy"> · </span>{{ row.original.splitHint }}
+            </span>
+          </span>
+          <span v-else class="text-xs text-muted">—</span>
         </template>
         <template #account-cell="{ row }">
           <span class="truncate text-sm text-muted">{{ row.original.account?.name ?? '—' }}</span>

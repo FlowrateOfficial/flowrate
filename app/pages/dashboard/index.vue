@@ -29,6 +29,8 @@ const {
   hasAccounts,
   hasAlertSubs,
   previewAlertSubs,
+  showSaasUpgradeGate,
+  saasUpgradeAlertCount,
   recentTransactions
 } = storeToRefs(dashboardStore)
 
@@ -164,7 +166,23 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
           </ul>
         </UCard>
 
-        <UCard v-if="showSaasShield && hasAlertSubs" :ui="{ body: 'p-4 sm:p-5', root: 'border-warning/30' }">
+        <UCard v-if="showSaasUpgradeGate" :ui="{ body: 'p-4 sm:p-5', root: 'border-primary/30' }">
+          <div class="mb-3 flex items-center gap-2">
+            <UIcon name="i-lucide-lock" class="size-4 text-primary" />
+            <h2 class="text-base font-semibold">{{ t('dashboard.overview.saasUpgradeTitle') }}</h2>
+          </div>
+          <p class="mb-4 text-sm text-muted">
+            {{ t('dashboard.overview.saasUpgradeDescription', { count: saasUpgradeAlertCount }) }}
+          </p>
+          <UButton
+            to="/dashboard/settings"
+            :label="t('dashboard.overview.saasUpgradeCta')"
+            icon="i-lucide-sparkles"
+            block
+          />
+        </UCard>
+
+        <UCard v-else-if="showSaasShield && hasAlertSubs" :ui="{ body: 'p-4 sm:p-5', root: 'border-warning/30' }">
           <div class="mb-3 flex items-center gap-2">
             <UIcon name="i-lucide-shield-alert" class="size-4 text-warning" />
             <h2 class="text-base font-semibold text-warning">{{ t('dashboard.overview.saasAlerts') }}</h2>

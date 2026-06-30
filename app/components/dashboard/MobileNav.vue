@@ -12,9 +12,13 @@ const { openMenu: openAccountMenu } = useMobileAccountMenu()
 
 const spaceNavKey = computed(() => space.value?.id ?? 'none')
 
-const isAccountActive = computed(() =>
-  userStore.getAccountMenuLinks().some(item => item.to === route.path)
-)
+const isAccountActive = computed(() => {
+  const path = route.path
+  const inFooter = footerItems.value.some(item => userStore.isActive(item.to))
+  if (inFooter) return false
+  return userStore.navItems.some(item => userStore.isActive(item.to))
+    || userStore.getAccountMenuLinks().some(item => path === item.to || path.startsWith(`${item.to}/`))
+})
 </script>
 
 <template>

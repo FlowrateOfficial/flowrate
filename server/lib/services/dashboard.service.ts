@@ -1,4 +1,5 @@
 // ANCHOR: Dashboard stats — balances and monthly cash flow with FX conversion
+import { ENUM } from '#shared/prisma-enums'
 import type { SpaceContext } from '../domain/context'
 import { createFxConverter } from '../fx/converter'
 import { accountWhereForSpace } from '../repositories/account.repository'
@@ -30,11 +31,10 @@ export async function getDashboardStats(ctx: SpaceContext, displayCurrency: stri
     }),
     spendingIncomeInRange(ctx.spaceId, startOfMonth),
     spendingIncomeInRange(ctx.spaceId, startOfLastMonth, endOfLastMonth),
-    prisma.spaceMember.count({ where: { spaceId: ctx.spaceId, status: 'ACTIVE' } }),
+    prisma.spaceMember.count({ where: { spaceId: ctx.spaceId, status: ENUM.member.ACTIVE } }),
     prisma.detectedSubscription.count({
       where: {
         spaceId: ctx.spaceId,
-        status: { in: ['PRICE_CHANGED', 'ACTIVE'] },
         alert: true
       }
     })
@@ -45,12 +45,12 @@ export async function getDashboardStats(ctx: SpaceContext, displayCurrency: stri
   const totalBalance = fx.sum(accounts.map(account => toMoney(Number(account.balance), account.currency)))
   const sharedBalance = fx.sum(
     accounts
-      .filter(account => account.visibility === 'SHARED')
+      .filter(account => account.visibility === ENUM.visibility.SHARED)
       .map(account => toMoney(Number(account.balance), account.currency))
   )
   const personalBalance = fx.sum(
     accounts
-      .filter(account => account.userId === ctx.userId && account.visibility === 'PERSONAL')
+      .filter(account => account.userId === ctx.userId && account.visibility === ENUM.visibility.PERSONAL)
       .map(account => toMoney(Number(account.balance), account.currency))
   )
 

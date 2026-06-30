@@ -1,4 +1,5 @@
 // ANCHOR: Child allowance jar payouts
+import { ENUM } from '#shared/prisma-enums'
 export async function processAllowancePayouts(spaceId: string) {
   const profiles = await prisma.childProfile.findMany({
     where: {
@@ -37,9 +38,9 @@ export async function processAllowancePayouts(spaceId: string) {
 function isAllowanceDue(frequency: string, lastPaid: Date, now: Date): boolean {
   const ms = now.getTime() - lastPaid.getTime()
   const days = ms / (1000 * 60 * 60 * 24)
-  if (frequency === 'WEEKLY') return days >= 7
-  if (frequency === 'MONTHLY') return days >= 28
-  if (frequency === 'YEARLY') return days >= 365
+  if (frequency === ENUM.period.WEEKLY) return days >= 7
+  if (frequency === ENUM.period.MONTHLY) return days >= 28
+  if (frequency === ENUM.period.YEARLY) return days >= 365
   return false
 }
 

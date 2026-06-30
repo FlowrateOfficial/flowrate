@@ -2,6 +2,7 @@
 import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
 import type { BudgetItem, BudgetPeriod } from '~/types/budget'
 import { BUDGET_CATEGORIES } from '#shared/categories'
+import { ENUM } from '#shared/prisma-enums'
 import { createSpaceScopedLoader, storeMoneyFormatter } from '~/utils/store-fetch'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -19,18 +20,18 @@ export const useBudgetsStore = defineStore('budgets', () => {
 
   const newBudget = reactive({
     name: '',
-    category: 'FOOD' as (typeof CATEGORIES)[number],
+    category: ENUM.category.FOOD as (typeof CATEGORIES)[number],
     amount: '',
-    period: 'MONTHLY' as BudgetPeriod,
+    period: ENUM.period.MONTHLY as BudgetPeriod,
     isShared: false
   })
 
   const isEditing = computed(() => editingId.value !== null)
 
   const periodItems = computed(() => [
-    { label: t('frequencies.WEEKLY'), value: 'WEEKLY' },
-    { label: t('frequencies.MONTHLY'), value: 'MONTHLY' },
-    { label: t('frequencies.YEARLY'), value: 'YEARLY' }
+    { label: t('frequencies.WEEKLY'), value: ENUM.period.WEEKLY },
+    { label: t('frequencies.MONTHLY'), value: ENUM.period.MONTHLY },
+    { label: t('frequencies.YEARLY'), value: ENUM.period.YEARLY }
   ])
 
   const categoryItems = computed(() =>
@@ -85,8 +86,8 @@ export const useBudgetsStore = defineStore('budgets', () => {
   function resetForm() {
     newBudget.name = ''
     newBudget.amount = ''
-    newBudget.category = 'FOOD'
-    newBudget.period = 'MONTHLY'
+    newBudget.category = ENUM.category.FOOD
+    newBudget.period = ENUM.period.MONTHLY
     newBudget.isShared = false
     editingId.value = null
   }

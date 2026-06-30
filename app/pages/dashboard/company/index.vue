@@ -271,19 +271,29 @@ const pending = overviewPending
               />
             </UCard>
 
-            <UCard class="lg:col-span-1" :ui="{ body: 'p-4 sm:p-5' }">
+            <UCard class="lg:col-span-2" :ui="{ body: 'p-4 sm:p-5' }">
               <h2 class="mb-3 text-base font-semibold">{{ t('dashboard.company.topVendors') }}</h2>
-              <ul v-if="overview.topVendors.length" class="space-y-3 text-sm">
-                <li
-                  v-for="vendor in overview.topVendors"
-                  :key="vendor.name"
-                  class="flex justify-between gap-3"
-                >
-                  <span class="truncate text-muted">{{ vendor.name }}</span>
-                  <span class="font-medium tabular-nums shrink-0">{{ businessStore.fmt(vendor.amount) }}</span>
-                </li>
-              </ul>
-              <p v-else class="text-sm text-muted">{{ t('dashboard.company.noVendors') }}</p>
+              <div class="grid gap-4 lg:grid-cols-2">
+                <ul v-if="overview.topVendors.length" class="space-y-3 text-sm">
+                  <li
+                    v-for="vendor in overview.topVendors"
+                    :key="vendor.name"
+                    class="flex justify-between gap-3"
+                  >
+                    <span class="truncate text-muted">{{ vendor.name }}</span>
+                    <span class="font-medium tabular-nums shrink-0">{{ businessStore.fmt(vendor.amount) }}</span>
+                  </li>
+                </ul>
+                <p v-else class="text-sm text-muted">{{ t('dashboard.company.noVendors') }}</p>
+
+                <div v-if="overview.vendorTrends?.length">
+                  <p class="mb-2 text-xs font-medium text-muted">{{ t('dashboard.company.vendorTrends') }}</p>
+                  <DashboardChartsVendorTrendChart
+                    :trends="overview.vendorTrends"
+                    :currency="overview.currency"
+                  />
+                </div>
+              </div>
             </UCard>
           </div>
 

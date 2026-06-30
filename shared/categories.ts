@@ -1,23 +1,26 @@
-// ANCHOR: Transaction category values — mirror Prisma TransactionCategory enum
+// ANCHOR: Transaction category values — sourced from Prisma TransactionCategory enum
+import { ENUM, TransactionCategory } from './prisma-enums'
+
+export { TransactionCategory }
 
 export const TRANSACTION_CATEGORIES = [
-  'HOUSING',
-  'FOOD',
-  'TRANSPORT',
-  'SUBSCRIPTIONS',
-  'UTILITIES',
-  'HEALTHCARE',
-  'ENTERTAINMENT',
-  'EDUCATION',
-  'SHOPPING',
-  'SAVINGS',
-  'INCOME',
-  'CLOUD_INFRA',
-  'DEVELOPER_TOOLS',
-  'OTHER'
+  ENUM.category.HOUSING,
+  ENUM.category.FOOD,
+  ENUM.category.TRANSPORT,
+  ENUM.category.SUBSCRIPTIONS,
+  ENUM.category.UTILITIES,
+  ENUM.category.HEALTHCARE,
+  ENUM.category.ENTERTAINMENT,
+  ENUM.category.EDUCATION,
+  ENUM.category.SHOPPING,
+  ENUM.category.SAVINGS,
+  ENUM.category.INCOME,
+  ENUM.category.CLOUD_INFRA,
+  ENUM.category.DEVELOPER_TOOLS,
+  ENUM.category.OTHER
 ] as const
 
-export type TransactionCategory = (typeof TRANSACTION_CATEGORIES)[number]
+export type TransactionCategoryValue = (typeof TRANSACTION_CATEGORIES)[number]
 
 export const TRANSACTION_FILTER_CATEGORIES = [
   'ALL',
@@ -28,18 +31,18 @@ export type TransactionCategoryFilter = (typeof TRANSACTION_FILTER_CATEGORIES)[n
 
 /** Categories available when creating a budget */
 export const BUDGET_CATEGORIES = [
-  'FOOD',
-  'TRANSPORT',
-  'SUBSCRIPTIONS',
-  'HOUSING',
-  'UTILITIES',
-  'HEALTHCARE',
-  'ENTERTAINMENT',
-  'SHOPPING',
-  'SAVINGS',
-  'CLOUD_INFRA',
-  'DEVELOPER_TOOLS',
-  'OTHER'
+  ENUM.category.FOOD,
+  ENUM.category.TRANSPORT,
+  ENUM.category.SUBSCRIPTIONS,
+  ENUM.category.HOUSING,
+  ENUM.category.UTILITIES,
+  ENUM.category.HEALTHCARE,
+  ENUM.category.ENTERTAINMENT,
+  ENUM.category.SHOPPING,
+  ENUM.category.SAVINGS,
+  ENUM.category.CLOUD_INFRA,
+  ENUM.category.DEVELOPER_TOOLS,
+  ENUM.category.OTHER
 ] as const
 
 export type BudgetCategory = (typeof BUDGET_CATEGORIES)[number]

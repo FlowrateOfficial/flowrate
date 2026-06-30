@@ -27,15 +27,25 @@ export type AnalyticsRange = '7d' | '30d' | '90d' | '12m'
 export interface SubscriptionItem {
   id: string
   name: string
+  rawName?: string
   amount: number
+  prev: number | null
+  priceChangePercent: number | null
+  periodPriceImpact: number | null
+  annualPriceImpact: number | null
   currency: string
   frequency: string | null
   status: string
   icon: string | null
+  logoUrl?: string | null
   lastCharge: string | null
   nextCharge: string | null
   alert: boolean
+  hidden?: boolean
+  excluded?: boolean
   isDuplicate: boolean
+  duplicateCount: number
+  duplicateIds: string[]
 }
 
 export interface AnalyticsOverview {

@@ -2,6 +2,7 @@
 import type { BusinessOverviewDto } from '#shared/api/business'
 import type { AppPlan } from '#shared/billing'
 import { planHasFeature } from '#shared/plan-limits'
+import { ENUM } from '#shared/prisma-enums'
 import type { SpaceContext } from '../domain/context'
 import { assertSaasShield, userPlanForId } from '../billing/enforcement'
 import { createFxConverter } from '../fx/converter'
@@ -19,7 +20,7 @@ export async function getBusinessOverview(
   ctx: SpaceContext,
   displayCurrency: string
 ): Promise<BusinessOverviewDto> {
-  if (ctx.spaceType !== 'COMPANY') {
+  if (ctx.spaceType !== ENUM.space.COMPANY) {
     throw createError({ statusCode: 400, message: 'Business metrics are only available for Business spaces' })
   }
 
@@ -42,7 +43,7 @@ export async function getBusinessOverview(
     }),
     spendingIncomeInRange(ctx.spaceId, startOfMonth),
     prisma.detectedSubscription.findMany({
-      where: { spaceId: ctx.spaceId, status: 'ACTIVE' },
+      where: { spaceId: ctx.spaceId, status: ENUM.subscription.ACTIVE },
       select: { name: true, amount: true, currency: true }
     }),
     prisma.transaction.count({ where: { spaceId: ctx.spaceId } }),
@@ -52,7 +53,7 @@ export async function getBusinessOverview(
         spaceId: ctx.spaceId,
         date: { gte: startOfMonth },
         amount: { lt: 0 },
-        category: { in: ['CLOUD_INFRA', 'DEVELOPER_TOOLS'] }
+        category: { in: [ENUM.category.CLOUD_INFRA, ENUM.category.DEVELOPER_TOOLS] }
       },
       _sum: { amount: true }
     }),
@@ -109,6 +110,8 @@ export async function getBusinessOverview(
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([name, amount]) => ({ name, amount: Math.round(amount * 100) / 100 }))
+
+  const vendorTrends = await buildVendorTrends(ctx.spaceId, topVendors.slice(0, 3).map(v => v.name), fx, displayCurrency)
 
   const hasAccounts = accounts.length > 0
   const hasTransactions = txCount > 0
@@ -180,6 +183,44 @@ export async function getBusinessOverview(
       step: setupComplete ? 4 : setupStep
     },
     alerts,
-    topVendors
+    topVendors,
+    vendorTrends
   }
+}
+
+async function buildVendorTrends(
+  spaceId: string,
+  vendorNames: string[],
+  fx: Awaited<ReturnType<typeof createFxConverter>>,
+  displayCurrency: string
+) {
+  if (!vendorNames.length) return []
+
+  const since = new Date()
+  since.setMonth(since.getMonth() - 5)
+  since.setDate(1)
+  since.setHours(0, 0, 0, 0)
+
+  const rows = await prisma.transaction.findMany({
+    where: { spaceId, date: { gte: since }, amount: { lt: 0 } },
+    select: { merchant: true, description: true, amount: true, currency: true, date: true }
+  })
+
+  const monthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+
+  return vendorNames.map((name) => {
+    const key = name.toLowerCase()
+    const pointsMap = new Map<string, number>()
+    for (const row of rows) {
+      const label = (row.merchant ?? row.description).trim()
+      if (!label.toLowerCase().includes(key) && !key.includes(label.toLowerCase())) continue
+      const mk = monthKey(row.date)
+      const converted = fx.convert(Math.abs(Number(row.amount)), row.currency)
+      pointsMap.set(mk, (pointsMap.get(mk) ?? 0) + converted)
+    }
+    const points = [...pointsMap.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([month, amount]) => ({ month, amount: Math.round(amount * 100) / 100 }))
+    return { name, points }
+  })
 }

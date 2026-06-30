@@ -23,6 +23,12 @@ const {
 const { settingsPending } = storeToRefs(billingStore)
 
 const accountDeleteModalRef = ref<{ openModal: (email: string) => void } | null>(null)
+const userPrefs = useUserPreferences()
+const { prefs, pending: prefsPending, saving: prefsSaving } = userPrefs
+
+const emailPriceAlerts = ref(true)
+const weeklyDigest = ref(true)
+const subscriptionCapMonthly = ref<number | null>(null)
 
 useDashboardSeo('dashboard.settings.title')
 
@@ -42,6 +48,15 @@ await useAsyncData(
   billingDataKey,
   () => billingStore.loadSettings({ checkoutSessionId: checkoutSessionId.value })
 )
+
+await useAsyncData('user-preferences', async () => {
+  await userPrefs.load()
+  if (userPrefs.prefs.value) {
+    emailPriceAlerts.value = userPrefs.prefs.value.emailPriceAlerts !== false
+    weeklyDigest.value = userPrefs.prefs.value.weeklyDigest !== false
+    subscriptionCapMonthly.value = userPrefs.prefs.value.subscriptionCapMonthly ?? null
+  }
+})
 
 onMounted(async () => {
   if (route.query.upgraded === '1') {
@@ -87,6 +102,14 @@ async function resendVerificationCode() {
   } catch (err: unknown) {
     appToast.errorMessage(userStore.profileSaveErrorMessage(err))
   }
+}
+
+async function savePreferences() {
+  await userPrefs.save({
+    emailPriceAlerts: emailPriceAlerts.value,
+    weeklyDigest: weeklyDigest.value,
+    subscriptionCapMonthly: subscriptionCapMonthly.value
+  })
 }
 </script>
 
@@ -187,6 +210,44 @@ async function resendVerificationCode() {
 
       <div class="mt-4 flex justify-end">
         <UButton :label="t('dashboard.settings.saveChanges')" :loading="isSavingProfile" @click="saveProfile" />
+      </div>
+    </UCard>
+
+    <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
+      <h2 class="mb-1 text-base font-semibold">{{ t('dashboard.settings.prefsTitle') }}</h2>
+      <p class="mb-4 text-sm text-muted">{{ t('dashboard.settings.prefsSubtitle') }}</p>
+
+      <div v-if="prefsPending" class="space-y-3">
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-full" />
+      </div>
+
+      <div v-else class="space-y-4">
+        <UCheckbox
+          v-model="emailPriceAlerts"
+          :label="t('dashboard.settings.emailPriceAlerts')"
+        />
+        <UCheckbox
+          v-model="weeklyDigest"
+          :label="t('dashboard.settings.weeklyDigest')"
+        />
+        <UFormField :label="t('dashboard.settings.subscriptionCap')">
+          <UInput
+            v-model.number="subscriptionCapMonthly"
+            type="number"
+            min="0"
+            step="1"
+            class="w-full max-w-xs"
+          />
+          <template #help>{{ t('dashboard.settings.subscriptionCapHelp') }}</template>
+        </UFormField>
+        <div class="flex justify-end">
+          <UButton
+            :label="t('dashboard.settings.saveChanges')"
+            :loading="prefsSaving"
+            @click="savePreferences"
+          />
+        </div>
       </div>
     </UCard>
 
