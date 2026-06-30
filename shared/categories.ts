@@ -1,4 +1,4 @@
-// ANCHOR: Transaction category values — sourced from Prisma TransactionCategory enum
+// ANCHOR: Transaction category values
 import { ENUM, TransactionCategory } from './prisma-enums'
 
 export { TransactionCategory }
@@ -29,7 +29,7 @@ export const TRANSACTION_FILTER_CATEGORIES = [
 
 export type TransactionCategoryFilter = (typeof TRANSACTION_FILTER_CATEGORIES)[number]
 
-/** Categories available when creating a budget */
+// NOTE - Categories available when creating a budget
 export const BUDGET_CATEGORIES = [
   ENUM.category.FOOD,
   ENUM.category.TRANSPORT,

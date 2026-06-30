@@ -2,7 +2,7 @@
 // ANCHOR: Dashboard overview — stats, charts, recent activity
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Overview', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Overview', middleware: 'auth', keepalive: true })
 
 const { t, displayCurrency } = useAppI18n()
 const dashboardStore = useDashboardStore()

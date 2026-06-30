@@ -17,16 +17,34 @@ export const useAnalyticsStore = defineStore('analytics', () => {
 
   const range = ref<AnalyticsRange>('30d')
   const data = ref<AnalyticsOverview | null>(null)
+  /** Dashboard overview seeds lite analytics (no merchants / net worth). */
+  const fullSnapshot = ref(false)
 
-  const { pending, load: fetchOverview, reset } = createSpaceScopedLoader({
+  const { pending, load: fetchOverview, reset, seed } = createSpaceScopedLoader({
     buildKey: spaceId => `analytics:${spaceId}:${range.value}:${getLocale()}`,
     fetch: async () => api<AnalyticsOverview>(apiRoutes.analytics.overview, {
       query: { range: range.value, locale: getLocale() }
     }),
-    apply: payload => { data.value = payload },
-    clear: () => { data.value = null },
-    isCached: () => data.value != null
+    apply: (payload) => {
+      data.value = payload
+      fullSnapshot.value = true
+    },
+    clear: () => {
+      data.value = null
+      fullSnapshot.value = false
+    },
+    isCached: () => data.value != null && fullSnapshot.value
   })
+
+  function seedLite(payload: AnalyticsOverview) {
+    const spaceId = useSpacesStore().space?.id
+    if (spaceId) {
+      seed(payload, `analytics:${spaceId}:30d:${getLocale()}`)
+    } else {
+      data.value = payload
+    }
+    fullSnapshot.value = false
+  }
 
   const rangeTabs = computed(() => [
     { label: t('dashboard.analytics.ranges.7d'), value: '7d' },
@@ -84,6 +102,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     fmt,
     categoryLabel,
     fetchOverview,
+    seedLite,
     syncTransactions,
     reset
   }

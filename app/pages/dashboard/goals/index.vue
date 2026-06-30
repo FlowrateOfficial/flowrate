@@ -2,7 +2,7 @@
 // ANCHOR: Goals page — adult savings pots
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Goals', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Goals', middleware: 'auth', keepalive: true })
 
 const { t } = useAppI18n()
 const goalsStore = useSavingsGoalsStore()

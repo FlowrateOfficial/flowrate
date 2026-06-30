@@ -1,5 +1,6 @@
-// ANCHOR: Resend email delivery for product notifications
+// ANCHOR: Resend email delivery for product notifications (inactive until configured)
 import type { H3Event } from 'h3'
+import { isResendEmailConfigured } from '../../utils/email-delivery'
 
 export interface SendEmailInput {
   to: string
@@ -12,10 +13,10 @@ export async function sendResendEmail(
   input: SendEmailInput
 ): Promise<boolean> {
   const config = event ? useRuntimeConfig(event) : useRuntimeConfig()
+  if (!isResendEmailConfigured(config)) return false
+
   const apiKey = config.resendApiKey as string
   const from = config.authFromEmail as string
-
-  if (!apiKey || !from) return false
 
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',

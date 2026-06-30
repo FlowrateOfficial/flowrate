@@ -4,6 +4,10 @@ import { localeFromRequest, resolveSpaceDisplayCurrency } from '../../utils/curr
 
 export default defineEventHandler(async (event) => {
   const ctx = await requireSpaceContext(event)
-  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, localeFromRequest(event))
+  const queryLocale = getQuery(event).locale
+  const locale = typeof queryLocale === 'string' && queryLocale.trim()
+    ? queryLocale.trim()
+    : localeFromRequest(event)
+  const currency = await resolveSpaceDisplayCurrency(ctx.spaceId, locale)
   return getRenewalCalendarForSpace(ctx, currency)
 })

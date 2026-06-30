@@ -2,7 +2,7 @@
 import type { SubscriptionListItemDto } from '#shared/api/subscriptions'
 import type { RenewalCalendarEvent } from '#shared/subscription-calendar'
 import { buildRenewalCalendarEvents } from '#shared/subscription-calendar'
-import { merchantLogoUrl, guessMerchantDomain } from '#shared/merchant-logo'
+import { resolveBrandSlug } from '#shared/brands'
 import { ENUM, type SubscriptionStatus } from '#shared/prisma-enums'
 import {
   annualPriceImpact,
@@ -36,15 +36,25 @@ function visibleWhere(includeHidden?: boolean) {
 
 function duplicateMeta(
   sub: { id: string, name: string },
-  subs: Array<{ id: string, name: string }>
+  groups: Map<string, string[]>
 ) {
-  const key = sub.name.toLowerCase()
-  const group = subs.filter(s => s.name.toLowerCase() === key)
+  const ids = groups.get(sub.name.toLowerCase()) ?? [sub.id]
   return {
-    isDuplicate: group.length > 1,
-    duplicateCount: group.length,
-    duplicateIds: group.filter(s => s.id !== sub.id).map(s => s.id)
+    isDuplicate: ids.length > 1,
+    duplicateCount: ids.length,
+    duplicateIds: ids.filter(id => id !== sub.id)
   }
+}
+
+function buildDuplicateGroups(subs: Array<{ id: string, name: string }>) {
+  const groups = new Map<string, string[]>()
+  for (const sub of subs) {
+    const key = sub.name.toLowerCase()
+    const ids = groups.get(key)
+    if (ids) ids.push(sub.id)
+    else groups.set(key, [sub.id])
+  }
+  return groups
 }
 
 function mapSubscription(
@@ -84,7 +94,6 @@ function mapSubscription(
     frequency: sub.frequency,
     status: sub.status,
     icon: sub.icon,
-    logoUrl: merchantLogoUrl(label, sub.merchantDomain),
     lastCharge: sub.lastCharge?.toISOString() ?? null,
     nextCharge: sub.nextCharge?.toISOString() ?? null,
     alert: sub.alert,
@@ -117,7 +126,7 @@ export async function listSubscriptionsForSpace(
     take: query.limit
   })
 
-  return subs.map(sub => mapSubscription(sub, duplicateMeta(sub, subs)))
+  return subs.map(sub => mapSubscription(sub, duplicateMeta(sub, buildDuplicateGroups(subs))))
 }
 
 export async function listAlertSubscriptionsForSpace(
@@ -139,8 +148,9 @@ export async function listAlertSubscriptionsForSpace(
     take: limit
   })
 
+  const groups = buildDuplicateGroups(subs)
   return {
-    items: subs.map(sub => mapSubscription(sub, duplicateMeta(sub, subs))),
+    items: subs.map(sub => mapSubscription(sub, duplicateMeta(sub, groups))),
     locked: false,
     count
   }
@@ -173,7 +183,11 @@ export async function getRenewalCalendarForSpace(
   return { events, currency: displayCurrency }
 }
 
-export async function checkSubscriptionCapForSpace(spaceId: string, userId: string) {
+export async function checkSubscriptionCapForSpace(
+  spaceId: string,
+  userId: string,
+  displayCurrency: string
+) {
   const [space, user, subs] = await Promise.all([
     prisma.financialSpace.findUnique({ where: { id: spaceId }, select: { settings: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { prefs: true } }),
@@ -189,7 +203,7 @@ export async function checkSubscriptionCapForSpace(spaceId: string, userId: stri
   )
   if (cap == null) return null
 
-  const fx = await createFxConverter('USD')
+  const fx = await createFxConverter(displayCurrency)
   const monthlyTotal = subs.reduce((sum, sub) => {
     const monthly = subscriptionMonthlyEquivalent(Number(sub.amount), sub.frequency)
     return sum + fx.convert(monthly, sub.currency)
@@ -197,7 +211,11 @@ export async function checkSubscriptionCapForSpace(spaceId: string, userId: stri
 
   if (monthlyTotal <= cap) return null
 
-  return { cap, monthlyTotal: Math.round(monthlyTotal * 100) / 100, currency: 'USD' }
+  return {
+    cap,
+    monthlyTotal: Math.round(monthlyTotal * 100) / 100,
+    currency: displayCurrency
+  }
 }
 
 export async function dismissSubscriptionAlert(
@@ -219,7 +237,8 @@ export async function dismissSubscriptionAlert(
   })
 
   const all = await loadVisibleSubs(ctx.spaceId, true)
-  return mapSubscription(updated, duplicateMeta(updated, all))
+  const groups = buildDuplicateGroups(all)
+  return mapSubscription(updated, duplicateMeta(updated, groups))
 }
 
 export async function patchSubscriptionForSpace(
@@ -245,7 +264,8 @@ export async function patchSubscriptionForSpace(
   })
 
   const all = await loadVisibleSubs(ctx.spaceId, true)
-  return mapSubscription(updated, duplicateMeta(updated, all))
+  const groups = buildDuplicateGroups(all)
+  return mapSubscription(updated, duplicateMeta(updated, groups))
 }
 
 export async function mergeDuplicateSubscriptions(
@@ -273,9 +293,10 @@ export async function mergeDuplicateSubscriptions(
   })
 
   const all = await loadVisibleSubs(ctx.spaceId, true)
-  return mapSubscription(keep, duplicateMeta(keep, all))
+  const groups = buildDuplicateGroups(all)
+  return mapSubscription(keep, duplicateMeta(keep, groups))
 }
 
 export function merchantDomainForName(name: string) {
-  return guessMerchantDomain(name)
+  return resolveBrandSlug(name)
 }

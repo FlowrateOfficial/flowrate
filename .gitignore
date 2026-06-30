@@ -25,3 +25,7 @@ logs
 
 # Prisma generated client
 generated/prisma
+
+workers/*
+
+tools/*

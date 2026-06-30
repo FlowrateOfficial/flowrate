@@ -2,7 +2,7 @@
 // ANCHOR: Budgets page — summary strip + create/edit modal
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Budgets', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Budgets', middleware: 'auth', keepalive: true })
 
 const { t } = useAppI18n()
 const budgetsStore = useBudgetsStore()

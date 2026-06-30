@@ -2,7 +2,7 @@
 // ANCHOR: Accounts page — connect banks, filter visibility
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Accounts', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Accounts', middleware: 'auth', keepalive: true })
 
 const { t } = useAppI18n()
 const accountsStore = useAccountsStore()

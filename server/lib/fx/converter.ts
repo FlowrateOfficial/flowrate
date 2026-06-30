@@ -29,6 +29,7 @@ export class FxConverter {
 }
 
 export async function createFxConverter(targetCurrency: string): Promise<FxConverter> {
-  const snapshot = await getFxRates()
-  return new FxConverter(snapshot, normalizeFxCurrency(targetCurrency))
+  const currency = normalizeFxCurrency(targetCurrency)
+  const snapshot = await getFxRates(currency)
+  return new FxConverter(snapshot, currency)
 }

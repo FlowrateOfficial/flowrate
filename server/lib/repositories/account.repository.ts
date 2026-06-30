@@ -57,6 +57,7 @@ export async function listAccounts(ctx: SpaceContext, filter: AccountListFilter 
       currency: true,
       syncedAt: true,
       userId: true,
+      createdAt: true,
       user: { select: { id: true, name: true } }
     }
   })

@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useInfiniteScroll } from '@vueuse/core'
 import type { TransactionRow } from '~/types/financial'
 
-definePageMeta({ layout: 'dashboard', title: 'Transactions', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Transactions', middleware: 'auth', keepalive: true })
 
 const { t } = useAppI18n()
 const transactionsStore = useTransactionsStore()
@@ -23,9 +23,11 @@ const {
   hasMore,
   pending,
   loadingMore,
-  columns
+  columns,
+  loadedForSpaceId
 } = storeToRefs(transactionsStore)
 const { isSyncing } = storeToRefs(syncStore)
+const spaceId = computed(() => useSpacesStore().space?.id)
 
 const hasConnectedAccounts = computed(() => accountsStore.accounts.length > 0)
 const hasActiveFilters = computed(() =>
@@ -55,10 +57,23 @@ const tableLoading = computed(() => pending.value && !items.value.length)
 const table = useTemplateRef('table')
 
 await useSpaceStoreFetch('transactions', async () => {
-  // NOTE - Warm accounts cache only when overview has not loaded them
+  const warmAccounts = accountsStore.accounts.length
+    ? Promise.resolve()
+    : accountsStore.fetchAccounts()
+
+  if (
+    spaceId.value
+    && transactionsStore.hasDefaultFilters
+    && transactionsStore.items.length
+    && loadedForSpaceId.value === spaceId.value
+  ) {
+    await warmAccounts
+    return
+  }
+
   await Promise.all([
     transactionsStore.resetAndFetch(),
-    accountsStore.accounts.length ? Promise.resolve() : accountsStore.fetchAccounts()
+    warmAccounts
   ])
 })
 
@@ -192,12 +207,20 @@ async function syncAndRefresh() {
           </span>
         </template>
         <template #description-cell="{ row }">
-          <div class="min-w-0">
-            <div class="truncate text-sm font-medium">
-              {{ row.original.merchant ?? row.original.description }}
-            </div>
-            <div v-if="row.original.merchant" class="truncate text-xs text-muted">
-              {{ row.original.description }}
+          <div class="flex min-w-0 items-center gap-3">
+            <DashboardPaymentIcon
+              :name="row.original.merchant ?? row.original.description"
+              :merchant="row.original.merchant"
+              :category="row.original.category"
+              size="xs"
+            />
+            <div class="min-w-0">
+              <div class="truncate text-sm font-medium">
+                {{ row.original.merchant ?? row.original.description }}
+              </div>
+              <div v-if="row.original.merchant" class="truncate text-xs text-muted">
+                {{ row.original.description }}
+              </div>
             </div>
           </div>
         </template>

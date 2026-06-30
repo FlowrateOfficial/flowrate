@@ -2,7 +2,7 @@
 // ANCHOR: Company page — burn rate, team, setup steps
 import { storeToRefs } from 'pinia'
 
-definePageMeta({ layout: 'dashboard', title: 'Business', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', title: 'Business', middleware: 'auth', keepalive: true })
 
 const route = useRoute()
 const { t } = useAppI18n()
