@@ -1,40 +1,11 @@
-import { z } from 'zod'
-
-const querySchema = z.object({
-  status: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(100).default(50)
-})
+import { listSubscriptionsForSpace } from '../../lib/services/subscriptions.service'
+import { subscriptionListQuerySchema } from '../../lib/schemas/api'
+import { requireSpaceContext } from '../../lib/domain/http'
+import { respondWithPrivateCache } from '../../lib/http/cache'
 
 export default defineEventHandler(async (event) => {
-  const { space } = await requireSpaceAccess(event)
-  const { status, limit } = await getValidatedQuery(event, querySchema.parse)
-
-  const subs = await prisma.detectedSubscription.findMany({
-    where: {
-      spaceId: space.id,
-      ...(status ? { status: status as never } : {})
-    },
-    orderBy: { amount: 'desc' },
-    take: limit
-  })
-
-  const nameCounts = subs.reduce<Record<string, number>>((acc, s) => {
-    const key = s.name.toLowerCase()
-    acc[key] = (acc[key] ?? 0) + 1
-    return acc
-  }, {})
-
-  return subs.map(s => ({
-    id: s.id,
-    name: s.name,
-    amount: Number(s.amount),
-    currency: s.currency,
-    frequency: s.frequency,
-    status: s.status,
-    icon: s.icon,
-    lastCharge: s.lastCharge?.toISOString() ?? null,
-    nextCharge: s.nextCharge?.toISOString() ?? null,
-    alert: s.alert,
-    isDuplicate: (nameCounts[s.name.toLowerCase()] ?? 0) > 1
-  }))
+  const ctx = await requireSpaceContext(event)
+  const query = await getValidatedQuery(event, subscriptionListQuerySchema.parse)
+  const payload = await listSubscriptionsForSpace(ctx, query)
+  return respondWithPrivateCache(event, payload) ?? undefined
 })

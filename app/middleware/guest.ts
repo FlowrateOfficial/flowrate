@@ -17,5 +17,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
     })
   }
 
-  return navigateTo('/dashboard')
+  return navigateToDashboard()
 })

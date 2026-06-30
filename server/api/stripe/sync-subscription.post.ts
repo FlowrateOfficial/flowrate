@@ -1,20 +1,15 @@
-import { z } from 'zod'
 import { requireAuthUser } from '../../lib/auth'
 import { syncPlanFromCheckoutSession, syncUserPlanFromStripe } from '../../lib/billing'
 import { requireStripe } from '../../lib/stripe'
-
-const bodySchema = z.object({
-  sessionId: z.string().optional()
-})
+import { stripeSyncSubscriptionBodySchema } from '../../lib/schemas/api'
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuthUser(event)
   const { stripe } = requireStripe(event)
-  const body = await readBody(event).catch(() => ({}))
-  const { sessionId } = bodySchema.parse(body ?? {})
+  const body = await readValidatedBody(event, stripeSyncSubscriptionBodySchema.parse)
 
-  const plan = sessionId
-    ? await syncPlanFromCheckoutSession(stripe, user.id, sessionId)
+  const plan = body.sessionId
+    ? await syncPlanFromCheckoutSession(stripe, user.id, body.sessionId)
     : await syncUserPlanFromStripe(stripe, user.id)
 
   return { plan }

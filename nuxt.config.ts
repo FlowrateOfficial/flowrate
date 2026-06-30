@@ -32,6 +32,8 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+    '/dashboard': { ssr: false },
+    '/dashboard/**': { ssr: false },
     '/api/stripe/webhook': { cors: false },
     '/api/plaid/webhook': { cors: false },
     '/api/webhooks/neon-auth': { cors: false }
@@ -84,6 +86,17 @@ export default defineNuxtConfig({
         process.env.GITHUB_TOKEN && process.env.GITHUB_FEEDBACK_REPO
       ),
       mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN ?? ''
+    }
+  },
+
+  hooks: {
+    'pages:extend'(pages) {
+      for (const page of pages) {
+        if (page.path?.startsWith('/dashboard')) {
+          page.meta ||= {}
+          page.meta.ssr = false
+        }
+      }
     }
   },
 

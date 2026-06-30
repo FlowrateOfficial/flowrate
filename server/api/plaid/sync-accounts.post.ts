@@ -1,14 +1,9 @@
-import { z } from 'zod'
 import {
   requirePlaid,
   syncAllPlaidAccountsForUser,
   syncPlaidSpaceTransactions
 } from '../../lib/plaid'
-
-const bodySchema = z.object({
-  visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL'),
-  syncAll: z.boolean().optional()
-})
+import { plaidSyncAccountsBodySchema } from '../../lib/schemas/api'
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
@@ -21,7 +16,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
   }
 
-  const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
+  const body = await readValidatedBody(event, plaidSyncAccountsBodySchema.parse)
   const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
   const { client } = requirePlaid(event)
 

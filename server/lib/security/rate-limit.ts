@@ -1,23 +1,10 @@
-// ANCHOR: In-memory per-IP rate limiting
+// ANCHOR: Per-IP rate limiting — Upstash Redis or in-memory fallback
 import type { H3Event } from 'h3'
+import { getRateLimitStore } from './rate-limit-store'
 
-interface RateLimitOptions {
+export interface RateLimitOptions {
   max: number
   windowMs: number
-}
-
-interface Bucket {
-  count: number
-  resetAt: number
-}
-
-const buckets = new Map<string, Bucket>()
-
-function cleanup(now: number) {
-  if (buckets.size < 5000) return
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) buckets.delete(key)
-  }
 }
 
 export function clientIp(event: H3Event): string {
@@ -28,21 +15,12 @@ export function clientIp(event: H3Event): string {
   return event.node?.req?.socket?.remoteAddress ?? 'unknown'
 }
 
-export function rateLimit(event: H3Event, key: string, options: RateLimitOptions) {
-  const now = Date.now()
-  cleanup(now)
-
+export async function rateLimit(event: H3Event, key: string, options: RateLimitOptions) {
   const bucketKey = `${key}:${clientIp(event)}`
-  const existing = buckets.get(bucketKey)
+  const { count, resetAt } = await getRateLimitStore().increment(bucketKey, options.windowMs)
 
-  if (!existing || existing.resetAt <= now) {
-    buckets.set(bucketKey, { count: 1, resetAt: now + options.windowMs })
-    return
-  }
-
-  existing.count += 1
-  if (existing.count > options.max) {
-    const retryAfter = Math.ceil((existing.resetAt - now) / 1000)
+  if (count > options.max) {
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000))
     setResponseHeader(event, 'Retry-After', retryAfter)
     throw createError({
       statusCode: 429,

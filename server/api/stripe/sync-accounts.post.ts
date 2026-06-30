@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import {
   assertFinancialConnectionOwnership,
   ensureStripeCustomer,
@@ -8,12 +7,8 @@ import {
 } from '../../lib/stripe'
 import { assertCanConnectBank } from '../../lib/billing/enforcement'
 import { syncSpaceTransactions } from '../../lib/transactionSync'
-
-const bodySchema = z.object({
-  accountIds: z.array(z.string().min(1)).optional(),
-  visibility: z.enum(['PERSONAL', 'SHARED']).default('PERSONAL'),
-  syncAll: z.boolean().optional()
-})
+import { syncAccountsBodySchema } from '../../lib/schemas/api'
+import { findAccountByStripeId } from '../../lib/repositories/space.repository'
 
 export default defineEventHandler(async (event) => {
   const { user, space, membership } = await requireSpaceAccess(event)
@@ -26,7 +21,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'You have read-only access to this business space' })
   }
 
-  const body = await readBody(event).then(b => bodySchema.parse(b ?? {}))
+  const body = await readValidatedBody(event, syncAccountsBodySchema.parse)
   const visibility = membership.role === 'TEEN' ? 'PERSONAL' : body.visibility
   const { stripe } = requireStripe(event)
 
@@ -59,7 +54,7 @@ export default defineEventHandler(async (event) => {
   const synced = []
 
   for (const accountId of accountIds) {
-    const existing = await prisma.account.findUnique({ where: { stripeId: accountId } })
+    const existing = await findAccountByStripeId(accountId)
     if (!existing) {
       await assertCanConnectBank(user.id)
     }

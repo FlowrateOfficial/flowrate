@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Invalid issue number' })
   }
 
-  rateLimit(event, `feedback:thread:${user.id}`, { max: 40, windowMs: 60 * 1000 })
+  await rateLimit(event, `feedback:thread:${user.id}`, { max: 40, windowMs: 60 * 1000 })
 
   const submission = await getFeedbackSubmissionForUser(user.id, issueNumber)
   if (!submission) {

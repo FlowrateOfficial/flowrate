@@ -12,6 +12,8 @@
     "postinstall": "prisma generate && nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "db:push": "prisma db push",
     "db:seed-spaces": "tsx prisma/seed-spaces.ts",
     "db:migrate": "prisma migrate dev",
@@ -55,6 +57,7 @@
     "prisma": "^7.8.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
+    "vitest": "^3.2.6",
     "vue-tsc": "^3.3.5"
   },
   "packageManager": "pnpm@11.8.0"

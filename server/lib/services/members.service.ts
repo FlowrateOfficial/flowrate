@@ -2,6 +2,29 @@ import { createNeonAuthEmailUser } from '../neonAuthUsers'
 import { sendPhoneVerification, sendSms } from '../twilio'
 import { normalizePhone } from '../../utils/phone'
 import type { H3Event } from 'h3'
+import type { SpaceContext } from '../domain/context'
+import {
+  assertCompanyMemberCapacity,
+  assertCompanyTeamInvite,
+  userPlanForId
+} from '../billing/enforcement'
+import {
+  companyInviteBodySchema,
+  familyInviteBodySchema
+} from '../schemas/api'
+import {
+  createSavingsJar,
+  deleteMemberInvitations,
+  deleteSpaceMember,
+  findMemberInSpace,
+  findMemberWithChildProfile,
+  findMembersList,
+  updateChildProfile
+} from '../repositories/space.repository'
+import { canManageMembers, isChildRole } from '../../utils/spaceAuth'
+import type { z } from 'zod'
+import type { childProfilePatchBodySchema, savingsJarBodySchema } from '../schemas/api'
+import { deleteOffspringUserAccount } from './user-deletion.service'
 
 export interface CreateChildAccountInput {
   username: string
@@ -418,4 +441,121 @@ export async function acceptEmailInvitation(token: string, userId: string, userE
   })
 
   return { spaceId: invitation.spaceId, spaceName: invitation.space.name }
+}
+
+export async function listMembersForSpace(spaceId: string) {
+  return findMembersList(spaceId)
+}
+
+export async function createMemberInvite(ctx: SpaceContext, event: H3Event, appUrl: string) {
+  if (!canManageMembers(ctx.role, ctx.spaceType)) {
+    throw createError({ statusCode: 403, message: 'Only guardians or admins can manage members' })
+  }
+
+  if (ctx.spaceType === 'COMPANY') {
+    const body = await readValidatedBody(event, companyInviteBodySchema.parse)
+    const plan = await userPlanForId(ctx.userId)
+    await assertCompanyTeamInvite(ctx.userId, plan)
+    await assertCompanyMemberCapacity(ctx.spaceId, plan)
+    return inviteCompanyMember(
+      ctx.userId,
+      ctx.spaceId,
+      ctx.space.name,
+      ctx.spaceType,
+      body,
+      appUrl
+    )
+  }
+
+  const body = await readValidatedBody(event, familyInviteBodySchema.parse)
+
+  if (body.role === 'CHILD' || body.role === 'TEEN') {
+    throw createError({
+      statusCode: 400,
+      message: 'Use the create-child endpoint to provision child or teen login accounts'
+    })
+  }
+
+  if (body.role !== 'CO_GUARDIAN') {
+    throw createError({ statusCode: 400, message: 'Invalid role for this space' })
+  }
+
+  return inviteFamilyMember(ctx.userId, ctx.spaceId, ctx.spaceType, {
+    email: body.email,
+    role: 'CO_GUARDIAN',
+    name: body.name
+  }, appUrl)
+}
+
+type ChildPatchBody = z.infer<typeof childProfilePatchBodySchema>
+type JarBody = z.infer<typeof savingsJarBodySchema>
+
+function assertCanManageMembers(ctx: SpaceContext) {
+  if (!canManageMembers(ctx.role, ctx.spaceType)) {
+    throw createError({ statusCode: 403, message: 'Insufficient permissions' })
+  }
+}
+
+async function requireChildProfile(memberId: string, spaceId: string) {
+  const member = await findMemberWithChildProfile(memberId, spaceId)
+  if (!member?.childProfile) {
+    throw createError({ statusCode: 404, message: 'Child profile not found' })
+  }
+  return member
+}
+
+export async function patchChildProfileForSpace(
+  ctx: SpaceContext,
+  memberId: string,
+  body: ChildPatchBody
+) {
+  assertCanManageMembers(ctx)
+  const member = await requireChildProfile(memberId, ctx.spaceId)
+  return updateChildProfile(member.childProfile!.id, body)
+}
+
+export async function addChildSavingsJar(
+  ctx: SpaceContext,
+  memberId: string,
+  body: JarBody
+) {
+  assertCanManageMembers(ctx)
+  const member = await requireChildProfile(memberId, ctx.spaceId)
+  return createSavingsJar(member.childProfile!.id, body)
+}
+
+export async function removeMemberFromSpace(
+  event: H3Event,
+  ctx: SpaceContext,
+  memberId: string,
+  options: { purge?: boolean }
+) {
+  assertCanManageMembers(ctx)
+
+  const target = await findMemberInSpace(memberId, ctx.spaceId)
+  if (!target) {
+    throw createError({ statusCode: 404, message: 'Member not found' })
+  }
+
+  if (target.role === 'OWNER') {
+    throw createError({ statusCode: 403, message: 'Cannot remove the space owner' })
+  }
+
+  if (target.userId === ctx.userId) {
+    throw createError({ statusCode: 403, message: 'Use Settings to delete your own account' })
+  }
+
+  const shouldPurge = options.purge === true
+    || (isChildRole(target.role) && Boolean(target.userId))
+
+  if (shouldPurge && target.userId && isChildRole(target.role)) {
+    return deleteOffspringUserAccount(event, ctx.spaceId, memberId)
+  }
+
+  if (target.email) {
+    await deleteMemberInvitations(ctx.spaceId, target.email)
+  }
+
+  await deleteSpaceMember(memberId)
+  return { ok: true, purged: false }
 }
