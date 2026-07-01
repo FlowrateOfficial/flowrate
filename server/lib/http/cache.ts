@@ -3,14 +3,14 @@ import { createHash } from 'node:crypto'
 import { getRequestHeader, setResponseHeader, setResponseStatus, type H3Event } from 'h3'
 
 export function weakEtag(payload: unknown): string {
-  const hash = createHash('sha1')
+  const hash = createHash('sha256')
     .update(JSON.stringify(payload))
     .digest('hex')
     .slice(0, 16)
   return `W/"${hash}"`
 }
 
-/** Sets cache headers; returns true when client sent matching If-None-Match */
+// NOTE - Sets cache headers; returns true when client sent matching If-None-Match
 export function isNotModified(event: H3Event, payload: unknown): boolean {
   const etag = weakEtag(payload)
   setResponseHeader(event, 'ETag', etag)
@@ -24,6 +24,7 @@ export function isNotModified(event: H3Event, payload: unknown): boolean {
   return false
 }
 
+// NOTE - Responds with private cache; returns null when client cache is fresh
 export function respondWithPrivateCache<T>(event: H3Event, payload: T): T | null {
   if (isNotModified(event, payload)) return null
   return payload
