@@ -18,8 +18,9 @@ export default defineNuxtPlugin({
       return
     }
 
-    const query = { ...route.query }
-    delete query[NEON_AUTH_SESSION_VERIFIER_PARAM]
+    const query = Object.fromEntries(
+      Object.entries(route.query).filter(([key]) => key !== NEON_AUTH_SESSION_VERIFIER_PARAM)
+    )
     await navigateTo({ path: route.path, query }, { replace: true })
   }
 })

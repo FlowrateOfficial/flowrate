@@ -54,12 +54,17 @@ function planCardClass(plan: LandingPlan) {
 </script>
 
 <template>
-  <LandingSection id="pricing" index="06">
+  <LandingSection
+    id="pricing"
+    index="06"
+  >
     <template #default>
       <div class="py-24 sm:py-32">
         <div class="grid lg:grid-cols-12 gap-10 mb-16 sm:mb-20 landing-section-intro">
           <div class="lg:col-span-6 space-y-6">
-            <p class="flow-section-label text-terracotta">06</p>
+            <p class="flow-section-label text-terracotta">
+              06
+            </p>
             <h2 class="text-display-section text-flow-ink dark:text-flow-ink-dark">
               {{ t('landing.pricingTitle') }}
             </h2>
@@ -151,11 +156,17 @@ function planCardClass(plan: LandingPlan) {
                   <span class="text-4xl sm:text-5xl font-light tabular-nums text-flow-ink dark:text-flow-ink-dark tracking-tight">
                     {{ plan.price }}
                   </span>
-                  <span v-if="plan.period" class="text-flow-muted dark:text-flow-muted-dark text-sm">
+                  <span
+                    v-if="plan.period"
+                    class="text-flow-muted dark:text-flow-muted-dark text-sm"
+                  >
                     {{ plan.period }}
                   </span>
                 </div>
-                <p v-if="plan.yearlyNote" class="text-xs text-sage">
+                <p
+                  v-if="plan.yearlyNote"
+                  class="text-xs text-sage"
+                >
                   {{ plan.yearlyNote }}
                 </p>
               </header>
@@ -184,7 +195,10 @@ function planCardClass(plan: LandingPlan) {
                     :key="feat"
                     class="text-sm text-flow-muted dark:text-flow-muted-dark flex gap-3 leading-relaxed"
                   >
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-sage shrink-0 mt-0.5 stroke-[1.25]" />
+                    <UIcon
+                      name="i-lucide-check"
+                      class="w-4 h-4 text-sage shrink-0 mt-0.5 stroke-[1.25]"
+                    />
                     {{ feat }}
                   </li>
                 </ul>

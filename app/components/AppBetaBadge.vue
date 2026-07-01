@@ -21,7 +21,10 @@ const { t } = useAppI18n()
     ]"
     :title="t('common.betaHint')"
   >
-    <span class="size-1.5 rounded-full bg-terracotta animate-pulse" aria-hidden="true" />
+    <span
+      class="size-1.5 rounded-full bg-terracotta animate-pulse"
+      aria-hidden="true"
+    />
     {{ t('common.beta') }}
     <span
       v-if="showHint"

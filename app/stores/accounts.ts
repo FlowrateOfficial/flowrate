@@ -160,7 +160,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         ? {}
         : { visibility: visibilityFilter.value }
     }),
-    apply: data => { accounts.value = data },
+    apply: (data) => { accounts.value = data },
     clear: () => { accounts.value = [] },
     isCached: () => accounts.value.length > 0,
     etagBust: spaceId => `accounts:${spaceId}:${visibilityFilter.value}`

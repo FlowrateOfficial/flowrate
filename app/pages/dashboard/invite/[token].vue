@@ -36,7 +36,7 @@ await useAsyncData(() => `invite-${token}`, () => invitesStore.fetchInvite(token
 
 watch(
   () => invite.value?.spaceName,
-  (name) => setBreadcrumbTail(name ?? null),
+  name => setBreadcrumbTail(name ?? null),
   { immediate: true }
 )
 
@@ -111,22 +111,50 @@ async function accept() {
 
 <template>
   <DashboardPageShell max-width="md">
-    <UCard v-if="error" :ui="{ body: 'p-6 sm:p-8 text-center' }">
-      <h1 class="text-xl font-semibold">{{ t('dashboard.invite.expiredTitle') }}</h1>
-      <p class="mt-2 text-sm text-muted">{{ t('dashboard.invite.expiredDescription') }}</p>
-      <UButton to="/dashboard" class="mt-4" :label="t('nav.overview')" />
+    <UCard
+      v-if="error"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
+      <h1 class="text-xl font-semibold">
+        {{ t('dashboard.invite.expiredTitle') }}
+      </h1>
+      <p class="mt-2 text-sm text-muted">
+        {{ t('dashboard.invite.expiredDescription') }}
+      </p>
+      <UButton
+        to="/dashboard"
+        class="mt-4"
+        :label="t('nav.overview')"
+      />
     </UCard>
 
-    <UCard v-else-if="accepted" :ui="{ body: 'p-6 sm:p-8 text-center' }">
-      <h1 class="text-xl font-semibold">{{ t('dashboard.invite.acceptedTitle') }}</h1>
-      <p v-if="loginEmail" class="mt-2 text-sm text-muted">
+    <UCard
+      v-else-if="accepted"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
+      <h1 class="text-xl font-semibold">
+        {{ t('dashboard.invite.acceptedTitle') }}
+      </h1>
+      <p
+        v-if="loginEmail"
+        class="mt-2 text-sm text-muted"
+      >
         {{ t('dashboard.invite.loginHint', { email: loginEmail }) }}
       </p>
-      <UButton to="/auth/login" class="mt-4" :label="t('common.signIn')" />
+      <UButton
+        to="/auth/login"
+        class="mt-4"
+        :label="t('common.signIn')"
+      />
     </UCard>
 
-    <UCard v-else-if="invite && showPhoneStep" :ui="{ body: 'p-4 sm:p-5' }">
-      <h1 class="mb-1 text-center text-xl font-semibold">{{ t('dashboard.invite.phoneTitle', { space: invite.spaceName }) }}</h1>
+    <UCard
+      v-else-if="invite && showPhoneStep"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h1 class="mb-1 text-center text-xl font-semibold">
+        {{ t('dashboard.invite.phoneTitle', { space: invite.spaceName }) }}
+      </h1>
       <p class="mb-4 text-center text-sm text-muted">
         {{ t('dashboard.invite.phoneDescription', { phone: invite.phone ?? '' }) }}
       </p>
@@ -158,22 +186,48 @@ async function accept() {
       </div>
     </UCard>
 
-    <UCard v-else-if="invite && showRegisterStep" :ui="{ body: 'p-4 sm:p-5' }">
-      <h1 class="mb-1 text-center text-xl font-semibold">{{ t('dashboard.invite.setupTitle', { space: invite.spaceName }) }}</h1>
-      <p class="mb-4 text-center text-sm text-muted">{{ t('dashboard.invite.setupDescription') }}</p>
+    <UCard
+      v-else-if="invite && showRegisterStep"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h1 class="mb-1 text-center text-xl font-semibold">
+        {{ t('dashboard.invite.setupTitle', { space: invite.spaceName }) }}
+      </h1>
+      <p class="mb-4 text-center text-sm text-muted">
+        {{ t('dashboard.invite.setupDescription') }}
+      </p>
       <div class="space-y-4">
         <UFormField :label="t('dashboard.invite.yourName')">
-          <UInput v-model="name" class="w-full" />
+          <UInput
+            v-model="name"
+            class="w-full"
+          />
         </UFormField>
         <UFormField :label="t('dashboard.invite.emailOptional')">
-          <UInput v-model="optionalEmail" type="email" class="w-full" />
-          <template #help>{{ t('dashboard.invite.emailOptionalHelp') }}</template>
+          <UInput
+            v-model="optionalEmail"
+            type="email"
+            class="w-full"
+          />
+          <template #help>
+            {{ t('dashboard.invite.emailOptionalHelp') }}
+          </template>
         </UFormField>
         <UFormField :label="t('dashboard.invite.password')">
-          <UInput v-model="password" type="password" autocomplete="new-password" class="w-full" />
+          <UInput
+            v-model="password"
+            type="password"
+            autocomplete="new-password"
+            class="w-full"
+          />
         </UFormField>
         <UFormField :label="t('dashboard.invite.confirmPassword')">
-          <UInput v-model="confirmPassword" type="password" autocomplete="new-password" class="w-full" />
+          <UInput
+            v-model="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            class="w-full"
+          />
         </UFormField>
         <UButton
           block
@@ -184,9 +238,16 @@ async function accept() {
       </div>
     </UCard>
 
-    <UCard v-else-if="invite && showEmailAccept" :ui="{ body: 'p-6 sm:p-8 text-center' }">
-      <h1 class="text-xl font-semibold">{{ t('dashboard.invite.title', { space: invite.spaceName }) }}</h1>
-      <p class="mt-2 text-sm text-muted">{{ t('dashboard.invite.description', { role: invite.role }) }}</p>
+    <UCard
+      v-else-if="invite && showEmailAccept"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
+      <h1 class="text-xl font-semibold">
+        {{ t('dashboard.invite.title', { space: invite.spaceName }) }}
+      </h1>
+      <p class="mt-2 text-sm text-muted">
+        {{ t('dashboard.invite.description', { role: invite.role }) }}
+      </p>
       <UButton
         v-if="isLoggedIn"
         :loading="accepting"

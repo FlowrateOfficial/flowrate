@@ -3,7 +3,6 @@ import { isTeenOrChild } from '~/types/space'
 import { planHasFeature } from '#shared/plan-limits'
 import { useActivePlan } from '~/composables/useActivePlan'
 import { createSpaceSchema } from '~/utils/schemas'
-import { resolveErrorMessage } from '~/utils/errors'
 import { resolvePathAfterSpaceSwitch } from '~/utils/space-routes'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
@@ -126,7 +125,7 @@ export const useSpacesStore = defineStore('spaces', () => {
     creating.value = true
     try {
       const parsed = createSchema.parse(createForm)
-      const space = await api<{ id: string; name: string }>(apiRoutes.spaces.list, {
+      const space = await api<{ id: string, name: string }>(apiRoutes.spaces.list, {
         method: 'POST',
         body: parsed,
         noSpace: true

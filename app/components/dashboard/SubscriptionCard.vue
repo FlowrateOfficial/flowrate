@@ -66,7 +66,9 @@ const showCancelled = computed(() =>
 
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
-          <p class="text-sm font-medium text-foreground truncate">{{ subscription.name }}</p>
+          <p class="text-sm font-medium text-foreground truncate">
+            {{ subscription.name }}
+          </p>
           <UBadge
             v-if="showCancelled"
             :label="t('dashboard.subscriptions.likelyCancelled')"
@@ -110,7 +112,10 @@ const showCancelled = computed(() =>
             variant="subtle"
             size="xs"
           />
-          <span v-if="subscription.nextCharge" class="text-xs text-muted">
+          <span
+            v-if="subscription.nextCharge"
+            class="text-xs text-muted"
+          >
             {{ t('dashboard.subscriptions.nextCharge', { date: formatShortDate(subscription.nextCharge) }) }}
           </span>
         </div>
@@ -142,18 +147,32 @@ const showCancelled = computed(() =>
               +{{ subscription.priceChangePercent }}%
             </span>
           </p>
-          <p v-if="periodImpactLabel" class="text-xs font-medium text-error tabular-nums">
+          <p
+            v-if="periodImpactLabel"
+            class="text-xs font-medium text-error tabular-nums"
+          >
             {{ periodImpactLabel }}
           </p>
-          <p v-if="annualImpactLabel" class="text-xs text-muted tabular-nums">
+          <p
+            v-if="annualImpactLabel"
+            class="text-xs text-muted tabular-nums"
+          >
             {{ annualImpactLabel }}
           </p>
-          <p v-else class="text-xs text-muted">{{ subscriptionFrequencyLabel(subscription.frequency) }}</p>
+          <p
+            v-else
+            class="text-xs text-muted"
+          >
+            {{ subscriptionFrequencyLabel(subscription.frequency) }}
+          </p>
         </div>
       </div>
     </div>
 
-    <div v-if="showActions && (subscription.alert || subscription.isDuplicate)" class="flex flex-wrap gap-2">
+    <div
+      v-if="showActions && (subscription.alert || subscription.isDuplicate)"
+      class="flex flex-wrap gap-2"
+    >
       <UButton
         v-if="subscription.alert"
         :label="t('dashboard.subscriptions.dismiss')"

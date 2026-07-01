@@ -256,10 +256,12 @@ export async function patchSubscriptionForSpace(
     data: {
       ...(patch.displayName !== undefined ? { displayName: patch.displayName } : {}),
       ...(patch.hidden !== undefined ? { hidden: patch.hidden } : {}),
-      ...(patch.excluded !== undefined ? {
-        excluded: patch.excluded,
-        hidden: patch.excluded ? true : patch.hidden ?? sub.hidden
-      } : {})
+      ...(patch.excluded !== undefined
+        ? {
+            excluded: patch.excluded,
+            hidden: patch.excluded ? true : patch.hidden ?? sub.hidden
+          }
+        : {})
     }
   })
 

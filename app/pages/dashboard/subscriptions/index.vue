@@ -28,7 +28,7 @@ await useSpaceStoreFetch('subscriptions', () =>
     subscriptionsStore.fetchSubscriptions(),
     subscriptionsStore.fetchCalendar()
   ]),
-  [displayCurrency]
+[displayCurrency]
 )
 
 useDashboardSeo('dashboard.subscriptions.title')
@@ -138,18 +138,36 @@ async function saveEdit(patch: { displayName?: string | null, hidden?: boolean, 
       />
     </div>
 
-    <DashboardSummaryStrip :items="summaryItems" :loading="loading" />
+    <DashboardSummaryStrip
+      :items="summaryItems"
+      :loading="loading"
+    />
 
     <DashboardSubscriptionInsights :subscriptions="subscriptions" />
 
-    <UCard class="mb-4" :ui="{ body: 'p-4 sm:p-5' }">
-      <h2 class="mb-4 text-base font-semibold">{{ t('dashboard.subscriptions.calendarTitle') }}</h2>
-      <DashboardSubscriptionRenewalCalendar :data="calendar" :loading="calendarPending" />
+    <UCard
+      class="mb-4"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h2 class="mb-4 text-base font-semibold">
+        {{ t('dashboard.subscriptions.calendarTitle') }}
+      </h2>
+      <DashboardSubscriptionRenewalCalendar
+        :data="calendar"
+        :loading="calendarPending"
+      />
     </UCard>
 
-    <DashboardCardSkeleton v-if="loading" :count="6" body-class="p-6" />
+    <DashboardCardSkeleton
+      v-if="loading"
+      :count="6"
+      body-class="p-6"
+    />
 
-    <UCard v-else-if="!subscriptions.length" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+    <UCard
+      v-else-if="!subscriptions.length"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
       <UEmpty
         icon="i-lucide-credit-card"
         :title="t('dashboard.subscriptions.emptyTitle')"
@@ -158,7 +176,10 @@ async function saveEdit(patch: { displayName?: string | null, hidden?: boolean, 
       />
     </UCard>
 
-    <div v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      v-else
+      class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+    >
       <UCard
         v-for="sub in subscriptions"
         :key="sub.id"

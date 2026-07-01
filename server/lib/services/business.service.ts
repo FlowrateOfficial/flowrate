@@ -192,7 +192,7 @@ async function buildVendorTrends(
   spaceId: string,
   vendorNames: string[],
   fx: Awaited<ReturnType<typeof createFxConverter>>,
-  displayCurrency: string
+  _displayCurrency: string
 ) {
   if (!vendorNames.length) return []
 

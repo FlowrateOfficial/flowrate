@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { acceptEmailInvitation } from '../../../lib/services/members.service'
 
 export default defineEventHandler(async (event) => {

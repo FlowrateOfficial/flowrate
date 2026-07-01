@@ -8,13 +8,13 @@ export const FINANCIAL_CONNECTIONS_BUSINESS_COUNTRIES = [
   'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'SM', 'US'
 ] as const
 
-export type FinancialConnectionsBusinessCountry =
-  (typeof FINANCIAL_CONNECTIONS_BUSINESS_COUNTRIES)[number]
+export type FinancialConnectionsBusinessCountry
+  = (typeof FINANCIAL_CONNECTIONS_BUSINESS_COUNTRIES)[number]
 
 export const FINANCIAL_CONNECTIONS_BANK_COUNTRIES = ['US'] as const
 
-export type FinancialConnectionsBankCountry =
-  (typeof FINANCIAL_CONNECTIONS_BANK_COUNTRIES)[number]
+export type FinancialConnectionsBankCountry
+  = (typeof FINANCIAL_CONNECTIONS_BANK_COUNTRIES)[number]
 
 export const FINANCIAL_CONNECTIONS_PERMISSIONS = ['balances', 'transactions'] as const
 

@@ -150,7 +150,7 @@ export async function buildStripePlanCatalog(
   plans: StripePlan[],
   options: { currency: string, locale: string }
 ): Promise<ResolvedStripePlan[]> {
-  let rates: Awaited<ReturnType<typeof getFxRates>> | null = null
+  let rates: Awaited<ReturnType<typeof getFxRates>> | null
   try {
     rates = await getFxRates(options.currency)
   } catch {
@@ -176,11 +176,11 @@ export async function buildStripePlanCatalog(
         ? source.amount
         : rates
           ? convertWithPresentmentMarkup(
-            source.amount,
-            source.currency,
-            options.currency,
-            rates
-          )
+              source.amount,
+              source.currency,
+              options.currency,
+              rates
+            )
           : source.amount
       const currency = (native
         ? source.currency

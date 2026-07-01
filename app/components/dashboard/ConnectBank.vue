@@ -34,7 +34,10 @@ const buttonClass = computed(() => {
     class="inline-flex flex-wrap items-center gap-2"
     :class="block ? 'w-full flex-col sm:flex-row sm:justify-center' : ''"
   >
-    <UDropdownMenu v-if="hasOptions" :items="connectItems">
+    <UDropdownMenu
+      v-if="hasOptions"
+      :items="connectItems"
+    >
       <UButton
         :label="label ?? t('dashboard.accounts.connectBank')"
         icon="i-lucide-plus"

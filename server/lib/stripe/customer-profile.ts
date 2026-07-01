@@ -1,6 +1,5 @@
 import type Stripe from 'stripe'
 import type {
-  BillingAddress,
   BillingAddressInput
 } from '#shared/billing-address'
 import type {

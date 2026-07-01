@@ -101,7 +101,10 @@ async function syncAndRefresh() {
 </script>
 
 <template>
-  <DashboardPageShell fill :show-guide="false">
+  <DashboardPageShell
+    fill
+    :show-guide="false"
+  >
     <DashboardPageHeader
       class="shrink-0"
       :title="t('dashboard.transactions.title')"
@@ -138,7 +141,10 @@ async function syncAndRefresh() {
       </template>
     </DashboardPageHeader>
 
-    <UCard class="shrink-0" :ui="{ body: 'p-3 sm:p-4' }">
+    <UCard
+      class="shrink-0"
+      :ui="{ body: 'p-3 sm:p-4' }"
+    >
       <div class="flex flex-col gap-3">
         <UFormField :label="t('dashboard.transactions.searchLabel')">
           <UInput
@@ -147,7 +153,10 @@ async function syncAndRefresh() {
             icon="i-lucide-search"
             class="w-full"
           >
-            <template v-if="search.trim()" #trailing>
+            <template
+              v-if="search.trim()"
+              #trailing
+            >
               <UButton
                 icon="i-lucide-x"
                 color="neutral"
@@ -218,7 +227,10 @@ async function syncAndRefresh() {
               <div class="truncate text-sm font-medium">
                 {{ row.original.merchant ?? row.original.description }}
               </div>
-              <div v-if="row.original.merchant" class="truncate text-xs text-muted">
+              <div
+                v-if="row.original.merchant"
+                class="truncate text-xs text-muted"
+              >
                 {{ row.original.description }}
               </div>
             </div>
@@ -233,13 +245,19 @@ async function syncAndRefresh() {
           />
         </template>
         <template #splitHint-cell="{ row }">
-          <span v-if="row.original.splitHint || row.original.paidBy" class="text-xs text-muted">
+          <span
+            v-if="row.original.splitHint || row.original.paidBy"
+            class="text-xs text-muted"
+          >
             <span v-if="row.original.paidBy">{{ row.original.paidBy }}</span>
             <span v-if="row.original.splitHint">
               <span v-if="row.original.paidBy"> · </span>{{ row.original.splitHint }}
             </span>
           </span>
-          <span v-else class="text-xs text-muted">—</span>
+          <span
+            v-else
+            class="text-xs text-muted"
+          >—</span>
         </template>
         <template #account-cell="{ row }">
           <span class="truncate text-sm text-muted">{{ row.original.account?.name ?? '—' }}</span>
@@ -271,7 +289,10 @@ async function syncAndRefresh() {
                 variant="outline"
                 @click="transactionsStore.clearFilters()"
               />
-              <DashboardConnectBank v-else-if="!hasConnectedAccounts" size="sm" />
+              <DashboardConnectBank
+                v-else-if="!hasConnectedAccounts"
+                size="sm"
+              />
               <UButton
                 v-else
                 :label="t('dashboard.analytics.syncData')"

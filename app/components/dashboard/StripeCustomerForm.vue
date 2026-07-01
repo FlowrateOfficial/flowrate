@@ -218,7 +218,10 @@ onBeforeUnmount(() => {
       :title="t('dashboard.settings.taxAddressUnavailable')"
     />
 
-    <div v-if="loading" class="space-y-3">
+    <div
+      v-if="loading"
+      class="space-y-3"
+    >
       <USkeleton class="h-10 w-full" />
       <USkeleton class="h-10 w-full" />
       <div class="grid gap-3 sm:grid-cols-2">
@@ -232,9 +235,22 @@ onBeforeUnmount(() => {
         v-if="profileMeta.customerId"
         class="rounded-lg border border-default bg-elevated/30 p-3 text-sm space-y-1"
       >
-        <p v-if="profileMeta.name" class="font-medium">{{ profileMeta.name }}</p>
-        <p v-if="profileMeta.email" class="text-muted">{{ profileMeta.email }}</p>
-        <p v-if="profileMeta.phone" class="text-muted">
+        <p
+          v-if="profileMeta.name"
+          class="font-medium"
+        >
+          {{ profileMeta.name }}
+        </p>
+        <p
+          v-if="profileMeta.email"
+          class="text-muted"
+        >
+          {{ profileMeta.email }}
+        </p>
+        <p
+          v-if="profileMeta.phone"
+          class="text-muted"
+        >
           {{ profileMeta.phone }}
           <UBadge
             v-if="profileMeta.phoneVerified"
@@ -246,7 +262,10 @@ onBeforeUnmount(() => {
             class="ml-1.5"
           />
         </p>
-        <p v-else class="text-xs text-muted">
+        <p
+          v-else
+          class="text-xs text-muted"
+        >
           {{ t('dashboard.settings.stripeCustomerPhoneNote') }}
         </p>
         <p class="text-xs text-muted font-mono">
@@ -343,7 +362,10 @@ onBeforeUnmount(() => {
 
         <p class="text-xs text-muted leading-relaxed">
           {{ t('dashboard.settings.taxAddressMapboxNote') }}
-          <NuxtLink to="/privacy#subprocessors" class="text-primary hover:underline">
+          <NuxtLink
+            to="/privacy#subprocessors"
+            class="text-primary hover:underline"
+          >
             {{ t('common.privacy') }}
           </NuxtLink>
         </p>
@@ -375,15 +397,24 @@ onBeforeUnmount(() => {
           />
         </div>
 
-        <p v-if="profileMeta.invoiceTemplateConfigured" class="text-xs text-muted">
+        <p
+          v-if="profileMeta.invoiceTemplateConfigured"
+          class="text-xs text-muted"
+        >
           {{ t('dashboard.settings.stripeCustomerInvoiceTemplateNote') }}
         </p>
 
-        <p v-if="!invoices.length" class="text-sm text-muted">
+        <p
+          v-if="!invoices.length"
+          class="text-sm text-muted"
+        >
           {{ t('dashboard.settings.stripeCustomerInvoicesEmpty') }}
         </p>
 
-        <ul v-else class="divide-y divide-default rounded-lg border border-default">
+        <ul
+          v-else
+          class="divide-y divide-default rounded-lg border border-default"
+        >
           <li
             v-for="invoice in invoices"
             :key="invoice.id"

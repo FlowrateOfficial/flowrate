@@ -65,16 +65,24 @@ function formatWhen(iso: string | null) {
 
     <template v-else-if="data">
       <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
-        <UCard v-for="item in [
-          { label: 'Users', value: data.totals.users },
-          { label: 'Paid', value: data.totals.paidUsers },
-          { label: 'Bank links', value: data.totals.bankConnections },
-          { label: 'Accounts', value: data.totals.accounts },
-          { label: 'Transactions', value: data.totals.transactions },
-          { label: 'Syncs (mo)', value: data.totals.syncsThisMonth }
-        ]" :key="item.label" :ui="{ body: 'p-3 sm:p-4' }">
-          <p class="text-xs text-muted">{{ item.label }}</p>
-          <p class="text-xl font-semibold tabular-nums">{{ item.value }}</p>
+        <UCard
+          v-for="item in [
+            { label: 'Users', value: data.totals.users },
+            { label: 'Paid', value: data.totals.paidUsers },
+            { label: 'Bank links', value: data.totals.bankConnections },
+            { label: 'Accounts', value: data.totals.accounts },
+            { label: 'Transactions', value: data.totals.transactions },
+            { label: 'Syncs (mo)', value: data.totals.syncsThisMonth }
+          ]"
+          :key="item.label"
+          :ui="{ body: 'p-3 sm:p-4' }"
+        >
+          <p class="text-xs text-muted">
+            {{ item.label }}
+          </p>
+          <p class="text-xl font-semibold tabular-nums">
+            {{ item.value }}
+          </p>
         </UCard>
       </div>
 
@@ -83,29 +91,65 @@ function formatWhen(iso: string | null) {
           <table class="min-w-full text-sm">
             <thead class="border-b border-default bg-elevated/50 text-left text-xs text-muted">
               <tr>
-                <th class="px-4 py-3 font-medium">User</th>
-                <th class="px-4 py-3 font-medium">Plan</th>
-                <th class="px-4 py-3 font-medium">Banks</th>
-                <th class="px-4 py-3 font-medium">Accounts</th>
-                <th class="px-4 py-3 font-medium">Txns</th>
-                <th class="px-4 py-3 font-medium">Syncs/mo</th>
-                <th class="px-4 py-3 font-medium">Last sync</th>
+                <th class="px-4 py-3 font-medium">
+                  User
+                </th>
+                <th class="px-4 py-3 font-medium">
+                  Plan
+                </th>
+                <th class="px-4 py-3 font-medium">
+                  Banks
+                </th>
+                <th class="px-4 py-3 font-medium">
+                  Accounts
+                </th>
+                <th class="px-4 py-3 font-medium">
+                  Txns
+                </th>
+                <th class="px-4 py-3 font-medium">
+                  Syncs/mo
+                </th>
+                <th class="px-4 py-3 font-medium">
+                  Last sync
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-default">
-              <tr v-for="row in data.rows" :key="row.userId">
+              <tr
+                v-for="row in data.rows"
+                :key="row.userId"
+              >
                 <td class="px-4 py-3">
-                  <p class="font-medium">{{ row.name ?? row.email }}</p>
-                  <p class="text-xs text-muted">{{ row.email }}</p>
+                  <p class="font-medium">
+                    {{ row.name ?? row.email }}
+                  </p>
+                  <p class="text-xs text-muted">
+                    {{ row.email }}
+                  </p>
                 </td>
                 <td class="px-4 py-3">
-                  <UBadge :label="row.plan" color="neutral" variant="subtle" size="xs" />
+                  <UBadge
+                    :label="row.plan"
+                    color="neutral"
+                    variant="subtle"
+                    size="xs"
+                  />
                 </td>
-                <td class="px-4 py-3 tabular-nums">{{ row.bankConnections }}</td>
-                <td class="px-4 py-3 tabular-nums">{{ row.accountCount }}</td>
-                <td class="px-4 py-3 tabular-nums">{{ row.transactionCount }}</td>
-                <td class="px-4 py-3 tabular-nums">{{ row.syncsThisMonth }}</td>
-                <td class="px-4 py-3 text-muted">{{ formatWhen(row.lastSyncAt) }}</td>
+                <td class="px-4 py-3 tabular-nums">
+                  {{ row.bankConnections }}
+                </td>
+                <td class="px-4 py-3 tabular-nums">
+                  {{ row.accountCount }}
+                </td>
+                <td class="px-4 py-3 tabular-nums">
+                  {{ row.transactionCount }}
+                </td>
+                <td class="px-4 py-3 tabular-nums">
+                  {{ row.syncsThisMonth }}
+                </td>
+                <td class="px-4 py-3 text-muted">
+                  {{ formatWhen(row.lastSyncAt) }}
+                </td>
               </tr>
             </tbody>
           </table>

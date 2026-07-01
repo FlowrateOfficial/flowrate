@@ -15,11 +15,17 @@ const stepPreviews = computed(() => [
 </script>
 
 <template>
-  <LandingSection id="how-it-works" index="01" tinted>
+  <LandingSection
+    id="how-it-works"
+    index="01"
+    tinted
+  >
     <template #default>
       <div class="py-24 sm:py-32">
         <div class="max-w-2xl mb-16 sm:mb-20 landing-section-intro">
-          <p class="text-sm text-sage mb-4">01</p>
+          <p class="text-sm text-sage mb-4">
+            01
+          </p>
           <h2 class="text-display-section text-flow-ink dark:text-flow-ink-dark mb-6">
             {{ t('landing.howItWorks.title') }}
           </h2>
@@ -39,7 +45,10 @@ const stepPreviews = computed(() => [
               <span class="text-sm text-flow-muted dark:text-flow-muted-dark tabular-nums">
                 {{ String(i + 1).padStart(2, '0') }}
               </span>
-              <UIcon :name="item.icon" class="size-5 text-sage stroke-[1.25]" />
+              <UIcon
+                :name="item.icon"
+                class="size-5 text-sage stroke-[1.25]"
+              />
             </div>
 
             <h3 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark mb-3">
@@ -50,7 +59,10 @@ const stepPreviews = computed(() => [
             </p>
 
             <div class="rounded-flow border border-flow-border/50 dark:border-flow-border-dark/50 bg-flow-warm/70 dark:bg-flow-elevated-dark/50 px-3 py-2.5 flex items-center gap-2">
-              <UIcon :name="stepPreviews[i]!.icon" class="size-4 text-terracotta shrink-0" />
+              <UIcon
+                :name="stepPreviews[i]!.icon"
+                class="size-4 text-terracotta shrink-0"
+              />
               <span class="text-sm text-flow-ink dark:text-flow-ink-dark">{{ stepPreviews[i]!.metric }}</span>
             </div>
           </article>

@@ -48,7 +48,7 @@ const options = computed<ChartOptions<'line'>>(() => ({
       grid: { color: theme.gridStrong.value },
       ticks: {
         color: theme.text.value,
-        callback: (value) => formatAxis(value)
+        callback: value => formatAxis(value)
       }
     }
   }
@@ -57,6 +57,9 @@ const options = computed<ChartOptions<'line'>>(() => ({
 
 <template>
   <ClientOnly>
-    <Line :data="chartData" :options="options" />
+    <Line
+      :data="chartData"
+      :options="options"
+    />
   </ClientOnly>
 </template>

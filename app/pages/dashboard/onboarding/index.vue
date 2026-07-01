@@ -23,11 +23,18 @@ useDashboardSeo('dashboard.onboarding.welcome')
 <template>
   <DashboardPageShell max-width="lg">
     <div class="text-center">
-      <h1 class="text-2xl font-semibold sm:text-3xl">{{ t('dashboard.onboarding.title') }}</h1>
-      <p class="mt-1 text-sm text-muted sm:text-base">{{ t('dashboard.onboarding.subtitle') }}</p>
+      <h1 class="text-2xl font-semibold sm:text-3xl">
+        {{ t('dashboard.onboarding.title') }}
+      </h1>
+      <p class="mt-1 text-sm text-muted sm:text-base">
+        {{ t('dashboard.onboarding.subtitle') }}
+      </p>
     </div>
 
-    <div v-if="step === 1" class="grid gap-3 sm:grid-cols-2">
+    <div
+      v-if="step === 1"
+      class="grid gap-3 sm:grid-cols-2"
+    >
       <UCard
         v-for="opt in options"
         :key="opt.type"
@@ -36,15 +43,29 @@ useDashboardSeo('dashboard.onboarding.welcome')
         :ui="{ body: 'p-4' }"
         @click="onboarding.selectType(opt.type)"
       >
-        <UIcon :name="opt.icon" class="mb-2 size-7 text-primary" />
-        <p class="font-semibold">{{ opt.title }}</p>
-        <p class="mt-1 text-sm text-muted">{{ opt.description }}</p>
+        <UIcon
+          :name="opt.icon"
+          class="mb-2 size-7 text-primary"
+        />
+        <p class="font-semibold">
+          {{ opt.title }}
+        </p>
+        <p class="mt-1 text-sm text-muted">
+          {{ opt.description }}
+        </p>
       </UCard>
     </div>
 
-    <UCard v-else-if="selected && selected !== 'INDEPENDENT'" :ui="{ body: 'p-4 sm:p-5' }">
+    <UCard
+      v-else-if="selected && selected !== 'INDEPENDENT'"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
       <UFormField :label="t('dashboard.onboarding.spaceNameLabel')">
-        <UInput v-model="spaceName" :placeholder="onboarding.defaultName(selected)" class="w-full" />
+        <UInput
+          v-model="spaceName"
+          :placeholder="onboarding.defaultName(selected)"
+          class="w-full"
+        />
       </UFormField>
     </UCard>
 

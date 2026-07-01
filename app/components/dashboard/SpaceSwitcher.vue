@@ -28,7 +28,10 @@ const items = computed(() =>
 </script>
 
 <template>
-  <UDropdownMenu :items="[items]" :disabled="loading || switching">
+  <UDropdownMenu
+    :items="[items]"
+    :disabled="loading || switching"
+  >
     <UButton
       color="neutral"
       variant="outline"
@@ -47,11 +50,17 @@ const items = computed(() =>
         <span class="block truncate text-base font-semibold">
           {{ space?.name ?? t('common.loading') }}
         </span>
-        <span v-if="space" class="block truncate text-sm text-muted">
+        <span
+          v-if="space"
+          class="block truncate text-sm text-muted"
+        >
           {{ spacesStore.spaceType(space.type) }}
         </span>
       </span>
-      <UIcon name="i-lucide-chevrons-up-down" class="size-4 shrink-0 text-muted" />
+      <UIcon
+        name="i-lucide-chevrons-up-down"
+        class="size-4 shrink-0 text-muted"
+      />
     </UButton>
   </UDropdownMenu>
 </template>

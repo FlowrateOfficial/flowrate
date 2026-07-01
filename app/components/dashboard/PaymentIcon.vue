@@ -55,7 +55,11 @@ const avatarLetter = computed(() => label.value.charAt(0).toUpperCase() || '?')
       decoding="async"
       @error="logoFailed = true"
     >
-    <UIcon v-else-if="iconName" :name="iconName" class="size-[55%] shrink-0 text-primary" />
+    <UIcon
+      v-else-if="iconName"
+      :name="iconName"
+      class="size-[55%] shrink-0 text-primary"
+    />
     <span v-else>{{ avatarLetter }}</span>
   </div>
 </template>

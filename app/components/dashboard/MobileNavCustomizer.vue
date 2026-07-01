@@ -96,7 +96,10 @@ function onReset() {
           </div>
         </div>
 
-        <div v-if="poolItems.length" class="space-y-2">
+        <div
+          v-if="poolItems.length"
+          class="space-y-2"
+        >
           <p class="text-xs font-semibold uppercase tracking-wide text-muted">
             {{ t('dashboard.layout.addFooterTab') }}
           </p>
@@ -108,7 +111,10 @@ function onReset() {
               class="flex min-h-12 items-center gap-2 rounded-xl border border-default bg-elevated/20 px-3 py-2 text-left transition-colors hover:bg-elevated/50"
               @click="addToSelected(item.to)"
             >
-              <UIcon :name="item.icon" class="size-4 shrink-0 text-muted" />
+              <UIcon
+                :name="item.icon"
+                class="size-4 shrink-0 text-muted"
+              />
               <span class="min-w-0 text-sm leading-snug line-clamp-2">{{ item.label }}</span>
             </button>
           </div>

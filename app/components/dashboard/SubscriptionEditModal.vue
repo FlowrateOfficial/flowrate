@@ -10,7 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  save: [patch: { displayName?: string | null, hidden?: boolean, excluded?: boolean }]
+  'save': [patch: { displayName?: string | null, hidden?: boolean, excluded?: boolean }]
 }>()
 
 const { t } = useAppI18n()
@@ -50,7 +50,10 @@ function save() {
     <template #body>
       <div class="space-y-4">
         <UFormField :label="t('dashboard.subscriptions.editName')">
-          <UInput v-model="displayName" class="w-full" />
+          <UInput
+            v-model="displayName"
+            class="w-full"
+          />
         </UFormField>
 
         <UCheckbox
@@ -62,7 +65,9 @@ function save() {
           v-model="notSubscription"
           :label="t('dashboard.subscriptions.editExclude')"
         />
-        <p class="text-xs text-muted">{{ t('dashboard.subscriptions.editExcludeHelp') }}</p>
+        <p class="text-xs text-muted">
+          {{ t('dashboard.subscriptions.editExcludeHelp') }}
+        </p>
       </div>
     </template>
 

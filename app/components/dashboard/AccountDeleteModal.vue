@@ -36,10 +36,16 @@ async function handleConfirm() {
 </script>
 
 <template>
-  <UModal v-model:open="open" :title="t('dashboard.settings.deleteModalTitle')">
+  <UModal
+    v-model:open="open"
+    :title="t('dashboard.settings.deleteModalTitle')"
+  >
     <template #body>
       <div class="space-y-4">
-        <p v-if="isLoadingChallenge" class="text-sm text-muted">
+        <p
+          v-if="isLoadingChallenge"
+          class="text-sm text-muted"
+        >
           {{ t('dashboard.settings.deleteLoadingChallenge') }}
         </p>
 
@@ -88,7 +94,9 @@ async function handleConfirm() {
                 :placeholder="t('dashboard.settings.deleteEmailCodePlaceholder')"
                 class="w-full"
               />
-              <template #help>{{ t('dashboard.settings.deleteEmailCodeHelp') }}</template>
+              <template #help>
+                {{ t('dashboard.settings.deleteEmailCodeHelp') }}
+              </template>
             </UFormField>
 
             <UFormField

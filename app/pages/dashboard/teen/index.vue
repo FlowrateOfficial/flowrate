@@ -57,11 +57,16 @@ function frequencyLabel(freq?: string | null) {
     </DashboardPageHeader>
 
     <UCard :ui="{ body: 'p-4 sm:p-6 text-center' }">
-      <p class="text-sm font-medium text-muted">{{ t('dashboard.teen.totalSaved') }}</p>
+      <p class="text-sm font-medium text-muted">
+        {{ t('dashboard.teen.totalSaved') }}
+      </p>
       <p class="mt-1 text-3xl font-bold tabular-nums text-primary sm:text-4xl">
         {{ fmt(teen?.totalSaved ?? 0) }}
       </p>
-      <p v-if="teen?.allowance" class="mt-2 text-sm text-muted">
+      <p
+        v-if="teen?.allowance"
+        class="mt-2 text-sm text-muted"
+      >
         {{ t('dashboard.teen.allowance', {
           amount: fmt(teen.allowance),
           frequency: frequencyLabel(teen.frequency)
@@ -70,20 +75,43 @@ function frequencyLabel(freq?: string | null) {
     </UCard>
 
     <div>
-      <h2 class="mb-3 text-base font-semibold sm:text-lg">{{ t('dashboard.teen.jarsTitle') }}</h2>
+      <h2 class="mb-3 text-base font-semibold sm:text-lg">
+        {{ t('dashboard.teen.jarsTitle') }}
+      </h2>
       <div class="grid gap-3 sm:grid-cols-2">
-        <UCard v-for="jar in teen?.jars" :key="jar.id" :ui="{ body: 'p-4' }">
+        <UCard
+          v-for="jar in teen?.jars"
+          :key="jar.id"
+          :ui="{ body: 'p-4' }"
+        >
           <div class="mb-2 flex items-center justify-between gap-3">
-            <p class="font-semibold">{{ jar.name }}</p>
-            <p class="text-lg font-bold tabular-nums">{{ fmt(jar.balance) }}</p>
+            <p class="font-semibold">
+              {{ jar.name }}
+            </p>
+            <p class="text-lg font-bold tabular-nums">
+              {{ fmt(jar.balance) }}
+            </p>
           </div>
-          <UProgress v-if="jar.target" :model-value="jar.progress ?? 0" size="sm" />
-          <p v-if="jar.target" class="mt-1.5 text-xs text-muted">
+          <UProgress
+            v-if="jar.target"
+            :model-value="jar.progress ?? 0"
+            size="sm"
+          />
+          <p
+            v-if="jar.target"
+            class="mt-1.5 text-xs text-muted"
+          >
             {{ t('dashboard.family.child.goal', { amount: fmt(jar.target) }) }}
           </p>
         </UCard>
-        <UCard v-if="!teen?.jars?.length && !pending" :ui="{ body: 'p-6 text-center' }" class="sm:col-span-2">
-          <p class="text-sm text-muted">{{ t('dashboard.teen.noJars') }}</p>
+        <UCard
+          v-if="!teen?.jars?.length && !pending"
+          :ui="{ body: 'p-6 text-center' }"
+          class="sm:col-span-2"
+        >
+          <p class="text-sm text-muted">
+            {{ t('dashboard.teen.noJars') }}
+          </p>
         </UCard>
       </div>
     </div>
@@ -96,8 +124,13 @@ function frequencyLabel(freq?: string | null) {
       variant="subtle"
     />
 
-    <div v-if="teen?.nudges?.length" class="space-y-2">
-      <h2 class="text-base font-semibold">{{ t('dashboard.teen.nudgesTitle') }}</h2>
+    <div
+      v-if="teen?.nudges?.length"
+      class="space-y-2"
+    >
+      <h2 class="text-base font-semibold">
+        {{ t('dashboard.teen.nudgesTitle') }}
+      </h2>
       <UAlert
         v-for="nudge in teen.nudges"
         :key="nudge.category"

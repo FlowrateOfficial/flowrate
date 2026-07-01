@@ -53,7 +53,7 @@ class UpstashRateLimitStore implements RateLimitStore {
     const response = await fetch(`${this.url}/pipeline`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.token}`,
+        'Authorization': `Bearer ${this.token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([

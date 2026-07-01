@@ -21,11 +21,11 @@ useSpaceStoreFetch(`member-financial-${memberId}`, async () => {
 const data = memberFinancial
 const pending = memberPending
 
-watch(data, (val) => familyStore.loadAllowanceFromMember(val ?? null), { immediate: true })
+watch(data, val => familyStore.loadAllowanceFromMember(val ?? null), { immediate: true })
 
 watch(
   () => data.value?.member.name,
-  (name) => setBreadcrumbTail(name ?? null),
+  name => setBreadcrumbTail(name ?? null),
   { immediate: true }
 )
 
@@ -75,19 +75,47 @@ async function confirmDeleteChild() {
       back-to="/dashboard/family"
     />
 
-    <DashboardSummaryStrip :items="summaryItems" :loading="pending" />
+    <DashboardSummaryStrip
+      :items="summaryItems"
+      :loading="pending"
+    />
 
-    <UTabs v-model="memberTab" :items="familyStore.memberTabs" :content="false" />
+    <UTabs
+      v-model="memberTab"
+      :items="familyStore.memberTabs"
+      :content="false"
+    />
 
-    <div v-if="memberTab === 'overview'" class="grid gap-4 sm:grid-cols-2">
+    <div
+      v-if="memberTab === 'overview'"
+      class="grid gap-4 sm:grid-cols-2"
+    >
       <UCard :ui="{ body: 'p-4 sm:p-5' }">
-        <h3 class="mb-3 text-base font-semibold">{{ t('dashboard.family.memberTabs.accounts') }}</h3>
-        <p v-if="!data?.accounts.length" class="text-sm text-muted">{{ t('dashboard.family.noLinkedAccounts') }}</p>
-        <div v-else class="space-y-3">
-          <div v-for="acc in data.accounts" :key="acc.id" class="flex justify-between text-sm">
+        <h3 class="mb-3 text-base font-semibold">
+          {{ t('dashboard.family.memberTabs.accounts') }}
+        </h3>
+        <p
+          v-if="!data?.accounts.length"
+          class="text-sm text-muted"
+        >
+          {{ t('dashboard.family.noLinkedAccounts') }}
+        </p>
+        <div
+          v-else
+          class="space-y-3"
+        >
+          <div
+            v-for="acc in data.accounts"
+            :key="acc.id"
+            class="flex justify-between text-sm"
+          >
             <div>
-              <p class="font-medium">{{ acc.name }}</p>
-              <p class="text-xs text-muted">{{ acc.institution ?? acc.type }}</p>
+              <p class="font-medium">
+                {{ acc.name }}
+              </p>
+              <p class="text-xs text-muted">
+                {{ acc.institution ?? acc.type }}
+              </p>
             </div>
             <span class="tabular-nums font-medium">{{ familyStore.fmt(acc.balance, acc.currency) }}</span>
           </div>
@@ -95,15 +123,36 @@ async function confirmDeleteChild() {
       </UCard>
 
       <UCard :ui="{ body: 'p-4 sm:p-5' }">
-        <h3 class="mb-3 text-base font-semibold">{{ t('dashboard.family.recentActivity') }}</h3>
-        <p v-if="!data?.transactions.length" class="text-sm text-muted">{{ t('dashboard.family.noTransactions') }}</p>
-        <div v-else class="space-y-3">
-          <div v-for="tx in data.transactions.slice(0, 5)" :key="tx.id" class="flex justify-between text-sm gap-4">
+        <h3 class="mb-3 text-base font-semibold">
+          {{ t('dashboard.family.recentActivity') }}
+        </h3>
+        <p
+          v-if="!data?.transactions.length"
+          class="text-sm text-muted"
+        >
+          {{ t('dashboard.family.noTransactions') }}
+        </p>
+        <div
+          v-else
+          class="space-y-3"
+        >
+          <div
+            v-for="tx in data.transactions.slice(0, 5)"
+            :key="tx.id"
+            class="flex justify-between text-sm gap-4"
+          >
             <div class="min-w-0">
-              <p class="font-medium truncate">{{ tx.merchant ?? tx.description }}</p>
-              <p class="text-xs text-muted">{{ familyStore.formatDate(tx.date) }}</p>
+              <p class="font-medium truncate">
+                {{ tx.merchant ?? tx.description }}
+              </p>
+              <p class="text-xs text-muted">
+                {{ familyStore.formatDate(tx.date) }}
+              </p>
             </div>
-            <span class="tabular-nums shrink-0" :class="tx.amount > 0 ? 'text-success' : ''">
+            <span
+              class="tabular-nums shrink-0"
+              :class="tx.amount > 0 ? 'text-success' : ''"
+            >
               {{ familyStore.fmt(Math.abs(tx.amount), tx.currency) }}
             </span>
           </div>
@@ -111,7 +160,10 @@ async function confirmDeleteChild() {
       </UCard>
     </div>
 
-    <UCard v-else-if="memberTab === 'accounts'" :ui="{ body: 'p-0 sm:p-0' }">
+    <UCard
+      v-else-if="memberTab === 'accounts'"
+      :ui="{ body: 'p-0 sm:p-0' }"
+    >
       <UTable
         :data="data?.accounts ?? []"
         :columns="[
@@ -126,7 +178,11 @@ async function confirmDeleteChild() {
           <span class="tabular-nums font-medium">{{ familyStore.fmt(row.original.balance, row.original.currency) }}</span>
         </template>
         <template #visibility-cell="{ row }">
-          <UBadge :label="row.original.visibility" variant="subtle" size="xs" />
+          <UBadge
+            :label="row.original.visibility"
+            variant="subtle"
+            size="xs"
+          />
         </template>
         <template #empty>
           <UEmpty
@@ -140,8 +196,15 @@ async function confirmDeleteChild() {
       </UTable>
     </UCard>
 
-    <UCard v-else-if="memberTab === 'transactions'" :ui="{ body: 'p-0 sm:p-0' }">
-      <UTable :data="data?.transactions ?? []" :columns="columns" :loading="pending">
+    <UCard
+      v-else-if="memberTab === 'transactions'"
+      :ui="{ body: 'p-0 sm:p-0' }"
+    >
+      <UTable
+        :data="data?.transactions ?? []"
+        :columns="columns"
+        :loading="pending"
+      >
         <template #date-cell="{ row }">
           <span class="text-sm text-muted">{{ familyStore.formatDate(row.original.date) }}</span>
         </template>
@@ -153,14 +216,23 @@ async function confirmDeleteChild() {
               :category="row.original.category"
               size="xs"
             />
-            <p class="truncate text-sm font-medium">{{ row.original.merchant ?? row.original.description }}</p>
+            <p class="truncate text-sm font-medium">
+              {{ row.original.merchant ?? row.original.description }}
+            </p>
           </div>
         </template>
         <template #category-cell="{ row }">
-          <UBadge :label="familyStore.categoryLabel(row.original.category)" variant="subtle" size="xs" />
+          <UBadge
+            :label="familyStore.categoryLabel(row.original.category)"
+            variant="subtle"
+            size="xs"
+          />
         </template>
         <template #amount-cell="{ row }">
-          <span class="tabular-nums font-semibold" :class="row.original.amount > 0 ? 'text-success' : ''">
+          <span
+            class="tabular-nums font-semibold"
+            :class="row.original.amount > 0 ? 'text-success' : ''"
+          >
             {{ row.original.amount > 0 ? '+' : '-' }}{{ familyStore.fmt(Math.abs(row.original.amount), row.original.currency) }}
           </span>
         </template>
@@ -176,17 +248,34 @@ async function confirmDeleteChild() {
       </UTable>
     </UCard>
 
-    <div v-else class="grid gap-4 sm:grid-cols-2">
+    <div
+      v-else
+      class="grid gap-4 sm:grid-cols-2"
+    >
       <UCard :ui="{ body: 'p-4 sm:p-5' }">
-        <h3 class="mb-4 text-base font-semibold">{{ t('dashboard.family.child.title') }}</h3>
+        <h3 class="mb-4 text-base font-semibold">
+          {{ t('dashboard.family.child.title') }}
+        </h3>
         <div class="space-y-4">
           <UFormField :label="t('dashboard.family.child.allowance')">
-            <UInput v-model.number="familyStore.allowanceForm.allowance" type="number" min="0" class="w-full" />
+            <UInput
+              v-model.number="familyStore.allowanceForm.allowance"
+              type="number"
+              min="0"
+              class="w-full"
+            />
           </UFormField>
           <UFormField :label="t('dashboard.family.child.frequency')">
-            <USelect v-model="familyStore.allowanceForm.frequency" :items="familyStore.frequencyItems" class="w-full" />
+            <USelect
+              v-model="familyStore.allowanceForm.frequency"
+              :items="familyStore.frequencyItems"
+              class="w-full"
+            />
           </UFormField>
-          <UCheckbox v-model="familyStore.allowanceForm.learnMode" :label="t('dashboard.family.child.learnMode')" />
+          <UCheckbox
+            v-model="familyStore.allowanceForm.learnMode"
+            :label="t('dashboard.family.child.learnMode')"
+          />
           <UButton
             :label="t('common.save')"
             :loading="saving"
@@ -196,23 +285,43 @@ async function confirmDeleteChild() {
       </UCard>
 
       <UCard :ui="{ body: 'p-4 sm:p-5' }">
-        <h3 class="mb-4 text-base font-semibold">{{ t('dashboard.family.child.jarsTitle') }}</h3>
+        <h3 class="mb-4 text-base font-semibold">
+          {{ t('dashboard.family.child.jarsTitle') }}
+        </h3>
         <div class="space-y-3 mb-4">
-          <div v-for="jar in data?.member.childProfile?.jars" :key="jar.id" class="flex justify-between text-sm">
+          <div
+            v-for="jar in data?.member.childProfile?.jars"
+            :key="jar.id"
+            class="flex justify-between text-sm"
+          >
             <span>{{ jar.name }}</span>
             <span class="font-medium tabular-nums">{{ familyStore.fmt(jar.balance) }}</span>
           </div>
         </div>
         <div class="flex gap-2">
-          <UInput v-model="familyStore.jarName" :placeholder="t('dashboard.family.child.jarPlaceholder')" class="flex-1" />
-          <UButton :label="t('common.add')" @click="familyStore.addJar(spaceId, memberId)" />
+          <UInput
+            v-model="familyStore.jarName"
+            :placeholder="t('dashboard.family.child.jarPlaceholder')"
+            class="flex-1"
+          />
+          <UButton
+            :label="t('common.add')"
+            @click="familyStore.addJar(spaceId, memberId)"
+          />
         </div>
       </UCard>
     </div>
 
-    <UCard v-if="isChildMember" :ui="{ body: 'p-4 sm:p-5' }">
-      <h3 class="mb-2 text-base font-semibold text-error">{{ t('dashboard.settings.dangerZone') }}</h3>
-      <p class="text-sm text-muted mb-4">{{ t('dashboard.family.deleteChildDescription') }}</p>
+    <UCard
+      v-if="isChildMember"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h3 class="mb-2 text-base font-semibold text-error">
+        {{ t('dashboard.settings.dangerZone') }}
+      </h3>
+      <p class="text-sm text-muted mb-4">
+        {{ t('dashboard.family.deleteChildDescription') }}
+      </p>
       <UButton
         :label="t('dashboard.family.deleteChildAccount')"
         color="error"
@@ -227,7 +336,9 @@ async function confirmDeleteChild() {
       :title="t('dashboard.family.deleteChildTitle', { name: data?.member.name ?? t('dashboard.family.childFallback') })"
     >
       <template #body>
-        <p class="text-sm text-muted">{{ t('dashboard.family.deleteChildDescription') }}</p>
+        <p class="text-sm text-muted">
+          {{ t('dashboard.family.deleteChildDescription') }}
+        </p>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2">

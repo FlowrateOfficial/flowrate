@@ -22,13 +22,19 @@ defineProps<{
         size="xs"
         class="-ml-1 mb-1"
       />
-      <p v-if="eyebrow" class="text-xs font-medium uppercase tracking-wide text-muted">
+      <p
+        v-if="eyebrow"
+        class="text-xs font-medium uppercase tracking-wide text-muted"
+      >
         {{ eyebrow }}
       </p>
       <h1 class="text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
         {{ title }}
       </h1>
-      <p v-if="description" class="max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
+      <p
+        v-if="description"
+        class="max-w-2xl text-sm leading-relaxed text-muted sm:text-base"
+      >
         {{ description }}
       </p>
     </div>

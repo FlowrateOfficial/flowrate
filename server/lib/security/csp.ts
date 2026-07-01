@@ -14,7 +14,7 @@ function isLocalhostOrigin(origin: string): boolean {
   }
 }
 
-// NOTE - Origins for connect-src / form-action (host + deploy URLs)
+// ANCHOR: Origins for connect-src / form-action (host + deploy URLs)
 export function collectAppOrigins(event: H3Event): string[] {
   const origins = new Set<string>()
   const requestOrigin = getRequestURL(event).origin
@@ -64,7 +64,7 @@ function plaidConnectSrc(event: H3Event): string[] {
 export function buildContentSecurityPolicy(event: H3Event): string {
   const origins = collectAppOrigins(event)
   const connectSrc = [
-    "'self'",
+    '\'self\'',
     ...origins,
     'https://api.stripe.com',
     'https://*.stripe.com',

@@ -119,7 +119,11 @@ function formatBillingDate(iso: string) {
 </script>
 
 <template>
-  <div v-if="!ready" class="billing-panel-skeleton space-y-3" aria-busy="true">
+  <div
+    v-if="!ready"
+    class="billing-panel-skeleton space-y-3"
+    aria-busy="true"
+  >
     <div class="h-20 rounded-flow bg-elevated/50 animate-pulse" />
     <div class="grid grid-cols-2 gap-2">
       <div class="h-28 rounded-flow bg-elevated/40 animate-pulse" />
@@ -129,7 +133,10 @@ function formatBillingDate(iso: string) {
     <div class="h-10 w-36 rounded-flow bg-elevated/40 animate-pulse" />
   </div>
 
-  <div v-else class="billing-panel space-y-5">
+  <div
+    v-else
+    class="billing-panel space-y-5"
+  >
     <div class="billing-status-card">
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div class="min-w-0">
@@ -139,7 +146,10 @@ function formatBillingDate(iso: string) {
           <p class="mt-1 text-lg font-semibold text-default">
             {{ planLabels[userPlan]?.label ?? t('dashboard.settings.plans.FREE') }}
           </p>
-          <p v-if="renewalLabel" class="mt-1 text-xs text-muted">
+          <p
+            v-if="renewalLabel"
+            class="mt-1 text-xs text-muted"
+          >
             {{ renewalLabel }}
           </p>
         </div>
@@ -155,7 +165,9 @@ function formatBillingDate(iso: string) {
     </div>
 
     <div>
-      <p class="billing-section-label">{{ t('dashboard.settings.choosePlan') }}</p>
+      <p class="billing-section-label">
+        {{ t('dashboard.settings.choosePlan') }}
+      </p>
       <div class="grid gap-2 sm:grid-cols-2">
         <button
           v-for="option in planOptions"
@@ -166,21 +178,29 @@ function formatBillingDate(iso: string) {
           @click="selectedPlanKey = option.key"
         >
           <div class="flex items-start justify-between gap-2">
-            <p class="text-sm font-semibold text-default">{{ option.title }}</p>
+            <p class="text-sm font-semibold text-default">
+              {{ option.title }}
+            </p>
             <UIcon
               v-if="selectedPlanKey === option.key"
               name="i-lucide-check-circle-2"
               class="size-4 shrink-0 text-primary"
             />
           </div>
-          <p class="mt-2 text-lg font-light tabular-nums text-default">{{ option.price }}</p>
-          <p class="mt-1 text-xs text-muted leading-relaxed">{{ option.blurb }}</p>
+          <p class="mt-2 text-lg font-light tabular-nums text-default">
+            {{ option.price }}
+          </p>
+          <p class="mt-1 text-xs text-muted leading-relaxed">
+            {{ option.blurb }}
+          </p>
         </button>
       </div>
     </div>
 
     <div>
-      <p class="billing-section-label">{{ t('dashboard.settings.billingCycle') }}</p>
+      <p class="billing-section-label">
+        {{ t('dashboard.settings.billingCycle') }}
+      </p>
       <div class="inline-flex rounded-flow border border-default p-1 bg-muted/20">
         <button
           type="button"
@@ -216,7 +236,10 @@ function formatBillingDate(iso: string) {
       </span>
     </div>
 
-    <p v-if="selectedPlan?.convertedForDisplay" class="text-xs text-muted">
+    <p
+      v-if="selectedPlan?.convertedForDisplay"
+      class="text-xs text-muted"
+    >
       {{ t('dashboard.settings.billedInStripeCurrency') }}
     </p>
 
@@ -239,7 +262,10 @@ function formatBillingDate(iso: string) {
       />
     </div>
 
-    <p v-if="hasActiveSubscription" class="text-xs text-muted">
+    <p
+      v-if="hasActiveSubscription"
+      class="text-xs text-muted"
+    >
       {{ t('dashboard.settings.cancelViaPortal') }}
     </p>
   </div>

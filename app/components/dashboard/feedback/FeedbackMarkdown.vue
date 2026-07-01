@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-v-html -- HTML is sanitized in feedbackMarkdownToHtml */
 import { feedbackMarkdownToHtml, repairFeedbackMarkdown } from '~/lib/feedback/markdown'
 
 const props = defineProps<{

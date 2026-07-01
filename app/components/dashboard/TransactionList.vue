@@ -27,8 +27,15 @@ function fmt(amount: number, currency: string): string {
 
 <template>
   <div>
-    <div v-if="loading" class="space-y-1">
-      <div v-for="i in 5" :key="i" class="flex animate-pulse items-center justify-between border-b border-default py-3">
+    <div
+      v-if="loading"
+      class="space-y-1"
+    >
+      <div
+        v-for="i in 5"
+        :key="i"
+        class="flex animate-pulse items-center justify-between border-b border-default py-3"
+      >
         <div class="h-3.5 w-36 rounded-sm bg-elevated" />
         <div class="h-3.5 w-14 rounded-sm bg-elevated/70" />
       </div>
@@ -43,7 +50,10 @@ function fmt(amount: number, currency: string): string {
       class="py-8"
     />
 
-    <ul v-else class="divide-y divide-default">
+    <ul
+      v-else
+      class="divide-y divide-default"
+    >
       <li
         v-for="tx in transactions"
         :key="tx.id"

@@ -19,9 +19,19 @@ const navLinks = computed(() => [
   <div class="min-h-screen flex flex-col surface-page">
     <header class="fixed inset-x-0 top-0 z-50 border-b border-flow-border/50 dark:border-flow-border-dark/60 bg-flow-bg/85 dark:bg-flow-bg-dark/80 backdrop-blur-sm dark:backdrop-blur-md">
       <UContainer class="flex items-center justify-between gap-2 sm:gap-4 h-14 sm:h-18 min-w-0">
-        <NuxtLink :to="homePath" class="inline-flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
-          <BrandFlowRateLogo :mark-size="26" compact-on-mobile class="shrink-0" />
-          <AppBetaBadge size="sm" :class="isLegalPage ? 'inline-flex shrink-0' : 'hidden sm:inline-flex shrink-0'" />
+        <NuxtLink
+          :to="homePath"
+          class="inline-flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink"
+        >
+          <BrandFlowRateLogo
+            :mark-size="26"
+            compact-on-mobile
+            class="shrink-0"
+          />
+          <AppBetaBadge
+            size="sm"
+            :class="isLegalPage ? 'inline-flex shrink-0' : 'hidden sm:inline-flex shrink-0'"
+          />
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-10">
@@ -37,7 +47,12 @@ const navLinks = computed(() => [
 
         <div class="flex items-center gap-0.5 sm:gap-2 shrink-0">
           <LanguageSwitcher compact />
-          <UColorModeButton color="neutral" variant="ghost" size="sm" class="shrink-0" />
+          <UColorModeButton
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            class="shrink-0"
+          />
           <template v-if="!isLoggedIn">
             <NuxtLink
               to="/auth/login"
@@ -65,7 +80,10 @@ const navLinks = computed(() => [
     </header>
 
     <UMain class="flex-1 overflow-x-clip pt-14 sm:pt-18">
-      <UContainer v-if="showBreadcrumbs" class="pt-8 pb-0">
+      <UContainer
+        v-if="showBreadcrumbs"
+        class="pt-8 pb-0"
+      >
         <AppBreadcrumbs />
       </UContainer>
       <slot />
@@ -75,23 +93,38 @@ const navLinks = computed(() => [
       <UContainer class="py-20 sm:py-28">
         <div class="grid lg:grid-cols-12 gap-12">
           <div class="lg:col-span-6 space-y-6">
-            <BrandFlowRateLogo :mark-size="28" class="text-display-footer" />
+            <BrandFlowRateLogo
+              :mark-size="28"
+              class="text-display-footer"
+            />
             <p class="text-flow-muted dark:text-flow-muted-dark max-w-sm leading-relaxed">
               {{ t('landing.heroSubtitle') }}
             </p>
           </div>
 
           <div class="lg:col-span-3 lg:col-start-8 space-y-4">
-            <NuxtLink to="/privacy" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+            <NuxtLink
+              to="/privacy"
+              class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+            >
               {{ t('common.privacy') }}
             </NuxtLink>
-            <NuxtLink to="/terms" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+            <NuxtLink
+              to="/terms"
+              class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+            >
               {{ t('common.terms') }}
             </NuxtLink>
-            <NuxtLink to="/glba" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+            <NuxtLink
+              to="/glba"
+              class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+            >
               {{ t('common.glba') }}
             </NuxtLink>
-            <a href="mailto:mathieu.lievre.pro@outlook.com" class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+            <a
+              href="mailto:mathieu.lievre.pro@outlook.com"
+              class="block text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+            >
               mathieu.lievre.pro@outlook.com
             </a>
             <NuxtLink

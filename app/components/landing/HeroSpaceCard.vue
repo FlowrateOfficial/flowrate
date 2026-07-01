@@ -27,7 +27,10 @@ const metricValue = computed(() => {
     :class="props.class"
   >
     <div class="flex items-start justify-between gap-3 mb-4">
-      <BrandSpaceShape :shape="card.shape" :size="28" />
+      <BrandSpaceShape
+        :shape="card.shape"
+        :size="28"
+      />
       <span class="text-[11px] text-flow-muted dark:text-flow-muted-dark tracking-wide">
         {{ card.metricLabel }}
       </span>

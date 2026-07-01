@@ -1,12 +1,12 @@
 // ANCHOR: Family space types — re-export shared API contracts
-export type {
-  ChildProfileDto,
+import type {
   MemberFinancialDto,
   SpaceDetailDto,
   SpaceDetailMemberDto
 } from '#shared/api/family'
 
-import type {
+export type {
+  ChildProfileDto,
   MemberFinancialDto,
   SpaceDetailDto,
   SpaceDetailMemberDto

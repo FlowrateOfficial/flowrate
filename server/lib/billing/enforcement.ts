@@ -27,7 +27,7 @@ function planLimitError(
   })
 }
 
-// NOTE - Plaid items + one Stripe FC bundle count as one link
+// ANCHOR: Plaid items + one Stripe FC bundle count as one link
 export async function countUserBankConnections(userId: string): Promise<number> {
   const [plaidLinks, stripeAccounts] = await Promise.all([
     prisma.plaidLink.count({ where: { userId } }),

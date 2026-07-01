@@ -1,6 +1,4 @@
 /// <reference types="node" />
-// ANCHOR: Prisma client singleton — avoids pool exhaustion on hot reload
-// NOTE - Optional read replica: set DATABASE_URL_REPLICA for read-heavy reporting routes
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '~~/generated/prisma/client'
 
@@ -36,4 +34,3 @@ if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prismaReplica = prismaRead
   }
 }
-

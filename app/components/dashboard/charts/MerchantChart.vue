@@ -42,7 +42,7 @@ const options = computed<ChartOptions<'bar'>>(() => ({
       grid: { color: theme.gridStrong.value },
       ticks: {
         color: theme.text.value,
-        callback: (value) => formatAxis(value)
+        callback: value => formatAxis(value)
       }
     },
     y: {
@@ -55,6 +55,9 @@ const options = computed<ChartOptions<'bar'>>(() => ({
 
 <template>
   <ClientOnly>
-    <Bar :data="chartData" :options="options" />
+    <Bar
+      :data="chartData"
+      :options="options"
+    />
   </ClientOnly>
 </template>

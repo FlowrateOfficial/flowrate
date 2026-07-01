@@ -56,8 +56,8 @@ function tableRows(sectionId: string): Array<{ name: string, purpose: string, lo
   <div class="space-y-10">
     <section
       v-for="sectionId in sectionIds"
-      :key="sectionId"
       v-show="sectionExists(sectionId)"
+      :key="sectionId"
       class="space-y-4"
     >
       <h2 class="text-xl font-semibold text-default">
@@ -80,7 +80,10 @@ function tableRows(sectionId: string): Array<{ name: string, purpose: string, lo
         v-if="listItems(sectionId).length"
         class="list-disc pl-6 space-y-2 text-muted leading-relaxed"
       >
-        <li v-for="(item, index) in listItems(sectionId)" :key="index">
+        <li
+          v-for="(item, index) in listItems(sectionId)"
+          :key="index"
+        >
           {{ item }}
         </li>
       </ul>
@@ -92,16 +95,31 @@ function tableRows(sectionId: string): Array<{ name: string, purpose: string, lo
         <table class="min-w-full text-sm text-left">
           <thead class="bg-elevated/60 text-default">
             <tr>
-              <th class="px-4 py-3 font-medium">{{ t(`${baseKey}.table.provider`) }}</th>
-              <th class="px-4 py-3 font-medium">{{ t(`${baseKey}.table.purpose`) }}</th>
-              <th class="px-4 py-3 font-medium">{{ t(`${baseKey}.table.location`) }}</th>
+              <th class="px-4 py-3 font-medium">
+                {{ t(`${baseKey}.table.provider`) }}
+              </th>
+              <th class="px-4 py-3 font-medium">
+                {{ t(`${baseKey}.table.purpose`) }}
+              </th>
+              <th class="px-4 py-3 font-medium">
+                {{ t(`${baseKey}.table.location`) }}
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-default/40 text-muted">
-            <tr v-for="(row, index) in tableRows(sectionId)" :key="index">
-              <td class="px-4 py-3 font-medium text-default">{{ row.name }}</td>
-              <td class="px-4 py-3">{{ row.purpose }}</td>
-              <td class="px-4 py-3">{{ row.location }}</td>
+            <tr
+              v-for="(row, index) in tableRows(sectionId)"
+              :key="index"
+            >
+              <td class="px-4 py-3 font-medium text-default">
+                {{ row.name }}
+              </td>
+              <td class="px-4 py-3">
+                {{ row.purpose }}
+              </td>
+              <td class="px-4 py-3">
+                {{ row.location }}
+              </td>
             </tr>
           </tbody>
         </table>

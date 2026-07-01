@@ -16,4 +16,3 @@ export interface NeonAuthSessionData {
     expiresAt: string
   }
 }
-

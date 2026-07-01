@@ -1,12 +1,12 @@
 // ANCHOR: Stripe SDK errors → stable H3 error codes
 import type Stripe from 'stripe'
 
-type StripeErrorCode =
-  | 'STRIPE_KEY_MISMATCH'
-  | 'STRIPE_LIVEMODE_MISMATCH'
-  | 'STRIPE_FC_NOT_ENABLED'
-  | 'STRIPE_FC_PERMISSION_DENIED'
-  | 'STRIPE_CONNECT_FAILED'
+type StripeErrorCode
+  = | 'STRIPE_KEY_MISMATCH'
+    | 'STRIPE_LIVEMODE_MISMATCH'
+    | 'STRIPE_FC_NOT_ENABLED'
+    | 'STRIPE_FC_PERMISSION_DENIED'
+    | 'STRIPE_CONNECT_FAILED'
 
 function isStripeError(error: unknown): error is Stripe.errors.StripeError {
   return Boolean(
