@@ -25,7 +25,7 @@ FlowRate is a full-stack personal and business finance app built with **Nuxt 4**
 | Area | What you get |
 |------|----------------|
 | **Financial Spaces** | Independent, Household, Family, and Company — switch context without juggling logins |
-| **Bank linking** | **Plaid** (EU) and **Stripe Financial Connections** (US test/live) |
+| **Bank linking** | **Plaid** (EU, sandbox only for now, need prod access) and **Stripe Financial Connections** (US test/live) |
 | **Money view** | Accounts, transactions, budgets, analytics, burn rate & runway (company) |
 | **Subscriptions** | SaaS Shield — detect recurring spend and duplicates |
 | **Family** | Member invites, allowances, supervised teen dashboard |
@@ -41,20 +41,38 @@ Auth runs on **Neon Auth** (Better Auth). Data lives in **PostgreSQL** via **Pri
 
 | Branch | Role | Deploy |
 |--------|------|--------|
-| **`master`** | Production — stable, deployable | Vercel production |
-| **`feature`** | Development — day-to-day work | Local / preview deploys |
+| **`master`** | Production — stable, deployable | [flowrate-app.vercel.app](https://flowrate-app.vercel.app) |
+| **`feature`** | Development — day-to-day work | [flowrate-dev.vercel.app](https://flowrate-dev.vercel.app) + local |
 
 ```text
-master   ───●────────●──────►  production (Vercel)
+master   ───●────────●──────►  production → flowrate-app.vercel.app  (.env)
               \
-feature  ──────●──●──●──►     local dev, PRs → master
+feature  ──────●──●──●──►     preview    → flowrate-dev.vercel.app  (.env.dev)
+                              local      → localhost:3000             (.env.dev)
 ```
 
 **Workflow**
 
-1. Clone and work on `feature` (see below).
-2. Open PRs from `feature` → `master` when ready.
-3. Merge to `master` to ship production.
+1. Branch off **`feature`** — never delete `feature`; it is our long-lived integration branch.
+2. Name your branch with a `feature-…` prefix (see below).
+3. Open a PR **into `feature`** — not into `master`.
+4. After review and a green preview on [flowrate-dev.vercel.app](https://flowrate-dev.vercel.app), open a PR **`feature` → `master`** to ship production.
+
+### Branch naming
+
+Use a `feature-…` prefix so work is easy to scan in GitHub and Vercel:
+
+```bash
+# ✓
+git checkout feature
+git pull
+git checkout -b feature-space-switch
+git checkout -b feature-subscriptions-cache
+
+# ✗
+git checkout -b fix-space-switch
+git checkout -b my-branch
+```
 
 > **Note:** Feedback media lives on a separate orphan Git branch (`issues_medias`). It is never merged into app code. Exclude it from fetch: `sh scripts/git-ignore-feedback-media-branch.sh`.
 
@@ -67,7 +85,6 @@ Clone **only** the branch you need — skips the large feedback-media branch:
 ```bash
 git clone --single-branch --branch master git@github.com:FlowrateOfficial/flowrate.git
 cd flowrate
-git checkout -b feature   # optional: create local dev branch tracking your workflow
 ```
 
 HTTPS:
@@ -99,20 +116,20 @@ git checkout feature
 
 ```bash
 pnpm install
-cp .env.example .env
+cp .env.example .env.dev
 # Fill in DATABASE_URL, NUXT_NEON_AUTH_URL, Stripe test keys, etc.
 pnpm prisma generate
 pnpm dev
 ```
 
-App runs at **http://localhost:3000**.
+App runs at **<http://localhost:3000>**.
 
 ### Common dev commands
 
 | Command | Purpose |
 |---------|---------|
-| `pnpm dev` | Nuxt dev server |
-| `pnpm dev:all` | Dev server + Stripe webhook listener |
+| `pnpm dev` | Nuxt dev server (loads `.env.dev`) |
+| `pnpm dev:prod` | Dev server with production env (loads `.env`) |
 | `pnpm stripe:listen` | Forward Stripe webhooks to localhost |
 | `pnpm typecheck` | TypeScript check |
 | `pnpm lint` | ESLint |
@@ -129,32 +146,30 @@ App runs at **http://localhost:3000**.
 
 ---
 
-## Production (`master` branch)
+## Deployments (Vercel)
 
-Production runs on **Vercel** (or any Node host that supports Nuxt SSR).
+Vercel is already wired for this repo — domains, branch mapping, and env scopes are set. You do not need to change project settings.
 
-### Deploy checklist
+| Environment | Git branch | URL | Env |
+|-------------|------------|-----|-----|
+| **Preview** | `feature` | [flowrate-dev.vercel.app](https://flowrate-dev.vercel.app) | `.env.dev` |
+| **Production** | `master` | [flowrate-app.vercel.app](https://flowrate-app.vercel.app) | `.env` |
 
-1. Merge tested work into **`master`**.
-2. Set production env vars in Vercel (see [`.env.example`](./.env.example)):
-   - `APP_URL` → your HTTPS domain
-   - `NUXT_SESSION_PASSWORD` → strong random secret (32+ chars)
-   - `DATABASE_URL`, `NUXT_NEON_AUTH_URL`, Neon auth domains
-   - **Live** Stripe keys + live webhook endpoint → `/api/stripe/webhook`
-   - Plaid / GitHub feedback vars if enabled
-3. Vercel build: `pnpm build` (runs `prisma generate` + `nuxt build`).
-4. Run migrations against production DB: `pnpm exec prisma migrate deploy`.
+**How we ship**
 
-### Prod vs dev at a glance
+- Merge your PR into **`feature`** → Vercel deploys preview automatically.
+- When the team is ready for prod, merge **`feature` → `master`** → production deploys.
+- **`feature` must stay** — do not delete it after a merge; it is the base we branch from and PR back into.
 
-| | **Development** (`feature`) | **Production** (`master`) |
-|--|---------------------------|-----------------------------|
-| Branch | `feature` | `master` |
-| URL | `http://localhost:3000` | `https://your-domain.com` |
-| Stripe | Test mode + CLI webhooks | Live keys + dashboard webhook |
-| Database | Neon dev branch | Neon production branch |
-| Auth domains | localhost + preview URLs | Production + custom domain |
-| Builds | Local `pnpm dev` | Vercel on push to `master` |
+**Env files (local only)** — ask a teammate or the maintainer for a filled `.env.dev` if you are new. Production secrets live in Vercel (Production scope); preview secrets are already in Vercel (Preview scope). See [`.env.example`](./.env.example) for the full variable list.
+
+**Production migrations** — after a `master` deploy that includes schema changes, run against the prod DB:
+
+```bash
+pnpm exec prisma migrate deploy
+```
+
+(Use production `DATABASE_URL` — only when explicitly asked to run migrations.)
 
 ---
 
@@ -173,12 +188,14 @@ docs/          Operational notes (e.g. feedback media branch)
 
 ## Environment variables
 
-All variables are documented in **[`.env.example`](./.env.example)** — copy to `.env` and fill in values. Never commit `.env`.
+Documented in **[`.env.example`](./.env.example)**. For local work, copy it to `.env.dev` or get a filled file from the team.
 
-Minimum for local dashboard:
+| File | When |
+|------|------|
+| `.env.dev` | `pnpm dev`, `db:*`, `test` — same values as preview |
+| `.env` | `pnpm build` / `preview` locally — same shape as production |
 
-- `DATABASE_URL`, `NUXT_NEON_AUTH_URL`, `NUXT_SESSION_PASSWORD`, `APP_URL`
-- `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` (with `stripe listen`)
+Do not commit `.env` or `.env.dev`.
 
 ---
 
