@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
-import type { Time, DateFormatter, getLocalTimeZone, today, type CalendarDate } from '@internationalized/date'
+import { DateFormatter, getLocalTimeZone, today, type CalendarDate, type Time } from '@internationalized/date'
 import { formatCalendarDate, formatTimeValue, parseCalendarDate, parseTimeValue, type DateRangePreset } from '~/utils/date-pickers'
 
 const dateFrom = defineModel<string>('dateFrom', { default: '' })
