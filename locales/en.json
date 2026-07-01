@@ -595,7 +595,7 @@
       "plaidOAuthInvalid": "Invalid bank connection callback. Please try again from Accounts.",
       "plaidOAuthBack": "Back to accounts",
       "connectError": "Failed to connect bank. Please try again.",
-      "syncNoAccounts": "Stripe linked but no accounts were saved. Try Connect again — if it persists, set STRIPE_WEBHOOK_SECRET from `pnpm stripe:listen` in .env and restart `pnpm dev`.",
+      "syncNoAccounts": "Stripe linked but no accounts were saved. Try Connect again — if it persists, set STRIPE_WEBHOOK_SECRET from `pnpm stripe:listen` in .env.dev and restart `pnpm dev`.",
       "resyncFromStripe": "Refresh from Stripe",
       "stripeNotConfigured": "Stripe is not configured. Add STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY to your environment.",
       "stripeTestModeTitle": "Stripe test mode",
