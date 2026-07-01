@@ -18,9 +18,12 @@ logs
 .fleet
 .idea
 
-# Local env files
+# Envs
+.env.dev
+.env.dev.*
+.env.local
+.env.*.local
 .env
-.env.*
 !.env.example
 
 # Prisma generated client

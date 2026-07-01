@@ -1,6 +1,9 @@
 import { createRequire } from 'node:module'
+import { config } from 'dotenv'
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'node:path'
+
+config({ path: resolve(__dirname, '.env.dev') })
 
 const require = createRequire(import.meta.url)
 

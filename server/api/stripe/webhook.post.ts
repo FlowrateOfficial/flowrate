@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   if (!config.stripeSecretKey || !config.stripeWebhookSecret) {
     console.error(
-      '[stripe/webhook] 503 — set STRIPE_WEBHOOK_SECRET in .env (run `pnpm stripe:listen` and copy the whsec_… value), then restart `pnpm dev`.'
+      '[stripe/webhook] 503 — set STRIPE_WEBHOOK_SECRET in .env.dev (run `pnpm stripe:listen` and copy the whsec_… value), then restart `pnpm dev`.'
     )
     throw createError({ statusCode: 503, message: 'Stripe webhook secret is not configured' })
   }

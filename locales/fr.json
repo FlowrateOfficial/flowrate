@@ -603,7 +603,7 @@
       "plaidOAuthInvalid": "Retour de connexion bancaire invalide. Réessayez depuis Comptes.",
       "plaidOAuthBack": "Retour aux comptes",
       "connectError": "Échec de la connexion bancaire. Veuillez réessayer.",
-      "syncNoAccounts": "Stripe a lié le compte mais rien n'a été enregistré. Réessayez — si le problème persiste, ajoutez STRIPE_WEBHOOK_SECRET depuis `pnpm stripe:listen` dans .env et redémarrez `pnpm dev`.",
+      "syncNoAccounts": "Stripe a lié le compte mais rien n'a été enregistré. Réessayez — si le problème persiste, ajoutez STRIPE_WEBHOOK_SECRET depuis `pnpm stripe:listen` dans .env.dev et redémarrez `pnpm dev`.",
       "resyncFromStripe": "Actualiser depuis Stripe",
       "stripeNotConfigured": "Stripe n'est pas configuré. Ajoutez STRIPE_PUBLISHABLE_KEY et STRIPE_SECRET_KEY à votre environnement.",
       "stripeTestModeTitle": "Mode test Stripe",
