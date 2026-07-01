@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
-import { DateFormatter, Time, getLocalTimeZone, today, type CalendarDate } from '@internationalized/date'
+import type { Time, DateFormatter, getLocalTimeZone, today, type CalendarDate } from '@internationalized/date'
 import { formatCalendarDate, formatTimeValue, parseCalendarDate, parseTimeValue, type DateRangePreset } from '~/utils/date-pickers'
 
 const dateFrom = defineModel<string>('dateFrom', { default: '' })
@@ -121,50 +121,13 @@ function applyRange() {
   <ClientOnly>
     <UPopover
       v-if="isDesktop"
-    v-model:open="open"
-    :content="{ align: 'start', side: 'bottom', collisionPadding: 16 }"
-    :ui="{ content: 'w-auto max-w-[calc(100vw-2rem)] p-0' }"
-  >
-    <UButton v-bind="triggerProps" />
-
-    <template #content>
-      <DashboardDateRangePickerPanel
-        v-model:range-value="rangeValue"
-        v-model:start-time="startTime"
-        v-model:end-time="endTime"
-        :preset-ranges="presetRanges"
-        :is-desktop="isDesktop"
-        :show-time="showTime"
-        :is-preset-selected="isPresetSelected"
-        @select-preset="selectPreset"
-      />
-      <div class="flex justify-end gap-2 border-t border-default p-2">
-        <UButton
-          :label="t('common.clear')"
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          @click="clearRange"
-        />
-        <UButton
-          :label="t('common.save')"
-          size="sm"
-          @click="applyRange"
-        />
-      </div>
-    </template>
-  </UPopover>
-
-  <div v-else class="w-full">
-    <UButton v-bind="triggerProps" @click="open = true" />
-
-    <UDrawer
       v-model:open="open"
-      direction="bottom"
-      :title="t('dashboard.dateRange.pickRange')"
-      :ui="{ content: 'max-h-[92dvh]', body: 'overflow-y-auto p-0' }"
+      :content="{ align: 'start', side: 'bottom', collisionPadding: 16 }"
+      :ui="{ content: 'w-auto max-w-[calc(100vw-2rem)] p-0' }"
     >
-      <template #body>
+      <UButton v-bind="triggerProps" />
+
+      <template #content>
         <DashboardDateRangePickerPanel
           v-model:range-value="rangeValue"
           v-model:start-time="startTime"
@@ -175,25 +138,68 @@ function applyRange() {
           :is-preset-selected="isPresetSelected"
           @select-preset="selectPreset"
         />
-      </template>
-      <template #footer>
-        <div class="flex w-full gap-2 p-4">
+        <div class="flex justify-end gap-2 border-t border-default p-2">
           <UButton
             :label="t('common.clear')"
             color="neutral"
-            variant="outline"
-            class="flex-1"
+            variant="ghost"
+            size="sm"
             @click="clearRange"
           />
           <UButton
             :label="t('common.save')"
-            class="flex-1"
+            size="sm"
             @click="applyRange"
           />
         </div>
       </template>
-    </UDrawer>
-  </div>
+    </UPopover>
+
+    <div
+      v-else
+      class="w-full"
+    >
+      <UButton
+        v-bind="triggerProps"
+        @click="open = true"
+      />
+
+      <UDrawer
+        v-model:open="open"
+        direction="bottom"
+        :title="t('dashboard.dateRange.pickRange')"
+        :ui="{ content: 'max-h-[92dvh]', body: 'overflow-y-auto p-0' }"
+      >
+        <template #body>
+          <DashboardDateRangePickerPanel
+            v-model:range-value="rangeValue"
+            v-model:start-time="startTime"
+            v-model:end-time="endTime"
+            :preset-ranges="presetRanges"
+            :is-desktop="isDesktop"
+            :show-time="showTime"
+            :is-preset-selected="isPresetSelected"
+            @select-preset="selectPreset"
+          />
+        </template>
+        <template #footer>
+          <div class="flex w-full gap-2 p-4">
+            <UButton
+              :label="t('common.clear')"
+              color="neutral"
+              variant="outline"
+              class="flex-1"
+              @click="clearRange"
+            />
+            <UButton
+              :label="t('common.save')"
+              class="flex-1"
+              @click="applyRange"
+            />
+          </div>
+        </template>
+      </UDrawer>
+    </div>
 
     <template #fallback>
       <UButton v-bind="triggerProps" />

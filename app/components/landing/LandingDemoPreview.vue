@@ -37,10 +37,19 @@ function formatDate(dateStr: string) {
         class="landing-demo-stat"
       >
         <div class="flex items-start gap-1.5 min-w-0">
-          <UIcon :name="card.icon" class="size-3.5 shrink-0 text-muted mt-0.5" aria-hidden="true" />
-          <p class="landing-demo-stat-label">{{ card.title }}</p>
+          <UIcon
+            :name="card.icon"
+            class="size-3.5 shrink-0 text-muted mt-0.5"
+            aria-hidden="true"
+          />
+          <p class="landing-demo-stat-label">
+            {{ card.title }}
+          </p>
         </div>
-        <p class="landing-demo-stat-value" :title="card.displayValue ?? (card.amount != null ? fmt(card.amount) : '—')">
+        <p
+          class="landing-demo-stat-value"
+          :title="card.displayValue ?? (card.amount != null ? fmt(card.amount) : '—')"
+        >
           {{ card.displayValue ?? (card.amount != null ? fmtStat(card.amount) : '—') }}
         </p>
         <p
@@ -57,7 +66,10 @@ function formatDate(dateStr: string) {
       v-if="scene.subscription"
       class="landing-demo-saas-row"
     >
-      <div class="landing-demo-saas-icon" aria-hidden="true">
+      <div
+        class="landing-demo-saas-icon"
+        aria-hidden="true"
+      >
         {{ scene.subscription.name.charAt(0) }}
       </div>
       <div class="min-w-0 flex-1">
@@ -71,7 +83,10 @@ function formatDate(dateStr: string) {
             class="hidden min-[24rem]:inline-flex shrink-0"
           />
         </div>
-        <p v-if="scene.subscription.nextCharge" class="text-[10px] text-muted mt-0.5">
+        <p
+          v-if="scene.subscription.nextCharge"
+          class="text-[10px] text-muted mt-0.5"
+        >
           {{ t('dashboard.subscriptions.nextCharge', { date: formatDate(scene.subscription.nextCharge) }) }}
         </p>
       </div>
@@ -79,7 +94,9 @@ function formatDate(dateStr: string) {
         <p class="text-[10px] sm:text-xs font-semibold tabular-nums text-default truncate">
           {{ fmt(scene.subscription.amount) }}
         </p>
-        <p class="text-[10px] text-muted">/mo</p>
+        <p class="text-[10px] text-muted">
+          /mo
+        </p>
       </div>
     </div>
 
@@ -101,7 +118,9 @@ function formatDate(dateStr: string) {
               <p class="text-[0.6875rem] sm:text-xs font-medium text-default truncate">
                 {{ tx.merchant ?? tx.description }}
               </p>
-              <p class="text-[10px] text-muted mt-0.5">{{ formatDate(tx.date) }}</p>
+              <p class="text-[10px] text-muted mt-0.5">
+                {{ formatDate(tx.date) }}
+              </p>
             </div>
             <span
               class="landing-demo-tx-amount"
@@ -113,7 +132,10 @@ function formatDate(dateStr: string) {
         </ul>
       </div>
 
-      <div v-if="scene.saasChart" class="landing-demo-panel landing-demo-panel-chart">
+      <div
+        v-if="scene.saasChart"
+        class="landing-demo-panel landing-demo-panel-chart"
+      >
         <p class="landing-demo-panel-title">
           {{ t('dashboard.overview.saasShield') }}
         </p>

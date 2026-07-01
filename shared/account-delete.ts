@@ -1,6 +1,6 @@
 import { OAUTH_PROVIDERS, type OAuthProvider } from './auth'
 
-// NOTE - sign-in OTP works for all auth methods; forget-password fails for OAuth-only accounts
+// ANCHOR: sign-in OTP works for all auth methods; forget-password fails for OAuth-only accounts
 export const ACCOUNT_DELETE_EMAIL_OTP_TYPE = 'sign-in' as const
 
 export interface AccountDeleteChallenge {

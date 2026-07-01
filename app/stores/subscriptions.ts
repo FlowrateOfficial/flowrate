@@ -61,7 +61,7 @@ export const useSubscriptionsStore = defineStore('subscriptions', () => {
       capStatus.value = cap
       return items
     },
-    apply: data => { subscriptions.value = data },
+    apply: (data) => { subscriptions.value = data },
     clear: () => {
       subscriptions.value = []
       capStatus.value = null

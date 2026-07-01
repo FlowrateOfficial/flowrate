@@ -35,7 +35,10 @@ async function saveCategory() {
     :title="t('dashboard.transactions.detailTitle')"
     :description="selectedTx?.merchant ?? selectedTx?.description"
   >
-    <template v-if="selectedTx" #body>
+    <template
+      v-if="selectedTx"
+      #body
+    >
       <div class="space-y-6 p-4 sm:p-6">
         <div class="flex items-center gap-3">
           <DashboardPaymentIcon
@@ -48,7 +51,10 @@ async function saveCategory() {
             <p class="truncate text-base font-semibold">
               {{ selectedTx.merchant ?? selectedTx.description }}
             </p>
-            <p v-if="selectedTx.merchant" class="truncate text-sm text-muted">
+            <p
+              v-if="selectedTx.merchant"
+              class="truncate text-sm text-muted"
+            >
               {{ selectedTx.description }}
             </p>
           </div>

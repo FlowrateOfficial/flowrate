@@ -52,7 +52,10 @@ const pending = overviewPending
       :title="t('dashboard.company.title')"
       :description="t('dashboard.company.subtitle')"
     >
-      <template v-if="spacesStore.isCompany && overview?.setup.complete" #actions>
+      <template
+        v-if="spacesStore.isCompany && overview?.setup.complete"
+        #actions
+      >
         <UButton
           :label="t('dashboard.company.setup.syncCta')"
           icon="i-lucide-refresh-cw"
@@ -72,36 +75,82 @@ const pending = overviewPending
       icon="i-lucide-eye"
     />
 
-    <UCard v-if="spacesStore.space?.type !== 'COMPANY'" :ui="{ body: 'p-6 sm:p-8 text-center' }">
-      <UIcon name="i-lucide-rocket" class="mx-auto mb-3 size-10 text-muted opacity-50" />
-      <h2 class="mb-1 text-lg font-semibold">{{ t('dashboard.company.noBusinessTitle') }}</h2>
-      <p class="mx-auto mb-4 max-w-md text-sm text-muted">{{ t('dashboard.company.switchHint') }}</p>
-      <UButton to="/dashboard/spaces" :label="t('dashboard.company.createBusinessCta')" icon="i-lucide-plus" />
+    <UCard
+      v-if="spacesStore.space?.type !== 'COMPANY'"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
+      <UIcon
+        name="i-lucide-rocket"
+        class="mx-auto mb-3 size-10 text-muted opacity-50"
+      />
+      <h2 class="mb-1 text-lg font-semibold">
+        {{ t('dashboard.company.noBusinessTitle') }}
+      </h2>
+      <p class="mx-auto mb-4 max-w-md text-sm text-muted">
+        {{ t('dashboard.company.switchHint') }}
+      </p>
+      <UButton
+        to="/dashboard/spaces"
+        :label="t('dashboard.company.createBusinessCta')"
+        icon="i-lucide-plus"
+      />
     </UCard>
 
     <template v-else>
-      <UTabs v-if="canManageBusiness" v-model="tab" :items="businessStore.tabs" :content="false" class="mb-2" />
+      <UTabs
+        v-if="canManageBusiness"
+        v-model="tab"
+        :items="businessStore.tabs"
+        :content="false"
+        class="mb-2"
+      />
 
-      <div v-if="tab === 'team' && canManageBusiness" class="space-y-4">
+      <div
+        v-if="tab === 'team' && canManageBusiness"
+        class="space-y-4"
+      >
         <UCard :ui="{ body: 'p-4 sm:p-5' }">
-          <h2 class="mb-1 text-base font-semibold">{{ t('dashboard.company.team.inviteTitle') }}</h2>
-          <p class="mb-4 text-sm text-muted">{{ t('dashboard.company.team.inviteDesc') }}</p>
+          <h2 class="mb-1 text-base font-semibold">
+            {{ t('dashboard.company.team.inviteTitle') }}
+          </h2>
+          <p class="mb-4 text-sm text-muted">
+            {{ t('dashboard.company.team.inviteDesc') }}
+          </p>
 
           <div class="grid sm:grid-cols-2 gap-4">
             <UFormField :label="t('dashboard.company.team.phone')">
-              <UInput v-model="businessStore.inviteForm.phone" type="tel" autocomplete="tel" class="w-full" />
-              <template #help>{{ t('dashboard.company.team.phoneHelp') }}</template>
+              <UInput
+                v-model="businessStore.inviteForm.phone"
+                type="tel"
+                autocomplete="tel"
+                class="w-full"
+              />
+              <template #help>
+                {{ t('dashboard.company.team.phoneHelp') }}
+              </template>
             </UFormField>
             <UFormField :label="t('dashboard.company.team.email')">
-              <UInput v-model="businessStore.inviteForm.email" type="email" class="w-full" />
-              <template #help>{{ t('dashboard.company.team.emailOptional') }}</template>
+              <UInput
+                v-model="businessStore.inviteForm.email"
+                type="email"
+                class="w-full"
+              />
+              <template #help>
+                {{ t('dashboard.company.team.emailOptional') }}
+              </template>
             </UFormField>
             <UFormField :label="t('dashboard.company.team.name')">
-              <UInput v-model="businessStore.inviteForm.name" class="w-full" />
+              <UInput
+                v-model="businessStore.inviteForm.name"
+                class="w-full"
+              />
             </UFormField>
           </div>
 
-          <UFormField :label="t('dashboard.company.team.role')" class="mt-4">
+          <UFormField
+            :label="t('dashboard.company.team.role')"
+            class="mt-4"
+          >
             <USelect
               v-model="businessStore.inviteForm.role"
               :items="businessStore.roleItems"
@@ -128,24 +177,51 @@ const pending = overviewPending
 
         <UCard :ui="{ body: 'p-0' }">
           <div class="border-b border-default px-4 py-3 sm:px-5">
-            <h2 class="text-base font-semibold">{{ t('dashboard.company.team.membersTitle') }}</h2>
+            <h2 class="text-base font-semibold">
+              {{ t('dashboard.company.team.membersTitle') }}
+            </h2>
           </div>
-          <div v-if="teamPending" class="p-6 text-center">
-            <UIcon name="i-lucide-loader-2" class="mx-auto size-6 animate-spin text-muted" />
+          <div
+            v-if="teamPending"
+            class="p-6 text-center"
+          >
+            <UIcon
+              name="i-lucide-loader-2"
+              class="mx-auto size-6 animate-spin text-muted"
+            />
           </div>
-          <ul v-else class="divide-y divide-default">
+          <ul
+            v-else
+            class="divide-y divide-default"
+          >
             <li
               v-for="member in teamMembers"
               :key="member.id"
               class="flex items-center justify-between gap-4 px-4 py-3 sm:px-5"
             >
               <div class="min-w-0">
-                <p class="font-medium truncate">{{ member.name ?? member.email }}</p>
-                <p v-if="member.email" class="text-xs text-muted truncate">{{ member.email }}</p>
+                <p class="font-medium truncate">
+                  {{ member.name ?? member.email }}
+                </p>
+                <p
+                  v-if="member.email"
+                  class="text-xs text-muted truncate"
+                >
+                  {{ member.email }}
+                </p>
               </div>
               <div class="flex items-center gap-2 shrink-0">
-                <UBadge :label="businessStore.roleLabel(member.role)" variant="subtle" color="neutral" size="xs" />
-                <UBadge :label="businessStore.statusLabel(member.status)" variant="subtle" size="xs" />
+                <UBadge
+                  :label="businessStore.roleLabel(member.role)"
+                  variant="subtle"
+                  color="neutral"
+                  size="xs"
+                />
+                <UBadge
+                  :label="businessStore.statusLabel(member.status)"
+                  variant="subtle"
+                  size="xs"
+                />
               </div>
             </li>
           </ul>
@@ -153,8 +229,15 @@ const pending = overviewPending
       </div>
 
       <template v-else>
-        <div v-if="pending" class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
-          <UCard v-for="i in 4" :key="i" :ui="{ body: 'p-3 sm:p-4' }">
+        <div
+          v-if="pending"
+          class="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4"
+        >
+          <UCard
+            v-for="i in 4"
+            :key="i"
+            :ui="{ body: 'p-3 sm:p-4' }"
+          >
             <div class="animate-pulse space-y-2">
               <div class="h-3.5 w-20 rounded-sm bg-elevated" />
               <div class="h-7 w-28 rounded-sm bg-elevated/70" />
@@ -163,9 +246,16 @@ const pending = overviewPending
         </div>
 
         <template v-else-if="overview">
-          <UCard v-if="!overview.setup.complete" :ui="{ body: 'p-4 sm:p-5' }">
-            <h2 class="mb-1 text-base font-semibold sm:text-lg">{{ t('dashboard.company.setup.title') }}</h2>
-            <p class="mb-5 max-w-2xl text-sm text-muted">{{ t('dashboard.company.setup.subtitle') }}</p>
+          <UCard
+            v-if="!overview.setup.complete"
+            :ui="{ body: 'p-4 sm:p-5' }"
+          >
+            <h2 class="mb-1 text-base font-semibold sm:text-lg">
+              {{ t('dashboard.company.setup.title') }}
+            </h2>
+            <p class="mb-5 max-w-2xl text-sm text-muted">
+              {{ t('dashboard.company.setup.subtitle') }}
+            </p>
 
             <ol class="space-y-4">
               <li
@@ -177,12 +267,20 @@ const pending = overviewPending
                   class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium"
                   :class="step.done ? 'bg-green-500/15 text-green-600' : 'bg-elevated text-muted'"
                 >
-                  <UIcon v-if="step.done" name="i-lucide-check" class="w-4 h-4" />
+                  <UIcon
+                    v-if="step.done"
+                    name="i-lucide-check"
+                    class="w-4 h-4"
+                  />
                   <span v-else>{{ index + 1 }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="font-medium">{{ step.title }}</p>
-                  <p class="text-sm text-muted mt-1">{{ step.description }}</p>
+                  <p class="font-medium">
+                    {{ step.title }}
+                  </p>
+                  <p class="text-sm text-muted mt-1">
+                    {{ step.description }}
+                  </p>
                   <UButton
                     v-if="!step.done && !isBusinessReadOnly"
                     class="mt-3"
@@ -195,8 +293,13 @@ const pending = overviewPending
             </ol>
           </UCard>
 
-          <div v-if="overview.alerts.length" class="space-y-2">
-            <h2 class="text-base font-semibold">{{ t('dashboard.company.alertsTitle') }}</h2>
+          <div
+            v-if="overview.alerts.length"
+            class="space-y-2"
+          >
+            <h2 class="text-base font-semibold">
+              {{ t('dashboard.company.alertsTitle') }}
+            </h2>
             <UAlert
               v-for="(alert, i) in overview.alerts"
               :key="`${alert.code}-${i}`"
@@ -231,23 +334,42 @@ const pending = overviewPending
           </div>
 
           <div class="grid gap-3 lg:grid-cols-3">
-            <UCard class="lg:col-span-1" :ui="{ body: 'p-4 sm:p-5' }">
-              <h2 class="mb-3 text-base font-semibold">{{ t('dashboard.company.monthlyBreakdown') }}</h2>
+            <UCard
+              class="lg:col-span-1"
+              :ui="{ body: 'p-4 sm:p-5' }"
+            >
+              <h2 class="mb-3 text-base font-semibold">
+                {{ t('dashboard.company.monthlyBreakdown') }}
+              </h2>
               <dl class="space-y-3 text-sm">
                 <div class="flex justify-between gap-4">
-                  <dt class="text-muted">{{ t('dashboard.company.income') }}</dt>
-                  <dd class="font-medium text-green-600 tabular-nums">{{ businessStore.fmt(overview.monthlyIncome) }}</dd>
+                  <dt class="text-muted">
+                    {{ t('dashboard.company.income') }}
+                  </dt>
+                  <dd class="font-medium text-green-600 tabular-nums">
+                    {{ businessStore.fmt(overview.monthlyIncome) }}
+                  </dd>
                 </div>
                 <div class="flex justify-between gap-4">
-                  <dt class="text-muted">{{ t('dashboard.company.expenses') }}</dt>
-                  <dd class="font-medium tabular-nums">{{ businessStore.fmt(overview.monthlyBurn) }}</dd>
+                  <dt class="text-muted">
+                    {{ t('dashboard.company.expenses') }}
+                  </dt>
+                  <dd class="font-medium tabular-nums">
+                    {{ businessStore.fmt(overview.monthlyBurn) }}
+                  </dd>
                 </div>
                 <div class="flex justify-between gap-4">
-                  <dt class="text-muted">{{ t('dashboard.company.subscriptions') }}</dt>
-                  <dd class="font-medium tabular-nums">{{ businessStore.fmt(overview.monthlySubscriptions) }}</dd>
+                  <dt class="text-muted">
+                    {{ t('dashboard.company.subscriptions') }}
+                  </dt>
+                  <dd class="font-medium tabular-nums">
+                    {{ businessStore.fmt(overview.monthlySubscriptions) }}
+                  </dd>
                 </div>
                 <div class="flex justify-between gap-4">
-                  <dt class="text-muted">{{ t('dashboard.company.cloudDev') }}</dt>
+                  <dt class="text-muted">
+                    {{ t('dashboard.company.cloudDev') }}
+                  </dt>
                   <dd class="font-medium tabular-nums">
                     {{ overview.cloudSpend != null ? businessStore.fmt(overview.cloudSpend) : '—' }}
                   </dd>
@@ -255,12 +377,20 @@ const pending = overviewPending
               </dl>
             </UCard>
 
-            <UCard class="lg:col-span-1" :ui="{ body: 'p-4 sm:p-5' }">
-              <h2 class="mb-2 text-base font-semibold">{{ t('dashboard.company.saasShield') }}</h2>
+            <UCard
+              class="lg:col-span-1"
+              :ui="{ body: 'p-4 sm:p-5' }"
+            >
+              <h2 class="mb-2 text-base font-semibold">
+                {{ t('dashboard.company.saasShield') }}
+              </h2>
               <p class="text-sm text-muted mb-4">
                 {{ t('dashboard.company.activeSubs', { count: overview.activeSubscriptions }) }}
               </p>
-              <p v-if="overview.subscriptionWaste > 0" class="text-sm text-amber-600 mb-4">
+              <p
+                v-if="overview.subscriptionWaste > 0"
+                class="text-sm text-amber-600 mb-4"
+              >
                 {{ t('dashboard.company.duplicateWaste', { amount: businessStore.fmt(overview.subscriptionWaste) }) }}
               </p>
               <UButton
@@ -271,10 +401,18 @@ const pending = overviewPending
               />
             </UCard>
 
-            <UCard class="lg:col-span-2" :ui="{ body: 'p-4 sm:p-5' }">
-              <h2 class="mb-3 text-base font-semibold">{{ t('dashboard.company.topVendors') }}</h2>
+            <UCard
+              class="lg:col-span-2"
+              :ui="{ body: 'p-4 sm:p-5' }"
+            >
+              <h2 class="mb-3 text-base font-semibold">
+                {{ t('dashboard.company.topVendors') }}
+              </h2>
               <div class="grid gap-4 lg:grid-cols-2">
-                <ul v-if="overview.topVendors.length" class="space-y-3 text-sm">
+                <ul
+                  v-if="overview.topVendors.length"
+                  class="space-y-3 text-sm"
+                >
                   <li
                     v-for="vendor in overview.topVendors"
                     :key="vendor.name"
@@ -284,10 +422,17 @@ const pending = overviewPending
                     <span class="font-medium tabular-nums shrink-0">{{ businessStore.fmt(vendor.amount) }}</span>
                   </li>
                 </ul>
-                <p v-else class="text-sm text-muted">{{ t('dashboard.company.noVendors') }}</p>
+                <p
+                  v-else
+                  class="text-sm text-muted"
+                >
+                  {{ t('dashboard.company.noVendors') }}
+                </p>
 
                 <div v-if="overview.vendorTrends?.length">
-                  <p class="mb-2 text-xs font-medium text-muted">{{ t('dashboard.company.vendorTrends') }}</p>
+                  <p class="mb-2 text-xs font-medium text-muted">
+                    {{ t('dashboard.company.vendorTrends') }}
+                  </p>
                   <DashboardChartsVendorTrendChart
                     :trends="overview.vendorTrends"
                     :currency="overview.currency"

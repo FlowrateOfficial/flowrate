@@ -48,7 +48,7 @@ function tableWithPresentmentRates(table: FxRateTable): FxRateTable {
   return { base: table.base, rates }
 }
 
-// Fallback when Stripe FX Quotes presentment rates are unavailable.
+// ANCHOR: Fallback when Stripe FX Quotes presentment rates are unavailable.
 export const BILLING_PRESENTMENT_MARKUP = 0.039
 
 export function convertWithPresentmentMarkup(

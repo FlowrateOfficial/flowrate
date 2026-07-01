@@ -23,7 +23,7 @@ export const useSavingsGoalsStore = defineStore('savingsGoals', () => {
   const { pending: loading, load: fetchGoals, reset } = createSpaceScopedLoader({
     buildKey: spaceId => `goals:${spaceId}`,
     fetch: async () => api<SavingsGoalItem[]>(apiRoutes.savingsGoals.list),
-    apply: data => { goals.value = data },
+    apply: (data) => { goals.value = data },
     clear: () => { goals.value = [] },
     isCached: () => goals.value.length > 0
   })

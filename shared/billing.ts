@@ -1,5 +1,5 @@
 // ANCHOR: App plan tiers and Stripe billing status mapping
-import { ENUM, Plan, SubStatus, enumValues, type Plan as PrismaPlan } from './prisma-enums'
+import { ENUM, Plan, enumValues, type Plan as PrismaPlan, type SubStatus } from './prisma-enums'
 
 export const APP_PLANS = enumValues(Plan)
 export type AppPlan = PrismaPlan

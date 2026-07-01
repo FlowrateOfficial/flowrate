@@ -27,7 +27,10 @@ function oauthHref(provider: 'google' | 'github') {
 </script>
 
 <template>
-  <div v-if="isOAuthConfigured" class="space-y-2">
+  <div
+    v-if="isOAuthConfigured"
+    class="space-y-2"
+  >
     <a
       :href="oauthHref('google')"
       class="flex w-full items-center justify-center gap-2 rounded-flow border border-flow-border/60 bg-flow-secondary/30 px-4 py-2.5 text-sm font-medium text-flow-ink transition-colors hover:bg-flow-secondary/60 dark:border-flow-border-dark/60 dark:bg-flow-secondary-dark/30 dark:text-flow-ink-dark dark:hover:bg-flow-secondary-dark/60"

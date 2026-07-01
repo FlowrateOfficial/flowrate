@@ -37,18 +37,27 @@ async function signOut() {
     <template #body>
       <div class="space-y-5 pb-4">
         <div class="flex items-center gap-3 rounded-xl bg-elevated p-4">
-          <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="lg" />
+          <UAvatar
+            :alt="user?.name ?? user?.email ?? 'U'"
+            size="lg"
+          />
           <div class="min-w-0">
             <p class="truncate text-base font-semibold">
               {{ user?.name ?? t('common.account') }}
             </p>
-            <p v-if="user?.email" class="truncate text-sm text-muted">
+            <p
+              v-if="user?.email"
+              class="truncate text-sm text-muted"
+            >
               {{ user.email }}
             </p>
           </div>
         </div>
 
-        <div v-if="menuNavItems.length" class="space-y-2">
+        <div
+          v-if="menuNavItems.length"
+          class="space-y-2"
+        >
           <p class="text-xs font-semibold uppercase tracking-wide text-muted">
             {{ t('dashboard.layout.allPages') }}
           </p>
@@ -61,7 +70,10 @@ async function signOut() {
               @pointerenter="prefetchRoute(item.to)"
               @click="goTo(item.to)"
             >
-              <UIcon :name="item.icon" class="size-4 shrink-0 text-primary" />
+              <UIcon
+                :name="item.icon"
+                class="size-4 shrink-0 text-primary"
+              />
               <span class="block min-w-0 flex-1 text-sm leading-snug line-clamp-2">{{ item.label }}</span>
             </button>
           </div>

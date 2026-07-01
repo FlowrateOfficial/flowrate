@@ -15,29 +15,20 @@ export default defineNuxtConfig({
       localeCookie: 'user-locale',
       translationDir: 'locales',
       strategy: 'no_prefix',
-      // NOTE - All copy in locales/en.json, en-GB.json (UK overrides), fr.json — per-page files broke merges
+      // NOTE - single locales/*.json per language (no per-page merges)
       disablePageLocales: true
     }]
   ],
-
-  devtools: {
-    enabled: true
-  },
 
   $production: {
     devtools: { enabled: false }
   },
 
-  css: ['~/assets/css/main.css'],
-
-  routeRules: {
-    '/': { prerender: true },
-    '/dashboard': { ssr: false },
-    '/dashboard/**': { ssr: false },
-    '/api/stripe/webhook': { cors: false },
-    '/api/plaid/webhook': { cors: false },
-    '/api/webhooks/neon-auth': { cors: false }
+  devtools: {
+    enabled: true
   },
+
+  css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
@@ -46,7 +37,7 @@ export default defineNuxtConfig({
     plaidClientId: process.env.PLAID_CLIENT_ID ?? '',
     plaidSecret: process.env.PLAID_SECRET ?? '',
     plaidEnv: process.env.PLAID_ENV ?? 'sandbox',
-    // Must match a URI registered at https://dashboard.plaid.com/team/api
+    // NOTE - Must match a URI registered at https://dashboard.plaid.com/team/api
     plaidRedirectUri: process.env.PLAID_REDIRECT_URI ?? '',
     plaidWebhookUrl: process.env.PLAID_WEBHOOK_URL ?? '',
     twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? '',
@@ -93,34 +84,16 @@ export default defineNuxtConfig({
     }
   },
 
-  hooks: {
-    'pages:extend'(pages) {
-      for (const page of pages) {
-        if (page.path?.startsWith('/dashboard')) {
-          page.meta ||= {}
-          page.meta.ssr = false
-        }
-      }
-    }
+  routeRules: {
+    '/': { prerender: true },
+    '/dashboard': { ssr: false },
+    '/dashboard/**': { ssr: false },
+    '/api/stripe/webhook': { cors: false },
+    '/api/plaid/webhook': { cors: false },
+    '/api/webhooks/neon-auth': { cors: false }
   },
 
   compatibilityDate: '2025-01-15',
-
-  icon: {
-    serverBundle: {
-      collections: ['lucide']
-    }
-  },
-
-  typescript: {
-    tsConfig: {
-      compilerOptions: {
-        paths: {
-          '~~/generated/prisma': ['../generated/prisma/client.ts']
-        }
-      }
-    }
-  },
 
   nitro: {
     externals: {
@@ -147,8 +120,29 @@ export default defineNuxtConfig({
         'vue-chartjs',
         'zod',
         'zod/v4/locales/en.js',
-        'zod/v4/locales/fr.js',
+        'zod/v4/locales/fr.js'
       ]
+    }
+  },
+
+  typescript: {
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          '~~/generated/prisma': ['../generated/prisma/client.ts']
+        }
+      }
+    }
+  },
+
+  hooks: {
+    'pages:extend'(pages) {
+      for (const page of pages) {
+        if (page.path?.startsWith('/dashboard')) {
+          page.meta ||= {}
+          page.meta.ssr = false
+        }
+      }
     }
   },
 
@@ -158,6 +152,12 @@ export default defineNuxtConfig({
         commaDangle: 'never',
         braceStyle: '1tbs'
       }
+    }
+  },
+
+  icon: {
+    serverBundle: {
+      collections: ['lucide']
     }
   }
 })

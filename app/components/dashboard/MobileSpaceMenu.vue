@@ -55,7 +55,9 @@ async function goToSpaces() {
               />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="truncate font-semibold">{{ item.name }}</p>
+              <p class="truncate font-semibold">
+                {{ item.name }}
+              </p>
               <p class="truncate text-sm text-muted">
                 {{ spacesStore.spaceType(item.type) }} · {{ spacesStore.roleLabel(item.role) }}
               </p>

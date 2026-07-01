@@ -82,12 +82,21 @@ useDashboardSeo('dashboard.accounts.title')
       icon="i-lucide-flask-conical"
     />
 
-    <DashboardSummaryStrip :items="displaySummary" :loading="pending" />
+    <DashboardSummaryStrip
+      :items="displaySummary"
+      :loading="pending"
+    />
 
-    <UCard v-if="!pending && !accounts.length" :ui="{ body: 'p-6 sm:p-8' }">
+    <UCard
+      v-if="!pending && !accounts.length"
+      :ui="{ body: 'p-6 sm:p-8' }"
+    >
       <div class="mx-auto max-w-md space-y-4 text-center">
         <div class="mx-auto flex size-12 items-center justify-center rounded-xl bg-elevated">
-          <UIcon name="i-lucide-landmark" class="size-6 text-muted" />
+          <UIcon
+            name="i-lucide-landmark"
+            class="size-6 text-muted"
+          />
         </div>
         <div class="space-y-1">
           <h2 class="text-lg font-semibold">
@@ -105,17 +114,26 @@ useDashboardSeo('dashboard.accounts.title')
     </UCard>
 
     <template v-else>
-      <UCard v-if="(isSharedSpace && !isTeenView) || accounts.length" :ui="{ body: 'p-3 sm:p-4' }">
+      <UCard
+        v-if="(isSharedSpace && !isTeenView) || accounts.length"
+        :ui="{ body: 'p-3 sm:p-4' }"
+      >
         <div class="space-y-3">
           <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <UFormField v-if="isSharedSpace && !isTeenView" :label="t('dashboard.accounts.filterLabel')">
+            <UFormField
+              v-if="isSharedSpace && !isTeenView"
+              :label="t('dashboard.accounts.filterLabel')"
+            >
               <USelect
                 v-model="visibilityFilter"
                 :items="visibilityItems"
                 class="w-full"
               />
             </UFormField>
-            <UFormField v-if="isSharedSpace && !isTeenView" :label="t('dashboard.accounts.connectOptions')">
+            <UFormField
+              v-if="isSharedSpace && !isTeenView"
+              :label="t('dashboard.accounts.connectOptions')"
+            >
               <USelect
                 v-model="connectVisibility"
                 :items="connectVisibilityItems"
@@ -145,16 +163,22 @@ useDashboardSeo('dashboard.accounts.title')
       </UCard>
 
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <UCard v-if="pending" v-for="i in 3" :key="`skeleton-${i}`" :ui="{ body: 'p-6' }">
-          <div class="animate-pulse space-y-4">
-            <div class="h-5 w-3/4 rounded-sm bg-elevated" />
-            <div class="h-10 w-1/2 rounded-sm bg-elevated/70" />
-          </div>
-        </UCard>
+        <template v-if="pending">
+          <UCard
+            v-for="i in 3"
+            :key="`skeleton-${i}`"
+            :ui="{ body: 'p-6' }"
+          >
+            <div class="animate-pulse space-y-4">
+              <div class="h-5 w-3/4 rounded-sm bg-elevated" />
+              <div class="h-10 w-1/2 rounded-sm bg-elevated/70" />
+            </div>
+          </UCard>
+        </template>
 
         <DashboardAccountCard
-          v-if="!pending"
           v-for="account in accounts"
+          v-else
           :key="account.id"
           :account="account"
         />

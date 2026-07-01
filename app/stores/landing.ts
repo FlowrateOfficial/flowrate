@@ -130,76 +130,76 @@ export const useLandingStore = defineStore('landing', () => {
 
     const cadence = pricingCadence.value === 'yearly' ? 'yearly' : 'monthly'
     const plans: LandingPlan[] = [
-    {
-      key: 'free',
-      name: t('landing.pricing.free.name'),
-      price: t('landing.pricing.free.price'),
-      target: t('landing.pricing.free.target'),
-      targetDetail: t('landing.pricing.free.targetDetail'),
-      bestFor: [
-        t('landing.pricing.free.bestFor.personal'),
-        t('landing.pricing.free.bestFor.starter'),
-        t('landing.pricing.free.bestFor.student')
-      ],
-      features: [
-        t('landing.pricing.free.features.space'),
-        t('landing.pricing.free.features.bank'),
-        t('landing.pricing.free.features.dashboard'),
-        t('landing.pricing.free.features.export')
-      ],
-      cta: t('landing.pricing.free.cta'),
-      to: '/auth/register',
-      highlight: false
-    },
-    {
-      key: 'pro',
-      name: t('landing.pricing.pro.name'),
-      price: proPricing.price,
-      period: proPricing.period,
-      yearlyNote: proPricing.yearlyNote,
-      target: t('landing.pricing.pro.target'),
-      targetDetail: t('landing.pricing.pro.targetDetail'),
-      bestFor: [
-        t('landing.pricing.pro.bestFor.freelancer'),
-        t('landing.pricing.pro.bestFor.founder'),
-        t('landing.pricing.pro.bestFor.couple')
-      ],
-      features: [
-        t('landing.pricing.pro.features.spaces'),
-        t('landing.pricing.pro.features.banks'),
-        t('landing.pricing.pro.features.shield'),
-        t('landing.pricing.pro.features.ai'),
-        t('landing.pricing.pro.features.teen'),
-        t('landing.pricing.pro.features.cloud')
-      ],
-      cta: t('landing.pricing.pro.cta'),
-      to: `/auth/register?plan=pro&billing=${cadence}`,
-      highlight: true
-    },
-    {
-      key: 'enterprise',
-      name: t('landing.pricing.enterprise.name'),
-      price: enterprisePricing.price,
-      period: enterprisePricing.period,
-      yearlyNote: enterprisePricing.yearlyNote,
-      target: t('landing.pricing.enterprise.target'),
-      targetDetail: t('landing.pricing.enterprise.targetDetail'),
-      bestFor: [
-        t('landing.pricing.enterprise.bestFor.team'),
-        t('landing.pricing.enterprise.bestFor.agency'),
-        t('landing.pricing.enterprise.bestFor.growing')
-      ],
-      features: [
-        t('landing.pricing.enterprise.features.pro'),
-        t('landing.pricing.enterprise.features.members'),
-        t('landing.pricing.enterprise.features.roles'),
-        t('landing.pricing.enterprise.features.audit'),
-        t('landing.pricing.enterprise.features.support')
-      ],
-      cta: t('landing.pricing.enterprise.cta'),
-      to: `/auth/register?plan=enterprise&billing=${cadence}`,
-      highlight: false
-    }
+      {
+        key: 'free',
+        name: t('landing.pricing.free.name'),
+        price: t('landing.pricing.free.price'),
+        target: t('landing.pricing.free.target'),
+        targetDetail: t('landing.pricing.free.targetDetail'),
+        bestFor: [
+          t('landing.pricing.free.bestFor.personal'),
+          t('landing.pricing.free.bestFor.starter'),
+          t('landing.pricing.free.bestFor.student')
+        ],
+        features: [
+          t('landing.pricing.free.features.space'),
+          t('landing.pricing.free.features.bank'),
+          t('landing.pricing.free.features.dashboard'),
+          t('landing.pricing.free.features.export')
+        ],
+        cta: t('landing.pricing.free.cta'),
+        to: '/auth/register',
+        highlight: false
+      },
+      {
+        key: 'pro',
+        name: t('landing.pricing.pro.name'),
+        price: proPricing.price,
+        period: proPricing.period,
+        yearlyNote: proPricing.yearlyNote,
+        target: t('landing.pricing.pro.target'),
+        targetDetail: t('landing.pricing.pro.targetDetail'),
+        bestFor: [
+          t('landing.pricing.pro.bestFor.freelancer'),
+          t('landing.pricing.pro.bestFor.founder'),
+          t('landing.pricing.pro.bestFor.couple')
+        ],
+        features: [
+          t('landing.pricing.pro.features.spaces'),
+          t('landing.pricing.pro.features.banks'),
+          t('landing.pricing.pro.features.shield'),
+          t('landing.pricing.pro.features.ai'),
+          t('landing.pricing.pro.features.teen'),
+          t('landing.pricing.pro.features.cloud')
+        ],
+        cta: t('landing.pricing.pro.cta'),
+        to: `/auth/register?plan=pro&billing=${cadence}`,
+        highlight: true
+      },
+      {
+        key: 'enterprise',
+        name: t('landing.pricing.enterprise.name'),
+        price: enterprisePricing.price,
+        period: enterprisePricing.period,
+        yearlyNote: enterprisePricing.yearlyNote,
+        target: t('landing.pricing.enterprise.target'),
+        targetDetail: t('landing.pricing.enterprise.targetDetail'),
+        bestFor: [
+          t('landing.pricing.enterprise.bestFor.team'),
+          t('landing.pricing.enterprise.bestFor.agency'),
+          t('landing.pricing.enterprise.bestFor.growing')
+        ],
+        features: [
+          t('landing.pricing.enterprise.features.pro'),
+          t('landing.pricing.enterprise.features.members'),
+          t('landing.pricing.enterprise.features.roles'),
+          t('landing.pricing.enterprise.features.audit'),
+          t('landing.pricing.enterprise.features.support')
+        ],
+        cta: t('landing.pricing.enterprise.cta'),
+        to: `/auth/register?plan=enterprise&billing=${cadence}`,
+        highlight: false
+      }
     ]
 
     return plans

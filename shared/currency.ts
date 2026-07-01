@@ -7,11 +7,11 @@ export interface LocaleCurrencyConfig {
   currency: DisplayCurrency
 }
 
-// NOTE - App locale code → Intl locale + default display currency
+// ANCHOR: App locale code → Intl locale + default display currency
 export const LOCALE_CURRENCY: Record<string, LocaleCurrencyConfig> = {
-  en: { intl: 'en-US', currency: 'USD' },
+  'en': { intl: 'en-US', currency: 'USD' },
   'en-GB': { intl: 'en-GB', currency: 'GBP' },
-  fr: { intl: 'fr-FR', currency: 'EUR' }
+  'fr': { intl: 'fr-FR', currency: 'EUR' }
 }
 
 const DEFAULT_LOCALE_CONFIG = LOCALE_CURRENCY.en!

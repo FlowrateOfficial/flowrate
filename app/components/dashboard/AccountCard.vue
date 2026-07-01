@@ -75,8 +75,15 @@ const syncStale = computed(() => {
           size="xl"
         />
         <div class="min-w-0">
-          <p class="truncate text-lg font-semibold">{{ account.name }}</p>
-          <p v-if="account.institution" class="truncate text-sm text-muted">{{ account.institution }}</p>
+          <p class="truncate text-lg font-semibold">
+            {{ account.name }}
+          </p>
+          <p
+            v-if="account.institution"
+            class="truncate text-sm text-muted"
+          >
+            {{ account.institution }}
+          </p>
         </div>
       </div>
       <UButton
@@ -92,7 +99,12 @@ const syncStale = computed(() => {
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2">
-      <UBadge :label="typeLabel(account.type)" color="neutral" variant="subtle" size="md" />
+      <UBadge
+        :label="typeLabel(account.type)"
+        color="neutral"
+        variant="subtle"
+        size="md"
+      />
       <UBadge
         v-if="account.visibility"
         :label="account.visibility === 'SHARED' ? t('dashboard.accounts.shared') : t('dashboard.accounts.personal')"
@@ -113,14 +125,24 @@ const syncStale = computed(() => {
       {{ fmt(account.balance, account.currency) }}
     </p>
 
-    <p v-if="account.syncedAt" class="mt-3 flex items-center gap-2 text-sm" :class="syncStale ? 'text-warning' : 'text-muted'">
-      <UIcon :name="syncStale ? 'i-lucide-alert-triangle' : 'i-lucide-refresh-cw'" class="size-4" />
+    <p
+      v-if="account.syncedAt"
+      class="mt-3 flex items-center gap-2 text-sm"
+      :class="syncStale ? 'text-warning' : 'text-muted'"
+    >
+      <UIcon
+        :name="syncStale ? 'i-lucide-alert-triangle' : 'i-lucide-refresh-cw'"
+        class="size-4"
+      />
       {{ syncStale
         ? t('dashboard.accounts.syncStale', { time: formatSynced(account.syncedAt) })
         : t('dashboard.accounts.synced', { time: formatSynced(account.syncedAt) })
       }}
     </p>
-    <p v-else class="mt-3 text-sm text-muted">
+    <p
+      v-else
+      class="mt-3 text-sm text-muted"
+    >
       {{ t('dashboard.accounts.notSynced') }}
     </p>
   </UCard>

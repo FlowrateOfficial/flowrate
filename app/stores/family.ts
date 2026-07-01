@@ -1,8 +1,6 @@
 // ANCHOR: Family store — members, children, splits, allowance
 import type { MemberFinancial, SpaceDetail } from '~/types/family'
 import type { TransactionRow } from '~/types/financial'
-
-export type { MemberFinancial, SpaceDetail, SpaceDetailMember } from '~/types/family'
 import { createSpaceScopedLoader } from '~/utils/store-fetch'
 import { createTransactionColumns } from '~/utils/table-columns'
 import { planHasFeature } from '#shared/plan-limits'
@@ -11,9 +9,10 @@ import { useActivePlan } from '~/composables/useActivePlan'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 
+export type { MemberFinancial, SpaceDetail, SpaceDetailMember } from '~/types/family'
+
 export const useFamilyStore = defineStore('family', () => {
   const { t, categoryLabel, formatCurrency, formatShortDateWithYear, roleLabel, memberStatusLabel } = useAppI18n()
-  const spacesStore = useSpacesStore()
   const appToast = useAppToast()
   const { api } = useApi()
   const activePlan = useActivePlan()
@@ -121,7 +120,7 @@ export const useFamilyStore = defineStore('family', () => {
         query: { view: detailView.value }
       })
     },
-    apply: data => { spaceDetail.value = data },
+    apply: (data) => { spaceDetail.value = data },
     clear: () => { spaceDetail.value = null },
     isCached: () => spaceDetail.value != null
   })
@@ -135,7 +134,7 @@ export const useFamilyStore = defineStore('family', () => {
     buildKey: spaceId => `member-financial:${spaceId}:${activeMemberId.value}`,
     fetch: spaceId =>
       api<MemberFinancial>(apiRoutes.spaces.memberFinancial(spaceId, activeMemberId.value)),
-    apply: data => { memberFinancial.value = data },
+    apply: (data) => { memberFinancial.value = data },
     clear: () => { memberFinancial.value = null },
     isCached: () => memberFinancial.value != null
   })

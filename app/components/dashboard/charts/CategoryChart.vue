@@ -60,7 +60,10 @@ const options = computed<ChartOptions<'doughnut'>>(() => ({
       class="relative h-full"
       :class="compact ? 'min-h-[100px]' : 'min-h-[200px]'"
     >
-      <Doughnut :data="chartData" :options="options" />
+      <Doughnut
+        :data="chartData"
+        :options="options"
+      />
       <div
         v-if="centerLabel"
         class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"

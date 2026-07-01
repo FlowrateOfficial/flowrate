@@ -8,13 +8,13 @@ defineProps<{
 }>()
 
 const maxWidthClass: Record<string, string> = {
-  md: 'max-w-3xl',
-  lg: 'max-w-4xl',
-  xl: 'max-w-5xl',
+  'md': 'max-w-3xl',
+  'lg': 'max-w-4xl',
+  'xl': 'max-w-5xl',
   '2xl': 'max-w-6xl',
   '6xl': 'max-w-6xl',
   '7xl': 'max-w-7xl',
-  full: 'max-w-360'
+  'full': 'max-w-360'
 }
 </script>
 

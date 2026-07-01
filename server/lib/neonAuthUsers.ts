@@ -34,8 +34,8 @@ export async function createNeonAuthEmailUser(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Origin: appOrigin,
-      Referer: `${appOrigin}/`,
+      'Origin': appOrigin,
+      'Referer': `${appOrigin}/`,
       'x-neon-auth-middleware': 'true'
     },
     body: JSON.stringify({

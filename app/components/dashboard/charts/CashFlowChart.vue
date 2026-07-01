@@ -84,7 +84,7 @@ const options = computed<ChartOptions<'line'>>(() => ({
       ticks: {
         color: theme.text.value,
         font: { family: 'Inter', size: 11 },
-        callback: (value) => formatAxis(value)
+        callback: value => formatAxis(value)
       }
     }
   }
@@ -93,6 +93,9 @@ const options = computed<ChartOptions<'line'>>(() => ({
 
 <template>
   <ClientOnly>
-    <Line :data="chartData" :options="options" />
+    <Line
+      :data="chartData"
+      :options="options"
+    />
   </ClientOnly>
 </template>

@@ -66,7 +66,7 @@ export function detectSubscriptionsFromTransactions(txs: TxLike[]): DetectedSubC
     if (!gaps.length) continue
     const avgGap = gaps.reduce((s, v) => s + v, 0) / gaps.length
 
-    let frequency: BudgetPeriod = ENUM.period.MONTHLY
+    let frequency: BudgetPeriod
     if (avgGap >= 25 && avgGap <= 35) frequency = ENUM.period.MONTHLY
     else if (avgGap >= 6 && avgGap <= 8) frequency = ENUM.period.WEEKLY
     else if (avgGap >= 350 && avgGap <= 380) frequency = ENUM.period.YEARLY

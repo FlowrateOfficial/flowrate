@@ -1,6 +1,6 @@
 import { formatPlanPeriod, formatPlanPrice, listStripePlans, buildStripePlanCatalog } from '../../lib/billing'
 import { requireStripe } from '../../lib/stripe'
-import { billingCurrencyFromRequest, localeFromRequest } from '../../utils/currency'
+import { localeFromRequest } from '../../utils/currency'
 import { currencyForLocale, intlLocaleFor } from '#shared/currency'
 
 // ANCHOR: Public Stripe plan catalog (cached 5 min) with locale currency display

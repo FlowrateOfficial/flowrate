@@ -1,5 +1,6 @@
 // ANCHOR: Space role/type helpers — shared by client and server
-import { ENUM, SpaceRole, SpaceType } from './prisma-enums'
+import type { SpaceRole, SpaceType } from './prisma-enums'
+import { ENUM } from './prisma-enums'
 
 export type { SpaceType, SpaceRole }
 

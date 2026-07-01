@@ -1,10 +1,10 @@
-// ANCHOR: Dashboard auth middleware — session, roles, route allowlists
+// ANCHOR: dashboard auth — session, roles, allowlists
 import { NEON_AUTH_SESSION_VERIFIER_PARAM } from '#shared/auth'
 
-// NOTE - Child routes: guardian-managed, no bank
+// NOTE - teen: guardian view, no bank link
 const CHILD_ALLOWED_PREFIXES = ['/dashboard/teen', '/dashboard/settings']
 
-// NOTE - Teen routes: own login, optional bank
+// NOTE - teen login routes
 const TEEN_ALLOWED_PREFIXES = [
   '/dashboard/teen',
   '/dashboard/accounts',
@@ -17,7 +17,7 @@ function isAllowedPath(path: string, prefixes: string[]) {
   return prefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`))
 }
 
-// NOTE - Guards /dashboard/*; OAuth verifier handled server-side
+// NOTE - /dashboard/* guard
 export default defineNuxtRouteMiddleware(async (to) => {
   const isDashboard = to.path === '/dashboard' || to.path.startsWith('/dashboard/')
 
@@ -33,7 +33,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const userStore = useUserStore()
   const spacesStore = useSpacesStore()
 
-  // NOTE - After first bootstrap, skip session round-trip on every navigation
+  // NOTE - skip session fetch after first bootstrap
   const sessionReady = userStore.bootstrapped && spacesStore.spaces.length > 0
 
   if (!sessionReady) {
@@ -57,7 +57,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     try {
       await userStore.fetchUser()
     } catch {
-      // NOTE - Profile fetch failed; layout retries
+      // NOTE - layout retries profile
     }
   }
 

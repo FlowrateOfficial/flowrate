@@ -1,4 +1,4 @@
-// ANCHOR: Page bootstrap — refetch store when space (or deps) change; lazy on client for instant nav
+// ANCHOR: refetch stores on space change (lazy client)
 import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 
@@ -18,7 +18,7 @@ export function useSpaceStoreFetch(
     },
     {
       watch: [spaceId, ...extraWatch.map(source => () => toValue(source))],
-      // NOTE - Render route immediately; stores expose pending for skeletons
+      // NOTE - render fast; stores show pending
       lazy: import.meta.client,
       dedupe: 'defer'
     }

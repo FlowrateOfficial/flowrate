@@ -186,6 +186,38 @@ docs/          Operational notes (e.g. feedback media branch)
 
 ---
 
+## CI & required status checks
+
+Every PR into **`feature`** or **`master`** runs [`.github/workflows/ci.yml`](./.github/workflows/ci.yml):
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm build` (with placeholder env — no secrets in GitHub Actions)
+
+GitHub Actions reports this as a **check** named **`CI / Build & verify`** on the PR (see [About status checks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks)).
+
+### One-time setup (maintainer)
+
+After the workflow has run at least once on the repo:
+
+1. **GitHub** → **FlowrateOfficial/flowrate** → **Settings** → **Branches**
+2. **Add branch protection rule** (or edit existing) for **`feature`**
+3. Enable **Require status checks to pass before merging**
+4. Search and tick **`CI / Build & verify`**
+5. Enable **Require branches to be up to date before merging** (recommended)
+6. Save
+
+Repeat for **`master`** if you want the same gate before production merges.
+
+Until the check is required, PRs can merge even when CI fails — the check still appears on the **Checks** tab so the team can see pass/fail.
+
+### If CI fails on your PR
+
+Open the PR → **Checks** tab → click the failed run → read the step log (`Lint`, `Typecheck`, `Test`, or `Build`). Fix locally, push again; the check re-runs automatically.
+
+---
+
 ## Environment variables
 
 Documented in **[`.env.example`](./.env.example)**. For local work, copy it to `.env.dev` or get a filled file from the team.

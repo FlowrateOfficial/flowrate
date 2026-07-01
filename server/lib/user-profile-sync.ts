@@ -23,9 +23,9 @@ async function updateNeonAuthUserName(event: H3Event, name: string): Promise<voi
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Origin: origin,
-      Referer: `${origin}/`,
-      Cookie: extractNeonAuthCookies(cookieHeader)
+      'Origin': origin,
+      'Referer': `${origin}/`,
+      'Cookie': extractNeonAuthCookies(cookieHeader)
     },
     body: JSON.stringify({ name })
   })

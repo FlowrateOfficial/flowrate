@@ -7,7 +7,6 @@ import {
 import { findAndLinkStripeCustomer, linkStripeCustomerToUser } from '../stripe'
 import { extractStripeId } from '../stripe/client'
 import { resolveUserIdFromStripeCustomer } from '../stripe/customer'
-import { formatPlanPrice, listStripePlans, resolveStripePriceId, type StripePlan } from './plans'
 import { ensureBillingProfile, getUserBillingSnapshot, setUserPlan } from './repository'
 
 const PAID_STRIPE_STATUSES = new Set<Stripe.Subscription.Status>(['active', 'trialing', 'past_due'])
@@ -95,7 +94,7 @@ export async function syncUserPlanFromStripe(
   const snapshot = await getUserBillingSnapshot(userId)
   if (!snapshot) return 'FREE'
 
-  let customerId = snapshot.customerId
+  const customerId = snapshot.customerId
     ?? await findAndLinkStripeCustomer(stripe, { id: userId, email: snapshot.email, name: snapshot.name })
 
   if (!customerId) {

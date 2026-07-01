@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
   const forgotSent = ref(false)
 
-  const inviteInfo = ref<{ spaceName: string; role: string; email: string } | null>(null)
+  const inviteInfo = ref<{ spaceName: string, role: string, email: string } | null>(null)
   const selectedPlan = ref<'free' | 'pro' | 'enterprise'>('free')
 
   const loginSchema = createLoginSchema()
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function loadInvite(token: string) {
     try {
-      const info = await $fetch<{ spaceName: string; role: string; email: string }>(`/api/invitations/${token}`)
+      const info = await $fetch<{ spaceName: string, role: string, email: string }>(`/api/invitations/${token}`)
       inviteInfo.value = info
       registerForm.email = info.email
     } catch {

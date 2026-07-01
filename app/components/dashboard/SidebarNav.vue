@@ -11,7 +11,10 @@ function linkClass(active: boolean) {
 </script>
 
 <template>
-  <nav class="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4" aria-label="Main">
+  <nav
+    class="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4"
+    aria-label="Main"
+  >
     <UButton
       v-for="item in navItems"
       :key="item.to"

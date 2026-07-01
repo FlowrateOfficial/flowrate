@@ -31,10 +31,15 @@ useSeoMeta({ title: () => t('auth.register.title') })
 <template>
   <div class="space-y-6">
     <header class="space-y-2">
-      <h1 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark">{{ t('auth.register.title') }}</h1>
+      <h1 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark">
+        {{ t('auth.register.title') }}
+      </h1>
       <p class="text-sm text-flow-muted dark:text-flow-muted-dark">
         {{ t('auth.register.hasAccount') }}
-        <NuxtLink to="/auth/login" class="text-charcoal dark:text-flow-ink-dark underline underline-offset-4">
+        <NuxtLink
+          to="/auth/login"
+          class="text-charcoal dark:text-flow-ink-dark underline underline-offset-4"
+        >
           {{ t('common.signIn') }}
         </NuxtLink>
       </p>
@@ -56,8 +61,13 @@ useSeoMeta({ title: () => t('auth.register.title') })
       />
     </header>
 
-    <div v-if="!inviteInfo" class="space-y-3">
-      <p class="text-sm font-medium text-flow-ink dark:text-flow-ink-dark">{{ t('auth.register.choosePlan') }}</p>
+    <div
+      v-if="!inviteInfo"
+      class="space-y-3"
+    >
+      <p class="text-sm font-medium text-flow-ink dark:text-flow-ink-dark">
+        {{ t('auth.register.choosePlan') }}
+      </p>
       <div class="grid gap-2 sm:grid-cols-3">
         <button
           v-for="option in [
@@ -73,8 +83,12 @@ useSeoMeta({ title: () => t('auth.register.title') })
             : 'border-flow-border/60 dark:border-flow-border-dark/60 hover:border-charcoal/40 dark:hover:border-flow-border-dark'"
           @click="selectedPlan = option.id as 'free' | 'pro' | 'enterprise'"
         >
-          <p class="text-sm font-medium text-flow-ink dark:text-flow-ink-dark">{{ option.title }}</p>
-          <p class="text-xs text-flow-muted dark:text-flow-muted-dark mt-1 leading-relaxed">{{ option.description }}</p>
+          <p class="text-sm font-medium text-flow-ink dark:text-flow-ink-dark">
+            {{ option.title }}
+          </p>
+          <p class="text-xs text-flow-muted dark:text-flow-muted-dark mt-1 leading-relaxed">
+            {{ option.description }}
+          </p>
         </button>
       </div>
       <div
@@ -109,36 +123,96 @@ useSeoMeta({ title: () => t('auth.register.title') })
       icon="i-lucide-mail"
     />
 
-    <UForm :schema="registerSchema" :state="registerForm" class="space-y-5" @submit="auth.register">
-      <UFormField :label="t('auth.register.name')" name="name" required>
-        <UInput v-model="registerForm.name" type="text" :placeholder="t('auth.register.namePlaceholder')" autocomplete="name" class="w-full" variant="outline" />
+    <UForm
+      :schema="registerSchema"
+      :state="registerForm"
+      class="space-y-5"
+      @submit="auth.register"
+    >
+      <UFormField
+        :label="t('auth.register.name')"
+        name="name"
+        required
+      >
+        <UInput
+          v-model="registerForm.name"
+          type="text"
+          :placeholder="t('auth.register.namePlaceholder')"
+          autocomplete="name"
+          class="w-full"
+          variant="outline"
+        />
       </UFormField>
 
-      <UFormField :label="t('auth.login.email')" name="email" required>
-        <UInput v-model="registerForm.email" type="email" :placeholder="t('auth.login.emailPlaceholder')" autocomplete="email" class="w-full" variant="outline" />
+      <UFormField
+        :label="t('auth.login.email')"
+        name="email"
+        required
+      >
+        <UInput
+          v-model="registerForm.email"
+          type="email"
+          :placeholder="t('auth.login.emailPlaceholder')"
+          autocomplete="email"
+          class="w-full"
+          variant="outline"
+        />
         <template #help>
           <span class="text-xs text-flow-muted dark:text-flow-muted-dark">{{ t('auth.register.verifyEmailHint') }}</span>
         </template>
       </UFormField>
 
-      <UFormField :label="t('auth.login.password')" name="password" required>
-        <UInput v-model="registerForm.password" type="password" :placeholder="t('auth.register.passwordPlaceholder')" autocomplete="new-password" class="w-full" variant="outline" />
+      <UFormField
+        :label="t('auth.login.password')"
+        name="password"
+        required
+      >
+        <UInput
+          v-model="registerForm.password"
+          type="password"
+          :placeholder="t('auth.register.passwordPlaceholder')"
+          autocomplete="new-password"
+          class="w-full"
+          variant="outline"
+        />
       </UFormField>
 
-      <UFormField :label="t('auth.register.confirmPassword')" name="confirmPassword" required>
-        <UInput v-model="registerForm.confirmPassword" type="password" :placeholder="t('auth.login.passwordPlaceholder')" autocomplete="new-password" class="w-full" variant="outline" />
+      <UFormField
+        :label="t('auth.register.confirmPassword')"
+        name="confirmPassword"
+        required
+      >
+        <UInput
+          v-model="registerForm.confirmPassword"
+          type="password"
+          :placeholder="t('auth.login.passwordPlaceholder')"
+          autocomplete="new-password"
+          class="w-full"
+          variant="outline"
+        />
       </UFormField>
 
-      <UFormField name="agreedToTerms" required>
+      <UFormField
+        name="agreedToTerms"
+        required
+      >
         <UCheckbox v-model="registerForm.agreedToTerms">
           <template #label>
             <span class="text-xs text-flow-muted dark:text-flow-muted-dark leading-relaxed">
               {{ t('auth.register.termsCheckboxPrefix') }}
-              <NuxtLink to="/terms" target="_blank" class="underline underline-offset-2 hover:text-flow-ink dark:hover:text-flow-ink-dark">
+              <NuxtLink
+                to="/terms"
+                target="_blank"
+                class="underline underline-offset-2 hover:text-flow-ink dark:hover:text-flow-ink-dark"
+              >
                 {{ t('auth.register.termsOfService') }}
               </NuxtLink>
               {{ t('auth.register.termsAnd') }}
-              <NuxtLink to="/privacy" target="_blank" class="underline underline-offset-2 hover:text-flow-ink dark:hover:text-flow-ink-dark">
+              <NuxtLink
+                to="/privacy"
+                target="_blank"
+                class="underline underline-offset-2 hover:text-flow-ink dark:hover:text-flow-ink-dark"
+              >
                 {{ t('auth.register.privacyPolicy') }}
               </NuxtLink>.
             </span>
@@ -162,9 +236,17 @@ useSeoMeta({ title: () => t('auth.register.title') })
 
     <p class="text-xs text-flow-muted dark:text-flow-muted-dark leading-relaxed text-center">
       {{ t('auth.register.termsPrefix') }}
-      <NuxtLink to="/terms" target="_blank" class="underline underline-offset-2">{{ t('auth.register.termsOfService') }}</NuxtLink>
+      <NuxtLink
+        to="/terms"
+        target="_blank"
+        class="underline underline-offset-2"
+      >{{ t('auth.register.termsOfService') }}</NuxtLink>
       {{ t('auth.register.termsAnd') }}
-      <NuxtLink to="/privacy" target="_blank" class="underline underline-offset-2">{{ t('auth.register.privacyPolicy') }}</NuxtLink>.
+      <NuxtLink
+        to="/privacy"
+        target="_blank"
+        class="underline underline-offset-2"
+      >{{ t('auth.register.privacyPolicy') }}</NuxtLink>.
     </p>
   </div>
 </template>

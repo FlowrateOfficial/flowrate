@@ -42,9 +42,16 @@ const items = computed(() => {
 </script>
 
 <template>
-  <UCard v-if="items.length" :ui="{ body: 'p-4 sm:p-5' }">
-    <h2 class="mb-3 text-base font-semibold">{{ t('dashboard.subscriptions.insightsTitle') }}</h2>
-    <p class="mb-4 text-sm text-muted">{{ t('dashboard.subscriptions.insightsSubtitle') }}</p>
+  <UCard
+    v-if="items.length"
+    :ui="{ body: 'p-4 sm:p-5' }"
+  >
+    <h2 class="mb-3 text-base font-semibold">
+      {{ t('dashboard.subscriptions.insightsTitle') }}
+    </h2>
+    <p class="mb-4 text-sm text-muted">
+      {{ t('dashboard.subscriptions.insightsSubtitle') }}
+    </p>
     <div class="flex flex-wrap gap-2">
       <UBadge
         v-for="item in items"

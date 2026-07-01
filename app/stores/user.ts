@@ -15,7 +15,7 @@ export const useUserStore = defineStore('user', () => {
   const { api } = useApi()
   const activePlan = useActivePlan()
 
-  const user = ref<{ id: string; name: string | null; email: string; phone?: string | null } | null>(null)
+  const user = ref<{ id: string, name: string | null, email: string, phone?: string | null } | null>(null)
   const billing = ref<UserProfile['billing']>(null)
   const phoneVerified = ref(false)
   const plan = ref<'FREE' | 'PRO' | 'ENTERPRISE'>('FREE')

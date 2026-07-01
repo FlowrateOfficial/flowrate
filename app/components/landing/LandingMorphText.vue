@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
 })
 
 const phrasesRef = computed(() => props.phrases)
-const { index, current, pick, stop } = useMorphCycle(phrasesRef, props.intervalMs)
+const { index, pick, stop } = useMorphCycle(phrasesRef, props.intervalMs)
 
 const displayIndex = computed(() =>
   props.activeIndex != null ? props.activeIndex : index.value
@@ -30,9 +30,19 @@ watch(() => props.activeIndex, (val) => {
 </script>
 
 <template>
-  <component :is="tag" class="landing-morph-text" aria-live="polite">
-    <Transition name="landing-morph" mode="out-in">
-      <span :key="displayText" class="landing-morph-text-inner">
+  <component
+    :is="tag"
+    class="landing-morph-text"
+    aria-live="polite"
+  >
+    <Transition
+      name="landing-morph"
+      mode="out-in"
+    >
+      <span
+        :key="displayText"
+        class="landing-morph-text-inner"
+      >
         {{ displayText }}
       </span>
     </Transition>

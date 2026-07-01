@@ -11,12 +11,17 @@ const shapes: Array<'circle' | 'triangle' | 'semicircle' | 'square'> = ['circle'
 </script>
 
 <template>
-  <LandingSection id="spaces" index="03">
+  <LandingSection
+    id="spaces"
+    index="03"
+  >
     <template #default>
       <div class="py-24 sm:py-32">
         <div class="grid lg:grid-cols-12 gap-12 mb-20 landing-section-intro">
           <div class="lg:col-span-7">
-            <p class="text-sm text-terracotta mb-4">03</p>
+            <p class="text-sm text-terracotta mb-4">
+              03
+            </p>
             <h2 class="text-display-section text-flow-ink dark:text-flow-ink-dark">
               {{ t('landing.spacesTitle') }}
             </h2>
@@ -36,7 +41,11 @@ const shapes: Array<'circle' | 'triangle' | 'semicircle' | 'square'> = ['circle'
             :class="i % 2 === 1 ? 'sm:mt-12' : ''"
             :style="{ '--stagger': `${i * 0.08}s` }"
           >
-            <BrandSpaceShape :shape="shapes[i]!" :size="40" class="mb-8 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+            <BrandSpaceShape
+              :shape="shapes[i]!"
+              :size="40"
+              class="mb-8 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+            />
             <h3 class="font-display text-2xl sm:text-3xl text-flow-ink dark:text-flow-ink-dark mb-4">
               {{ item.title }}
             </h3>

@@ -6,10 +6,15 @@ const enabled = computed(() => config.public.feedbackConfigured === true)
 </script>
 
 <template>
-  <UCard id="feedback" :ui="{ body: 'p-4 sm:p-5' }">
+  <UCard
+    id="feedback"
+    :ui="{ body: 'p-4 sm:p-5' }"
+  >
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="space-y-1">
-        <h2 class="text-base font-semibold">{{ t('dashboard.feedback.title') }}</h2>
+        <h2 class="text-base font-semibold">
+          {{ t('dashboard.feedback.title') }}
+        </h2>
         <p class="text-sm text-muted leading-relaxed">
           {{ t('dashboard.feedback.settingsTeaser') }}
         </p>

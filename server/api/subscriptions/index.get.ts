@@ -1,8 +1,4 @@
-import {
-  dismissSubscriptionAlert,
-  listSubscriptionsForSpace,
-  mergeDuplicateSubscriptions
-} from '../../lib/services/subscriptions.service'
+import { listSubscriptionsForSpace } from '../../lib/services/subscriptions.service'
 import { subscriptionListQuerySchema } from '../../lib/schemas/api'
 import { requireSpaceContext } from '../../lib/domain/http'
 import { respondWithPrivateCache } from '../../lib/http/cache'

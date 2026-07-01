@@ -20,7 +20,10 @@ const lastUpdated = computed(() => {
 </script>
 
 <template>
-  <AppBetaBadge show-hint class="mb-4" />
+  <AppBetaBadge
+    show-hint
+    class="mb-4"
+  />
 
   <slot name="see-also" />
 
@@ -34,8 +37,15 @@ const lastUpdated = computed(() => {
     {{ intro }}
   </p>
 
-  <div class="legal-beta-notice mb-10" role="note">
-    <UIcon name="i-lucide-triangle-alert" class="legal-beta-notice-icon" aria-hidden="true" />
+  <div
+    class="legal-beta-notice mb-10"
+    role="note"
+  >
+    <UIcon
+      name="i-lucide-triangle-alert"
+      class="legal-beta-notice-icon"
+      aria-hidden="true"
+    />
     <p class="text-sm leading-relaxed">
       {{ t('legal.betaNotice') }}
     </p>

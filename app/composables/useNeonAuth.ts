@@ -39,7 +39,7 @@ export function useNeonAuth() {
     try {
       if (import.meta.server) {
         const { api } = useApi()
-        return await api<{ user?: { id: string; email?: string; name?: string | null } | null; session?: unknown }>(
+        return await api<{ user?: { id: string, email?: string, name?: string | null } | null, session?: unknown }>(
           apiRoutes.auth.session,
           { noSpace: true }
         )
