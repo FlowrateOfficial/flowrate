@@ -7,4 +7,3 @@ export interface NeonAuthUser {
   createdAt: string
   updatedAt: string
 }
-

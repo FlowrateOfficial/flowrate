@@ -28,7 +28,10 @@ function fmt(amount: number) {
 </script>
 
 <template>
-  <div class="landing-hero-visual" aria-hidden="true">
+  <div
+    class="landing-hero-visual"
+    aria-hidden="true"
+  >
     <div class="landing-hero-visual-ambient" />
 
     <div class="landing-hero-window">
@@ -56,14 +59,23 @@ function fmt(amount: number) {
               class="landing-hero-sidebar-item"
               :class="icon === 'i-lucide-layout-dashboard' && 'is-active'"
             >
-              <UIcon :name="icon" class="size-3.5" />
+              <UIcon
+                :name="icon"
+                class="size-3.5"
+              />
             </span>
           </div>
         </aside>
 
         <div class="landing-hero-main min-w-0">
-          <Transition name="landing-scene" mode="out-in">
-            <div :key="scene.type" class="space-y-3">
+          <Transition
+            name="landing-scene"
+            mode="out-in"
+          >
+            <div
+              :key="scene.type"
+              class="space-y-3"
+            >
               <div class="flex items-center justify-between gap-2">
                 <div class="min-w-0">
                   <p class="text-[10px] uppercase tracking-wide text-muted">
@@ -74,7 +86,10 @@ function fmt(amount: number) {
                   </p>
                 </div>
                 <span class="landing-demo-space-badge shrink-0">
-                  <BrandSpaceShape :shape="scene.shape" :size="11" />
+                  <BrandSpaceShape
+                    :shape="scene.shape"
+                    :size="11"
+                  />
                   {{ scene.title }}
                 </span>
               </div>
@@ -86,7 +101,10 @@ function fmt(amount: number) {
                   class="landing-hero-stat"
                 >
                   <div class="flex items-center gap-1.5 mb-1.5">
-                    <UIcon :name="card.icon" class="size-3 text-muted shrink-0" />
+                    <UIcon
+                      :name="card.icon"
+                      class="size-3 text-muted shrink-0"
+                    />
                     <span class="text-[10px] text-muted truncate">{{ card.title }}</span>
                   </div>
                   <p class="text-sm font-semibold tabular-nums text-default truncate">
@@ -127,7 +145,10 @@ function fmt(amount: number) {
                 v-if="scene.subscription"
                 class="landing-hero-alert"
               >
-                <UIcon name="i-lucide-shield-alert" class="size-3.5 text-warning shrink-0" />
+                <UIcon
+                  name="i-lucide-shield-alert"
+                  class="size-3.5 text-warning shrink-0"
+                />
                 <span class="text-[10px] text-default truncate">
                   {{ scene.subscription.name }} — {{ fmt(scene.subscription.amount) }}/mo
                 </span>
@@ -146,7 +167,10 @@ function fmt(amount: number) {
           :class="demoActiveIndex === i && 'is-active'"
           tabindex="-1"
         >
-          <BrandSpaceShape :shape="shapes[i]!" :size="10" />
+          <BrandSpaceShape
+            :shape="shapes[i]!"
+            :size="10"
+          />
         </button>
       </div>
     </div>

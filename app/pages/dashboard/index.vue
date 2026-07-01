@@ -38,7 +38,10 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
 </script>
 
 <template>
-  <DashboardPageShell max-width="full" :show-guide="false">
+  <DashboardPageShell
+    max-width="full"
+    :show-guide="false"
+  >
     <DashboardPageHeader
       :title="t('dashboard.overview.title')"
       :description="t('dashboard.overview.subtitle', { name: spaceName })"
@@ -82,13 +85,19 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
             :spending="cashFlowSpending"
             :currency="summaryCurrency"
           />
-          <div v-else class="flex h-full items-center justify-center text-sm text-muted">
+          <div
+            v-else
+            class="flex h-full items-center justify-center text-sm text-muted"
+          >
             {{ t('dashboard.analytics.emptyDescription') }}
           </div>
         </DashboardChartsChartCard>
       </div>
 
-      <div v-if="showSaasShield" class="xl:col-span-4">
+      <div
+        v-if="showSaasShield"
+        class="xl:col-span-4"
+      >
         <DashboardChartsChartCard
           :title="t('dashboard.overview.saasShield')"
           :subtitle="t('dashboard.overview.saasShieldHint')"
@@ -101,9 +110,16 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
             :center-label="t('dashboard.overview.saasIssues')"
             :currency="summaryCurrency"
           />
-          <div v-else class="flex h-full flex-col items-center justify-center text-center">
-            <p class="text-2xl font-semibold tabular-nums">{{ saasShieldCenterValue }}</p>
-            <p class="mt-1 text-xs text-muted">{{ t('dashboard.overview.saasIssues') }}</p>
+          <div
+            v-else
+            class="flex h-full flex-col items-center justify-center text-center"
+          >
+            <p class="text-2xl font-semibold tabular-nums">
+              {{ saasShieldCenterValue }}
+            </p>
+            <p class="mt-1 text-xs text-muted">
+              {{ t('dashboard.overview.saasIssues') }}
+            </p>
           </div>
         </DashboardChartsChartCard>
       </div>
@@ -125,14 +141,19 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
               trailing-icon="i-lucide-arrow-right"
             />
           </div>
-          <DashboardTransactionList :transactions="recentTransactions" :loading="txLoading" />
+          <DashboardTransactionList
+            :transactions="recentTransactions"
+            :loading="txLoading"
+          />
         </UCard>
       </div>
 
       <div class="flex flex-col gap-4 lg:col-span-5">
         <UCard :ui="{ body: 'p-4 sm:p-5' }">
           <div class="mb-4 flex items-center justify-between gap-3">
-            <h2 class="text-base font-semibold">{{ t('dashboard.overview.accounts') }}</h2>
+            <h2 class="text-base font-semibold">
+              {{ t('dashboard.overview.accounts') }}
+            </h2>
             <UButton
               to="/dashboard/accounts"
               :label="t('common.manage')"
@@ -143,21 +164,36 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
             />
           </div>
 
-          <div v-if="!hasAccounts" class="py-6 text-center">
-            <UIcon name="i-lucide-landmark" class="mx-auto mb-2 size-7 text-muted opacity-40" />
-            <p class="mb-3 text-sm text-muted">{{ t('dashboard.overview.noAccounts') }}</p>
+          <div
+            v-if="!hasAccounts"
+            class="py-6 text-center"
+          >
+            <UIcon
+              name="i-lucide-landmark"
+              class="mx-auto mb-2 size-7 text-muted opacity-40"
+            />
+            <p class="mb-3 text-sm text-muted">
+              {{ t('dashboard.overview.noAccounts') }}
+            </p>
             <DashboardConnectBank size="md" />
           </div>
 
-          <ul v-else class="divide-y divide-default">
+          <ul
+            v-else
+            class="divide-y divide-default"
+          >
             <li
               v-for="acc in previewAccounts"
               :key="acc.id"
               class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
             >
               <div class="min-w-0">
-                <p class="truncate text-sm font-medium">{{ acc.name }}</p>
-                <p class="mt-0.5 truncate text-xs text-muted">{{ acc.subtitle }}</p>
+                <p class="truncate text-sm font-medium">
+                  {{ acc.name }}
+                </p>
+                <p class="mt-0.5 truncate text-xs text-muted">
+                  {{ acc.subtitle }}
+                </p>
               </div>
               <span class="shrink-0 text-sm font-semibold tabular-nums">
                 {{ acc.balanceLabel }}
@@ -166,10 +202,18 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
           </ul>
         </UCard>
 
-        <UCard v-if="showSaasUpgradeGate" :ui="{ body: 'p-4 sm:p-5', root: 'border-primary/30' }">
+        <UCard
+          v-if="showSaasUpgradeGate"
+          :ui="{ body: 'p-4 sm:p-5', root: 'border-primary/30' }"
+        >
           <div class="mb-3 flex items-center gap-2">
-            <UIcon name="i-lucide-lock" class="size-4 text-primary" />
-            <h2 class="text-base font-semibold">{{ t('dashboard.overview.saasUpgradeTitle') }}</h2>
+            <UIcon
+              name="i-lucide-lock"
+              class="size-4 text-primary"
+            />
+            <h2 class="text-base font-semibold">
+              {{ t('dashboard.overview.saasUpgradeTitle') }}
+            </h2>
           </div>
           <p class="mb-4 text-sm text-muted">
             {{ t('dashboard.overview.saasUpgradeDescription', { count: saasUpgradeAlertCount }) }}
@@ -182,13 +226,25 @@ await useSpaceStoreFetch('dashboard-overview', () => dashboardStore.fetchOvervie
           />
         </UCard>
 
-        <UCard v-else-if="showSaasShield && hasAlertSubs" :ui="{ body: 'p-4 sm:p-5', root: 'border-warning/30' }">
+        <UCard
+          v-else-if="showSaasShield && hasAlertSubs"
+          :ui="{ body: 'p-4 sm:p-5', root: 'border-warning/30' }"
+        >
           <div class="mb-3 flex items-center gap-2">
-            <UIcon name="i-lucide-shield-alert" class="size-4 text-warning" />
-            <h2 class="text-base font-semibold text-warning">{{ t('dashboard.overview.saasAlerts') }}</h2>
+            <UIcon
+              name="i-lucide-shield-alert"
+              class="size-4 text-warning"
+            />
+            <h2 class="text-base font-semibold text-warning">
+              {{ t('dashboard.overview.saasAlerts') }}
+            </h2>
           </div>
           <ul class="divide-y divide-default">
-            <li v-for="sub in previewAlertSubs" :key="sub.id" class="py-2.5 first:pt-0">
+            <li
+              v-for="sub in previewAlertSubs"
+              :key="sub.id"
+              class="py-2.5 first:pt-0"
+            >
               <DashboardSubscriptionCard :subscription="sub" />
             </li>
           </ul>

@@ -9,7 +9,7 @@ export default defineConfig({
     alias: {
       '#shared': resolve(__dirname, 'shared'),
       '~~': resolve(__dirname),
-      h3: require.resolve('h3')
+      'h3': require.resolve('h3')
     }
   },
   test: {

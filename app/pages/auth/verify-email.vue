@@ -96,8 +96,15 @@ async function resendCode() {
       :title="t('auth.verifyEmail.missingEmail')"
     />
 
-    <form v-else class="space-y-5" @submit.prevent="verifyEmail">
-      <UFormField :label="t('auth.verifyEmail.code')" required>
+    <form
+      v-else
+      class="space-y-5"
+      @submit.prevent="verifyEmail"
+    >
+      <UFormField
+        :label="t('auth.verifyEmail.code')"
+        required
+      >
         <UInput
           v-model="code"
           inputmode="numeric"
@@ -120,7 +127,10 @@ async function resendCode() {
       />
 
       <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
-        <NuxtLink to="/auth/login" class="text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark underline underline-offset-4">
+        <NuxtLink
+          to="/auth/login"
+          class="text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark underline underline-offset-4"
+        >
           {{ t('auth.verifyEmail.backToSignIn') }}
         </NuxtLink>
         <UButton

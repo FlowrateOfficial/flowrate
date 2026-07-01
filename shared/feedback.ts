@@ -1,4 +1,4 @@
-// ANCHOR: Feedback submission limits and GitHub issue comment anchors
+// ANCHOR: feedback limits + GitHub issue anchors
 
 export const FEEDBACK_ATTACH_PREFIX = 'flowrate-attach:'
 
@@ -33,28 +33,28 @@ export const FEEDBACK_VIDEO_TYPES = new Set([
   'video/x-m4v'
 ])
 
-// NOTE - Orphan branch for feedback media only — never merged into app code (see docs/feedback-issues-medias-branch.md)
+// NOTE - media on orphan branch issues_medias (never merged)
 export const FEEDBACK_MEDIA_BRANCH = 'issues_medias'
 
-// NOTE - DB list TTL before refreshing from GitHub
+// NOTE - list cache TTL
 export const FEEDBACK_SYNC_TTL_MS = 5 * 60 * 1000
 
-// NOTE - Max parallel GitHub syncs when refreshing stale
+// NOTE - parallel GitHub sync cap
 export const FEEDBACK_SYNC_CONCURRENCY = 5
 
-// NOTE - Max parallel uploads per new issue
+// NOTE - parallel upload cap per issue
 export const FEEDBACK_UPLOAD_CONCURRENCY = 4
 
 export type FeedbackType = 'review' | 'feature' | 'bug'
 
-// NOTE - Auto-applied label on every submission
+// NOTE - always applied
 export const FEEDBACK_AUTO_LABEL = 'from-app'
 
-// NOTE - User-selectable submission labels
+// NOTE - user-picked labels
 export const FEEDBACK_USER_LABELS = ['USER_BUG', 'USER_FEATURE'] as const
 export type FeedbackUserLabel = typeof FEEDBACK_USER_LABELS[number]
 
-// NOTE - Hidden UI labels for internal tracking
+// NOTE - hidden in UI
 export const FEEDBACK_HIDDEN_LABELS = new Set<string>([FEEDBACK_AUTO_LABEL])
 
 export const FEEDBACK_TYPE_USER_LABEL: Partial<Record<FeedbackType, FeedbackUserLabel>> = {
@@ -92,7 +92,7 @@ export interface FeedbackLabel {
   description?: string | null
 }
 
-// NOTE - Parse labelsJson (legacy string[] or GitHub objects)
+// NOTE - legacy labelsJson shapes
 export function feedbackDisplayLabelsFromJson(labelsJson: string): FeedbackLabel[] {
   try {
     const parsed = JSON.parse(labelsJson)
@@ -167,7 +167,7 @@ export function isFeedbackMimeType(mime: string): boolean {
   return FEEDBACK_IMAGE_TYPES.has(mime) || FEEDBACK_VIDEO_TYPES.has(mime)
 }
 
-// NOTE - Fix nested img markdown from attach token replacement
+// NOTE - fix nested img markdown after attach tokens
 export function repairFeedbackMarkdown(content: string): string {
   let result = content.trim()
   if (!result) return result
@@ -191,7 +191,7 @@ export function repairFeedbackMarkdown(content: string): string {
   return result
 }
 
-// NOTE - Normalize legacy media URLs to blob?raw=true
+// NOTE - normalize blob URLs to ?raw=true
 export function githubFeedbackAssetUrl(url: string): string {
   try {
     const parsed = new URL(url)
@@ -220,7 +220,7 @@ export function githubFeedbackAssetUrl(url: string): string {
   }
 }
 
-// NOTE - Proxy private blob URLs via /api/feedback/media
+// NOTE - proxy private blobs via /api/feedback/media
 export function githubFeedbackMediaProxyPath(url: string): string | null {
   try {
     const parsed = new URL(url)

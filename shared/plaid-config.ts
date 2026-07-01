@@ -1,12 +1,8 @@
-// ANCHOR: Plaid Link — shared EU bank connection config
-// NOTE - Dashboard: sandbox, keys, OAuth redirect URLs
-// NOTE - https://dashboard.plaid.com/developers/sandbox
-// NOTE - https://dashboard.plaid.com/developers/keys
-// NOTE - https://dashboard.plaid.com/team/api
+// ANCHOR: Plaid Link config (EU markets)
 export const PLAID_DOCS_URL = 'https://plaid.com/docs/'
 export const PLAID_SANDBOX_URL = 'https://dashboard.plaid.com/developers/sandbox'
 
-// NOTE - EU Plaid Link markets (ISO-3166-1 alpha-2)
+// NOTE - EU Link country codes
 export const PLAID_COUNTRY_CODES = [
   'FR', 'DE', 'ES', 'IT', 'NL', 'BE', 'GB', 'IE', 'PT', 'AT', 'FI', 'PL', 'DK', 'NO', 'SE'
 ] as const

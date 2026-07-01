@@ -2,8 +2,7 @@ import { requireSessionUser } from '../../lib/auth'
 import { requireStripe, findAndLinkStripeCustomer } from '../../lib/stripe'
 import {
   getStripeCustomerProfile,
-  reconcileStripeCustomerPhone,
-  attachDbPhoneToProfile
+  reconcileStripeCustomerPhone
 } from '../../lib/stripe/customer-profile'
 import { stripeInvoiceTemplateId, loadStripeUserContext } from '../../utils/stripeUser'
 

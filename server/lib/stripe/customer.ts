@@ -6,7 +6,7 @@ import {
   setStripeCustomerId,
   clearStripeCustomerId
 } from '../billing/repository'
-import { isLivemodeMismatch, isStaleStripeCustomer } from './errors'
+import { isStaleStripeCustomer } from './errors'
 import { stripeCustomerInvoiceSettings, verifiedPhoneForUser } from './customer-profile'
 import type { StripeUserRef } from './types'
 

@@ -74,7 +74,7 @@ export async function fetchStripeFxQuotes(
   const response = await fetch('https://api.stripe.com/v1/fx_quotes', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${secretKey}`,
+      'Authorization': `Bearer ${secretKey}`,
       'Stripe-Version': STRIPE_FX_API_VERSION,
       'Content-Type': 'application/x-www-form-urlencoded'
     },

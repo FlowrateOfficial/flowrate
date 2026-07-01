@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // ANCHOR: Renewal calendar — charge days highlighted, browse any month up to 12 mo
-import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
-import type { DateValue } from '@internationalized/date'
+import { getLocalTimeZone, today } from '@internationalized/date'
+import type { DateValue, CalendarDate } from '@internationalized/date'
 import type { RenewalCalendarResponse } from '#shared/api/subscriptions'
 import type { RenewalCalendarEvent } from '#shared/subscription-calendar'
 import { groupEventsByDate } from '#shared/subscription-calendar'
@@ -125,7 +125,10 @@ watch(placeholder, (month) => {
           <span class="size-2 rounded-full bg-primary" />
           {{ t('dashboard.subscriptions.calendarChargeDay') }}
         </span>
-        <span v-if="visibleMonthChargeCount" class="text-muted">
+        <span
+          v-if="visibleMonthChargeCount"
+          class="text-muted"
+        >
           {{ t('dashboard.subscriptions.calendarMonthCount', { count: visibleMonthChargeCount }) }}
         </span>
       </div>
@@ -135,8 +138,15 @@ watch(placeholder, (month) => {
     </div>
 
     <div class="min-w-0">
-      <div v-if="loading" class="space-y-2">
-        <USkeleton v-for="i in 4" :key="i" class="h-12 w-full rounded-lg" />
+      <div
+        v-if="loading"
+        class="space-y-2"
+      >
+        <USkeleton
+          v-for="i in 4"
+          :key="i"
+          class="h-12 w-full rounded-lg"
+        />
       </div>
 
       <template v-else-if="data?.events.length && selected">
@@ -144,12 +154,18 @@ watch(placeholder, (month) => {
           <h3 class="text-sm font-semibold">
             {{ t('dashboard.subscriptions.calendarDayTitle', { date: formatShortDate(selectedKey) }) }}
           </h3>
-          <p v-if="selectedEvents.length" class="text-sm font-semibold tabular-nums text-primary">
+          <p
+            v-if="selectedEvents.length"
+            class="text-sm font-semibold tabular-nums text-primary"
+          >
             {{ formatCurrency(selectedDayTotal, data?.currency ?? displayCurrency) }}
           </p>
         </div>
 
-        <ul v-if="selectedEvents.length" class="divide-y divide-default rounded-lg border border-default">
+        <ul
+          v-if="selectedEvents.length"
+          class="divide-y divide-default rounded-lg border border-default"
+        >
           <li
             v-for="event in selectedEvents"
             :key="`${event.subscriptionId}-${event.date}`"
@@ -168,7 +184,12 @@ watch(placeholder, (month) => {
             </span>
           </li>
         </ul>
-        <p v-else class="text-sm text-muted">{{ t('dashboard.subscriptions.calendarDayEmpty') }}</p>
+        <p
+          v-else
+          class="text-sm text-muted"
+        >
+          {{ t('dashboard.subscriptions.calendarDayEmpty') }}
+        </p>
       </template>
 
       <UEmpty

@@ -59,7 +59,7 @@ async function twilioVerifyRequest(
     {
       method: 'POST',
       headers: {
-        Authorization: `Basic ${twilioCredentials(twilio)}`,
+        'Authorization': `Basic ${twilioCredentials(twilio)}`,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: new URLSearchParams(body)
@@ -128,7 +128,7 @@ export async function sendSms(to: string, body: string): Promise<{ sid: string }
     {
       method: 'POST',
       headers: {
-        Authorization: `Basic ${twilioCredentials(twilio)}`,
+        'Authorization': `Basic ${twilioCredentials(twilio)}`,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: new URLSearchParams({

@@ -78,7 +78,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
   const { pending, load: fetchBudgets, reset } = createSpaceScopedLoader({
     buildKey: spaceId => `budgets:${spaceId}`,
     fetch: async () => api<BudgetItem[]>(apiRoutes.budgets.list),
-    apply: data => { budgets.value = data },
+    apply: (data) => { budgets.value = data },
     clear: () => { budgets.value = [] },
     isCached: () => budgets.value.length > 0
   })

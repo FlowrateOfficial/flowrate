@@ -46,7 +46,10 @@ const statusColor = computed(() => {
         />
         <span class="truncate text-sm font-medium">{{ budget.name }}</span>
       </div>
-      <div v-if="$slots.actions" class="flex shrink-0 items-center gap-0.5">
+      <div
+        v-if="$slots.actions"
+        class="flex shrink-0 items-center gap-0.5"
+      >
         <slot name="actions" />
       </div>
     </div>
@@ -63,7 +66,10 @@ const statusColor = computed(() => {
     />
     <p class="text-right text-xs text-muted">
       {{ t('dashboard.budgets.percentUsed', { percent: percentage }) }}
-      <span v-if="percentage >= 90" class="ml-1 font-medium text-error">{{ t('dashboard.budgets.overBudget') }}</span>
+      <span
+        v-if="percentage >= 90"
+        class="ml-1 font-medium text-error"
+      >{{ t('dashboard.budgets.overBudget') }}</span>
     </p>
   </div>
 </template>

@@ -1,3 +1,5 @@
+import type { TransactionListItem, TransactionListResponse } from '#shared/api/transactions'
+
 export interface AccountSummary {
   id: string
   name: string
@@ -16,8 +18,6 @@ export type {
   TransactionListItem,
   TransactionListResponse
 } from '#shared/api/transactions'
-
-import type { TransactionListItem, TransactionListResponse } from '#shared/api/transactions'
 
 export type TransactionRow = TransactionListItem
 export type TransactionsResponse = TransactionListResponse

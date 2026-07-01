@@ -1,4 +1,4 @@
-// ANCHOR: Prefetch dashboard data on nav hover for near-instant page opens
+// ANCHOR: prefetch dashboard routes on nav hover
 const prefetched = new Set<string>()
 
 export function useNavPrefetch() {

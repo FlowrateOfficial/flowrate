@@ -1,27 +1,27 @@
 import type { AppPlan } from './billing'
 
 export interface PlanLimits {
-  // NOTE - Max linked banks (Plaid + one Stripe FC); null = unlimited
+  // NOTE - max banks; null = unlimited
   bankConnections: number | null
-  // NOTE - Max active space memberships; null = unlimited
+  // NOTE - max spaces; null = unlimited
   spaces: number | null
-  // NOTE - Hours between manual syncs; 0 = no throttle
+  // NOTE - manual sync cooldown (hours); 0 = off
   manualSyncIntervalHours: number
-  // NOTE - Household/Family/Company spaces (Free = Independent only)
+  // NOTE - shared space types (HH/Family/Co)
   sharedSpaces: boolean
-  // NOTE - SaaS Shield, burn rate, runway, business metrics
+  // NOTE - SaaS Shield + company metrics
   saasShield: boolean
-  // NOTE - Teen / child login accounts
+  // NOTE - teen/child logins
   teenAccounts: boolean
-  // NOTE - Cloud and developer-tool spend breakdowns
+  // NOTE - cloud/dev spend breakdown
   cloudSpendTracking: boolean
-  // NOTE - Company team invites with roles
+  // NOTE - company team invites
   companyTeam: boolean
-  // NOTE - Max Company space members; null = N/A
+  // NOTE - max company members; null = n/a
   companyMemberLimit: number | null
-  // NOTE - Basic CSV export
+  // NOTE - CSV export
   csvExport: boolean
-  // NOTE - Audit-ready export with extra fields
+  // NOTE - audit CSV export
   auditExport: boolean
 }
 
@@ -67,14 +67,14 @@ export const PLAN_LIMITS: Record<AppPlan, PlanLimits> = {
   }
 }
 
-export type PlanFeature =
-  | 'sharedSpaces'
-  | 'saasShield'
-  | 'teenAccounts'
-  | 'cloudSpendTracking'
-  | 'companyTeam'
-  | 'auditExport'
-  | 'csvExport'
+export type PlanFeature
+  = | 'sharedSpaces'
+    | 'saasShield'
+    | 'teenAccounts'
+    | 'cloudSpendTracking'
+    | 'companyTeam'
+    | 'auditExport'
+    | 'csvExport'
 
 export function limitsForPlan(plan: AppPlan): PlanLimits {
   return PLAN_LIMITS[plan]

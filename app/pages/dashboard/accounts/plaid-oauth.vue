@@ -69,9 +69,17 @@ onMounted(async () => {
     />
 
     <UCard :ui="{ body: 'p-4 sm:p-5' }">
-      <div v-if="pending && !failed" class="flex items-center gap-3">
-        <UIcon name="i-lucide-loader-2" class="size-5 animate-spin text-muted" />
-        <p class="text-sm text-muted">{{ t('dashboard.accounts.plaidOAuthPending') }}</p>
+      <div
+        v-if="pending && !failed"
+        class="flex items-center gap-3"
+      >
+        <UIcon
+          name="i-lucide-loader-2"
+          class="size-5 animate-spin text-muted"
+        />
+        <p class="text-sm text-muted">
+          {{ t('dashboard.accounts.plaidOAuthPending') }}
+        </p>
       </div>
       <div v-else-if="failed">
         <UButton

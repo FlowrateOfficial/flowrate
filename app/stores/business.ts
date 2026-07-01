@@ -1,5 +1,4 @@
 // ANCHOR: Company store — burn rate overview + team invites
-import type { SummaryItem } from '~/components/dashboard/SummaryStrip.vue'
 import type { TeamMember } from '~/types/business'
 import type { BusinessOverview } from '~/types/dashboard'
 import { planHasFeature } from '#shared/plan-limits'
@@ -103,18 +102,18 @@ export const useBusinessStore = defineStore('business', () => {
 
   const { pending: overviewPending, load: fetchOverview, reset: resetOverview } = createSpaceScopedLoader({
     buildKey: spaceId => `biz-overview:${spaceId}`,
-    fetch: async (spaceId) => api<BusinessOverview>(apiRoutes.spaces.businessOverview(spaceId)),
-    apply: data => { overview.value = data },
+    fetch: async spaceId => api<BusinessOverview>(apiRoutes.spaces.businessOverview(spaceId)),
+    apply: (data) => { overview.value = data },
     clear: () => { overview.value = null },
     isCached: () => overview.value != null
   })
 
   const { pending: teamPending, load: fetchTeam, reset: resetTeam } = createSpaceScopedLoader({
     buildKey: spaceId => `biz-team:${spaceId}`,
-    fetch: async (spaceId) => api<{ members: TeamMember[] }>(apiRoutes.spaces.detail(spaceId), {
+    fetch: async spaceId => api<{ members: TeamMember[] }>(apiRoutes.spaces.detail(spaceId), {
       query: { view: 'team' }
     }),
-    apply: data => { teamMembers.value = data.members },
+    apply: (data) => { teamMembers.value = data.members },
     clear: () => { teamMembers.value = [] },
     isCached: () => teamMembers.value.length > 0
   })

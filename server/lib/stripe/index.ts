@@ -6,7 +6,6 @@ export {
 } from './client'
 
 export {
-  isLivemodeMismatch,
   throwStripeApiError
 } from './errors'
 

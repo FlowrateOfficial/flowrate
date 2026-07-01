@@ -6,7 +6,7 @@ export function isProrationLine(line: Stripe.InvoiceLineItem): boolean {
     || parent?.invoice_item_details?.proration === true
 }
 
-// NOTE - Net proration in cents
+// ANCHOR: Net proration in cents
 export function prorationNetCents(invoice: Stripe.Invoice): {
   amountCents: number
   hasProrationLines: boolean

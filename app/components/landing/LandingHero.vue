@@ -12,7 +12,6 @@ const featureStrip = computed(() => [
   { icon: 'i-lucide-user-round', label: t('landing.featureStrip.teen') },
   { icon: 'i-lucide-sparkles', label: t('landing.featureStrip.ai') }
 ])
-
 </script>
 
 <template>
@@ -43,16 +42,28 @@ const featureStrip = computed(() => [
             {{ t('landing.heroDescription') }}
           </p>
           <div class="flex flex-wrap gap-4 pt-2">
-            <NuxtLink to="/auth/register" class="btn-primary-editorial">
+            <NuxtLink
+              to="/auth/register"
+              class="btn-primary-editorial"
+            >
               {{ t('common.getStartedFree') }}
-              <UIcon name="i-lucide-arrow-right" class="w-4 h-4 stroke-[1.25]" />
+              <UIcon
+                name="i-lucide-arrow-right"
+                class="w-4 h-4 stroke-[1.25]"
+              />
             </NuxtLink>
-            <NuxtLink to="/#demo" class="btn-secondary-editorial">
+            <NuxtLink
+              to="/#demo"
+              class="btn-secondary-editorial"
+            >
               {{ t('landing.seeHow') }}
             </NuxtLink>
           </div>
           <p class="text-sm text-flow-muted dark:text-flow-muted-dark flex items-center gap-2 pt-2">
-            <UIcon name="i-lucide-check-circle" class="size-4 text-sage shrink-0" />
+            <UIcon
+              name="i-lucide-check-circle"
+              class="size-4 text-sage shrink-0"
+            />
             {{ t('landing.heroTrust') }}
           </p>
         </div>
@@ -69,7 +80,10 @@ const featureStrip = computed(() => [
             :key="item.label"
             class="flex items-center gap-3 text-flow-muted dark:text-flow-muted-dark"
           >
-            <UIcon :name="item.icon" class="w-4 h-4 stroke-[1.25] shrink-0" />
+            <UIcon
+              :name="item.icon"
+              class="w-4 h-4 stroke-[1.25] shrink-0"
+            />
             <span class="text-sm tracking-wide">{{ item.label }}</span>
           </div>
         </div>
@@ -82,7 +96,10 @@ const featureStrip = computed(() => [
       :aria-label="t('landing.scrollHint')"
     >
       <span class="text-xs tracking-[0.2em] uppercase text-flow-muted">{{ t('landing.scrollHint') }}</span>
-      <UIcon name="i-lucide-arrow-down" class="size-4 landing-scroll-arrow" />
+      <UIcon
+        name="i-lucide-arrow-down"
+        class="size-4 landing-scroll-arrow"
+      />
     </NuxtLink>
   </section>
 </template>

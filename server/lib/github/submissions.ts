@@ -1,7 +1,6 @@
 // ANCHOR: Feedback submission persistence + cached GitHub metadata
 
-import type { FeedbackType, FeedbackUserLabel } from '#shared/feedback'
-import type { FeedbackLabel } from '#shared/feedback'
+import type { FeedbackType, FeedbackUserLabel, FeedbackLabel } from '#shared/feedback'
 import { feedbackDisplayLabelsFromJson } from '#shared/feedback'
 import {
   isFeedbackSyncStale,

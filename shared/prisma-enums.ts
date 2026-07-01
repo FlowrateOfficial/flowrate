@@ -1,7 +1,4 @@
-// ANCHOR: Prisma enum constants — single source of truth from generated client
-// Use ENUM.subscription.PRICE_CHANGED instead of 'PRICE_CHANGED'
-
-export * from '../generated/prisma/enums'
+// ANCHOR: Prisma enums + ENUM groups (plan, space, role, member, …)
 
 import {
   Plan,
@@ -18,11 +15,8 @@ import {
   LinkProvider
 } from '../generated/prisma/enums'
 
-/**
- * Grouped Prisma enums — short keys, still readable.
- * plan · space · role · member · account · visibility · category · period
- * subscription · split · billing · link
- */
+export * from '../generated/prisma/enums'
+
 export const ENUM = {
   plan: Plan,
   space: SpaceType,
@@ -38,7 +32,7 @@ export const ENUM = {
   link: LinkProvider
 } as const
 
-/** All values of a Prisma enum object as a typed tuple (for Zod, filters, etc.) */
+// NOTE - enum object → typed value array
 export function enumValues<T extends Record<string, string>>(enumObj: T) {
   return Object.values(enumObj) as [T[keyof T], ...T[keyof T][]]
 }

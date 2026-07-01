@@ -1,1 +1,1 @@
-// Placeholder service worker — satisfies browser/extension requests without hitting the SPA router.
+// ANCHOR: Placeholder service worker — satisfies browser/extension requests without hitting the SPA router.

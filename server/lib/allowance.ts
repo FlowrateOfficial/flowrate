@@ -1,5 +1,6 @@
 // ANCHOR: Child allowance jar payouts
 import { ENUM } from '#shared/prisma-enums'
+
 export async function processAllowancePayouts(spaceId: string) {
   const profiles = await prisma.childProfile.findMany({
     where: {

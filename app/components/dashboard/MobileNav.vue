@@ -44,7 +44,10 @@ const isAccountActive = computed(() => {
           @pointerenter="onNavHover(item.to)"
           @focus="onNavHover(item.to)"
         >
-          <UIcon :name="item.icon" class="size-5 shrink-0 sm:size-6" />
+          <UIcon
+            :name="item.icon"
+            class="size-5 shrink-0 sm:size-6"
+          />
           <span class="mobile-nav-tab-label w-full text-center leading-tight">
             {{ item.label }}
           </span>
@@ -60,7 +63,11 @@ const isAccountActive = computed(() => {
           :title="t('common.account')"
           @click="openAccountMenu"
         >
-          <UAvatar :alt="user?.name ?? user?.email ?? 'U'" size="xs" class="size-5 shrink-0 sm:size-6" />
+          <UAvatar
+            :alt="user?.name ?? user?.email ?? 'U'"
+            size="xs"
+            class="size-5 shrink-0 sm:size-6"
+          />
           <span class="mobile-nav-tab-label w-full text-center leading-tight">
             {{ t('common.account') }}
           </span>
@@ -74,7 +81,11 @@ const isAccountActive = computed(() => {
         aria-hidden="true"
       >
         <div class="flex gap-1 px-2 py-2 safe-area-pb">
-          <div v-for="i in 5" :key="i" class="min-h-14 min-w-0 flex-1 rounded-lg bg-elevated/40" />
+          <div
+            v-for="i in 5"
+            :key="i"
+            class="min-h-14 min-w-0 flex-1 rounded-lg bg-elevated/40"
+          />
         </div>
       </nav>
     </template>

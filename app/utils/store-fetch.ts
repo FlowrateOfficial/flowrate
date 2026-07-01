@@ -1,7 +1,7 @@
-// ANCHOR: Pinia fetch helpers — dedupe, space scope, money fmt
+// ANCHOR: Pinia loaders — dedupe, space scope, money fmt
 import { clearEtagEntriesMatching, clearEtagStore } from '~/lib/api/etag-cache'
 
-// NOTE - Same cache key reuses one in-flight promise
+// NOTE - dedupe in-flight by cache key
 export function createStoreFetch() {
   let inflightKey = ''
   let inflight: Promise<unknown> | null = null
@@ -39,7 +39,7 @@ export interface SpaceScopedLoaderOptions<T> {
   etagBust?: (spaceId: string) => string
 }
 
-// NOTE - load/clear per space; pending ref; auto-reset on space switch
+// NOTE - per-space load; reset on space switch
 export function createSpaceScopedLoader<T>(options: SpaceScopedLoaderOptions<T>) {
   const { fetchOnce, cancelInflight } = createStoreFetch()
   const pending = ref(false)
@@ -81,7 +81,7 @@ export function createSpaceScopedLoader<T>(options: SpaceScopedLoaderOptions<T>)
     options.clear()
   }
 
-  // NOTE - Pre-fill from composite endpoints (e.g. dashboard overview)
+  // NOTE - seed from dashboard overview
   function seed(data: T, key?: string) {
     options.apply(data)
     const spaceId = useSpacesStore().space?.id

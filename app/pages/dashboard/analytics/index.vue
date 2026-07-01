@@ -65,7 +65,12 @@ useDashboardSeo('dashboard.analytics.title')
 
     <UCard :ui="{ body: 'p-3 sm:p-4' }">
       <UFormField :label="t('dashboard.analytics.periodLabel')">
-        <UTabs v-model="range" :items="rangeTabs" :content="false" class="w-full" />
+        <UTabs
+          v-model="range"
+          :items="rangeTabs"
+          :content="false"
+          class="w-full"
+        />
       </UFormField>
     </UCard>
 
@@ -96,8 +101,14 @@ useDashboardSeo('dashboard.analytics.title')
       />
     </div>
 
-    <UCard v-if="!pending && !hasData" :ui="{ body: 'p-6 sm:p-8 text-center' }">
-      <UIcon name="i-lucide-bar-chart-3" class="mx-auto mb-3 size-8 text-muted opacity-40" />
+    <UCard
+      v-if="!pending && !hasData"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
+      <UIcon
+        name="i-lucide-bar-chart-3"
+        class="mx-auto mb-3 size-8 text-muted opacity-40"
+      />
       <h3 class="mb-1 text-base font-semibold">
         {{ hasConnectedAccounts ? t('dashboard.analytics.emptyTitleConnected') : t('dashboard.analytics.emptyTitle') }}
       </h3>
@@ -117,7 +128,10 @@ useDashboardSeo('dashboard.analytics.title')
       </div>
     </UCard>
 
-    <div v-else class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <div
+      v-else
+      class="grid grid-cols-1 gap-4 xl:grid-cols-2"
+    >
       <DashboardChartsChartCard
         :title="t('dashboard.analytics.cashFlow')"
         :subtitle="t('dashboard.analytics.cashFlowHint')"
@@ -164,8 +178,13 @@ useDashboardSeo('dashboard.analytics.title')
       </DashboardChartsChartCard>
     </div>
 
-    <UCard v-if="data?.categories?.length" :ui="{ body: 'p-4 sm:p-5' }">
-      <h3 class="mb-3 text-base font-semibold">{{ t('dashboard.analytics.insightsTitle') }}</h3>
+    <UCard
+      v-if="data?.categories?.length"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h3 class="mb-3 text-base font-semibold">
+        {{ t('dashboard.analytics.insightsTitle') }}
+      </h3>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <UCard
           v-for="cat in data.categories.slice(0, 6)"
@@ -173,8 +192,12 @@ useDashboardSeo('dashboard.analytics.title')
           :ui="{ body: 'p-3 sm:p-4' }"
           variant="subtle"
         >
-          <p class="mb-0.5 text-xs font-medium text-muted">{{ analyticsStore.categoryLabel(cat.category) }}</p>
-          <p class="text-lg font-semibold tabular-nums">{{ analyticsStore.fmt(cat.amount) }}</p>
+          <p class="mb-0.5 text-xs font-medium text-muted">
+            {{ analyticsStore.categoryLabel(cat.category) }}
+          </p>
+          <p class="text-lg font-semibold tabular-nums">
+            {{ analyticsStore.fmt(cat.amount) }}
+          </p>
           <UProgress
             class="mt-2"
             :model-value="data.summary.spending > 0 ? (cat.amount / data.summary.spending) * 100 : 0"

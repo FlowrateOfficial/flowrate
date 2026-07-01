@@ -14,7 +14,10 @@ const props = withDefaults(defineProps<{
 </script>
 
 <template>
-  <span class="inline-flex items-center gap-2.5 shrink-0" :class="props.class">
+  <span
+    class="inline-flex items-center gap-2.5 shrink-0"
+    :class="props.class"
+  >
     <BrandFlowRateMark :size="markSize" />
     <span
       v-if="showWordmark"

@@ -28,25 +28,23 @@ export function normalizePhone(input: string): string | null {
   const digits = trimmed.replace(/\D/g, '')
   if (!digits) return null
 
-  let candidate: string | null = null
+  let candidate: string
 
   if (trimmed.startsWith('+')) {
     candidate = `+${digits}`
+  } else if (digits.length === 10 && digits.startsWith('0')) {
+    // NOTE - French local 0987765432 → +33987765432
+    candidate = `+33${digits.slice(1)}`
   } else if (digits.length === 10) {
     // NOTE - US 10-digit local → +1XXXXXXXXXX
     candidate = `+1${digits}`
   } else if (digits.length === 11 && digits.startsWith('1')) {
     candidate = `+${digits}`
-  } else if (digits.length === 10 && digits.startsWith('0')) {
-    // NOTE - French local 0987765432 → +33987765432
-    candidate = `+33${digits.slice(1)}`
   } else if (digits.length === 11 && digits.startsWith('33')) {
     candidate = `+${digits}`
   } else {
     candidate = `+${digits}`
   }
-
-  if (!candidate) return null
 
   candidate = stripTrunkZeroAfterCountryCode(candidate)
   return E164_REGEX.test(candidate) ? candidate : null

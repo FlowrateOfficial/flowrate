@@ -24,7 +24,7 @@ const { settingsPending } = storeToRefs(billingStore)
 
 const accountDeleteModalRef = ref<{ openModal: (email: string) => void } | null>(null)
 const userPrefs = useUserPreferences()
-const { prefs, pending: prefsPending, saving: prefsSaving } = userPrefs
+const { pending: prefsPending, saving: prefsSaving } = userPrefs
 
 const runtimeConfig = useRuntimeConfig()
 const emailNotificationsEnabled = computed(
@@ -134,11 +134,17 @@ async function savePreferences() {
     />
 
     <UCard :ui="{ body: 'p-4 sm:p-5' }">
-      <h2 class="mb-4 text-base font-semibold">{{ t('dashboard.settings.profile') }}</h2>
+      <h2 class="mb-4 text-base font-semibold">
+        {{ t('dashboard.settings.profile') }}
+      </h2>
 
       <div class="space-y-4">
         <UFormField :label="t('dashboard.settings.fullName')">
-          <UInput v-model="profileForm.name" :placeholder="t('dashboard.settings.namePlaceholder')" class="w-full" />
+          <UInput
+            v-model="profileForm.name"
+            :placeholder="t('dashboard.settings.namePlaceholder')"
+            class="w-full"
+          />
         </UFormField>
 
         <UFormField :label="t('dashboard.settings.email')">
@@ -165,7 +171,10 @@ async function savePreferences() {
           <template #help>
             <span>{{ t('dashboard.settings.phoneHelp') }}</span>
             <span class="block mt-1 text-xs text-muted">{{ t('dashboard.settings.phoneFormatHint') }}</span>
-            <span v-if="profileForm.phone" class="block mt-1">
+            <span
+              v-if="profileForm.phone"
+              class="block mt-1"
+            >
               <UBadge
                 v-if="phoneVerified"
                 :label="t('dashboard.settings.phoneVerified')"
@@ -222,20 +231,37 @@ async function savePreferences() {
       </div>
 
       <div class="mt-4 flex justify-end">
-        <UButton :label="t('dashboard.settings.saveChanges')" :loading="isSavingProfile" @click="saveProfile" />
+        <UButton
+          :label="t('dashboard.settings.saveChanges')"
+          :loading="isSavingProfile"
+          @click="saveProfile"
+        />
       </div>
     </UCard>
 
-    <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
-      <h2 class="mb-1 text-base font-semibold">{{ t('dashboard.settings.prefsTitle') }}</h2>
-      <p class="mb-4 text-sm text-muted">{{ t('dashboard.settings.prefsSubtitle') }}</p>
+    <UCard
+      v-if="!isMinor"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h2 class="mb-1 text-base font-semibold">
+        {{ t('dashboard.settings.prefsTitle') }}
+      </h2>
+      <p class="mb-4 text-sm text-muted">
+        {{ t('dashboard.settings.prefsSubtitle') }}
+      </p>
 
-      <div v-if="prefsPending" class="space-y-3">
+      <div
+        v-if="prefsPending"
+        class="space-y-3"
+      >
         <USkeleton class="h-10 w-full" />
         <USkeleton class="h-10 w-full" />
       </div>
 
-      <div v-else class="space-y-4">
+      <div
+        v-else
+        class="space-y-4"
+      >
         <UAlert
           v-if="!emailNotificationsEnabled"
           color="neutral"
@@ -262,7 +288,9 @@ async function savePreferences() {
             step="1"
             class="w-full max-w-xs"
           />
-          <template #help>{{ t('dashboard.settings.subscriptionCapHelp') }}</template>
+          <template #help>
+            {{ t('dashboard.settings.subscriptionCapHelp') }}
+          </template>
         </UFormField>
         <div class="flex justify-end">
           <UButton
@@ -276,8 +304,13 @@ async function savePreferences() {
 
     <DashboardFeedbackPanel />
 
-    <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
-      <h2 class="mb-4 text-base font-semibold">{{ t('dashboard.settings.stripeCustomerTitle') }}</h2>
+    <UCard
+      v-if="!isMinor"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
+      <h2 class="mb-4 text-base font-semibold">
+        {{ t('dashboard.settings.stripeCustomerTitle') }}
+      </h2>
       <ClientOnly>
         <DashboardStripeCustomerForm />
         <template #fallback>
@@ -286,9 +319,14 @@ async function savePreferences() {
       </ClientOnly>
     </UCard>
 
-    <UCard v-if="!isMinor" :ui="{ body: 'p-4 sm:p-5' }">
+    <UCard
+      v-if="!isMinor"
+      :ui="{ body: 'p-4 sm:p-5' }"
+    >
       <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-base font-semibold">{{ t('dashboard.settings.planBilling') }}</h2>
+        <h2 class="text-base font-semibold">
+          {{ t('dashboard.settings.planBilling') }}
+        </h2>
         <AppBetaBadge size="sm" />
       </div>
 
@@ -299,12 +337,17 @@ async function savePreferences() {
     </UCard>
 
     <UCard :ui="{ body: 'p-4 sm:p-5' }">
-      <h2 class="mb-3 text-base font-semibold text-error">{{ t('dashboard.settings.dangerZone') }}</h2>
+      <h2 class="mb-3 text-base font-semibold text-error">
+        {{ t('dashboard.settings.dangerZone') }}
+      </h2>
       <p class="text-sm text-muted mb-4">
         {{ t('dashboard.settings.deleteWarning') }}
       </p>
       <p class="text-xs text-muted mb-4">
-        <NuxtLink to="/privacy" class="text-primary hover:underline">{{ t('common.privacy') }}</NuxtLink>
+        <NuxtLink
+          to="/privacy"
+          class="text-primary hover:underline"
+        >{{ t('common.privacy') }}</NuxtLink>
       </p>
       <UButton
         :label="t('dashboard.settings.deleteAccount')"

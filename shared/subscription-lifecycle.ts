@@ -5,13 +5,13 @@ import { missedRenewalGraceDays } from './subscription-alerts'
 
 const MS_PER_DAY = 86_400_000
 
-export type SubscriptionLifecycleEvent =
-  | 'missed_renewal'
-  | 'likely_cancelled'
-  | 'resumed'
-  | 'price_increase'
-  | 'price_decrease'
-  | 'new'
+export type SubscriptionLifecycleEvent
+  = | 'missed_renewal'
+    | 'likely_cancelled'
+    | 'resumed'
+    | 'price_increase'
+    | 'price_decrease'
+    | 'new'
 
 export function periodDays(frequency: BudgetPeriod | string): number {
   switch (frequency) {
@@ -36,10 +36,10 @@ export function daysSinceExpectedCharge(nextCharge: Date, now = Date.now()): num
   return Math.max(0, Math.floor((now - nextCharge.getTime()) / MS_PER_DAY))
 }
 
-export type StaleSubscriptionResolution =
-  | { action: 'none' }
-  | { action: 'missed_renewal', status: typeof ENUM.subscription.PAUSED, alert: true }
-  | { action: 'likely_cancelled', status: typeof ENUM.subscription.CANCELLED, alert: true }
+export type StaleSubscriptionResolution
+  = | { action: 'none' }
+    | { action: 'missed_renewal', status: typeof ENUM.subscription.PAUSED, alert: true }
+    | { action: 'likely_cancelled', status: typeof ENUM.subscription.CANCELLED, alert: true }
 
 export function resolveStaleSubscription(
   frequency: BudgetPeriod | string,

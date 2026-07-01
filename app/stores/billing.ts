@@ -1,7 +1,7 @@
 import type { AppPlan } from '#shared/billing'
 import { matchStripePlan } from '#shared/billing-plans'
 import { convertWithPresentmentMarkup } from '#shared/fx'
-import type { UserBillingInfo, UserProfile } from '~/types/user'
+import type { UserBillingInfo } from '~/types/user'
 import { apiRoutes } from '~/lib/api/endpoints'
 import { useApi } from '~/lib/api/useApi'
 

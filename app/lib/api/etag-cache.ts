@@ -1,4 +1,4 @@
-// ANCHOR: Client-side ETag cache for conditional GET requests
+// ANCHOR: client ETag cache for GET dedupe
 const MAX_ENTRIES = 128
 
 interface EtagEntry {
@@ -33,7 +33,7 @@ export function clearEtagStore() {
   store.clear()
 }
 
-/** Drop cached GETs whose key contains a fragment (e.g. space id or route path). */
+// NOTE - bust cache keys matching fragment
 export function clearEtagEntriesMatching(matcher: string | ((key: string) => boolean)) {
   const test = typeof matcher === 'string'
     ? (key: string) => key.includes(matcher)

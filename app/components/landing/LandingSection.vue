@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   id?: string
   index?: string
   labelClass?: string
@@ -21,7 +21,11 @@ const { target, visible } = useScrollReveal(0.08)
   >
     <slot name="background" />
     <UContainer class="relative min-w-0 max-w-full overflow-x-clip">
-      <slot :visible="visible" :index="index" :label-class="labelClass" />
+      <slot
+        :visible="visible"
+        :index="index"
+        :label-class="labelClass"
+      />
     </UContainer>
   </section>
 </template>

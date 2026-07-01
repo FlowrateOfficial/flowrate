@@ -32,7 +32,10 @@ useDashboardSeo('dashboard.budgets.title')
 </script>
 
 <template>
-  <DashboardPageShell max-width="xl" :show-guide="false">
+  <DashboardPageShell
+    max-width="xl"
+    :show-guide="false"
+  >
     <DashboardPageHeader
       :title="t('dashboard.budgets.title')"
       :description="subtitle"
@@ -55,9 +58,15 @@ useDashboardSeo('dashboard.budgets.title')
       icon="i-lucide-alert-triangle"
     />
 
-    <DashboardSummaryStrip :items="summaryItems" :loading="pending" />
+    <DashboardSummaryStrip
+      :items="summaryItems"
+      :loading="pending"
+    />
 
-    <UCard v-if="!pending && !budgets.length" :ui="{ body: 'p-6 sm:p-8 text-center' }">
+    <UCard
+      v-if="!pending && !budgets.length"
+      :ui="{ body: 'p-6 sm:p-8 text-center' }"
+    >
       <UEmpty
         icon="i-lucide-pie-chart"
         :title="t('dashboard.budgets.emptyTitle')"
@@ -74,8 +83,15 @@ useDashboardSeo('dashboard.budgets.title')
       </UEmpty>
     </UCard>
 
-    <div v-else class="grid gap-3 sm:grid-cols-2">
-      <UCard v-for="budget in budgets" :key="budget.id" :ui="{ body: 'p-4 sm:p-5' }">
+    <div
+      v-else
+      class="grid gap-3 sm:grid-cols-2"
+    >
+      <UCard
+        v-for="budget in budgets"
+        :key="budget.id"
+        :ui="{ body: 'p-4 sm:p-5' }"
+      >
         <DashboardBudgetProgress :budget="budget">
           <template #actions>
             <UButton
@@ -107,16 +123,35 @@ useDashboardSeo('dashboard.budgets.title')
       <template #body>
         <div class="space-y-4">
           <UFormField :label="t('dashboard.budgets.nameLabel')">
-            <UInput v-model="budgetsStore.newBudget.name" :placeholder="t('dashboard.budgets.namePlaceholder')" class="w-full" />
+            <UInput
+              v-model="budgetsStore.newBudget.name"
+              :placeholder="t('dashboard.budgets.namePlaceholder')"
+              class="w-full"
+            />
           </UFormField>
           <UFormField :label="t('dashboard.budgets.categoryLabel')">
-            <USelect v-model="budgetsStore.newBudget.category" :items="budgetsStore.categoryItems" class="w-full" />
+            <USelect
+              v-model="budgetsStore.newBudget.category"
+              :items="budgetsStore.categoryItems"
+              class="w-full"
+            />
           </UFormField>
           <UFormField :label="t('dashboard.budgets.limitLabel')">
-            <UInput v-model="budgetsStore.newBudget.amount" type="number" placeholder="0.00" min="0" step="0.01" class="w-full" />
+            <UInput
+              v-model="budgetsStore.newBudget.amount"
+              type="number"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              class="w-full"
+            />
           </UFormField>
           <UFormField :label="t('dashboard.budgets.periodLabel')">
-            <USelect v-model="budgetsStore.newBudget.period" :items="budgetsStore.periodItems" class="w-full" />
+            <USelect
+              v-model="budgetsStore.newBudget.period"
+              :items="budgetsStore.periodItems"
+              class="w-full"
+            />
           </UFormField>
           <UCheckbox
             v-model="budgetsStore.newBudget.isShared"
@@ -126,7 +161,12 @@ useDashboardSeo('dashboard.budgets.title')
       </template>
       <template #footer>
         <div class="flex justify-end gap-2">
-          <UButton :label="t('common.cancel')" color="neutral" variant="ghost" @click="budgetsStore.closeModal()" />
+          <UButton
+            :label="t('common.cancel')"
+            color="neutral"
+            variant="ghost"
+            @click="budgetsStore.closeModal()"
+          />
           <UButton
             :label="isEditing ? t('common.save') : t('dashboard.budgets.createBudget')"
             :loading="isSaving"

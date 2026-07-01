@@ -22,17 +22,31 @@ onMounted(() => {
 <template>
   <div class="space-y-6">
     <header class="space-y-2">
-      <h1 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark">{{ t('auth.login.title') }}</h1>
+      <h1 class="font-display text-2xl text-flow-ink dark:text-flow-ink-dark">
+        {{ t('auth.login.title') }}
+      </h1>
       <p class="text-sm text-flow-muted dark:text-flow-muted-dark">
         {{ t('auth.login.noAccount') }}
-        <NuxtLink to="/auth/register" class="text-charcoal dark:text-flow-ink-dark underline underline-offset-4">
+        <NuxtLink
+          to="/auth/register"
+          class="text-charcoal dark:text-flow-ink-dark underline underline-offset-4"
+        >
           {{ t('auth.login.createFree') }}
         </NuxtLink>
       </p>
     </header>
 
-    <UForm :schema="loginSchema" :state="loginForm" class="space-y-5" @submit="auth.login">
-      <UFormField :label="t('auth.login.email')" name="email" required>
+    <UForm
+      :schema="loginSchema"
+      :state="loginForm"
+      class="space-y-5"
+      @submit="auth.login"
+    >
+      <UFormField
+        :label="t('auth.login.email')"
+        name="email"
+        required
+      >
         <UInput
           v-model="loginForm.email"
           type="email"
@@ -43,7 +57,11 @@ onMounted(() => {
         />
       </UFormField>
 
-      <UFormField :label="t('auth.login.password')" name="password" required>
+      <UFormField
+        :label="t('auth.login.password')"
+        name="password"
+        required
+      >
         <UInput
           v-model="loginForm.password"
           type="password"
@@ -55,7 +73,10 @@ onMounted(() => {
       </UFormField>
 
       <div class="flex justify-end">
-        <NuxtLink to="/auth/forgot-password" class="text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors">
+        <NuxtLink
+          to="/auth/forgot-password"
+          class="text-sm text-flow-muted dark:text-flow-muted-dark hover:text-flow-ink dark:hover:text-flow-ink-dark transition-colors"
+        >
           {{ t('auth.login.forgotPassword') }}
         </NuxtLink>
       </div>
